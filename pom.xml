@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>farao-parent-ws</artifactId>
+        <groupId>com.farao-community.farao</groupId>
+        <version>1.4.0</version>
+    </parent>
+
+    <artifactId>gridcapa-swe</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>GridCapa SWE</name>
+    <description>A full suite to perform capacity calculations on SWE zone</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>gridcapa-swe-runner-spring-boot-starter</module>
+        <module>gridcapa-swe-runner-api</module>
+        <module>gridcapa-swe-runner-app</module>
+    </modules>
+
+    <scm>
+        <connection>scm:git:https://github.com/farao-community/gridcapa-swe.git</connection>
+        <developerConnection>scm:git:https://github.com/farao-community/gridcapa-swe.git</developerConnection>
+        <url>https://github.com/farao-community/gridcapa-swe.git</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>Mozilla Public License, Version 2.0</name>
+            <url>https://www.mozilla.org/en-US/MPL/2.0/</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Theo PASCOLI</name>
+            <email>theo.pascoli@rte-france.com</email>
+            <organization>RTE</organization>
+            <organizationUrl>http://www.rte-france.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <properties>
+        <farao.dependencies.version>1.4.0</farao.dependencies.version>
+        <gridcapa.task-manager.version>1.6.0</gridcapa.task-manager.version>
+        <jackson.datatype.version>2.13.4</jackson.datatype.version>
+        <jsonapi.converter.version>0.11</jsonapi.converter.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Compile dependencies -->
+            <dependency>
+                <groupId>com.farao-community.farao</groupId>
+                <artifactId>gridcapa-task-manager-api</artifactId>
+                <version>${gridcapa.task-manager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.datatype.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jasminb</groupId>
+                <artifactId>jsonapi-converter</artifactId>
+                <version>${jsonapi.converter.version}</version>
+            </dependency>
+
+            <!-- IMPORTED DEPENDENCIES -->
+            <dependency>
+                <groupId>com.farao-community.farao</groupId>
+                <artifactId>farao-dependencies</artifactId>
+                <version>${farao.dependencies.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
