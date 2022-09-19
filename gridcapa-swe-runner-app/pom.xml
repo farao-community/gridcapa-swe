@@ -6,12 +6,13 @@
     <parent>
         <artifactId>gridcapa-swe</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1</version>
     </parent>
 
     <artifactId>gridcapa-swe-runner-app</artifactId>
     <name>GridCapa SWE runner application</name>
     <description>Application that performs capacity calculation on SWE zone</description>
+    <version>0.1</version>
     <packaging>jar</packaging>
 
     <build>
@@ -19,6 +20,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -38,8 +47,22 @@
             <artifactId>gridcapa-task-manager-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>

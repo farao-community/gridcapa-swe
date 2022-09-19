@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>GridCapa SWE</name>
     <description>A full suite to perform capacity calculations on SWE zone</description>
     <packaging>pom</packaging>
@@ -48,6 +48,7 @@
         <gridcapa.task-manager.version>1.6.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
+        <logstash.version>7.0.1</logstash.version>
     </properties>
 
     <dependencyManagement>
@@ -67,6 +68,12 @@
                 <groupId>com.github.jasminb</groupId>
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash.version}</version>
+                <scope>runtime</scope>
             </dependency>
 
             <!-- IMPORTED DEPENDENCIES -->

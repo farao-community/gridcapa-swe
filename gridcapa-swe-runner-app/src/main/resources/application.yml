@@ -1,3 +1,34 @@
+logback:
+  amqp:
+    exchange: task-manager-logs-exchange
+    routing-key: "#"
+
 spring:
   banner:
     location: banner.txt
+  application:
+    name: swe-idcc-runner
+    rabbitmq:
+      host: localhost
+      port: 5672
+      username: gridcapa
+      password: gridcapa
+      template:
+        reply-timeout: 2400000
+
+swe-runner:
+  async-time-out: 600000 # 10min (10*60*1000)
+  bindings:
+    request:
+      destination: swe-idcc-request
+      routing-key: "#"
+    response:
+      destination: swe-idcc-response
+      expiration: 600000
+
+minio-adapter:
+  bucket: gridcapa
+  base-path: SWE/IDCC
+  access-key: gridcapa
+  secret-key: gridcapa
+  url: http://localhost:9000/

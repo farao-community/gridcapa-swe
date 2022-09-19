@@ -25,6 +25,8 @@ public class SweClientAutoConfiguration {
 
     @Bean
     public SweClient sweClient(AmqpTemplate amqpTemplate) {
+        System.out.println("PLFDFD");
         return new SweClient(amqpTemplate, clientProperties);
     }
+
 }

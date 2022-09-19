@@ -3,15 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>gridcapa-swe</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1</version>
     </parent>
 
     <artifactId>gridcapa-swe-runner-api</artifactId>
     <name>GridCapa SWE runner API</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <description>Client API to gridcapa swe process</description>
     <packaging>jar</packaging>
 
@@ -23,6 +24,10 @@
         <dependency>
             <groupId>com.github.jasminb</groupId>
             <artifactId>jsonapi-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
