@@ -45,7 +45,7 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <farao.dependencies.version>1.4.0</farao.dependencies.version>
+        <farao.dependencies.version>1.5.1</farao.dependencies.version>
         <gridcapa.task-manager.version>1.6.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
