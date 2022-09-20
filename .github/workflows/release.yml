@@ -80,7 +80,7 @@ jobs:
           skip_checkout: true
 
       - name: Merge automatically into main
-        uses: devmasx/merge-branch@main
+        uses: devmasx/merge-branch@master
         with:
           type: now
           from_branch: next-release-v${{ github.event.inputs.nextVersion }}
