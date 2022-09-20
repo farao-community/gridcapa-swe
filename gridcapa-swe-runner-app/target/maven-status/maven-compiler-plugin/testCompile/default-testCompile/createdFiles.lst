@@ -1,0 +1,8 @@
+com/farao_community/farao/swe/runner/app/SweApplicationTest.class
+com/farao_community/farao/swe/runner/app/utils/GenericThreadLauncherTest$LaunchWithMultipleThreadableAnnotation.class
+com/farao_community/farao/swe/runner/app/services/InterruptionServiceTest$MyThread.class
+com/farao_community/farao/swe/runner/app/services/InterruptionServiceTest.class
+com/farao_community/farao/swe/runner/app/utils/GenericThreadLauncherTest$LaunchWithoutThreadableAnnotation.class
+com/farao_community/farao/swe/runner/app/utils/GenericThreadLauncherTest.class
+com/farao_community/farao/swe/runner/app/services/RequestServiceTest.class
+com/farao_community/farao/swe/runner/app/utils/GenericThreadLauncherTest$LaunchWithThreadableAnnotation.class

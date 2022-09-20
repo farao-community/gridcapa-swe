@@ -1,0 +1,42 @@
+{
+  "groups": [
+    {
+      "name": "swe-runner",
+      "type": "com.farao_community.farao.swe.runner.starter.SweClientProperties",
+      "sourceType": "com.farao_community.farao.swe.runner.starter.SweClientProperties"
+    },
+    {
+      "name": "swe-runner.binding",
+      "type": "com.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration",
+      "sourceType": "com.farao_community.farao.swe.runner.starter.SweClientProperties",
+      "sourceMethod": "getBinding()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "swe-runner.binding.application-id",
+      "type": "java.lang.String",
+      "description": "Name of the application that call SWE through starter.",
+      "sourceType": "com.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"
+    },
+    {
+      "name": "swe-runner.binding.destination",
+      "type": "java.lang.String",
+      "description": "The exchange name on which to send the SWE request.",
+      "sourceType": "com.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"
+    },
+    {
+      "name": "swe-runner.binding.expiration",
+      "type": "java.lang.String",
+      "description": "Expiration time of SWE requests.",
+      "sourceType": "com.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"
+    },
+    {
+      "name": "swe-runner.binding.routing-key",
+      "type": "java.lang.String",
+      "description": "The routing key to use for the binding to swe-runner instance. Default value \"#\" is used to notify all queues.",
+      "sourceType": "com.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"
+    }
+  ],
+  "hints": []
+}

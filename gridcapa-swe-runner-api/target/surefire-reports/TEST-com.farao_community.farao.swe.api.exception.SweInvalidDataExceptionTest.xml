@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.farao_community.farao.swe.api.exception.SweInvalidDataExceptionTest" time="0.009" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
+    <property name="java.specification.version" value="11"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/target/test-classes:/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/target/classes:/home/runner/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.13.4/jackson-datatype-jsr310-2.13.4.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.13.2/jackson-annotations-2.13.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.13.2/jackson-core-2.13.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.13.2.2/jackson-databind-2.13.2.2.jar:/home/runner/.m2/repository/com/github/jasminb/jsonapi-converter/0.11/jsonapi-converter-0.11.jar:/home/runner/.m2/repository/com/squareup/retrofit2/retrofit/2.5.0/retrofit-2.5.0.jar:/home/runner/.m2/repository/com/squareup/okhttp3/okhttp/3.14.9/okhttp-3.14.9.jar:/home/runner/.m2/repository/com/squareup/okio/okio/1.17.2/okio-1.17.2.jar:/home/runner/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/runner/.m2/repository/org/springframework/spring-context/5.3.18/spring-context-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-aop/5.3.18/spring-aop-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-beans/5.3.18/spring-beans-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-core/5.3.18/spring-core-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-jcl/5.3.18/spring-jcl-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-expression/5.3.18/spring-expression-5.3.18.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.0/junit-jupiter-5.9.0.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar:/home/runner/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar:/home/runner/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar:"/>
+    <property name="java.vm.vendor" value="Azul Systems, Inc."/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="http://www.azul.com/"/>
+    <property name="user.timezone" value="Etc/UTC"/>
+    <property name="java.vm.specification.version" value="11"/>
+    <property name="os.name" value="Linux"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/opt/hostedtoolcache/jdk/11.0.16/x64/lib"/>
+    <property name="sun.java.command" value="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/target/surefire/surefirebooter1099257456363851735.jar /home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/target/surefire 2022-09-20T11-37-21_314-jvmRun1 surefire13691782671639195676tmp surefire_017667486044492718913tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/target/test-classes:/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/target/classes:/home/runner/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.13.4/jackson-datatype-jsr310-2.13.4.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.13.2/jackson-annotations-2.13.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.13.2/jackson-core-2.13.2.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.13.2.2/jackson-databind-2.13.2.2.jar:/home/runner/.m2/repository/com/github/jasminb/jsonapi-converter/0.11/jsonapi-converter-0.11.jar:/home/runner/.m2/repository/com/squareup/retrofit2/retrofit/2.5.0/retrofit-2.5.0.jar:/home/runner/.m2/repository/com/squareup/okhttp3/okhttp/3.14.9/okhttp-3.14.9.jar:/home/runner/.m2/repository/com/squareup/okio/okio/1.17.2/okio-1.17.2.jar:/home/runner/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/runner/.m2/repository/org/springframework/spring-context/5.3.18/spring-context-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-aop/5.3.18/spring-aop-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-beans/5.3.18/spring-beans-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-core/5.3.18/spring-core-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-jcl/5.3.18/spring-jcl-5.3.18.jar:/home/runner/.m2/repository/org/springframework/spring-expression/5.3.18/spring-expression-5.3.18.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.0/junit-jupiter-5.9.0.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar:/home/runner/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar:/home/runner/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar:/home/runner/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar:/home/runner/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/runner"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2022-07-19"/>
+    <property name="java.home" value="/opt/hostedtoolcache/jdk/11.0.16/x64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="jdk.vendor.version" value="Zulu11.58+15-CA"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="surefire.real.class.path" value="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/target/surefire/surefirebooter1099257456363851735.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="11.0.16+8-LTS"/>
+    <property name="user.name" value="runner"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="5.15.0-1019-azure"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Zulu11.58+15-CA"/>
+    <property name="localRepository" value="/home/runner/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="http://www.azul.com/support/"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="11.0.16"/>
+    <property name="user.dir" value="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vendor" value="Azul Systems, Inc."/>
+    <property name="java.vm.version" value="11.0.16+8-LTS"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="55.0"/>
+  </properties>
+  <testcase name="checkStandardExceptionUsage" classname="com.farao_community.farao.swe.api.exception.SweInvalidDataExceptionTest" time="0.006"/>
+</testsuite>
