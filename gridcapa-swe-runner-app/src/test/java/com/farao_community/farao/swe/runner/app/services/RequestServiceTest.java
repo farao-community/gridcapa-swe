@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.swe.api.JsonApiConverter;
-import com.farao_community.farao.swe.api.exception.SweInternalException;
 import com.farao_community.farao.swe.api.resource.SweRequest;
 import com.farao_community.farao.swe.api.resource.SweResponse;
 import org.junit.jupiter.api.Test;
