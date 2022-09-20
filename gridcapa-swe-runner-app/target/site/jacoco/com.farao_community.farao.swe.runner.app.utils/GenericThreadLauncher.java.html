@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GenericThreadLauncher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GridCapa SWE runner application</a> &gt; <a href="index.source.html" class="el_package">com.farao_community.farao.swe.runner.app.utils</a> &gt; <span class="el_source">GenericThreadLauncher.java</span></div><h1>GenericThreadLauncher.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package com.farao_community.farao.swe.runner.app.utils;
+
+import com.farao_community.farao.swe.api.exception.SweInternalException;
+import com.farao_community.farao.swe.api.resource.ThreadLauncherResult;
+import org.slf4j.MDC;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Theo Pascoli {@literal &lt;theo.pascoli at rte-france.com&gt;}
+ */
+public class GenericThreadLauncher&lt;T, U&gt; extends Thread {
+
+    private final T threadable;
+    private final Method run;
+    private final Object[] args;
+
+    private ThreadLauncherResult&lt;U&gt; result;
+
+    public GenericThreadLauncher(T threadable, String id, Object... args) {
+<span class="fc" id="L31">        super(id);</span>
+<span class="fc" id="L32">        this.run = getMethodAnnotatedWith(threadable.getClass());</span>
+<span class="fc" id="L33">        this.threadable = threadable;</span>
+<span class="fc" id="L34">        this.args = args;</span>
+<span class="fc" id="L35">    }</span>
+
+    private static Method getMethodAnnotatedWith(final Class&lt;?&gt; type) {
+<span class="fc" id="L38">        List&lt;Method&gt; methods = getMethodsAnnotatedWith(type);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (methods.isEmpty()) {</span>
+<span class="fc" id="L40">            throw new SweInternalException(&quot;the class &quot; + type.getCanonicalName() + &quot; does not have his running method annotated with @Threadable&quot;);</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        } else if (methods.size() &gt; 1) {</span>
+<span class="fc" id="L42">            throw new SweInternalException(&quot;the class &quot; + type.getCanonicalName() + &quot; must have only one method annotated with @Threadable&quot;);</span>
+        } else {
+<span class="fc" id="L44">            return methods.get(0);</span>
+        }
+    }
+
+    private static List&lt;Method&gt; getMethodsAnnotatedWith(final Class&lt;?&gt; type) {
+<span class="fc" id="L49">        final List&lt;Method&gt; methods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L50">        Class&lt;?&gt; klass = type;</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        while (klass != Object.class) { // need to traverse a type hierarchy in order to process methods from super types</span>
+            // iterate though the list of methods declared in the class represented by klass variable, and add those annotated with the specified annotation
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            for (final Method method : klass.getDeclaredMethods()) {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">                if (method.isAnnotationPresent(Threadable.class)) {</span>
+<span class="fc" id="L55">                    methods.add(method);</span>
+                }
+            }
+            // move to the upper class in the hierarchy in search for more methods
+<span class="fc" id="L59">            klass = klass.getSuperclass();</span>
+        }
+<span class="fc" id="L61">        return methods;</span>
+    }
+
+    @Override
+    public void run() {
+        try {
+<span class="fc" id="L67">            MDC.put(&quot;gridcapa-task-id&quot;, getName());</span>
+<span class="fc" id="L68">            U threadResult = (U) this.run.invoke(threadable, args);</span>
+<span class="fc" id="L69">            this.result = ThreadLauncherResult.success(threadResult);</span>
+<span class="nc" id="L70">        } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            if (checkInterruption(e)) {</span>
+                //an interruption is not considered as an error because it is intentional
+<span class="nc" id="L73">                this.result = ThreadLauncherResult.interrupt();</span>
+            } else {
+<span class="nc" id="L75">                this.result = ThreadLauncherResult.error(e);</span>
+            }
+<span class="fc" id="L77">        }</span>
+<span class="fc" id="L78">    }</span>
+
+    public ThreadLauncherResult&lt;U&gt; getResult() {
+        try {
+<span class="fc" id="L82">            join();</span>
+<span class="nc" id="L83">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L84">            interrupt();</span>
+<span class="fc" id="L85">        }</span>
+<span class="fc" id="L86">        return result;</span>
+    }
+
+    private boolean checkInterruption(Exception exception) {
+<span class="nc" id="L90">        boolean isInterrupt = false;</span>
+<span class="nc" id="L91">        Throwable e = exception;</span>
+<span class="nc bnc" id="L92" title="All 4 branches missed.">        while (e != null &amp;&amp; !isInterrupt) {</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">            if (&quot;interrupted&quot;.equals(e.getMessage())) {</span>
+<span class="nc" id="L94">                isInterrupt = true;</span>
+            }
+<span class="nc" id="L96">            e = e.getCause();</span>
+        }
+<span class="nc" id="L98">        return isInterrupt;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

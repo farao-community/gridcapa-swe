@@ -1,0 +1,4 @@
+com.farao_community.farao.swe.api.resource.ThreadLauncherResult#success(Ljava/lang/Object;)Lcom/farao_community/farao/swe/api/resource/ThreadLauncherResult;
+com.farao_community.farao.swe.api.resource.ThreadLauncherResult#instance-init#
+java.util.Optional#of(Ljava/lang/Object;)Ljava/util/Optional;
+com.farao_community.farao.swe.api.resource.ThreadLauncherResult#<init>(Ljava/util/Optional;ZLjava/lang/Exception;)V

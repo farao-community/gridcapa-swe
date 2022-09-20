@@ -1,0 +1,5 @@
+com/farao_community/farao/swe/api/exception/SweInternalExceptionTest.class
+com/farao_community/farao/swe/api/resource/SweRequestTest.class
+com/farao_community/farao/swe/api/JsonApiConverterTest.class
+com/farao_community/farao/swe/api/resource/SweResponseTest.class
+com/farao_community/farao/swe/api/exception/SweInvalidDataExceptionTest.class

@@ -1,0 +1,32 @@
+
+V__sonar_lambda_1$com.farao_community.farao.swe.runner.app.services.InterruptionService§
+œ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java   (3"startingBlock*Ï
+startingBlock§
+œ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java   (3Ž
+‹
+
+__unknown_file (
+idjava.lang.String"__id*Q*OG
+Ecom.farao_community.farao.swe.runner.app.services.InterruptionService"
+id*
+1*Â
+1§
+œ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java   (—”
+§
+œ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java   ((
+%4java.lang.String",java.lang.Thread#getName()Ljava/lang/String;*
+
+tjava.lang.Thread2	getName()º·
+§
+œ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java   (3
+%5boolean",java.lang.String#equals(Ljava/lang/Object;)Z*
+
+%4java.lang.String*
+
+idjava.lang.String2equals(Ljava/lang/Object;)"»
+§
+œ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java   (3
+
+%5boolean:
+tjava.lang.ThreadB 
+java.util.function.Predicate

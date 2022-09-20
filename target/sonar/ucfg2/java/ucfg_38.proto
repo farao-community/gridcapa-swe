@@ -1,0 +1,194 @@
+
+ƒcom.farao_community.farao.swe.runner.starter.SweClient#run(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/Class;I)Ljava/lang/Object;œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java ("1*ÉT
+1œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java   (È
+Å
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java   (
+%0org.slf4j.Logger"__id*
+""ØÕ
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java   (0
+
+%1void"<org.slf4j.Logger#info(Ljava/lang/String;Ljava/lang/Object;)V*
+
+%0org.slf4j.Logger*
+Request sent: {}*
+
+requestI2*info(Ljava/lang/String;Ljava/lang/Object;)È
+Å
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java! !(
+%2org.slf4j.Logger"__id*
+""Å
+Â
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java!, !(?F
+%3@com.farao_community.farao.swe.runner.starter.SweClientProperties"__id*S*Q8
+6com.farao_community.farao.swe.runner.starter.SweClient"
+sweClientPropertiesþû
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java!, !(L[
+%4Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"¤com.farao_community.farao.swe.runner.starter.SweClientProperties#getBinding()Lcom/farao_community/farao/swe/runner/starter/SweClientProperties$BindingConfiguration;*H
+F
+%3@com.farao_community.farao.swe.runner.starter.SweClientProperties2getBinding()¥¢
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java!, !(]
+%5java.lang.String"xcom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration#getDestination()Ljava/lang/String;*]
+[
+%4Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration2getDestination()æã
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java! !(^
+
+%6void"<org.slf4j.Logger#info(Ljava/lang/String;Ljava/lang/Object;)V*
+
+%2org.slf4j.Logger*
+Request sent to : {}*
+
+%5java.lang.String2*info(Ljava/lang/String;Ljava/lang/Object;)È
+Å
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java" "(
+%7org.slf4j.Logger"__id*
+""Å
+Â
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java", "(?F
+%8@com.farao_community.farao.swe.runner.starter.SweClientProperties"__id*S*Q8
+6com.farao_community.farao.swe.runner.starter.SweClient"
+sweClientPropertiesþû
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java", "(L[
+%9Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"¤com.farao_community.farao.swe.runner.starter.SweClientProperties#getBinding()Lcom/farao_community/farao/swe/runner/starter/SweClientProperties$BindingConfiguration;*H
+F
+%8@com.farao_community.farao.swe.runner.starter.SweClientProperties2getBinding()¤¡
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java", "(\
+%10java.lang.String"wcom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration#getRoutingKey()Ljava/lang/String;*]
+[
+%9Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration2getRoutingKey()èå
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java" "(]
+%11void"<org.slf4j.Logger#info(Ljava/lang/String;Ljava/lang/Object;)V*
+
+%7org.slf4j.Logger*
+Request sent to : {}*
+
+%10java.lang.String2*info(Ljava/lang/String;Ljava/lang/Object;)©
+¦
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java#" #(.1
+%12*org.springframework.amqp.core.AmqpTemplate"__id*L*J8
+6com.farao_community.farao.swe.runner.starter.SweClient"
+amqpTemplateÆ
+Ã
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java$ $(#G
+%13@com.farao_community.farao.swe.runner.starter.SweClientProperties"__id*S*Q8
+6com.farao_community.farao.swe.runner.starter.SweClient"
+sweClientProperties€ý
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java$ $(0\
+%14Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"¤com.farao_community.farao.swe.runner.starter.SweClientProperties#getBinding()Lcom/farao_community/farao/swe/runner/starter/SweClientProperties$BindingConfiguration;*I
+G
+%13@com.farao_community.farao.swe.runner.starter.SweClientProperties2getBinding()§¤
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java$ $(A
+%15java.lang.String"xcom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration#getDestination()Ljava/lang/String;*^
+\
+%14Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration2getDestination()Æ
+Ã
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java% %(#G
+%16@com.farao_community.farao.swe.runner.starter.SweClientProperties"__id*S*Q8
+6com.farao_community.farao.swe.runner.starter.SweClient"
+sweClientProperties€ý
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java% %(0\
+%17Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration"¤com.farao_community.farao.swe.runner.starter.SweClientProperties#getBinding()Lcom/farao_community/farao/swe/runner/starter/SweClientProperties$BindingConfiguration;*I
+G
+%16@com.farao_community.farao.swe.runner.starter.SweClientProperties2getBinding()¥¢
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java% %(@
+%18java.lang.String"wcom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration#getRoutingKey()Ljava/lang/String;*^
+\
+%17Ucom.farao_community.farao.swe.runner.starter.SweClientProperties$BindingConfiguration2getRoutingKey()Â
+¿
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java& &(!E
+%19>com.farao_community.farao.swe.runner.starter.SweMessageHandler"__id*Q*O8
+6com.farao_community.farao.swe.runner.starter.SweClient"
+sweMessageHandler£ 
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java& &(O,
+%20%org.springframework.amqp.core.Message"˜com.farao_community.farao.swe.runner.starter.SweMessageHandler#buildMessage(Ljava/lang/Object;Ljava/lang/Class;I)Lorg/springframework/amqp/core/Message;*G
+E
+%19>com.farao_community.farao.swe.runner.starter.SweMessageHandler*
+
+requestI*!
+
+requestClassjava.lang.Class*
+""22buildMessage(Ljava/lang/Object;Ljava/lang/Class;I)øõ
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java#" '(	,
+%21%org.springframework.amqp.core.Message"­org.springframework.amqp.core.AmqpTemplate#sendAndReceive(Ljava/lang/String;Ljava/lang/String;Lorg/springframework/amqp/core/Message;)Lorg/springframework/amqp/core/Message;*3
+1
+%12*org.springframework.amqp.core.AmqpTemplate*
+
+%15java.lang.String*
+
+%18java.lang.String*.
+,
+%20%org.springframework.amqp.core.Message2[sendAndReceive(Ljava/lang/String;Ljava/lang/String;Lorg/springframework/amqp/core/Message;)’
+
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java# '(
+8
+responseMessage%org.springframework.amqp.core.Message"__id*.
+,
+%21%org.springframework.amqp.core.MessageÂ
+¿
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java( ((&E
+%22>com.farao_community.farao.swe.runner.starter.SweMessageHandler"__id*Q*O8
+6com.farao_community.farao.swe.runner.starter.SweClient"
+sweMessageHandlerµ²
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java( ((R
+%23J"–com.farao_community.farao.swe.runner.starter.SweMessageHandler#readMessage(Lorg/springframework/amqp/core/Message;Ljava/lang/Class;)Ljava/lang/Object;*G
+E
+%22>com.farao_community.farao.swe.runner.starter.SweMessageHandler*:
+8
+responseMessage%org.springframework.amqp.core.Message*"
+ 
+responseClassjava.lang.Class2EreadMessage(Lorg/springframework/amqp/core/Message;Ljava/lang/Class;)Ã
+À
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java( ((S
+responseJ"__id*
+
+
+%23JÉ
+Æ
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java) )(
+%24org.slf4j.Logger"__id*
+""àÝ
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java) )(6
+%25void"<org.slf4j.Logger#info(Ljava/lang/String;Ljava/lang/Object;)V*
+
+%24org.slf4j.Logger*
+Response received: {}*
+
+responseJ2*info(Ljava/lang/String;Ljava/lang/Object;)"°
+œ
+‘/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java* *(
+
+responseJ:
+requestI:
+requestClassjava.lang.Class: 
+responseClassjava.lang.Class:
+""B:8
+6com.farao_community.farao.swe.runner.starter.SweClient

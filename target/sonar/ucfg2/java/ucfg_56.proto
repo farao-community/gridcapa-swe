@@ -1,0 +1,16 @@
+
+_com.farao_community.farao.swe.api.resource.ThreadLauncherResult#getResult()Ljava/util/Optional;¡
+–/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java& &( "1*…
+1¡
+–/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java' '(˜
+•
+¡
+–/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java' '(
+%0java.util.Optional"__id*O*MA
+?com.farao_community.farao.swe.api.resource.ThreadLauncherResult"
+result"À
+¡
+–/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java' '(
+
+%0java.util.OptionalBCA
+?com.farao_community.farao.swe.api.resource.ThreadLauncherResult

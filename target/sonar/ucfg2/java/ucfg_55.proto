@@ -1,0 +1,29 @@
+
+ùcom.farao_community.farao.swe.api.resource.ThreadLauncherResult#error(Ljava/lang/Exception;)Lcom/farao_community/farao/swe/api/resource/ThreadLauncherResult;°
+ñ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java". "(3"1*Å
+1°
+ñ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java#* #(2â
+Ü
+°
+ñ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java#* #(:
+%0java.util.Optional".java.util.Optional#empty()Ljava/util/Optional;*"
+java.util.OptionalØ¨
+°
+ñ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java# #()E
+%1?com.farao_community.farao.swe.api.resource.ThreadLauncherResult"?com.farao_community.farao.swe.api.resource.ThreadLauncherResult©
+¶
+°
+ñ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java# #(D
+%2"scom.farao_community.farao.swe.api.resource.ThreadLauncherResult#<init>(Ljava/util/Optional;ZLjava/lang/Exception;)V*G
+E
+%1?com.farao_community.farao.swe.api.resource.ThreadLauncherResult*
+
+%0java.util.Optional*2*
+
+ejava.lang.Exception"Ì
+°
+ñ/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java# #(EG
+E
+%1?com.farao_community.farao.swe.api.resource.ThreadLauncherResult:
+ejava.lang.ExceptionBC"A
+?com.farao_community.farao.swe.api.resource.ThreadLauncherResult

@@ -1,0 +1,4 @@
+com.farao_community.farao.swe.runner.app.services.InterruptionService#interruption(Ljava/lang/String;)V
+java.util.Optional#isPresent()Z
+com.farao_community.farao.swe.runner.app.services.InterruptionService#isRunning(Ljava/lang/String;)Ljava/util/Optional;
+java.util.Optional#get()Ljava/lang/Object;

@@ -1,0 +1,27 @@
+
+¾com.farao_community.farao.swe.runner.app.configurations.InterruptConfiguration#interrupt(Lcom/farao_community/farao/swe/runner/app/services/InterruptionService;)Ljava/util/function/Consumer;°
+¥/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/InterruptConfiguration.java (%"startingBlock*Ð
+startingBlock°
+¥/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/InterruptConfiguration.java% (NÙ
+Ö
+°
+¥/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/InterruptConfiguration.java (	
+%0"
+__annotate*/-
++org.springframework.context.annotation.Bean*^
+\
+interruptionServiceEcom.farao_community.farao.swe.runner.app.services.InterruptionServiceª
+§
+°
+¥/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/InterruptConfiguration.java: (M\
+interruptionServiceEcom.farao_community.farao.swe.runner.app.services.InterruptionService"__annotation*
+
+%0*
+1*ô
+1°
+¥/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/InterruptConfiguration.java (0"»
+°
+¥/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/InterruptConfiguration.java (1
+"":\
+interruptionServiceEcom.farao_community.farao.swe.runner.app.services.InterruptionServiceBRP
+Ncom.farao_community.farao.swe.runner.app.configurations.InterruptConfiguration

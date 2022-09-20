@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractSweException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GridCapa SWE runner API</a> &gt; <a href="index.source.html" class="el_package">com.farao_community.farao.swe.api.exception</a> &gt; <span class="el_source">AbstractSweException.java</span></div><h1>AbstractSweException.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2021, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.swe.api.exception;
+
+/**
+ * Custom abstract exception to be extended by all application exceptions.
+ * Any subclass may be automatically wrapped to a JSON API error message if needed
+ *
+ * @author Amira Kahya {@literal &lt;amira.kahya at rte-france.com&gt;}
+ */
+public abstract class AbstractSweException extends RuntimeException {
+    protected AbstractSweException(String message) {
+<span class="fc" id="L17">        super(message);</span>
+<span class="fc" id="L18">    }</span>
+
+    protected AbstractSweException(String message, Throwable throwable) {
+<span class="fc" id="L21">        super(message, throwable);</span>
+<span class="fc" id="L22">    }</span>
+
+    public abstract int getStatus();
+
+    public abstract String getCode();
+
+    public final String getTitle() {
+<span class="fc" id="L29">        return getMessage();</span>
+    }
+
+    public final String getDetails() {
+<span class="fc" id="L33">        String message = getMessage();</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        if (message != null) {</span>
+<span class="fc" id="L35">            StringBuilder sb = new StringBuilder(message);</span>
+<span class="fc" id="L36">            Throwable cause = getCause();</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">            while (cause != null) {</span>
+<span class="fc" id="L38">                sb.append(&quot;; nested exception is &quot;).append(cause);</span>
+<span class="fc" id="L39">                cause = cause.getCause();</span>
+            }
+<span class="fc" id="L41">            return sb.toString();</span>
+        } else {
+<span class="nc" id="L43">            return &quot;No details&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

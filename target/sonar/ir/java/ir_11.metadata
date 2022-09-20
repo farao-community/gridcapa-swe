@@ -1,0 +1,4 @@
+com.farao_community.farao.swe.runner.app.utils.GenericThreadLauncher#getMethodsAnnotatedWith(Ljava/lang/Class;)Ljava/util/List;
+java.util.ArrayList#<init>()V
+java.lang.Class#getSuperclass()Ljava/lang/Class;
+java.util.ArrayList#instance-init#

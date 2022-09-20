@@ -1,0 +1,5 @@
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/resource/SweResponseTest.java
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/exception/SweInvalidDataExceptionTest.java
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/exception/SweInternalExceptionTest.java
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/resource/SweRequestTest.java
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/JsonApiConverterTest.java

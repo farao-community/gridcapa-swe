@@ -1,0 +1,41 @@
+
+µcom.farao_community.farao.swe.runner.app.configurations.RequestConfiguration#request(Lcom/farao_community/farao/swe/runner/app/services/RequestService;)Ljava/util/function/Function;Æ
+£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java0 (7"startingBlock*∂
+startingBlockÆ
+£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java7 (VÕ
+ 
+Æ
+£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java (	
+%3"
+__annotate*/-
++org.springframework.context.annotation.Bean*T
+R
+requestService@com.farao_community.farao.swe.runner.app.services.RequestServiceû
+õ
+Æ
+£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.javaG (UR
+requestService@com.farao_community.farao.swe.runner.app.services.RequestService"__annotation*
+
+%3*
+1*ê
+1Æ
+£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java (Õ
+ 
+Æ
+£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java (!
+%0java.util.function.Function"__declareFunction*a_
+]__sonar_lambda_0$com.farao_community.farao.swe.runner.app.configurations.RequestConfiguration∞
+≠
+
+__unknown_file (5
+!
+%0java.util.function.Function"
+requestService"__id*T
+R
+requestService@com.farao_community.farao.swe.runner.app.services.RequestService"÷
+Æ
+£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java (#
+!
+%0java.util.function.Function:R
+requestService@com.farao_community.farao.swe.runner.app.services.RequestServiceBPN
+Lcom.farao_community.farao.swe.runner.app.configurations.RequestConfiguration

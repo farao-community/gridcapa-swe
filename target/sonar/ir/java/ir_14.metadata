@@ -1,0 +1,1 @@
+com.farao_community.farao.swe.runner.app.configurations.InterruptConfiguration#interrupt(Lcom/farao_community/farao/swe/runner/app/services/InterruptionService;)Ljava/util/function/Consumer;

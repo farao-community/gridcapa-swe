@@ -1,0 +1,3 @@
+com.farao_community.farao.swe.runner.app.services.SweRunner#run(Lcom/farao_community/farao/swe/api/resource/SweRequest;)Lcom/farao_community/farao/swe/api/resource/SweResponse;
+com.farao_community.farao.swe.api.resource.SweResponse#instance-init#
+com.farao_community.farao.swe.api.resource.SweResponse#<init>(Ljava/lang/String;)V

@@ -1,0 +1,5 @@
+com.farao_community.farao.swe.runner.app.services.RequestService#sendSweResponse(Lcom/farao_community/farao/swe/api/resource/SweResponse;)[B
+java.util.UUID#fromString(Ljava/lang/String;)Ljava/util/UUID;
+com.farao_community.farao.gridcapa.task_manager.api.TaskStatusUpdate#<init>(Ljava/util/UUID;Lcom/farao_community/farao/gridcapa/task_manager/api/TaskStatus;)V
+org.springframework.cloud.stream.function.StreamBridge#send(Ljava/lang/String;Ljava/lang/Object;)Z
+com.farao_community.farao.gridcapa.task_manager.api.TaskStatusUpdate#instance-init#

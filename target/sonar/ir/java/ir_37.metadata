@@ -1,0 +1,3 @@
+com.farao_community.farao.swe.runner.starter.SweClient#<init>(Lorg/springframework/amqp/core/AmqpTemplate;Lcom/farao_community/farao/swe/runner/starter/SweClientProperties;)V
+com.farao_community.farao.swe.runner.starter.SweMessageHandler#<init>(Lcom/farao_community/farao/swe/runner/starter/SweClientProperties;)V
+com.farao_community.farao.swe.runner.starter.SweMessageHandler#instance-init#

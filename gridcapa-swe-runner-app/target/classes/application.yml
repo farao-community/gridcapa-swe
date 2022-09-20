@@ -1,0 +1,40 @@
+logback:
+  amqp:
+    exchange: swe-idcc-task-manager-logs-exchange
+    routing-key: "#"
+spring:
+  application:
+    name: swe-idcc-runner
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: gridcapa
+    password: gridcapa
+    template:
+      reply-timeout: 7200000
+  cloud:
+    stream:
+      function:
+        definition: request;interrupt
+      default:
+        binder: rabbit
+      bindings:
+        interrupt-in-0:
+          destination: swe-idcc-stop-task
+        request-in-0:
+          destination: swe-idcc-request
+        request-out-0:
+          destination: swe-idcc-response
+        task-status-update:
+          destination: swe-idcc-task-status-updated
+
+swe-runner:
+  whitelist:
+    - http://minio:9000/
+
+minio-adapter:
+  bucket: gridcapa
+  base-path: /SWE/IDCC
+  access-key: gridcapa
+  secret-key: gridcapa
+  url: http://minio:9000

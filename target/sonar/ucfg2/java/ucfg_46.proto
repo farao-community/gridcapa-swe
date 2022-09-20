@@ -1,0 +1,49 @@
+
+„com.farao_community.farao.swe.api.JsonApiConverter#createConverter([Ljava/lang/Class;)Lcom/github/jasminb/jsonapi/ResourceConverter;”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java@ @(-"1*–
+1”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaA< A(H
+š
+”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaA< A(H1
+%0+com.fasterxml.jackson.databind.ObjectMapper"__id*H*F4
+2com.farao_community.farao.swe.api.JsonApiConverter"
+objectMapperüù
+”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaA* A(;2
+%1,com.github.jasminb.jsonapi.ResourceConverter",com.github.jasminb.jsonapi.ResourceConverter¢
+Ÿ
+”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaA& A(R
+%2"ucom.github.jasminb.jsonapi.ResourceConverter#<init>(Lcom/fasterxml/jackson/databind/ObjectMapper;[Ljava/lang/Class;)V*4
+2
+%1,com.github.jasminb.jsonapi.ResourceConverter*3
+1
+%0+com.fasterxml.jackson.databind.ObjectMapper*
+
+classesjava.lang.Class[]‘
+Ž
+”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaA A(S9
+	converter,com.github.jasminb.jsonapi.ResourceConverter"__id*4
+2
+%1,com.github.jasminb.jsonapi.ResourceConverterß
+Ü
+”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaB- B(N5
+%3/com.github.jasminb.jsonapi.SerializationFeature"__id*
+""èå
+”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaB B(O
+
+%4void"{com.github.jasminb.jsonapi.ResourceConverter#disableSerializationOption(Lcom/github/jasminb/jsonapi/SerializationFeature;)V*;
+9
+	converter,com.github.jasminb.jsonapi.ResourceConverter*7
+5
+%3/com.github.jasminb.jsonapi.SerializationFeature2MdisableSerializationOption(Lcom/github/jasminb/jsonapi/SerializationFeature;)"Ô
+”
+‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.javaC C(;
+9
+	converter,com.github.jasminb.jsonapi.ResourceConverter:
+classesjava.lang.Class[]B64
+2com.farao_community.farao.swe.api.JsonApiConverter

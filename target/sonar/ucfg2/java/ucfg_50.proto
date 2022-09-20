@@ -1,0 +1,14 @@
+
+]com.farao_community.farao.swe.api.exception.AbstractSweException#getTitle()Ljava/lang/String;¢
+—/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java ( "1*µ
+1¢
+—/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java (ÈÅ
+¢
+—/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java (
+%0java.lang.String"2java.lang.Throwable#getMessage()Ljava/lang/String;*DB
+@com.farao_community.farao.swe.api.exception.AbstractSweException2getMessage()"¿
+¢
+—/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java (
+
+%0java.lang.StringBDB
+@com.farao_community.farao.swe.api.exception.AbstractSweException

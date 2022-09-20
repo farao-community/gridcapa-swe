@@ -1,0 +1,4 @@
+com.farao_community.farao.swe.api.JsonApiConverter#<init>()V
+com.fasterxml.jackson.datatype.jsr310.JavaTimeModule#instance-init#
+com.fasterxml.jackson.datatype.jsr310.JavaTimeModule#<init>()V
+com.fasterxml.jackson.databind.json.JsonMapper#builder()Lcom/fasterxml/jackson/databind/json/JsonMapper$Builder;

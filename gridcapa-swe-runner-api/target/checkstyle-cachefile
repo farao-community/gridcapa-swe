@@ -1,0 +1,14 @@
+#Tue Sep 20 11:34:30 UTC 2022
+configuration*?=54D8AE8106962C394B656059A02869156E98B187
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/SweResponse.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/JsonApiConverterTest.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/resource/SweResponseTest.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/SweRequest.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/SweInvalidDataException.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/exception/SweInternalExceptionTest.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/exception/SweInvalidDataExceptionTest.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/resource/SweRequestTest.java=1663673644021
+/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/SweInternalException.java=1663673644021

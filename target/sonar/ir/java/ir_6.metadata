@@ -1,0 +1,2 @@
+com.farao_community.farao.swe.runner.app.services.InterruptionService#isRunning(Ljava/lang/String;)Ljava/util/Optional;
+java.lang.Thread#getAllStackTraces()Ljava/util/Map;

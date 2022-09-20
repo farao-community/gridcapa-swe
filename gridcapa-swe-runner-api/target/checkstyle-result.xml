@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="8.29">
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/SweRequest.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/ThreadLauncherResult.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/resource/SweResponse.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/SweInternalException.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/SweInvalidDataException.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/resource/SweRequestTest.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/resource/SweResponseTest.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/exception/SweInvalidDataExceptionTest.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/exception/SweInternalExceptionTest.java">
+</file>
+<file name="/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/test/java/com/farao_community/farao/swe/api/JsonApiConverterTest.java">
+</file>
+</checkstyle>

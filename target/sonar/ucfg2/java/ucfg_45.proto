@@ -1,0 +1,59 @@
+
+Ücom.farao_community.farao.swe.api.JsonApiConverter#toJsonMessage(Lcom/farao_community/farao/swe/api/exception/AbstractSweException;)[Bî
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java6 6("5*ƒ
+3î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java: :(<"ß
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java: :(<
+
+%4byte[]*Ò
+4î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java: :(œÃ
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java: :(;
+%4byte[]"jcom.github.jasminb.jsonapi.ResourceConverter#writeDocument(Lcom/github/jasminb/jsonapi/JSONAPIDocument;)[B*;
+9
+	converter,com.github.jasminb.jsonapi.ResourceConverter*?
+=
+jsonApiDocument*com.github.jasminb.jsonapi.JSONAPIDocument2;writeDocument(Lcom/github/jasminb/jsonapi/JSONAPIDocument;)*
+3*Í
+5î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java7& 7(5ç
+ä
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java7& 7(72
+%0,com.github.jasminb.jsonapi.ResourceConverter"Ñcom.farao_community.farao.swe.api.JsonApiConverter#createConverter([Ljava/lang/Class;)Lcom/github/jasminb/jsonapi/ResourceConverter;*64
+2com.farao_community.farao.swe.api.JsonApiConverterë
+é
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java7 7(89
+	converter,com.github.jasminb.jsonapi.ResourceConverter"__id*4
+2
+%0,com.github.jasminb.jsonapi.ResourceConverterû
+õ
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java8C 8(i4
+%1.com.github.jasminb.jsonapi.models.errors.Error"¬com.farao_community.farao.swe.api.JsonApiConverter#convertExceptionToJsonError(Lcom/farao_community/farao/swe/api/exception/AbstractSweException;)Lcom/github/jasminb/jsonapi/models/errors/Error;*64
+2com.farao_community.farao.swe.api.JsonApiConverter*O
+M
+	exception@com.farao_community.farao.swe.api.exception.AbstractSweException¯ı
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java81 8(B0
+%2*com.github.jasminb.jsonapi.JSONAPIDocument"*com.github.jasminb.jsonapi.JSONAPIDocumentÚ
+Ô
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java8- 8(j
+%3"dcom.github.jasminb.jsonapi.JSONAPIDocument#<init>(Lcom/github/jasminb/jsonapi/models/errors/Error;)V*2
+0
+%2*com.github.jasminb.jsonapi.JSONAPIDocument*6
+4
+%1.com.github.jasminb.jsonapi.models.errors.Errorì
+ê
+î
+â/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java8 8(k=
+jsonApiDocument*com.github.jasminb.jsonapi.JSONAPIDocument"__id*2
+0
+%2*com.github.jasminb.jsonapi.JSONAPIDocument*
+4:M
+	exception@com.farao_community.farao.swe.api.exception.AbstractSweExceptionB64
+2com.farao_community.farao.swe.api.JsonApiConverter
