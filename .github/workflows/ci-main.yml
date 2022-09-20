@@ -42,7 +42,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Broadcast update event
-        uses: farao-community/broadcast-event@main
+        uses: farao-community/broadcast-event@master
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           event-type: gridcapa_swe_updated
