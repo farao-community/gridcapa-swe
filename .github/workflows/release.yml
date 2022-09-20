@@ -40,7 +40,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Commit and tag release version
-        uses: stefanzweifel/git-auto-commit-action@main
+        uses: stefanzweifel/git-auto-commit-action@master
         with:
           branch: release-v${{ github.event.inputs.releaseVersion }}
           create_branch: true
@@ -71,7 +71,7 @@ jobs:
         run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${{ github.event.inputs.nextVersion }}-SNAPSHOT
 
       - name: Commit next version
-        uses: stefanzweifel/git-auto-commit-action@main
+        uses: stefanzweifel/git-auto-commit-action@master
         with:
           branch: next-release-v${{ github.event.inputs.nextVersion }}
           create_branch: true
