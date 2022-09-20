@@ -1,5 +1,0 @@
-com.farao_community.farao.swe.runner.starter.SweMessageHandler#buildMessage(Ljava/lang/Object;Ljava/lang/Class;I)Lorg/springframework/amqp/core/Message;
-org.springframework.amqp.core.MessageBuilder#build()Lorg/springframework/amqp/core/Message;
-org.springframework.amqp.core.MessageBuilder#andProperties(Lorg/springframework/amqp/core/MessageProperties;)Lorg/springframework/amqp/core/MessageBuilder;
-com.farao_community.farao.swe.runner.starter.SweMessageHandler#buildMessageProperties(I)Lorg/springframework/amqp/core/MessageProperties;
-org.springframework.amqp.core.MessageBuilder#withBody([B)Lorg/springframework/amqp/core/MessageBuilder;

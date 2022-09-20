@@ -1,5 +1,0 @@
-com.farao_community.farao.swe.runner.app.services.RequestService#handleError(Ljava/lang/Exception;Ljava/lang/String;)[B
-com.farao_community.farao.swe.runner.app.services.RequestService#sendErrorResponse(Ljava/lang/String;Lcom/farao_community/farao/swe/api/exception/AbstractSweException;)[B
-com.farao_community.farao.swe.api.exception.AbstractSweException#getDetails()Ljava/lang/String;
-com.farao_community.farao.swe.api.exception.SweInternalException#instance-init#
-com.farao_community.farao.swe.api.exception.SweInternalException#<init>(Ljava/lang/String;Ljava/lang/Throwable;)V

@@ -1,53 +1,0 @@
-
-˜com.farao_community.farao.swe.runner.starter.SweMessageHandler#buildMessage(Ljava/lang/Object;Ljava/lang/Class;I)Lorg/springframework/amqp/core/Message;¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java (#"1*ü
-1¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java (Á
-¾
-¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java' (48
-%02com.farao_community.farao.swe.api.JsonApiConverter"__id*U*S@
->com.farao_community.farao.swe.runner.starter.SweMessageHandler"
-jsonConverterÄÁ
-¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java' (Y
-%1byte[]"gcom.farao_community.farao.swe.api.JsonApiConverter#toJsonMessage(Ljava/lang/Object;Ljava/lang/Class;)[B*:
-8
-%02com.farao_community.farao.swe.api.JsonApiConverter*
-
-requestI*!
-
-requestClassjava.lang.Class22toJsonMessage(Ljava/lang/Object;Ljava/lang/Class;)‰
-†
-¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java (Z2
-%2,org.springframework.amqp.core.MessageBuilder"gorg.springframework.amqp.core.MessageBuilder#withBody([B)Lorg/springframework/amqp/core/MessageBuilder;*0".
-,org.springframework.amqp.core.MessageBuilder*
-
-%1byte[]¹
-¶
-¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java (?5
-%3/org.springframework.amqp.core.MessageProperties"‰com.farao_community.farao.swe.runner.starter.SweMessageHandler#buildMessageProperties(I)Lorg/springframework/amqp/core/MessageProperties;*B@
->com.farao_community.farao.swe.runner.starter.SweMessageHandler*
-""­ª
-¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java (@2
-%4,org.springframework.amqp.core.MessageBuilder"›org.springframework.amqp.core.MessageBuilder#andProperties(Lorg/springframework/amqp/core/MessageProperties;)Lorg/springframework/amqp/core/MessageBuilder;*4
-2
-%2,org.springframework.amqp.core.MessageBuilder*7
-5
-%3/org.springframework.amqp.core.MessageProperties2@andProperties(Lorg/springframework/amqp/core/MessageProperties;)óğ
-¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java (+
-%5%org.springframework.amqp.core.Message"[org.springframework.amqp.core.MessageBuilder#build()Lorg/springframework/amqp/core/Message;*4
-2
-%4,org.springframework.amqp.core.MessageBuilder2build()"Ö
-¤
-™/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweMessageHandler.java (-
-+
-%5%org.springframework.amqp.core.Message:
-requestI:
-requestClassjava.lang.Class:
-""BB@
->com.farao_community.farao.swe.runner.starter.SweMessageHandler

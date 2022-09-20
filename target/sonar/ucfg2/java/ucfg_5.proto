@@ -1,51 +1,0 @@
-
-wcom.farao_community.farao.swe.runner.app.services.InterruptionService#isRunning(Ljava/lang/String;)Ljava/util/Optional;ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java (&"1*∞
-1ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java (ç
-ä
-ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java ()
-%0java.util.Map"3java.lang.Thread#getAllStackTraces()Ljava/util/Map;*"
-java.lang.Threadäá
-ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java (
-%1java.util.Set"%java.util.Map#keySet()Ljava/util/Set;*
-
-%0java.util.Map2keySet()•¢
-ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java (
-%2java.util.stream.Stream"6java.util.Collection#stream()Ljava/util/stream/Stream;*
-
-%1java.util.Set2stream()¿
-Ω
-ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java   (3"
-%3java.util.function.Predicate"__declareFunction*ZX
-V__sonar_lambda_1$com.farao_community.farao.swe.runner.app.services.InterruptionServiceh
-f
-
-__unknown_file (*
-"
-%3java.util.function.Predicate"
-id"__id*
-
-idjava.lang.Stringîë
-ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java  (4
-%6java.util.stream.Stream"Wjava.util.stream.Stream#filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;*
-
-%2java.util.stream.Stream*$
-"
-%3java.util.function.Predicate2&filter(Ljava/util/function/Predicate;)Æ´
-ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java !(
-%7java.util.Optional"7java.util.stream.Stream#findFirst()Ljava/util/Optional;*
-
-%6java.util.stream.Stream2findFirst()"∆
-ß
-ú/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/InterruptionService.java !(
-
-%7java.util.Optional:
-idjava.lang.StringBIG
-Ecom.farao_community.farao.swe.runner.app.services.InterruptionService

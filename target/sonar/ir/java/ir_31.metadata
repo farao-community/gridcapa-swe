@@ -1,2 +1,0 @@
-com.farao_community.farao.swe.runner.starter.SweMessageHandler#buildMessageProperties(I)Lorg/springframework/amqp/core/MessageProperties;
-org.springframework.amqp.core.MessagePropertiesBuilder#newInstance()Lorg/springframework/amqp/core/MessagePropertiesBuilder;

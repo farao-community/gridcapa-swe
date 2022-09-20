@@ -1,3 +1,0 @@
-com.farao_community.farao.swe.runner.app.utils.GenericThreadLauncher#<init>(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/Object;)V
-java.lang.Object#getClass()Ljava/lang/Class;
-com.farao_community.farao.swe.runner.app.utils.GenericThreadLauncher#getMethodAnnotatedWith(Ljava/lang/Class;)Ljava/lang/reflect/Method;

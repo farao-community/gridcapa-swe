@@ -1,48 +1,0 @@
-
-icom.farao_community.farao.swe.api.JsonApiConverter#fromJsonMessage([BLjava/lang/Class;)Ljava/lang/Object;”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java" "( "8*¿
-5”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java% %(E"¢
-”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java% %(E	
-
-%2T*Ä
-6”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java% %(D¢Ÿ
-”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java% %(D
-%2T"Bcom.github.jasminb.jsonapi.JSONAPIDocument#get()Ljava/lang/Object;*2
-0
-%1*com.github.jasminb.jsonapi.JSONAPIDocument2get()*
-5*€
-7”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java% %(ÞÛ
-”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java% %(>0
-%1*com.github.jasminb.jsonapi.JSONAPIDocument"zcom.github.jasminb.jsonapi.ResourceConverter#readDocument([BLjava/lang/Class;)Lcom/github/jasminb/jsonapi/JSONAPIDocument;*;
-9
-	converter,com.github.jasminb.jsonapi.ResourceConverter*
-
-jsonMessagebyte[]*
-
-tClassjava.lang.Class2!readDocument([BLjava/lang/Class;)*
-6*à
-8”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java#& #(5ª
-§
-”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java#& #(=2
-%0,com.github.jasminb.jsonapi.ResourceConverter"„com.farao_community.farao.swe.api.JsonApiConverter#createConverter([Ljava/lang/Class;)Lcom/github/jasminb/jsonapi/ResourceConverter;*64
-2com.farao_community.farao.swe.api.JsonApiConverter*
-
-tClassjava.lang.Class‘
-Ž
-”
-‰/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/JsonApiConverter.java# #(>9
-	converter,com.github.jasminb.jsonapi.ResourceConverter"__id*4
-2
-%0,com.github.jasminb.jsonapi.ResourceConverter*
-7:
-jsonMessagebyte[]:
-tClassjava.lang.ClassB64
-2com.farao_community.farao.swe.api.JsonApiConverter

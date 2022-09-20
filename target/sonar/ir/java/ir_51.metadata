@@ -1,6 +1,0 @@
-com.farao_community.farao.swe.api.exception.AbstractSweException#getDetails()Ljava/lang/String;
-java.lang.StringBuilder#instance-init#
-java.lang.StringBuilder#<init>(Ljava/lang/String;)V
-java.lang.StringBuilder#append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-java.lang.StringBuilder#append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
-java.lang.StringBuilder#toString()Ljava/lang/String;

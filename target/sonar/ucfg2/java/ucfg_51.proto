@@ -1,97 +1,0 @@
-
-_com.farao_community.farao.swe.api.exception.AbstractSweException#getDetails()Ljava/lang/String;¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java   (""6*ê
-2¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java) )(£†
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java) )( 
-%7java.lang.String"4java.lang.StringBuilder#toString()Ljava/lang/String;*
-
-sbjava.lang.StringBuilder2
-toString()"ø
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java) )(!
-
-%7java.lang.String*ß
-3¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java& &(ÌÍ
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java& &(3
-%4java.lang.StringBuilder"Kjava.lang.StringBuilder#append(Ljava/lang/String;)Ljava/lang/StringBuilder;*
-
-sbjava.lang.StringBuilder*
-; nested exception is 2append(Ljava/lang/String;)ÒÓ
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java& &(A
-%5java.lang.StringBuilder"Kjava.lang.StringBuilder#append(Ljava/lang/Object;)Ljava/lang/StringBuilder;*
-
-%4java.lang.StringBuilder*
-
-causejava.lang.Throwable2append(Ljava/lang/Object;)§°
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java' '((
-%6java.lang.Throwable"3java.lang.Throwable#getCause()Ljava/lang/Throwable;*
-
-causejava.lang.Throwable2
-getCause()È
-Ê
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java' '((
-causejava.lang.Throwable"__id*
-
-%6java.lang.Throwable*
-2
-3*„
-5¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java#1 #(8‡›
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java## #(0
-%1java.lang.StringBuilder"java.lang.StringBuilder£
-†
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java# #(9
-%2"3java.lang.StringBuilder#<init>(Ljava/lang/String;)V*
-
-%1java.lang.StringBuilder*
-
-messagejava.lang.StringÓ
-Î
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java# #(:
-sbjava.lang.StringBuilder"__id*
-
-%1java.lang.StringBuilder «
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java$ $((
-%3java.lang.Throwable"3java.lang.Throwable#getCause()Ljava/lang/Throwable;*DB
-@com.farao_community.farao.swe.api.exception.AbstractSweException2
-getCause()È
-Ê
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java$ $()
-causejava.lang.Throwable"__id*
-
-%3java.lang.Throwable*
-2
-3*„
-6¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java! !(#»≈
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java! !(%
-%0java.lang.String"2java.lang.Throwable#getMessage()Ljava/lang/String;*DB
-@com.farao_community.farao.swe.api.exception.AbstractSweException2getMessage()Â
-‚
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java! !(&
-messagejava.lang.String"__id*
-
-%0java.lang.String*
-5
-1*‡
-1¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java+ +("µ
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-api/src/main/java/com/farao_community/farao/swe/api/exception/AbstractSweException.java+ +( 
-
-No detailsBDB
-@com.farao_community.farao.swe.api.exception.AbstractSweException

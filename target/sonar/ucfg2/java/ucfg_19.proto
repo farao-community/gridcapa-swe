@@ -1,24 +1,0 @@
-
-ùcom.farao_community.farao.swe.runner.app.services.RequestService#exceptionToJsonMessage(Lcom/farao_community/farao/swe/api/exception/AbstractSweException;)[B¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/RequestService.java` `()"1*¡	
-1¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/RequestService.javaa a(ƒ
-¡
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/RequestService.javaa a(8
-%02com.farao_community.farao.swe.api.JsonApiConverter"__id*Z*XB
-@com.farao_community.farao.swe.runner.app.services.RequestService"
-jsonApiConverteróî
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/RequestService.javaa a(0
-%1byte[]"Ücom.farao_community.farao.swe.api.JsonApiConverter#toJsonMessage(Lcom/farao_community/farao/swe/api/exception/AbstractSweException;)[B*:
-8
-%02com.farao_community.farao.swe.api.JsonApiConverter*G
-E
-e@com.farao_community.farao.swe.api.exception.AbstractSweException2QtoJsonMessage(Lcom/farao_community/farao/swe/api/exception/AbstractSweException;)"µ
-¢
-ó/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/services/RequestService.javaa a(1
-
-%1byte[]:E
-e@com.farao_community.farao.swe.api.exception.AbstractSweExceptionBDB
-@com.farao_community.farao.swe.runner.app.services.RequestService

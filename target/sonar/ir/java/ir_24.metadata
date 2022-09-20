@@ -1,2 +1,0 @@
-com.farao_community.farao.swe.runner.app.SweApplication#main([Ljava/lang/String;)V
-org.springframework.boot.SpringApplication#run(Ljava/lang/Class;[Ljava/lang/String;)Lorg/springframework/context/ConfigurableApplicationContext;

@@ -1,30 +1,0 @@
-
-Çcom.farao_community.farao.swe.runner.starter.SweClient#run(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;ú
-ë/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java- -("1*ù
-1ú
-ë/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java. .(ª
-∏
-ú
-ë/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java.9 .(I	
-%0int"__id*
-""çä
-ú
-ë/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java. .(J
-%1J"Écom.farao_community.farao.swe.runner.starter.SweClient#run(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/Class;I)Ljava/lang/Object;*:8
-6com.farao_community.farao.swe.runner.starter.SweClient*
-
-requestI*!
-
-requestClassjava.lang.Class*"
- 
-responseClassjava.lang.Class*
-	
-%0int2:run(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/Class;I)"™
-ú
-ë/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-starter/src/main/java/com/farao_community/farao/swe/runner/starter/SweClient.java. .(K	
-
-%1J:
-requestI:
-requestClassjava.lang.Class: 
-responseClassjava.lang.ClassB:8
-6com.farao_community.farao.swe.runner.starter.SweClient

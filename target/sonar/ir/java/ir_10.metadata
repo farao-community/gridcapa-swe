@@ -1,5 +1,0 @@
-com.farao_community.farao.swe.runner.app.utils.GenericThreadLauncher#getMethodAnnotatedWith(Ljava/lang/Class;)Ljava/lang/reflect/Method;
-com.farao_community.farao.swe.api.exception.SweInternalException#<init>(Ljava/lang/String;)V
-com.farao_community.farao.swe.runner.app.utils.GenericThreadLauncher#getMethodsAnnotatedWith(Ljava/lang/Class;)Ljava/util/List;
-com.farao_community.farao.swe.api.exception.SweInternalException#instance-init#
-java.lang.Class#getCanonicalName()Ljava/lang/String;

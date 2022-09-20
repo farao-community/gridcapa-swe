@@ -1,31 +1,0 @@
-
-]__sonar_lambda_0$com.farao_community.farao.swe.runner.app.configurations.RequestConfiguration®
-£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java ("startingBlock*¥
-startingBlock®
-£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java (Ý
-Ú
-
-__unknown_file (R
-requestService@com.farao_community.farao.swe.runner.app.services.RequestService"__id*d*bN
-Lcom.farao_community.farao.swe.runner.app.configurations.RequestConfiguration"
-requestService*
-1*ç
-1®
-£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java! (/‘Ž
-®
-£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java! (6!
-%1reactor.core.publisher.Flux"[reactor.core.publisher.Flux#map(Ljava/util/function/Function;)Lreactor/core/publisher/Flux;*/
--
-sweRequestFluxreactor.core.publisher.Flux*
-""2"map(Ljava/util/function/Function;)ÃÀ
-®
-£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java! (!
-%2reactor.core.publisher.Flux">reactor.core.publisher.Flux#log()Lreactor/core/publisher/Flux;*#
-!
-%1reactor.core.publisher.Flux2log()"Ö
-®
-£/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/RequestConfiguration.java! (#
-!
-%2reactor.core.publisher.Flux:-
-sweRequestFluxreactor.core.publisher.FluxB
-java.util.function.Function

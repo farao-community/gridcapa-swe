@@ -1,16 +1,0 @@
-
-bcom.farao_community.farao.swe.runner.app.configurations.EventsLogger#getLogger()Lorg/slf4j/Logger;¦
-›/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/EventsLogger.java ("1*´
-1¦
-›/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/EventsLogger.java (¿
-¼
-¦
-›/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/EventsLogger.java (9
-%0org.slf4j.Logger"Gorg.slf4j.LoggerFactory#getLogger(Ljava/lang/String;)Lorg/slf4j/Logger;*"
-org.slf4j.LoggerFactory*
-BUSINESS_LOGGER"Ã
-¦
-›/home/runner/work/gridcapa-swe/gridcapa-swe/gridcapa-swe-runner-app/src/main/java/com/farao_community/farao/swe/runner/app/configurations/EventsLogger.java (:
-
-%0org.slf4j.LoggerBHF
-Dcom.farao_community.farao.swe.runner.app.configurations.EventsLogger
