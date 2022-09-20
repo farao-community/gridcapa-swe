@@ -2,11 +2,13 @@
 <configuration>
     <springProperty scope="context" name="rabbitMQHost" source="spring.rabbitmq.host" defaultValue="localhost"/>
     <springProperty scope="context" name="rabbitMQPort" source="spring.rabbitmq.port" defaultValue="5672"/>
-    <springProperty scope="context" name="rabbitMQUserName" source="spring.rabbitmq.username" defaultValue="guest" />
-    <springProperty scope="context" name="rabbitMQPassword" source="spring.rabbitmq.password" defaultValue="guest" />
-    <springProperty scope="context" name="rabbitMQExchangeName" source="logback.amqp.exchange" defaultValue="task-manager-logs-exchange"/>
+    <springProperty scope="context" name="rabbitMQUserName" source="spring.rabbitmq.username" defaultValue="guest"/>
+    <springProperty scope="context" name="rabbitMQPassword" source="spring.rabbitmq.password" defaultValue="guest"/>
+    <springProperty scope="context" name="rabbitMQExchangeName" source="logback.amqp.exchange"
+                    defaultValue="task-manager-logs-exchange"/>
     <springProperty scope="context" name="rabbitMQRoutingKey" source="logback.amqp.routing-key" defaultValue="#"/>
-    <springProperty scope="context" name="serviceName" source="spring.application.name" defaultValue="gridcapa-back-end" />
+    <springProperty scope="context" name="serviceName" source="spring.application.name"
+                    defaultValue="gridcapa-back-end"/>
 
     <!-- specific appender to send business events to a rabbitmq exchange-->
     <appender name="amqp-business-events" class="org.springframework.amqp.rabbit.logback.AmqpAppender">

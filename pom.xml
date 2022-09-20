@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,15 +10,15 @@
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
-    <version>0.1</version>
+    <version>0.0.1</version>
     <name>GridCapa SWE</name>
     <description>A full suite to perform capacity calculations on SWE zone</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>gridcapa-swe-runner-spring-boot-starter</module>
         <module>gridcapa-swe-runner-api</module>
         <module>gridcapa-swe-runner-app</module>
+        <module>gridcapa-swe-runner-starter</module>
     </modules>
 
     <scm>
@@ -44,6 +44,7 @@
     </developers>
 
     <properties>
+        <awaitility.version>3.0.0</awaitility.version>
         <farao.dependencies.version>1.4.0</farao.dependencies.version>
         <gridcapa.task-manager.version>1.6.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
@@ -69,11 +70,21 @@
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
             </dependency>
+
+            <!-- Runtime dependencies -->
             <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- IMPORTED DEPENDENCIES -->

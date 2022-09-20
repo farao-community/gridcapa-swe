@@ -27,8 +27,8 @@ public class JsonApiConverter {
 
     public JsonApiConverter() {
         objectMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .build();
+                .addModule(new JavaTimeModule())
+                .build();
     }
 
     public <T> T fromJsonMessage(byte[] jsonMessage, Class<T> tClass) {

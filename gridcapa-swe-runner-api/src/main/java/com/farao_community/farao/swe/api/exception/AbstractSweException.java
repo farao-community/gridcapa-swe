@@ -12,7 +12,7 @@ package com.farao_community.farao.swe.api.exception;
  *
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
-public abstract class AbstractSweException extends RuntimeException  {
+public abstract class AbstractSweException extends RuntimeException {
     protected AbstractSweException(String message) {
         super(message);
     }
