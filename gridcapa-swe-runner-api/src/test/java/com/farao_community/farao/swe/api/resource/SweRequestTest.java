@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
-public class SweRequestTest {
+class SweRequestTest {
 
     @Test
     void simpleRequestTest() {

@@ -9,14 +9,17 @@ package com.farao_community.farao.swe.runner.app;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @SpringBootTest
-public class SweApplicationTest {
+class SweApplicationTest {
 
     @Test
     void contextLoads() {
+        assertTrue(true);
     }
 
 }
