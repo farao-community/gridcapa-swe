@@ -37,9 +37,8 @@ public class SweRunner {
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp 1"); // todo mettre getter timestamp
-        PreProcessRequest preProcessRequest = new PreProcessRequest(sweRequest.getId(), OffsetDateTime.now());
-        PreProcessResponse run = swePreprocessClient.run(preProcessRequest, PreProcessRequest.class, PreProcessResponse.class);
-        LOGGER.info("RESPONSE PRE PROCESS " + run.getId());
+
+
         return new SweResponse(sweRequest.getId());
     }
 
