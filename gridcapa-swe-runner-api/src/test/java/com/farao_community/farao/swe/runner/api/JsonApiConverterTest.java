@@ -4,11 +4,11 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.swe.api;
+package com.farao_community.farao.swe.runner.api;
 
-import com.farao_community.farao.swe.api.exception.SweInternalException;
-import com.farao_community.farao.swe.api.resource.SweRequest;
-import com.farao_community.farao.swe.api.resource.SweResponse;
+import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
+import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

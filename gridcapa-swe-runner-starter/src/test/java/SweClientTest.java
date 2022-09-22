@@ -4,9 +4,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import com.farao_community.farao.swe.api.JsonApiConverter;
-import com.farao_community.farao.swe.api.resource.SweRequest;
-import com.farao_community.farao.swe.api.resource.SweResponse;
+import com.farao_community.farao.swe.runner.api.JsonApiConverter;
+import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.starter.SweClient;
 import com.farao_community.farao.swe.runner.starter.SweClientProperties;
 import org.junit.jupiter.api.Test;

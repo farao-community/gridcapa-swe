@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.utils;
 
-import com.farao_community.farao.swe.api.exception.SweInternalException;
-import com.farao_community.farao.swe.api.resource.ThreadLauncherResult;
+import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
+import com.farao_community.farao.swe.runner.api.resource.ThreadLauncherResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

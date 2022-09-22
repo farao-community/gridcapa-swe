@@ -30,8 +30,6 @@ public class SweClient {
 
     public <I, J> J run(I request, Class<I> requestClass, Class<J> responseClass, int priority) {
         LOGGER.info("Request sent: {}", request);
-        LOGGER.info("Request sent to : {}", sweClientProperties.getBinding().getDestination());
-        LOGGER.info("Request sent to : {}", sweClientProperties.getBinding().getRoutingKey());
         Message responseMessage = amqpTemplate.sendAndReceive(
                 sweClientProperties.getBinding().getDestination(),
                 sweClientProperties.getBinding().getRoutingKey(),

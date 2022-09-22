@@ -7,19 +7,39 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.swe.api.resource.SweRequest;
-import com.farao_community.farao.swe.api.resource.SweResponse;
+import com.farao_community.farao.swe.preprocess.api.resource.PreProcessRequest;
+import com.farao_community.farao.swe.preprocess.api.resource.PreProcessResponse;
+import com.farao_community.farao.swe.preprocess.starter.SwePreprocessClient;
+import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service
 public class SweRunner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
+    private final AmqpTemplate amqpTemplate;
+    private final SwePreprocessClient swePreprocessClient;
+
+    public SweRunner(AmqpTemplate amqpTemplate, SwePreprocessClient swePreprocessClient) {
+        this.amqpTemplate = amqpTemplate;
+        this.swePreprocessClient = swePreprocessClient;
+    }
 
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
+        LOGGER.info("Request received for timestamp 1"); // todo mettre getter timestamp
+        PreProcessRequest preProcessRequest = new PreProcessRequest(sweRequest.getId(), OffsetDateTime.now());
+        PreProcessResponse run = swePreprocessClient.run(preProcessRequest, PreProcessRequest.class, PreProcessResponse.class);
+        LOGGER.info("RESPONSE PRE PROCESS " + run.getId());
         return new SweResponse(sweRequest.getId());
     }
 

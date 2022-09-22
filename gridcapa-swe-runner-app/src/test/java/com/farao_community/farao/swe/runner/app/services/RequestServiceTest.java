@@ -6,9 +6,9 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.swe.api.JsonApiConverter;
-import com.farao_community.farao.swe.api.resource.SweRequest;
-import com.farao_community.farao.swe.api.resource.SweResponse;
+import com.farao_community.farao.swe.runner.api.JsonApiConverter;
+import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

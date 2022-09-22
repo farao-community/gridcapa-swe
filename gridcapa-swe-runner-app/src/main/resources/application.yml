@@ -28,6 +28,10 @@ spring:
         task-status-update:
           destination: swe-idcc-task-status-updated
 
+swe-preprocess:
+  binding:
+    destination: swe-preprocess-request
+
 swe-runner:
   whitelist:
     - http://minio:9000/
