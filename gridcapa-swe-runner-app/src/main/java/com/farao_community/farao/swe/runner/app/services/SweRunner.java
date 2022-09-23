@@ -7,7 +7,6 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.swe.preprocess.starter.SwePreprocessClient;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
@@ -23,17 +22,14 @@ import org.springframework.stereotype.Service;
 public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
     private final AmqpTemplate amqpTemplate;
-    private final SwePreprocessClient swePreprocessClient;
 
-    public SweRunner(AmqpTemplate amqpTemplate, SwePreprocessClient swePreprocessClient) {
+    public SweRunner(AmqpTemplate amqpTemplate) {
         this.amqpTemplate = amqpTemplate;
-        this.swePreprocessClient = swePreprocessClient;
     }
 
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
-        LOGGER.info("Request received for timestamp 1"); // todo mettre getter timestamp
-
+        LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
 
         return new SweResponse(sweRequest.getId());
     }

@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.jasminb.jsonapi.annotations.Id;
 import com.github.jasminb.jsonapi.annotations.Type;
 
+import java.time.OffsetDateTime;
+
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
@@ -18,13 +20,90 @@ import com.github.jasminb.jsonapi.annotations.Type;
 public class SweRequest {
     @Id
     private final String id;
+    private final OffsetDateTime targetProcessDateTime;
+    private final SweFileResource coresoSv;
+    private final SweFileResource reeEq;
+    private final SweFileResource reeSsh;
+    private final SweFileResource reeTp;
+    private final SweFileResource renEq;
+    private final SweFileResource renSsh;
+    private final SweFileResource renTp;
+    private final SweFileResource rteEq;
+    private final SweFileResource rteSsh;
+    private final SweFileResource rteTp;
 
     @JsonCreator
-    public SweRequest(@JsonProperty("id") String id) {
+    public SweRequest(@JsonProperty("id") String id,
+                      @JsonProperty("targetProcessDateTime") OffsetDateTime targetProcessDateTime,
+                      @JsonProperty("coresoSv") SweFileResource coresoSv,
+                      @JsonProperty("reeEq") SweFileResource reeEq,
+                      @JsonProperty("reeSsq") SweFileResource reeSsh,
+                      @JsonProperty("reeTp") SweFileResource reeTp,
+                      @JsonProperty("renEq") SweFileResource renEq,
+                      @JsonProperty("renSsh") SweFileResource renSsh,
+                      @JsonProperty("renTp") SweFileResource renTp,
+                      @JsonProperty("rteEq") SweFileResource rteEq,
+                      @JsonProperty("rteSsh") SweFileResource rteSsh,
+                      @JsonProperty("rteTp") SweFileResource rteTp) {
         this.id = id;
+        this.targetProcessDateTime = targetProcessDateTime;
+        this.coresoSv = coresoSv;
+        this.reeEq = reeEq;
+        this.reeSsh = reeSsh;
+        this.reeTp = reeTp;
+        this.renEq = renEq;
+        this.renSsh = renSsh;
+        this.renTp = renTp;
+        this.rteEq = rteEq;
+        this.rteSsh = rteSsh;
+        this.rteTp = rteTp;
     }
 
     public String getId() {
         return id;
+    }
+
+    public OffsetDateTime getTargetProcessDateTime() {
+        return targetProcessDateTime;
+    }
+
+    public SweFileResource getCoresoSv() {
+        return coresoSv;
+    }
+
+    public SweFileResource getReeEq() {
+        return reeEq;
+    }
+
+    public SweFileResource getReeSsh() {
+        return reeSsh;
+    }
+
+    public SweFileResource getReeTp() {
+        return reeTp;
+    }
+
+    public SweFileResource getRenEq() {
+        return renEq;
+    }
+
+    public SweFileResource getRenSsh() {
+        return renSsh;
+    }
+
+    public SweFileResource getRenTp() {
+        return renTp;
+    }
+
+    public SweFileResource getRteEq() {
+        return rteEq;
+    }
+
+    public SweFileResource getRteSsh() {
+        return rteSsh;
+    }
+
+    public SweFileResource getRteTp() {
+        return rteTp;
     }
 }
