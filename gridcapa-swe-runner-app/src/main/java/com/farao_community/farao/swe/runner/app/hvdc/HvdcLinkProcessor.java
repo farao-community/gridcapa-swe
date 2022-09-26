@@ -10,6 +10,8 @@ package com.farao_community.farao.swe.runner.app.hvdc;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.VscStationCreationParameters;
 import com.powsybl.iidm.network.*;
+import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
+import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
 
 import java.util.Comparator;
 import java.util.List;

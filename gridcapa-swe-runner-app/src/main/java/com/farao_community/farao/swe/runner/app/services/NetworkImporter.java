@@ -79,7 +79,7 @@ public class NetworkImporter {
 
             for (SweFileResource file : listCgmFiles) {
                 InputStream inputStream = new URL(file.getUrl()).openStream();
-
+                System.out.println("inputstream ok");
                 File srcFile = new File(tmp.toAbsolutePath() + "/" + file.getFilename());
                 FileUtils.copyInputStreamToFile(inputStream, srcFile);
                 FileInputStream fis = new FileInputStream(srcFile);
@@ -93,6 +93,7 @@ public class NetworkImporter {
                 fis.close();
             }
             zos.close();
+            System.out.println("zip ok");
             return zipPath;
         } catch (IOException ioe) {
             System.out.println("Error creating zip file: " + ioe);
@@ -104,6 +105,7 @@ public class NetworkImporter {
         Properties importParams = new Properties();
         importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
         Network network = Importers.loadNetwork(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
+        System.out.println("import network ok " + network.toString());
         deleteZip(zipPath);
         return network;
     }

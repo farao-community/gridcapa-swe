@@ -12,6 +12,7 @@ import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePrep
 import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

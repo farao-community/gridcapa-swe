@@ -30,11 +30,11 @@ spring:
 
 swe-runner:
   whitelist:
-    - http://minio:9000/
+    - http://localhost:9000/
 
 minio-adapter:
   bucket: gridcapa
   base-path: /SWE/D2CC
   access-key: gridcapa
   secret-key: gridcapa
-  url: http://minio:9000
+  url: http://localhost:9000
