@@ -1,10 +1,10 @@
 logback:
   amqp:
-    exchange: swe-idcc-task-manager-logs-exchange
+    exchange: swe-d2cc-task-manager-logs-exchange
     routing-key: "#"
 spring:
   application:
-    name: swe-idcc-runner
+    name: swe-d2cc-runner
   rabbitmq:
     host: localhost
     port: 5672
@@ -20,21 +20,22 @@ spring:
         binder: rabbit
       bindings:
         interrupt-in-0:
-          destination: swe-idcc-stop-task
+          destination: swe-d2cc-stop-task
         request-in-0:
-          destination: swe-idcc-request
+          destination: swe-d2cc-request
         request-out-0:
-          destination: swe-idcc-response
+          destination: swe-d2cc-response
         task-status-update:
-          destination: swe-idcc-task-status-updated
+          destination: swe-d2cc-task-status-updated
 
 swe-runner:
+  boundary-location: test
   whitelist:
-    - http://minio:9000/
+    - http://localhost:9000/
 
 minio-adapter:
   bucket: gridcapa
-  base-path: /SWE/IDCC
+  base-path: /SWE/D2CC
   access-key: gridcapa
   secret-key: gridcapa
-  url: http://minio:9000
+  url: http://localhost:9000
