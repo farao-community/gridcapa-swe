@@ -1,0 +1,11 @@
+swe-runner:
+  whitelist:
+    - http://minio:9000/
+    - file:/
+
+minio-adapter:
+  bucket: gridcapa
+  base-path: SWE/VALID
+  access-key: gridcapa
+  secret-key: gridcapa
+  url: http://localhost:9000/
