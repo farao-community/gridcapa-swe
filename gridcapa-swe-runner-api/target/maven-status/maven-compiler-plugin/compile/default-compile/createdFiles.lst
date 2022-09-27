@@ -1,7 +1,0 @@
-com/farao_community/farao/swe/api/exception/SweInternalException.class
-com/farao_community/farao/swe/api/resource/SweResponse.class
-com/farao_community/farao/swe/api/resource/ThreadLauncherResult.class
-com/farao_community/farao/swe/api/exception/SweInvalidDataException.class
-com/farao_community/farao/swe/api/resource/SweRequest.class
-com/farao_community/farao/swe/api/JsonApiConverter.class
-com/farao_community/farao/swe/api/exception/AbstractSweException.class
