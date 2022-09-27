@@ -96,7 +96,7 @@ public class NetworkService {
 
             for (SweFileResource file : listCgmFiles) {
                 InputStream inputStream = new URL(file.getUrl()).openStream();
-                File srcFile = new File(tmp.toAbsolutePath() + "/" + file.getFilename());
+                File srcFile = new File(tmp.toAbsolutePath() + File.separator + file.getFilename());
                 FileUtils.copyInputStreamToFile(inputStream, srcFile);
                 FileInputStream fis = new FileInputStream(srcFile);
                 zos.putNextEntry(new ZipEntry(srcFile.getName()));
@@ -123,8 +123,10 @@ public class NetworkService {
     }
 
     private void deleteFile(File srcFile) {
-        if (!srcFile.delete()) {
-            LOGGER.info("Temporary file could not be deleted, check for full storage error");
+        try {
+            Files.delete(srcFile.toPath());
+        } catch (IOException e) {
+            LOGGER.warn("Temporary file could not be deleted, check for full storage error");
         }
     }
 

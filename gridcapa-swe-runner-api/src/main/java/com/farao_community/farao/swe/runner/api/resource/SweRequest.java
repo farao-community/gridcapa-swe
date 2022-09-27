@@ -37,7 +37,7 @@ public class SweRequest {
                       @JsonProperty("targetProcessDateTime") OffsetDateTime targetProcessDateTime,
                       @JsonProperty("coresoSv") SweFileResource coresoSv,
                       @JsonProperty("reeEq") SweFileResource reeEq,
-                      @JsonProperty("reeSsq") SweFileResource reeSsh,
+                      @JsonProperty("reeSsh") SweFileResource reeSsh,
                       @JsonProperty("reeTp") SweFileResource reeTp,
                       @JsonProperty("renEq") SweFileResource renEq,
                       @JsonProperty("renSsh") SweFileResource renSsh,

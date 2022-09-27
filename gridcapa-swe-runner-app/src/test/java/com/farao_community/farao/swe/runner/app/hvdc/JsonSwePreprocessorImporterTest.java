@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Mitri {@literal <peter.mitri@rte-france.com>}
  */
-public class JsonSwePreprocessorImporterTest {
+class JsonSwePreprocessorImporterTest {
     private static final double DOUBLE_TOLERANCE = 1e-6;
 
     @Test
-    public void testImportNok() {
+    void testImportNok() {
         assertThrows(UncheckedIOException.class, () -> JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_error0.json")));
         assertThrows(UncheckedIOException.class, () -> JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_error1.json")));
         assertThrows(UncheckedIOException.class, () -> JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_error2.json")));
@@ -36,7 +36,7 @@ public class JsonSwePreprocessorImporterTest {
     }
 
     @Test
-    public void testImport() {
+    void testImport() {
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
         assertNotNull(params);
         assertNotNull(params.getHvdcCreationParametersSet());

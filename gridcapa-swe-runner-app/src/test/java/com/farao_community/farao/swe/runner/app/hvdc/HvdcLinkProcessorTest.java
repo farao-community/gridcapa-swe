@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Mitri {@literal <peter.mitri@rte-france.com>}
  */
-public class HvdcLinkProcessorTest {
+class HvdcLinkProcessorTest {
 
     @Test
-    public void testHvdcCreationRoundTrip() {
+    void testHvdcCreationRoundTrip() {
         // Test that when we create the HVDC then remove it, the network is the same
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
@@ -34,7 +34,7 @@ public class HvdcLinkProcessorTest {
     }
 
     @Test
-    public void testHvdcCreation() {
+    void testHvdcCreation() {
         // Inspect the contents of the created HVDC lines
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
@@ -43,7 +43,7 @@ public class HvdcLinkProcessorTest {
     }
 
     @Test
-    public void testHvdcCreationRoundTripInverted() {
+    void testHvdcCreationRoundTripInverted() {
         // Test that when we create the HVDC then remove it, the network is the same
         // in this case the power flow on HVDC_FR4-DE1 is inverted
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes_inverted.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes_inverted.xiidm"));
@@ -54,7 +54,7 @@ public class HvdcLinkProcessorTest {
     }
 
     @Test
-    public void testHvdcCreationInverted() {
+    void testHvdcCreationInverted() {
         // Inspect the contents of the created HVDC lines
         // in this case the power flow on HVDC_FR4-DE1 is inverted
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes_inverted.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes_inverted.xiidm"));
@@ -64,7 +64,7 @@ public class HvdcLinkProcessorTest {
     }
 
     @Test
-    public void testHvdcCreationAndSetpointModification() {
+    void testHvdcCreationAndSetpointModification() {
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
@@ -81,7 +81,7 @@ public class HvdcLinkProcessorTest {
     }
 
     @Test
-    public void testDisconnectedAcLine() {
+    void testDisconnectedAcLine() {
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         network.getLine("FFR4AA1  DDE1AA1  1").getTerminal1().disconnect();
@@ -91,7 +91,7 @@ public class HvdcLinkProcessorTest {
     }
 
     @Test
-    public void testDisconnectedAcLine2() {
+    void testDisconnectedAcLine2() {
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());

@@ -30,15 +30,15 @@ class NetworkImporterTest {
     @BeforeAll
     void setUp() {
         sweRequest = new SweRequest("id", OffsetDateTime.now(),
-                new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),
-                new SweFileResource("REN_SSH.xml", "/network/REN_SSH_000.xml"),
-                new SweFileResource("RTE_SSH.xml", "/network/RTEFRANCE_SSH_000.xml"),
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
+                new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),
                 new SweFileResource("REE_TP.xml", "/network/REE_TP_001.xml"),
                 new SweFileResource("REN_EQ.xml", "/network/REN_EQ_001.xml"),
+                new SweFileResource("REN_SSH.xml", "/network/REN_SSH_000.xml"),
                 new SweFileResource("REN_TP.xml", "/network/REN_TP_001.xml"),
                 new SweFileResource("RTE_EQ.xml", "/network/RTEFRANCE_EQ_000.xml"),
+                new SweFileResource("RTE_SSH.xml", "/network/RTEFRANCE_SSH_000.xml"),
                 new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"));
     }
 
