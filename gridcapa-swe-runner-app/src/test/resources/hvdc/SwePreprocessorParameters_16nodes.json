@@ -1,0 +1,74 @@
+{
+  "hvdcCreationParameters": [
+    {
+      "id": "HVDC_FR4-DE1",
+      "maxP": 1000.0,
+      "r": 0.5,
+      "nominalV": 400,
+      "vscCreationParameters": [
+        {
+          "side": 1,
+          "id": "HVDC_FR4-DE1_VSC1",
+          "reactivePowerSetpoint": 0.0,
+          "lossFactor": 1.0,
+          "voltageRegulatorOn": false,
+          "defaultVoltageSetpoint": 400.0
+        },
+        {
+          "side": 2,
+          "id": "HVDC_FR4-DE1_VSC2",
+          "reactivePowerSetpoint": 20.0,
+          "lossFactor": 10.0,
+          "voltageRegulatorOn": true,
+          "defaultVoltageSetpoint": 380.0
+        }
+      ],
+      "angleDroopActivePowerControlParameters": {
+        "p0": 0.0,
+        "droop": 180.0
+      },
+      "hvdcAcEquivalentModel": {
+        "side1GeneratorId": "FFR4AA1 _generator",
+        "side2GeneratorId": "DDE1AA1 _generator",
+        "side1LoadID": "FFR4AA1 _load",
+        "side2LoadId": "DDE1AA1 _load",
+        "acLineId": "FFR4AA1  DDE1AA1  1"
+      }
+    },
+    {
+      "id": "HVDC_BE2-FR3",
+      "maxP": 200.0,
+      "r": 0.75,
+      "nominalV": 220,
+      "vscCreationParameters": [
+        {
+          "side": 1,
+          "id": "HVDC_BE2-FR3_VSC1",
+          "reactivePowerSetpoint": 5.0,
+          "lossFactor": 2.0,
+          "voltageRegulatorOn": false,
+          "defaultVoltageSetpoint": 100.0
+        },
+        {
+          "side": 2,
+          "id": "HVDC_BE2-FR3_VSC2",
+          "reactivePowerSetpoint": -10.0,
+          "lossFactor": 15.0,
+          "voltageRegulatorOn": true,
+          "defaultVoltageSetpoint": 440.0
+        }
+      ],
+      "angleDroopActivePowerControlParameters": {
+        "p0": 10.0,
+        "droop": 270.0
+      },
+      "hvdcAcEquivalentModel": {
+        "side1GeneratorId": "BBE2AA1 _generator",
+        "side2GeneratorId": "FFR3AA1 _generator",
+        "side1LoadID": "BBE2AA1 _load",
+        "side2LoadId": "FFR3AA1 _load",
+        "acLineId": "BBE2AA1  FFR3AA1  1"
+      }
+    }
+  ]
+}

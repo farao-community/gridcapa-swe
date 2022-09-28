@@ -7,13 +7,12 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.swe.preprocess.starter.SwePreprocessClient;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
+import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,19 +21,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
-    private final AmqpTemplate amqpTemplate;
-    private final SwePreprocessClient swePreprocessClient;
+    private final NetworkService networkImporter;
 
-    public SweRunner(AmqpTemplate amqpTemplate, SwePreprocessClient swePreprocessClient) {
-        this.amqpTemplate = amqpTemplate;
-        this.swePreprocessClient = swePreprocessClient;
+    public SweRunner(NetworkService networkImporter) {
+        this.networkImporter = networkImporter;
     }
 
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
-        LOGGER.info("Request received for timestamp 1"); // todo mettre getter timestamp
-
-
+        LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
+        Network network = networkImporter.importNetwork(sweRequest);
         return new SweResponse(sweRequest.getId());
     }
 

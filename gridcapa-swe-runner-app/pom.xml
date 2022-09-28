@@ -33,11 +33,29 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
-            <artifactId>gridcapa-swe-preprocess-api</artifactId>
+            <artifactId>gridcapa-starter-minio-adapter</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>gridcapa-swe-preprocess-starter</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-cgmes-conversion</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-cgmes-model</artifactId>
+            <version>${powsybl.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-xml-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-extensions</artifactId>
+            <version>${powsybl.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -79,6 +97,19 @@
         </dependency>
 
         <!-- Test dependencies -->
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-config-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-triple-store-impl-rdf4j</artifactId>
+            <version>${powsybl.core.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>

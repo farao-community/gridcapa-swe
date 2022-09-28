@@ -29,7 +29,7 @@ spring:
           destination: swe-d2cc-task-status-updated
 
 swe-runner:
-  boundary-location: /home/farao/.itools/cgmes/boundary/
+  boundary-location: test
   whitelist:
     - http://localhost:9000/
 
