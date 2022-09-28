@@ -53,7 +53,6 @@
         <logstash.version>7.0.1</logstash.version>
         <sonar.organization>farao-community</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <swe.preprocess.version>0.0.1-SNAPSHOT</swe.preprocess.version>
     </properties>
 
     <dependencyManagement>
@@ -63,11 +62,6 @@
                 <groupId>com.farao-community.farao</groupId>
                 <artifactId>gridcapa-task-manager-api</artifactId>
                 <version>${gridcapa.task-manager.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.farao-community.farao</groupId>
-                <artifactId>gridcapa-swe-preprocess-starter</artifactId>
-                <version>${swe.preprocess.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.farao-community.farao</groupId>
