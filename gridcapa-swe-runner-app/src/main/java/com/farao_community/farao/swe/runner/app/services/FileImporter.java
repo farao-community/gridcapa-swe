@@ -8,8 +8,6 @@ import com.farao_community.farao.data.crac_io_api.CracImporters;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,7 +22,6 @@ import java.time.OffsetDateTime;
 public class FileImporter {
 
     private final UrlValidationService urlValidationService;
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileImporter.class);
 
     public FileImporter(UrlValidationService urlValidationService) {
         this.urlValidationService = urlValidationService;
