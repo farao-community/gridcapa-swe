@@ -23,7 +23,7 @@ public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
     private final AmqpTemplate amqpTemplate;
 
-    public SweRunner(AmqpTemplate amqpTemplate {
+    public SweRunner(AmqpTemplate amqpTemplate) {
         this.amqpTemplate = amqpTemplate;
     }
 
