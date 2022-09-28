@@ -1,11 +1,41 @@
+logback:
+  amqp:
+    exchange: swe-d2cc-task-manager-logs-exchange
+    routing-key: "#"
+spring:
+  application:
+    name: swe-d2cc-runner
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: gridcapa
+    password: gridcapa
+    template:
+      reply-timeout: 7200000
+  cloud:
+    stream:
+      function:
+        definition: request;interrupt
+      default:
+        binder: rabbit
+      bindings:
+        interrupt-in-0:
+          destination: swe-d2cc-stop-task
+        request-in-0:
+          destination: swe-d2cc-request
+        request-out-0:
+          destination: swe-d2cc-response
+        task-status-update:
+          destination: swe-d2cc-task-status-updated
+
 swe-runner:
+  boundary-location: test
   whitelist:
-    - http://minio:9000/
-    - file:/
+    - http://localhost:9000/
 
 minio-adapter:
   bucket: gridcapa
-  base-path: SWE/VALID
+  base-path: /SWE/D2CC
   access-key: gridcapa
   secret-key: gridcapa
-  url: http://localhost:9000/
+  url: http://localhost:9000

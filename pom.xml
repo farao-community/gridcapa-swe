@@ -51,6 +51,7 @@
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
         <logstash.version>7.0.1</logstash.version>
+        <powsybl.core.version>4.9.2</powsybl.core.version>
         <sonar.organization>farao-community</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -65,8 +66,8 @@
             </dependency>
             <dependency>
                 <groupId>com.farao-community.farao</groupId>
-                <artifactId>gridcapa-starter-minio-adapter</artifactId>
-                <version>${gridcapa.starter.minio.version}</version>
+                <artifactId>gridcapa-task-manager-api</artifactId>
+                <version>${gridcapa.task-manager.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>

@@ -18,9 +18,9 @@ class SweResponseTest {
 
     @Test
     void simpleRequestTest() {
-        SweRequest sweRequest = new SweRequest("id");
-        assertNotNull(sweRequest);
-        assertEquals("id", sweRequest.getId());
+        SweResponse sweResponse = new SweResponse("id");
+        assertNotNull(sweResponse);
+        assertEquals("id", sweResponse.getId());
     }
 
 }
