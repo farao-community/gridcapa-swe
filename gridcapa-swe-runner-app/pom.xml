@@ -33,10 +33,6 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
-            <artifactId>gridcapa-swe-preprocess-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-swe-preprocess-starter</artifactId>
         </dependency>
         <dependency>
@@ -51,6 +47,10 @@
         <dependency>
             <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-task-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-starter-minio-adapter</artifactId>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
@@ -76,6 +76,28 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-crac-creation-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-crac-creator-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-crac-creator-cim</artifactId>
+            <!-- I added version here because unknown dependency version in farao-dependencies! -->
+            <version>4.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-crac-io-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-crac-io-json</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
