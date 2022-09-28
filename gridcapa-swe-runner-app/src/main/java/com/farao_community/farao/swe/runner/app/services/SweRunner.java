@@ -33,8 +33,6 @@ public class SweRunner {
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp 1"); // todo mettre getter timestamp
-
-
         return new SweResponse(sweRequest.getId());
     }
 
