@@ -33,7 +33,7 @@ public class FileExporter {
 
     /**
      * Saves Crac in Json format to MinIO
-     * */
+     */
     public String saveCracInJsonFormat(Crac crac, OffsetDateTime processTargetDateTime, ProcessType processType) {
         MemDataSource memDataSource = new MemDataSource();
         try (OutputStream os = memDataSource.newOutputStream(JSON_CRAC_FILE_NAME, false)) {
@@ -63,6 +63,5 @@ public class FileExporter {
     public enum FileKind {
         ARTIFACTS,
         OUTPUTS
-
     }
 }

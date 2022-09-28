@@ -66,8 +66,8 @@
             </dependency>
             <dependency>
                 <groupId>com.farao-community.farao</groupId>
-                <artifactId>gridcapa-task-manager-api</artifactId>
-                <version>${gridcapa.task-manager.version}</version>
+                <artifactId>gridcapa-starter-minio-adapter</artifactId>
+                <version>${gridcapa.starter.minio.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>

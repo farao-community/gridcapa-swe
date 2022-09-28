@@ -32,6 +32,7 @@ swe-runner:
   boundary-location: test
   whitelist:
     - http://localhost:9000/
+    - file:/
 
 minio-adapter:
   bucket: gridcapa

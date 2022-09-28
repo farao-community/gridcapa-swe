@@ -67,6 +67,10 @@
             <artifactId>gridcapa-task-manager-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-starter-minio-adapter</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
         </dependency>
