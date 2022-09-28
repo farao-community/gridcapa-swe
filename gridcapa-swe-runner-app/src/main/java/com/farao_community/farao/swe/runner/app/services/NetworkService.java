@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
@@ -153,7 +154,7 @@ public class NetworkService {
         try {
             xiidm = memDataSource.newInputStream("", "xiidm");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new SweInternalException("Could not export XIIDM file");
         }
         minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", OffsetDateTime.now());
     }
