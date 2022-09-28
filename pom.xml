@@ -45,7 +45,7 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <farao.dependencies.version>1.5.1</farao.dependencies.version>
+        <farao.dependencies.version>1.5.2</farao.dependencies.version>
         <gridcapa.starter.minio.version>0.2.0</gridcapa.starter.minio.version>
         <gridcapa.task-manager.version>1.6.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
@@ -61,13 +61,13 @@
             <!-- Compile dependencies -->
             <dependency>
                 <groupId>com.farao-community.farao</groupId>
-                <artifactId>gridcapa-starter-minio-adapter</artifactId>
-                <version>${gridcapa.starter.minio.version}</version>
+                <artifactId>gridcapa-task-manager-api</artifactId>
+                <version>${gridcapa.task-manager.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.farao-community.farao</groupId>
-                <artifactId>gridcapa-task-manager-api</artifactId>
-                <version>${gridcapa.task-manager.version}</version>
+                <artifactId>gridcapa-starter-minio-adapter</artifactId>
+                <version>${gridcapa.starter.minio.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
