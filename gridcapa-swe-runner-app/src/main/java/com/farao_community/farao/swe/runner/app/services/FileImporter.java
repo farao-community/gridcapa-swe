@@ -38,7 +38,7 @@ public class FileImporter {
     }
 
     public Crac importCrac(CimCrac cimCrac, OffsetDateTime targetProcessDateTime, Network network) {
-        LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}",targetProcessDateTime);
+        LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", targetProcessDateTime);
         return CracCreators.createCrac(cimCrac, network, targetProcessDateTime).getCrac();
     }
 
