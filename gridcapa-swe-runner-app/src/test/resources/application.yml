@@ -29,7 +29,6 @@ spring:
           destination: swe-d2cc-task-status-updated
 
 swe-runner:
-  boundary-location: test
   whitelist:
     - http://localhost:9000/
     - file:/

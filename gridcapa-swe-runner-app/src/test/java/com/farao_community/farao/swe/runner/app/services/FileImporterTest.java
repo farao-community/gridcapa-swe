@@ -2,6 +2,8 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
+import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
+import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.google.common.base.Suppliers;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.import_.ImportConfig;
@@ -65,11 +67,9 @@ class FileImporterTest {
                 Suppliers.memoize(ImportConfig::load).get(),
                 importParams
         );
-        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(
-                getClass().getResource(testDirectory + cimCracFilename).toExternalForm(),
-                dateTime,
-                network
-        );
+        SweRequest sweRequest = new SweRequest("id", dateTime, null, null, null, null, null, null, null, null, null, null,
+                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null);
+        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest, network);
         Assertions.assertNotNull(crac);
     }
 

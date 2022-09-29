@@ -32,6 +32,8 @@ public class SweRequest {
     private final SweFileResource rteSsh;
     private final SweFileResource rteTp;
     private final SweFileResource crac;
+    private final SweFileResource boundaryEq;
+    private final SweFileResource boundaryTp;
 
     @JsonCreator
     public SweRequest(@JsonProperty("id") String id,
@@ -46,7 +48,9 @@ public class SweRequest {
                       @JsonProperty("rteEq") SweFileResource rteEq,
                       @JsonProperty("rteSsh") SweFileResource rteSsh,
                       @JsonProperty("rteTp") SweFileResource rteTp,
-                      @JsonProperty("crac") SweFileResource crac) {
+                      @JsonProperty("crac") SweFileResource crac,
+                      @JsonProperty("boundaryEq") SweFileResource boundaryEq,
+                      @JsonProperty("boundaryTp") SweFileResource boundaryTp) {
         this.id = id;
         this.targetProcessDateTime = targetProcessDateTime;
         this.coresoSv = coresoSv;
@@ -60,6 +64,8 @@ public class SweRequest {
         this.rteSsh = rteSsh;
         this.rteTp = rteTp;
         this.crac = crac;
+        this.boundaryEq = boundaryEq;
+        this.boundaryTp = boundaryTp;
     }
 
     public String getId() {
@@ -114,4 +120,11 @@ public class SweRequest {
         return crac;
     }
 
+    public SweFileResource getBoundaryEq() {
+        return boundaryEq;
+    }
+
+    public SweFileResource getBoundaryTp() {
+        return boundaryTp;
+    }
 }

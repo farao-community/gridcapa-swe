@@ -14,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -43,10 +42,11 @@ class SweRunnerTest {
                 new SweFileResource("RTE_EQ.xml", "/network/RTEFRANCE_EQ_000.xml"),
                 new SweFileResource("RTE_SSH.xml", "/network/RTEFRANCE_SSH_000.xml"),
                 new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"),
-                new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml")
-        );
+                new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
+                new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
+                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"));
         when(networkImporter.importNetwork(sweRequest)).thenReturn(Network.create("network-id", "format"));
-        when(fileImporter.importCimCracFromUrlWithNetwork(anyString(), any(OffsetDateTime.class), any(Network.class)))
+        when(fileImporter.importCimCracFromUrlWithNetwork(any(), any(Network.class)))
                 .thenReturn(new CracImpl("crac-id", "name"));
         SweResponse sweResponse = sweRunner.run(sweRequest);
         Assertions.assertNotNull(sweResponse);

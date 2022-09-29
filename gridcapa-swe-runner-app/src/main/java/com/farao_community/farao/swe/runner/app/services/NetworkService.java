@@ -26,7 +26,6 @@ import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -53,16 +52,13 @@ public class NetworkService {
 
     private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
 
-    @Value("${swe-runner.boundary-location}")
-    private String boundaryLocation;
-
     public NetworkService(MinioAdapter minioAdapter) {
         this.minioAdapter = minioAdapter;
     }
 
     public Network importNetwork(SweRequest sweRequest) {
         LOGGER.info("Importing CGMES network");
-        List<SweFileResource> listCgms = getCgmFilesFromRequest(sweRequest);
+        List<SweFileResource> listCgms = getCgmAndBoundaryFilesFromRequest(sweRequest);
         String zipPath = buildZipFromCgms(listCgms);
         Network network = importFromZip(zipPath);
         deleteFile(new File(zipPath));
@@ -72,7 +68,7 @@ public class NetworkService {
         return network;
     }
 
-    List<SweFileResource> getCgmFilesFromRequest(SweRequest sweRequest) {
+    List<SweFileResource> getCgmAndBoundaryFilesFromRequest(SweRequest sweRequest) {
         List<SweFileResource> listCgms = new ArrayList<>();
         listCgms.add(sweRequest.getCoresoSv());
         listCgms.add(sweRequest.getReeEq());
@@ -84,6 +80,8 @@ public class NetworkService {
         listCgms.add(sweRequest.getRteEq());
         listCgms.add(sweRequest.getRteTp());
         listCgms.add(sweRequest.getRteSsh());
+        listCgms.add(sweRequest.getBoundaryEq());
+        listCgms.add(sweRequest.getBoundaryTp());
         return listCgms;
     }
 
@@ -119,7 +117,6 @@ public class NetworkService {
     Network importFromZip(String zipPath) {
         Properties importParams = new Properties();
         importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
-        importParams.put(CgmesImport.BOUNDARY_LOCATION, boundaryLocation);
         return Importers.loadNetwork(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
     }
 
@@ -150,7 +147,7 @@ public class NetworkService {
     private void exportToMinio(Network network, OffsetDateTime targetDateTime) {
         MemDataSource memDataSource = new MemDataSource();
         Exporters.export("XIIDM", network, new Properties(), memDataSource);
-        InputStream xiidm = null;
+        InputStream xiidm;
         try {
             xiidm = memDataSource.newInputStream("", "xiidm");
         } catch (IOException e) {
