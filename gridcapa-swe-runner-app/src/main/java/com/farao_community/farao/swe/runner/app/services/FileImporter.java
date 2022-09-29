@@ -42,6 +42,10 @@ public class FileImporter {
         return CracCreators.createCrac(cimCrac, network, targetProcessDateTime).getCrac();
     }
 
+    public Crac importCimCracFromUrlWithNetwork(String cracUrl, OffsetDateTime targetProcessDateTime, Network network) {
+        return importCrac(importCimCrac(cracUrl), targetProcessDateTime, network);
+    }
+
     public Crac importCracFromJson(String cracUrl) {
         LOGGER.info("Importing Crac from json file url");
         try (InputStream cracResultStream = urlValidationService.openUrlStream(cracUrl)) {
