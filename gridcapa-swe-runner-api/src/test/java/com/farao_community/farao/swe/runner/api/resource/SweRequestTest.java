@@ -31,11 +31,13 @@ class SweRequestTest {
                 new SweFileResource("REN_TP.xml", "/network/REN_TP_001.xml"),
                 new SweFileResource("RTE_EQ.xml", "/network/RTEFRANCE_EQ_000.xml"),
                 new SweFileResource("RTE_SSH.xml", "/network/RTEFRANCE_SSH_000.xml"),
-                new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"));
+                new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"),
+                new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"));
         assertNotNull(sweRequest);
         assertEquals("id", sweRequest.getId());
         assertEquals(now, sweRequest.getTargetProcessDateTime());
         assertEquals("REN_SSH.xml", sweRequest.getRenSsh().getFilename());
+        assertEquals("CRAC.xml", sweRequest.getCrac().getFilename());
     }
 
 }

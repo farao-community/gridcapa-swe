@@ -7,6 +7,7 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
@@ -15,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
@@ -22,15 +25,20 @@ import org.springframework.stereotype.Service;
 public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
     private final NetworkService networkImporter;
+    private final FileImporter fileImporter;
 
-    public SweRunner(NetworkService networkImporter) {
+    public SweRunner(NetworkService networkImporter, FileImporter fileImporter) {
         this.networkImporter = networkImporter;
+        this.fileImporter = fileImporter;
     }
 
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
-        LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
+        final OffsetDateTime processDateTime = sweRequest.getTargetProcessDateTime();
+        LOGGER.info("Request received for timestamp {}", processDateTime);
         Network network = networkImporter.importNetwork(sweRequest);
+        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest.getCrac().getUrl(), processDateTime, network);
+        //to be continued!
         return new SweResponse(sweRequest.getId());
     }
 

@@ -56,6 +56,24 @@ class FileImporterTest {
     }
 
     @Test
+    void testImportCimCracFromUrlWithNetwork() {
+        Properties importParams = new Properties();
+        importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
+        Network network = Importers.loadNetwork(
+                Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
+                LocalComputationManager.getDefault(),
+                Suppliers.memoize(ImportConfig::load).get(),
+                importParams
+        );
+        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(
+                getClass().getResource(testDirectory + cimCracFilename).toExternalForm(),
+                dateTime,
+                network
+        );
+        Assertions.assertNotNull(crac);
+    }
+
+    @Test
     void testImportCracFromJson() {
         Crac cracFromJson = fileImporter.importCracFromJson(Objects.requireNonNull(getClass().getResource(testDirectory + jsonCracFilename)).toString());
         assertNotNull(cracFromJson);

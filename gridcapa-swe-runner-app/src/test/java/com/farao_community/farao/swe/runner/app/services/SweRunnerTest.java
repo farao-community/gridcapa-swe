@@ -1,35 +1,38 @@
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.powsybl.iidm.network.Network;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-class NetworkImporterTest {
+class SweRunnerTest {
 
     @Autowired
-    private NetworkService networkImporter;
+    SweRunner sweRunner;
 
-    private SweRequest sweRequest;
+    @MockBean
+    NetworkService networkImporter;
 
-    @BeforeAll
-    void setUp() {
-        sweRequest = new SweRequest("id", OffsetDateTime.now(),
+    @MockBean
+    FileImporter fileImporter;
+
+    @Test
+    void run() {
+        OffsetDateTime now = OffsetDateTime.now();
+        SweRequest sweRequest = new SweRequest("id", now,
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
                 new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),
@@ -40,18 +43,13 @@ class NetworkImporterTest {
                 new SweFileResource("RTE_EQ.xml", "/network/RTEFRANCE_EQ_000.xml"),
                 new SweFileResource("RTE_SSH.xml", "/network/RTEFRANCE_SSH_000.xml"),
                 new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"),
-                new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"));
-    }
-
-    @Test
-    void getCgmListFromRequestTest() {
-        List<SweFileResource> cgmFilesFromRequest = networkImporter.getCgmFilesFromRequest(sweRequest);
-        assertEquals(10, cgmFilesFromRequest.size());
-    }
-
-    @Test
-    void importNetworkSuccess() throws URISyntaxException {
-        Network network = networkImporter.importFromZip(Paths.get(Objects.requireNonNull(getClass().getResource("/network/MicroGrid.zip")).toURI()).toString());
-        assertNotNull(network);
+                new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml")
+        );
+        when(networkImporter.importNetwork(sweRequest)).thenReturn(Network.create("network-id", "format"));
+        when(fileImporter.importCimCracFromUrlWithNetwork(anyString(), any(OffsetDateTime.class), any(Network.class)))
+                .thenReturn(new CracImpl("crac-id", "name"));
+        SweResponse sweResponse = sweRunner.run(sweRequest);
+        Assertions.assertNotNull(sweResponse);
+        Assertions.assertEquals(sweRequest.getId(), sweResponse.getId());
     }
 }
