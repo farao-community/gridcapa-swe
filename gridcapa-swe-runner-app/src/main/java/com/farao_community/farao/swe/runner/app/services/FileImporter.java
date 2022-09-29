@@ -6,6 +6,7 @@ import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCracImporter;
 import com.farao_community.farao.data.crac_io_api.CracImporters;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
+import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -42,8 +43,8 @@ public class FileImporter {
         return CracCreators.createCrac(cimCrac, network, targetProcessDateTime).getCrac();
     }
 
-    public Crac importCimCracFromUrlWithNetwork(String cracUrl, OffsetDateTime targetProcessDateTime, Network network) {
-        return importCrac(importCimCrac(cracUrl), targetProcessDateTime, network);
+    public Crac importCimCracFromUrlWithNetwork(SweRequest sweRequest, Network network) {
+        return importCrac(importCimCrac(sweRequest.getCrac().getUrl()), sweRequest.getTargetProcessDateTime(), network);
     }
 
     public Crac importCracFromJson(String cracUrl) {

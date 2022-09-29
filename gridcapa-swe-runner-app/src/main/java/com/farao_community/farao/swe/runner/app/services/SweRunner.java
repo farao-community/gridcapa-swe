@@ -34,10 +34,9 @@ public class SweRunner {
 
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
-        final OffsetDateTime processDateTime = sweRequest.getTargetProcessDateTime();
-        LOGGER.info("Request received for timestamp {}", processDateTime);
+        LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         Network network = networkImporter.importNetwork(sweRequest);
-        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest.getCrac().getUrl(), processDateTime, network);
+        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest, network);
         //to be continued!
         return new SweResponse(sweRequest.getId());
     }

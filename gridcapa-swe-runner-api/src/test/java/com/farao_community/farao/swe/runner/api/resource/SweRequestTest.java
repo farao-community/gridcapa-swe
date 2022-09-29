@@ -32,12 +32,16 @@ class SweRequestTest {
                 new SweFileResource("RTE_EQ.xml", "/network/RTEFRANCE_EQ_000.xml"),
                 new SweFileResource("RTE_SSH.xml", "/network/RTEFRANCE_SSH_000.xml"),
                 new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"),
-                new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"));
+                new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
+                new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
+                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"));
         assertNotNull(sweRequest);
         assertEquals("id", sweRequest.getId());
         assertEquals(now, sweRequest.getTargetProcessDateTime());
         assertEquals("REN_SSH.xml", sweRequest.getRenSsh().getFilename());
         assertEquals("CRAC.xml", sweRequest.getCrac().getFilename());
+        assertEquals("BOUNDARY_EQ.xml", sweRequest.getBoundaryEq().getFilename());
+        assertEquals("BOUNDARY_TP.xml", sweRequest.getBoundaryTp().getFilename());
     }
 
 }
