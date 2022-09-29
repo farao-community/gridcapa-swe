@@ -67,7 +67,7 @@ class FileImporterTest {
                 Suppliers.memoize(ImportConfig::load).get(),
                 importParams
         );
-        SweRequest sweRequest = new SweRequest("id", dateTime, null, null, null, null, null, null, null, null, null,null,
+        SweRequest sweRequest = new SweRequest("id", dateTime, null, null, null, null, null, null, null, null, null, null,
                 new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null);
         Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest, network);
         Assertions.assertNotNull(crac);
