@@ -5,28 +5,6 @@ logback:
 spring:
   application:
     name: swe-d2cc-runner
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: gridcapa
-    password: gridcapa
-    template:
-      reply-timeout: 7200000
-  cloud:
-    stream:
-      function:
-        definition: request;interrupt
-      default:
-        binder: rabbit
-      bindings:
-        interrupt-in-0:
-          destination: swe-d2cc-stop-task
-        request-in-0:
-          destination: swe-d2cc-request
-        request-out-0:
-          destination: swe-d2cc-response
-        task-status-update:
-          destination: swe-d2cc-task-status-updated
 
 swe-runner:
   whitelist:
