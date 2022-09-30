@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
@@ -42,7 +48,8 @@ class NetworkImporterTest {
                 new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"),
                 new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
-                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"));
+                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"),
+                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
     }
 
     @Test

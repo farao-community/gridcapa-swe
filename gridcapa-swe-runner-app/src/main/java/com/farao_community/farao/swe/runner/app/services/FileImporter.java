@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
@@ -7,6 +13,9 @@ import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCrac
 import com.farao_community.farao.data.crac_io_api.CracImporters;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.powsybl.glsk.api.io.GlskDocumentImporters;
+import com.powsybl.glsk.commons.ZonalData;
+import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -16,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 
 /**
@@ -54,5 +64,9 @@ public class FileImporter {
         } catch (IOException e) {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl));
         }
+    }
+
+    public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
+        return GlskDocumentImporters.importGlsk(urlValidationService.openUrlStream(glskUrl)).getZonalScalable(network, instant);
     }
 }

@@ -34,6 +34,7 @@ public class SweRequest {
     private final SweFileResource crac;
     private final SweFileResource boundaryEq;
     private final SweFileResource boundaryTp;
+    private final SweFileResource glsk;
 
     @JsonCreator
     public SweRequest(@JsonProperty("id") String id,
@@ -50,7 +51,8 @@ public class SweRequest {
                       @JsonProperty("rteTp") SweFileResource rteTp,
                       @JsonProperty("crac") SweFileResource crac,
                       @JsonProperty("boundaryEq") SweFileResource boundaryEq,
-                      @JsonProperty("boundaryTp") SweFileResource boundaryTp) {
+                      @JsonProperty("boundaryTp") SweFileResource boundaryTp,
+                      @JsonProperty("glsk") SweFileResource glsk) {
         this.id = id;
         this.targetProcessDateTime = targetProcessDateTime;
         this.coresoSv = coresoSv;
@@ -66,6 +68,7 @@ public class SweRequest {
         this.crac = crac;
         this.boundaryEq = boundaryEq;
         this.boundaryTp = boundaryTp;
+        this.glsk = glsk;
     }
 
     public String getId() {
@@ -126,5 +129,9 @@ public class SweRequest {
 
     public SweFileResource getBoundaryTp() {
         return boundaryTp;
+    }
+
+    public SweFileResource getGlsk() {
+        return glsk;
     }
 }

@@ -42,6 +42,18 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-glsk-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-glsk-document-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-glsk-document-cim</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
             <artifactId>powsybl-iidm-api</artifactId>
         </dependency>
         <dependency>
@@ -52,6 +64,10 @@
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-iidm-extensions</artifactId>
             <version>${powsybl.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-modification</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
