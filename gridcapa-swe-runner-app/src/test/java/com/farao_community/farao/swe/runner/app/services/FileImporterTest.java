@@ -33,6 +33,10 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
+ */
 @SpringBootTest
 class FileImporterTest {
 
