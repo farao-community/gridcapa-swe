@@ -22,12 +22,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
-    private final NetworkService networkImporter;
     private final FileImporter fileImporter;
+    private final NetworkService networkImporter;
 
-    public SweRunner(NetworkService networkImporter, FileImporter fileImporter) {
-        this.networkImporter = networkImporter;
+    public SweRunner(FileImporter fileImporter, NetworkService networkImporter) {
         this.fileImporter = fileImporter;
+        this.networkImporter = networkImporter;
     }
 
     @Threadable

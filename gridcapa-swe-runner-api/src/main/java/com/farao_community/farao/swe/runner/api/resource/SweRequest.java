@@ -20,6 +20,7 @@ import java.time.OffsetDateTime;
 public class SweRequest {
     @Id
     private final String id;
+    private final ProcessType processType;
     private final OffsetDateTime targetProcessDateTime;
     private final SweFileResource coresoSv;
     private final SweFileResource reeEq;
@@ -38,6 +39,7 @@ public class SweRequest {
 
     @JsonCreator
     public SweRequest(@JsonProperty("id") String id,
+                      @JsonProperty("processType") ProcessType processType,
                       @JsonProperty("targetProcessDateTime") OffsetDateTime targetProcessDateTime,
                       @JsonProperty("coresoSv") SweFileResource coresoSv,
                       @JsonProperty("reeEq") SweFileResource reeEq,
@@ -54,6 +56,7 @@ public class SweRequest {
                       @JsonProperty("boundaryTp") SweFileResource boundaryTp,
                       @JsonProperty("glsk") SweFileResource glsk) {
         this.id = id;
+        this.processType = processType;
         this.targetProcessDateTime = targetProcessDateTime;
         this.coresoSv = coresoSv;
         this.reeEq = reeEq;
@@ -73,6 +76,10 @@ public class SweRequest {
 
     public String getId() {
         return id;
+    }
+
+    public ProcessType getProcessType() {
+        return processType;
     }
 
     public OffsetDateTime getTargetProcessDateTime() {

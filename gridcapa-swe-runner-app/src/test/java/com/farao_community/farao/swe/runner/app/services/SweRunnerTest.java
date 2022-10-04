@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_impl.CracImpl;
+import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
@@ -37,7 +38,7 @@ class SweRunnerTest {
     @Test
     void run() {
         OffsetDateTime now = OffsetDateTime.now();
-        SweRequest sweRequest = new SweRequest("id", now,
+        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, now,
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
                 new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),

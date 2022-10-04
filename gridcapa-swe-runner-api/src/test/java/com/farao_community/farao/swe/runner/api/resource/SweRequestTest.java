@@ -21,7 +21,7 @@ class SweRequestTest {
     @Test
     void simpleRequestTest() {
         OffsetDateTime now = OffsetDateTime.now();
-        SweRequest sweRequest = new SweRequest("id", now,
+        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, now,
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
                 new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),
@@ -38,6 +38,7 @@ class SweRequestTest {
                 new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
         assertNotNull(sweRequest);
         assertEquals("id", sweRequest.getId());
+        assertEquals(ProcessType.D2CC, sweRequest.getProcessType());
         assertEquals(now, sweRequest.getTargetProcessDateTime());
         assertEquals("REN_SSH.xml", sweRequest.getRenSsh().getFilename());
         assertEquals("CRAC.xml", sweRequest.getCrac().getFilename());
