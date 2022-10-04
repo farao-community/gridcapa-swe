@@ -8,6 +8,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
+import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
@@ -34,7 +35,9 @@ public class SweRunner {
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         Network network = networkImporter.importNetwork(sweRequest);
-        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest, network);
+        CimCrac cimCrac = fileImporter.importCimCrac(sweRequest);
+        Crac cracFrEs = fileImporter.importCracFromUrlWithNetworkFrEs(cimCrac, sweRequest, network);
+        Crac cracEsPt = fileImporter.importCracFromUrlWithNetworkEsPT(cimCrac, sweRequest, network);
         //to be continued!
         return new SweResponse(sweRequest.getId());
     }

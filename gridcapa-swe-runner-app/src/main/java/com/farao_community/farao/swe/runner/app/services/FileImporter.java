@@ -2,6 +2,8 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.api.CracCreators;
+import com.farao_community.farao.data.crac_creation.creator.api.parameters.CracCreationParameters;
+import com.farao_community.farao.data.crac_creation.creator.api.parameters.JsonCracCreationParameters;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCracImporter;
 import com.farao_community.farao.data.crac_io_api.CracImporters;
@@ -25,26 +27,40 @@ import java.time.OffsetDateTime;
 public class FileImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileImporter.class);
+    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON = "/crac/CimCracCreationParameters_PT-ES.json";
+    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON = "/crac/CimCracCreationParameters_FR-ES.json";
     private final UrlValidationService urlValidationService;
 
     public FileImporter(UrlValidationService urlValidationService) {
         this.urlValidationService = urlValidationService;
     }
 
-    public CimCrac importCimCrac(String cracUrl) {
+    public CimCrac importCimCrac(SweRequest sweRequest) {
         LOGGER.info("Importing Cim Crac file from url");
-        InputStream cracInputStream = urlValidationService.openUrlStream(cracUrl);
+        InputStream cracInputStream = urlValidationService.openUrlStream(sweRequest.getCrac().getUrl());
         CimCracImporter cimCracImporter = new CimCracImporter();
         return cimCracImporter.importNativeCrac(cracInputStream);
     }
 
-    public Crac importCrac(CimCrac cimCrac, OffsetDateTime targetProcessDateTime, Network network) {
+    public Crac importCrac(CimCrac cimCrac, OffsetDateTime targetProcessDateTime, Network network, CracCreationParameters params) {
         LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", targetProcessDateTime);
-        return CracCreators.createCrac(cimCrac, network, targetProcessDateTime).getCrac();
+        return CracCreators.createCrac(cimCrac, network, targetProcessDateTime, params).getCrac();
     }
 
-    public Crac importCimCracFromUrlWithNetwork(SweRequest sweRequest, Network network) {
-        return importCrac(importCimCrac(sweRequest.getCrac().getUrl()), sweRequest.getTargetProcessDateTime(), network);
+    public Crac importCracFromUrlWithNetworkFrEs(CimCrac cimCrac, SweRequest sweRequest, Network network) {
+        return importCrac(
+                cimCrac,
+                sweRequest.getTargetProcessDateTime(),
+                network,
+                getCimCracCreationParameters(CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON));
+    }
+
+    public Crac importCracFromUrlWithNetworkEsPT(CimCrac cimCrac, SweRequest sweRequest, Network network) {
+        return importCrac(
+                cimCrac,
+                sweRequest.getTargetProcessDateTime(),
+                network,
+                getCimCracCreationParameters(CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON));
     }
 
     public Crac importCracFromJson(String cracUrl) {
@@ -55,4 +71,10 @@ public class FileImporter {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl));
         }
     }
+
+    private CracCreationParameters getCimCracCreationParameters(String paramFile) {
+        LOGGER.info("Importing Crac Creation Parameters file {}", paramFile);
+        return JsonCracCreationParameters.read(getClass().getResourceAsStream(paramFile));
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
@@ -46,7 +47,7 @@ class SweRunnerTest {
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
                 new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"));
         when(networkImporter.importNetwork(sweRequest)).thenReturn(Network.create("network-id", "format"));
-        when(fileImporter.importCimCracFromUrlWithNetwork(any(), any(Network.class)))
+        when(fileImporter.importCracFromUrlWithNetworkFrEs(any(CimCrac.class), any(SweRequest.class), any(Network.class)))
                 .thenReturn(new CracImpl("crac-id", "name"));
         SweResponse sweResponse = sweRunner.run(sweRequest);
         Assertions.assertNotNull(sweResponse);
