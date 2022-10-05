@@ -26,9 +26,10 @@ class SweRunnerTest {
 
     @MockBean
     NetworkService networkImporter;
-
     @MockBean
     FileImporter fileImporter;
+    @MockBean
+    FileExporter fileExporter;
 
     @Test
     void run() {
@@ -50,6 +51,8 @@ class SweRunnerTest {
         when(networkImporter.importNetwork(sweRequest)).thenReturn(Network.create("network-id", "format"));
         when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString()))
                 .thenReturn(new CracImpl("crac-id", "name"));
+        when(fileExporter.saveCracInJsonFormat(any(), anyString(), any(), any()))
+                .thenReturn("testStringUrl");
         SweResponse sweResponse = sweRunner.run(sweRequest);
         Assertions.assertNotNull(sweResponse);
         Assertions.assertEquals(sweRequest.getId(), sweResponse.getId());
