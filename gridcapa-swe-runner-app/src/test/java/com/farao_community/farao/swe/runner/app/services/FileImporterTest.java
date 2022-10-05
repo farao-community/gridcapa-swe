@@ -1,7 +1,6 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_creation.creator.api.parameters.CracCreationParameters;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
@@ -42,21 +41,6 @@ class FileImporterTest {
     }
 
     @Test
-    void testImportCrac() {
-        Properties importParams = new Properties();
-        importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
-        Network network = Importers.loadNetwork(
-                Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
-                LocalComputationManager.getDefault(),
-                Suppliers.memoize(ImportConfig::load).get(),
-                importParams);
-        SweRequest req = createEmptySweRequest();
-        CimCrac cimCrac = fileImporter.importCimCrac(req);
-        Crac crac = fileImporter.importCrac(cimCrac, dateTime, network, new CracCreationParameters());
-        Assertions.assertNotNull(crac);
-    }
-
-    @Test
     void testImportCimCracFromUrlWithNetwork() {
         Properties importParams = new Properties();
         importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
@@ -68,9 +52,9 @@ class FileImporterTest {
         );
         SweRequest sweRequest = createEmptySweRequest();
         SweRequest req = createEmptySweRequest();
-        Crac cracFrEs = fileImporter.importCracFromUrlWithNetworkFrEs(fileImporter.importCimCrac(req), sweRequest, network);
+        Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
         Assertions.assertNotNull(cracFrEs);
-        Crac cracEsPt = fileImporter.importCracFromUrlWithNetworkEsPT(fileImporter.importCimCrac(req), sweRequest, network);
+        Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, SweRunner.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
         Assertions.assertNotNull(cracEsPt);
     }
 
