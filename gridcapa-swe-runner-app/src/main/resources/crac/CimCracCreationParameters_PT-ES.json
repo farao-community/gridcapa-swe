@@ -1,0 +1,14 @@
+{
+  "crac-factory": "CracImplFactory",
+  "extensions": {
+    "CimCracCreatorParameters": {
+      "timeseries-mrids" : [ "REE-TimeSeries-ESPT", "REN-TimeSeries-1" ],
+      "range-action-speeds": [
+        {
+          "range-action-id": "REE-RA-139",
+          "speed": 1
+        }
+      ]
+    }
+  }
+}

@@ -1,7 +1,15 @@
+/*
+ * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.api.CracCreators;
+import com.farao_community.farao.data.crac_creation.creator.api.parameters.CracCreationParameters;
+import com.farao_community.farao.data.crac_creation.creator.api.parameters.JsonCracCreationParameters;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCracImporter;
 import com.farao_community.farao.data.crac_io_api.CracImporters;
@@ -9,6 +17,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,20 +40,19 @@ public class FileImporter {
         this.urlValidationService = urlValidationService;
     }
 
-    public CimCrac importCimCrac(String cracUrl) {
+    public CimCrac importCimCrac(SweRequest sweRequest) {
         LOGGER.info("Importing Cim Crac file from url");
-        InputStream cracInputStream = urlValidationService.openUrlStream(cracUrl);
+        InputStream cracInputStream = urlValidationService.openUrlStream(sweRequest.getCrac().getUrl());
         CimCracImporter cimCracImporter = new CimCracImporter();
         return cimCracImporter.importNativeCrac(cracInputStream);
     }
 
-    public Crac importCrac(CimCrac cimCrac, OffsetDateTime targetProcessDateTime, Network network) {
-        LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", targetProcessDateTime);
-        return CracCreators.createCrac(cimCrac, network, targetProcessDateTime).getCrac();
-    }
-
-    public Crac importCimCracFromUrlWithNetwork(SweRequest sweRequest, Network network) {
-        return importCrac(importCimCrac(sweRequest.getCrac().getUrl()), sweRequest.getTargetProcessDateTime(), network);
+    public Crac importCracFromCimCracAndNetwork(CimCrac cimCrac, OffsetDateTime processDateTime, Network network, String cracCreationParams) {
+        return importCrac(
+                cimCrac,
+                processDateTime,
+                network,
+                getCimCracCreationParameters(cracCreationParams));
     }
 
     public Crac importCracFromJson(String cracUrl) {
@@ -55,4 +63,18 @@ public class FileImporter {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl));
         }
     }
+
+    private Crac importCrac(CimCrac cimCrac, OffsetDateTime targetProcessDateTime, Network network, CracCreationParameters params) {
+        LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", targetProcessDateTime);
+        return CracCreators.createCrac(cimCrac, network, targetProcessDateTime, params).getCrac();
+    }
+
+    private CracCreationParameters getCimCracCreationParameters(String paramFilePath) {
+        LOGGER.info("Importing Crac Creation Parameters file: {}", paramFilePath);
+        if (StringUtils.isAllBlank(paramFilePath)) {
+            return new CracCreationParameters();
+        }
+        return JsonCracCreationParameters.read(getClass().getResourceAsStream(paramFilePath));
+    }
+
 }

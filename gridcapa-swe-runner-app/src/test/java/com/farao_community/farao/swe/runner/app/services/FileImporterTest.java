@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
@@ -35,26 +41,9 @@ class FileImporterTest {
 
     @Test
     void testImportCimCrac() {
-        CimCrac cimCrac = fileImporter.importCimCrac(
-                getClass().getResource(testDirectory + cimCracFilename).toExternalForm()
-                );
+        SweRequest req = createEmptySweRequest();
+        CimCrac cimCrac = fileImporter.importCimCrac(req);
         Assertions.assertNotNull(cimCrac);
-    }
-
-    @Test
-    void testImportCrac() {
-        Properties importParams = new Properties();
-        importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
-        Network network = Importers.loadNetwork(
-                Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
-                LocalComputationManager.getDefault(),
-                Suppliers.memoize(ImportConfig::load).get(),
-                importParams);
-        CimCrac cimCrac = fileImporter.importCimCrac(
-                getClass().getResource(testDirectory + cimCracFilename).toExternalForm()
-        );
-        Crac crac = fileImporter.importCrac(cimCrac, dateTime, network);
-        Assertions.assertNotNull(crac);
     }
 
     @Test
@@ -67,15 +56,22 @@ class FileImporterTest {
                 Suppliers.memoize(ImportConfig::load).get(),
                 importParams
         );
-        SweRequest sweRequest = new SweRequest("id", dateTime, null, null, null, null, null, null, null, null, null, null,
-                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null);
-        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest, network);
-        Assertions.assertNotNull(crac);
+        SweRequest sweRequest = createEmptySweRequest();
+        SweRequest req = createEmptySweRequest();
+        Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
+        Assertions.assertNotNull(cracFrEs);
+        Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, SweRunner.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
+        Assertions.assertNotNull(cracEsPt);
     }
 
     @Test
     void testImportCracFromJson() {
         Crac cracFromJson = fileImporter.importCracFromJson(Objects.requireNonNull(getClass().getResource(testDirectory + jsonCracFilename)).toString());
         assertNotNull(cracFromJson);
+    }
+
+    SweRequest createEmptySweRequest() {
+        return new SweRequest("id", dateTime, null, null, null, null, null, null, null, null, null, null,
+                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null);
     }
 }

@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
@@ -14,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -24,9 +32,10 @@ class SweRunnerTest {
 
     @MockBean
     NetworkService networkImporter;
-
     @MockBean
     FileImporter fileImporter;
+    @MockBean
+    FileExporter fileExporter;
 
     @Test
     void run() {
@@ -46,8 +55,10 @@ class SweRunnerTest {
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
                 new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"));
         when(networkImporter.importNetwork(sweRequest)).thenReturn(Network.create("network-id", "format"));
-        when(fileImporter.importCimCracFromUrlWithNetwork(any(), any(Network.class)))
+        when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString()))
                 .thenReturn(new CracImpl("crac-id", "name"));
+        when(fileExporter.saveCracInJsonFormat(any(), anyString(), any(), any()))
+                .thenReturn("testStringUrl");
         SweResponse sweResponse = sweRunner.run(sweRequest);
         Assertions.assertNotNull(sweResponse);
         Assertions.assertEquals(sweRequest.getId(), sweResponse.getId());
