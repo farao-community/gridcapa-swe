@@ -7,18 +7,13 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
+import com.farao_community.farao.swe.runner.app.utils.ImportedFiles;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
-import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -27,31 +22,19 @@ import java.time.OffsetDateTime;
 public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
 
-    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON = "/crac/CimCracCreationParameters_PT-ES.json";
-    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON = "/crac/CimCracCreationParameters_FR-ES.json";
+    private final FilesService filesService;
+    private ImportedFiles importedFiles;
 
-    private final NetworkService networkImporter;
-    private final FileImporter fileImporter;
-    private final FileExporter fileExporter;
-
-    public SweRunner(NetworkService networkImporter, FileImporter fileImporter, FileExporter fileExporter) {
-        this.networkImporter = networkImporter;
-        this.fileImporter = fileImporter;
-        this.fileExporter = fileExporter;
+    public SweRunner(FilesService filesService) {
+        this.filesService = filesService;
     }
 
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
-        Network network = networkImporter.importNetwork(sweRequest);
-        CimCrac cimCrac = fileImporter.importCimCrac(sweRequest);
-        OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
-        Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(cimCrac, targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
-        Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(cimCrac, targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
-        String jsonPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, ProcessType.D2CC);
-        String jsonPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, ProcessType.D2CC);
-        //to be continued!
+        importedFiles = filesService.importFiles(sweRequest);
         return new SweResponse(sweRequest.getId());
     }
+
 
 }
