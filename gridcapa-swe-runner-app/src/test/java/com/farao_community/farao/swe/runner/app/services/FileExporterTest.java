@@ -21,6 +21,9 @@ import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
+ */
 @SpringBootTest
 class FileExporterTest {
 

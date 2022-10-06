@@ -8,6 +8,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
+import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
@@ -40,7 +41,7 @@ class SweRunnerTest {
     @Test
     void run() {
         OffsetDateTime now = OffsetDateTime.now();
-        SweRequest sweRequest = new SweRequest("id", now,
+        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, now,
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
                 new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),
@@ -53,7 +54,8 @@ class SweRunnerTest {
                 new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"),
                 new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
-                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"));
+                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"),
+                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
         when(networkImporter.importNetwork(sweRequest)).thenReturn(Network.create("network-id", "format"));
         when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString()))
                 .thenReturn(new CracImpl("crac-id", "name"));

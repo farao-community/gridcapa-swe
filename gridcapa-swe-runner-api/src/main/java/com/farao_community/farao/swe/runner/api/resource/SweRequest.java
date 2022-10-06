@@ -20,6 +20,7 @@ import java.time.OffsetDateTime;
 public class SweRequest {
     @Id
     private final String id;
+    private final ProcessType processType;
     private final OffsetDateTime targetProcessDateTime;
     private final SweFileResource coresoSv;
     private final SweFileResource reeEq;
@@ -34,9 +35,11 @@ public class SweRequest {
     private final SweFileResource crac;
     private final SweFileResource boundaryEq;
     private final SweFileResource boundaryTp;
+    private final SweFileResource glsk;
 
     @JsonCreator
     public SweRequest(@JsonProperty("id") String id,
+                      @JsonProperty("processType") ProcessType processType,
                       @JsonProperty("targetProcessDateTime") OffsetDateTime targetProcessDateTime,
                       @JsonProperty("coresoSv") SweFileResource coresoSv,
                       @JsonProperty("reeEq") SweFileResource reeEq,
@@ -50,8 +53,10 @@ public class SweRequest {
                       @JsonProperty("rteTp") SweFileResource rteTp,
                       @JsonProperty("crac") SweFileResource crac,
                       @JsonProperty("boundaryEq") SweFileResource boundaryEq,
-                      @JsonProperty("boundaryTp") SweFileResource boundaryTp) {
+                      @JsonProperty("boundaryTp") SweFileResource boundaryTp,
+                      @JsonProperty("glsk") SweFileResource glsk) {
         this.id = id;
+        this.processType = processType;
         this.targetProcessDateTime = targetProcessDateTime;
         this.coresoSv = coresoSv;
         this.reeEq = reeEq;
@@ -66,10 +71,15 @@ public class SweRequest {
         this.crac = crac;
         this.boundaryEq = boundaryEq;
         this.boundaryTp = boundaryTp;
+        this.glsk = glsk;
     }
 
     public String getId() {
         return id;
+    }
+
+    public ProcessType getProcessType() {
+        return processType;
     }
 
     public OffsetDateTime getTargetProcessDateTime() {
@@ -126,5 +136,9 @@ public class SweRequest {
 
     public SweFileResource getBoundaryTp() {
         return boundaryTp;
+    }
+
+    public SweFileResource getGlsk() {
+        return glsk;
     }
 }

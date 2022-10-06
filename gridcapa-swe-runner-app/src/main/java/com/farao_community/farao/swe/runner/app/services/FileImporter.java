@@ -15,6 +15,9 @@ import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCrac
 import com.farao_community.farao.data.crac_io_api.CracImporters;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.powsybl.glsk.api.io.GlskDocumentImporters;
+import com.powsybl.glsk.commons.ZonalData;
+import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -77,4 +80,8 @@ public class FileImporter {
         return JsonCracCreationParameters.read(getClass().getResourceAsStream(paramFilePath));
     }
 
+
+    public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
+        return GlskDocumentImporters.importGlsk(urlValidationService.openUrlStream(glskUrl)).getZonalScalable(network, instant);
+    }
 }

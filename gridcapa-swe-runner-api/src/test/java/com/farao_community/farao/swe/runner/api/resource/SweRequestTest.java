@@ -21,7 +21,7 @@ class SweRequestTest {
     @Test
     void simpleRequestTest() {
         OffsetDateTime now = OffsetDateTime.now();
-        SweRequest sweRequest = new SweRequest("id", now,
+        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, now,
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
                 new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),
@@ -34,14 +34,17 @@ class SweRequestTest {
                 new SweFileResource("RTE_TP.xml", "/network/RTEFRANCE_TP_000.xml"),
                 new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
-                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"));
+                new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"),
+                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
         assertNotNull(sweRequest);
         assertEquals("id", sweRequest.getId());
+        assertEquals(ProcessType.D2CC, sweRequest.getProcessType());
         assertEquals(now, sweRequest.getTargetProcessDateTime());
         assertEquals("REN_SSH.xml", sweRequest.getRenSsh().getFilename());
         assertEquals("CRAC.xml", sweRequest.getCrac().getFilename());
         assertEquals("BOUNDARY_EQ.xml", sweRequest.getBoundaryEq().getFilename());
         assertEquals("BOUNDARY_TP.xml", sweRequest.getBoundaryTp().getFilename());
+        assertEquals("GLSK.xml", sweRequest.getGlsk().getFilename());
     }
 
 }
