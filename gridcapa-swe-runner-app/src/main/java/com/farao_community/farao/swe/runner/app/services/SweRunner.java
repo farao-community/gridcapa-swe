@@ -36,5 +36,4 @@ public class SweRunner {
         return new SweResponse(sweRequest.getId());
     }
 
-
 }
