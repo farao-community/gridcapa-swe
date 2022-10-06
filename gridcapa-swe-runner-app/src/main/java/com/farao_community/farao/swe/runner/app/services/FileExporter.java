@@ -27,7 +27,6 @@ import java.time.ZonedDateTime;
 @Service
 public class FileExporter {
 
-    private static final String JSON_CRAC_FILE_NAME = "crac.json";
     private static final String MINIO_SEPARATOR = "/";
     private static final String ZONE_ID = "Europe/Paris";
 
@@ -40,15 +39,15 @@ public class FileExporter {
     /**
      * Saves Crac in Json format to MinIO
      */
-    public String saveCracInJsonFormat(Crac crac, OffsetDateTime processTargetDateTime, ProcessType processType) {
+    public String saveCracInJsonFormat(Crac crac, String targetName, OffsetDateTime processTargetDateTime, ProcessType processType) {
         MemDataSource memDataSource = new MemDataSource();
-        try (OutputStream os = memDataSource.newOutputStream(JSON_CRAC_FILE_NAME, false)) {
+        try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
             CracExporters.exportCrac(crac, "Json", os);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save converted CRAC file.", e);
         }
-        String cracPath = makeDestinationMinioPath(processTargetDateTime, processType, FileKind.ARTIFACTS) + JSON_CRAC_FILE_NAME;
-        try (InputStream is = memDataSource.newInputStream(JSON_CRAC_FILE_NAME)) {
+        String cracPath = makeDestinationMinioPath(processTargetDateTime, processType, FileKind.ARTIFACTS) + targetName;
+        try (InputStream is = memDataSource.newInputStream(targetName)) {
             minioAdapter.uploadArtifactForTimestamp(cracPath, is, processType.toString(), "", processTargetDateTime);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
@@ -56,7 +55,7 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(cracPath);
     }
 
-    public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, ProcessType processType, FileKind filekind) {
+    protected String makeDestinationMinioPath(OffsetDateTime offsetDateTime, ProcessType processType, FileKind filekind) {
         ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
         return processType + MINIO_SEPARATOR
                 + targetDateTime.getYear() + MINIO_SEPARATOR

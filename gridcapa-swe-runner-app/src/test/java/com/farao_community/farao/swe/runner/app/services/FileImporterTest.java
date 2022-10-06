@@ -64,33 +64,38 @@ class FileImporterTest {
 
     @Test
     void testImportCimCrac() {
-        CimCrac cimCrac = fileImporter.importCimCrac(
-                getClass().getResource(testDirectory + cimCracFilename).toExternalForm()
-                );
+        SweRequest req = createEmptySweRequest();
+        CimCrac cimCrac = fileImporter.importCimCrac(req);
         Assertions.assertNotNull(cimCrac);
     }
 
     @Test
-    void testImportCrac() {
-        CimCrac cimCrac = fileImporter.importCimCrac(
-                getClass().getResource(testDirectory + cimCracFilename).toExternalForm()
-        );
-        Crac crac = fileImporter.importCrac(cimCrac, dateTime, network);
-        Assertions.assertNotNull(crac);
-    }
-
-    @Test
     void testImportCimCracFromUrlWithNetwork() {
-        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
-                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null);
-        Crac crac = fileImporter.importCimCracFromUrlWithNetwork(sweRequest, network);
-        Assertions.assertNotNull(crac);
+        Properties importParams = new Properties();
+        importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
+        Network network = Importers.loadNetwork(
+                Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
+                LocalComputationManager.getDefault(),
+                Suppliers.memoize(ImportConfig::load).get(),
+                importParams
+        );
+        SweRequest sweRequest = createEmptySweRequest();
+        SweRequest req = createEmptySweRequest();
+        Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
+        Assertions.assertNotNull(cracFrEs);
+        Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, SweRunner.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
+        Assertions.assertNotNull(cracEsPt);
     }
 
     @Test
     void testImportCracFromJson() {
         Crac cracFromJson = fileImporter.importCracFromJson(Objects.requireNonNull(getClass().getResource(testDirectory + jsonCracFilename)).toString());
         assertNotNull(cracFromJson);
+    }
+
+    SweRequest createEmptySweRequest() {
+        return new SweRequest("id", dateTime, null, null, null, null, null, null, null, null, null, null,
+                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null);
     }
 
     @Test

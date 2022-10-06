@@ -123,7 +123,7 @@
             <groupId>com.farao-community.farao</groupId>
             <artifactId>farao-crac-creator-cim</artifactId>
             <!-- I added version here because unknown dependency version in farao-dependencies! -->
-            <version>4.1.1</version>
+            <version>4.1.4</version>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>

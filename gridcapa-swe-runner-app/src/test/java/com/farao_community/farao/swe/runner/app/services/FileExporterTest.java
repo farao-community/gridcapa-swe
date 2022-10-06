@@ -38,7 +38,7 @@ class FileExporterTest {
     void saveCracInJsonFormat() {
         Crac crac = new CracImpl("id");
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("cracUrl");
-        String cracUrl = fileExporter.saveCracInJsonFormat(crac, dateTime, ProcessType.D2CC);
+        String cracUrl = fileExporter.saveCracInJsonFormat(crac, "test.json", dateTime, ProcessType.D2CC);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(
                 Mockito.anyString(),
                 Mockito.any(InputStream.class),

@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -31,9 +33,10 @@ class SweRunnerTest {
 
     @MockBean
     NetworkService networkImporter;
-
     @MockBean
     FileImporter fileImporter;
+    @MockBean
+    FileExporter fileExporter;
 
     @Test
     void run() {
@@ -54,8 +57,10 @@ class SweRunnerTest {
                 new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"),
                 new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
         when(networkImporter.importNetwork(sweRequest)).thenReturn(Network.create("network-id", "format"));
-        when(fileImporter.importCimCracFromUrlWithNetwork(any(), any(Network.class)))
+        when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString()))
                 .thenReturn(new CracImpl("crac-id", "name"));
+        when(fileExporter.saveCracInJsonFormat(any(), anyString(), any(), any()))
+                .thenReturn("testStringUrl");
         SweResponse sweResponse = sweRunner.run(sweRequest);
         Assertions.assertNotNull(sweResponse);
         Assertions.assertEquals(sweRequest.getId(), sweResponse.getId());
