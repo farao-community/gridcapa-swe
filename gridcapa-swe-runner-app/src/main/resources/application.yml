@@ -31,6 +31,7 @@ spring:
 swe-runner:
   whitelist:
     - http://localhost:9000/
+    - http://minio:9000/
 
 minio-adapter:
   bucket: gridcapa
