@@ -1,4 +1,4 @@
-package com.farao_community.farao.swe.runner.app.utils;
+package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;

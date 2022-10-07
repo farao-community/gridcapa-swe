@@ -9,7 +9,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
-import com.farao_community.farao.swe.runner.app.utils.ImportedFiles;
+import com.farao_community.farao.swe.runner.app.domain.ImportedFiles;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
