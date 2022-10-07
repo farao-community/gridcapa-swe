@@ -79,7 +79,6 @@ class FileImporterTest {
                 Suppliers.memoize(ImportConfig::load).get(),
                 importParams
         );
-        SweRequest sweRequest = createEmptySweRequest();
         SweRequest req = createEmptySweRequest();
         Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
         Assertions.assertNotNull(cracFrEs);
@@ -94,8 +93,8 @@ class FileImporterTest {
     }
 
     SweRequest createEmptySweRequest() {
-        return new SweRequest("id", dateTime, null, null, null, null, null, null, null, null, null, null,
-                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null);
+        return new SweRequest("id", ProcessType.IDCC, dateTime, null, null, null, null, null, null, null, null, null, null,
+                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null);
     }
 
     @Test

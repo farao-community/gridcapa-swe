@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 
 /**
@@ -79,7 +80,6 @@ public class FileImporter {
         }
         return JsonCracCreationParameters.read(getClass().getResourceAsStream(paramFilePath));
     }
-
 
     public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
         return GlskDocumentImporters.importGlsk(urlValidationService.openUrlStream(glskUrl)).getZonalScalable(network, instant);
