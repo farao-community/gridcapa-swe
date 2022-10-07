@@ -79,7 +79,6 @@ class FileImporterTest {
                 Suppliers.memoize(ImportConfig::load).get(),
                 importParams
         );
-        SweRequest sweRequest = createEmptySweRequest();
         SweRequest req = createEmptySweRequest();
         Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
         Assertions.assertNotNull(cracFrEs);
