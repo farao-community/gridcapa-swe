@@ -133,6 +133,14 @@
             <groupId>com.farao-community.farao</groupId>
             <artifactId>farao-crac-io-json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-dichotomy-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-dichotomy-shift</artifactId>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
