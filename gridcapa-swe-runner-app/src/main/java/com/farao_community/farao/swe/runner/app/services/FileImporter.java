@@ -82,6 +82,7 @@ public class FileImporter {
     }
 
     public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
+        LOGGER.info("Importing Glsk file : {}", glskUrl);
         return GlskDocumentImporters.importGlsk(urlValidationService.openUrlStream(glskUrl)).getZonalScalable(network, instant);
     }
 }

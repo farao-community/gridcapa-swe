@@ -33,6 +33,7 @@ public class SweRunner {
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         importedFiles = filesService.importFiles(sweRequest);
+        LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return new SweResponse(sweRequest.getId());
     }
 
