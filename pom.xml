@@ -51,14 +51,12 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <farao.dependencies.version>1.6.0</farao.dependencies.version>
+        <farao.dependencies.version>1.7.0-SNAPSHOT</farao.dependencies.version>
         <gridcapa.starter.minio.version>0.2.0</gridcapa.starter.minio.version>
         <gridcapa.task-manager.version>1.7.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
         <logstash.version>7.0.1</logstash.version>
-        <powsybl.core.version>4.10.1</powsybl.core.version>
-        <powsybl.entsoe.version>1.6.1</powsybl.entsoe.version>
         <sonar.organization>farao-community</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -85,26 +83,6 @@
                 <groupId>com.github.jasminb</groupId>
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-glsk-commons</artifactId>
-                <version>${powsybl.entsoe.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-glsk-document-api</artifactId>
-                <version>${powsybl.entsoe.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-glsk-document-cim</artifactId>
-                <version>${powsybl.entsoe.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-iidm-modification</artifactId>
-                <version>${powsybl.core.version}</version>
             </dependency>
 
             <!-- Runtime dependencies -->
