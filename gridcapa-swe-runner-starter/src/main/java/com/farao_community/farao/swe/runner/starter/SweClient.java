@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.starter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Message;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -28,19 +27,14 @@ public class SweClient {
         this.sweMessageHandler = new SweMessageHandler(sweClientProperties);
     }
 
-    public <I, J> J run(I request, Class<I> requestClass, Class<J> responseClass, int priority) {
+    public <I> void run(I request, Class<I> requestClass, int priority) {
         LOGGER.info("Request sent: {}", request);
-        Message responseMessage = amqpTemplate.sendAndReceive(
-                sweClientProperties.getBinding().getDestination(),
+        amqpTemplate.send(sweClientProperties.getBinding().getDestination(),
                 sweClientProperties.getBinding().getRoutingKey(),
-                sweMessageHandler.buildMessage(request, requestClass, priority)
-        );
-        J response = sweMessageHandler.readMessage(responseMessage, responseClass);
-        LOGGER.info("Response received: {}", response);
-        return response;
+                sweMessageHandler.buildMessage(request, requestClass, priority));
     }
 
-    public <I, J> J run(I request, Class<I> requestClass, Class<J> responseClass) {
-        return run(request, requestClass, responseClass, DEFAULT_PRIORITY);
+    public <I> void run(I request, Class<I> requestClass) {
+        run(request, requestClass, DEFAULT_PRIORITY);
     }
 }

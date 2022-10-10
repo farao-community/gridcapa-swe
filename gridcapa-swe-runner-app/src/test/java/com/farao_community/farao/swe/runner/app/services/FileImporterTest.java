@@ -82,7 +82,7 @@ class FileImporterTest {
         SweRequest req = createEmptySweRequest();
         Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
         Assertions.assertNotNull(cracFrEs);
-        Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, SweRunner.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
+        Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
         Assertions.assertNotNull(cracEsPt);
     }
 
@@ -93,7 +93,7 @@ class FileImporterTest {
     }
 
     SweRequest createEmptySweRequest() {
-        return new SweRequest("id", ProcessType.IDCC, dateTime, null, null, null, null, null, null, null, null, null, null,
+        return new SweRequest("id", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
                 new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null);
     }
 

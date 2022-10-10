@@ -5,7 +5,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.swe.runner.app.services;
+package com.farao_community.farao.swe.runner.app.utils;
 
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.configurations.UrlWhitelistConfiguration;
