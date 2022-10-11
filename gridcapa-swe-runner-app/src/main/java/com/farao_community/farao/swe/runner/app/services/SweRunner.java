@@ -23,7 +23,6 @@ public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
 
     private final FilesService filesService;
-    private SweData sweData;
 
     public SweRunner(FilesService filesService) {
         this.filesService = filesService;
@@ -32,7 +31,7 @@ public class SweRunner {
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
-        sweData = filesService.importFiles(sweRequest);
+        SweData sweData = filesService.importFiles(sweRequest);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return new SweResponse(sweRequest.getId());
     }
