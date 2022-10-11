@@ -9,7 +9,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
-import com.farao_community.farao.swe.runner.app.domain.ImportedFiles;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
 
     private final FilesService filesService;
-    private ImportedFiles importedFiles;
+    private SweData sweData;
 
     public SweRunner(FilesService filesService) {
         this.filesService = filesService;
@@ -32,7 +32,7 @@ public class SweRunner {
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
-        importedFiles = filesService.importFiles(sweRequest);
+        sweData = filesService.importFiles(sweRequest);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return new SweResponse(sweRequest.getId());
     }
