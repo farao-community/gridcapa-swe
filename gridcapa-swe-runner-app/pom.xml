@@ -27,6 +27,14 @@
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-dichotomy-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-dichotomy-shift</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>gridcapa-swe-runner-api</artifactId>
             <version>${project.version}</version>
