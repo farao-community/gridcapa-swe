@@ -8,7 +8,7 @@ spring:
 
 swe-runner:
   dichotomy:
-    direction:
+    parameters:
       ES_FR:
         min-value: 0
         max-value: 6400

@@ -9,6 +9,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
+import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyParallelization;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
 import org.slf4j.Logger;
@@ -22,9 +23,11 @@ import org.springframework.stereotype.Service;
 public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
 
+    private final DichotomyParallelization dichotomyParallelization;
     private final FilesService filesService;
 
-    public SweRunner(FilesService filesService) {
+    public SweRunner(DichotomyParallelization dichotomyParallelization, FilesService filesService) {
+        this.dichotomyParallelization = dichotomyParallelization;
         this.filesService = filesService;
     }
 
@@ -32,6 +35,7 @@ public class SweRunner {
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         SweData sweData = filesService.importFiles(sweRequest);
+        dichotomyParallelization.launchDichotomy(sweData);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return new SweResponse(sweRequest.getId());
     }

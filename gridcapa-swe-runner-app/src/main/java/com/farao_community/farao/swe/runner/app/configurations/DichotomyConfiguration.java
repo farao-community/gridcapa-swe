@@ -19,14 +19,14 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "swe-runner.dichotomy")
 public class DichotomyConfiguration {
 
-    private Map<Direction, Parameters> direction;
+    private Map<Direction, Parameters> parameters;
 
-    public Map<Direction, Parameters> getDirection() {
-        return direction;
+    public Map<Direction, Parameters> getParameters() {
+        return parameters;
     }
 
-    public void setDirection(Map<Direction, Parameters> direction) {
-        this.direction = direction;
+    public void setParameters(Map<Direction, Parameters> parameters) {
+        this.parameters = parameters;
     }
 
     public static class Parameters {
