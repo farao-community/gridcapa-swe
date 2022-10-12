@@ -28,7 +28,7 @@ public class DichotomyRunner {
 
     public String run(SweData sweData, Direction direction) {
         Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
-        dichotomyLogging.logStartDichotomy(parameters, direction);
+        dichotomyLogging.logStartDichotomy(direction, parameters);
         return null;
     }
 

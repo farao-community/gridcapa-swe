@@ -23,7 +23,7 @@ public class DichotomyLogging {
         this.eventsLogger = eventsLogger;
     }
 
-    public void logStartDichotomy(Parameters parameters, Direction direction) {
+    public void logStartDichotomy(Direction direction, Parameters parameters) {
         eventsLogger.info("{} - Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction, parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 }
