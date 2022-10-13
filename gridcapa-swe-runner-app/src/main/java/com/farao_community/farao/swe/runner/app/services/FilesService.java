@@ -8,9 +8,8 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
-import com.farao_community.farao.swe.runner.app.domain.ImportedFiles;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
@@ -35,14 +34,14 @@ public class FilesService {
         this.fileExporter = fileExporter;
     }
 
-    public ImportedFiles importFiles(SweRequest sweRequest) {
+    public SweData importFiles(SweRequest sweRequest) {
         Network network = networkImporter.importNetwork(sweRequest);
         CimCrac cimCrac = fileImporter.importCimCrac(sweRequest);
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(cimCrac, targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
         Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(cimCrac, targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
-        String jsonPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, ProcessType.D2CC);
-        String jsonPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, ProcessType.D2CC);
-        return new ImportedFiles(network, cimCrac, cracEsPt, cracFrEs, jsonPathEsPt, jsonPathFrEs);
+        String jsonCracPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, sweRequest.getProcessType());
+        String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());
+        return new SweData(network, cimCrac, cracEsPt, cracFrEs, jsonCracPathEsPt, jsonCracPathFrEs);
     }
 }
