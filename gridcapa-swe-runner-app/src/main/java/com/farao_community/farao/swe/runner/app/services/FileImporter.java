@@ -13,6 +13,8 @@ import com.farao_community.farao.data.crac_creation.creator.api.parameters.JsonC
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCracImporter;
 import com.farao_community.farao.data.crac_io_api.CracImporters;
+import com.farao_community.farao.data.rao_result_api.RaoResult;
+import com.farao_community.farao.data.rao_result_json.RaoResultImporter;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
@@ -34,6 +36,7 @@ import java.time.OffsetDateTime;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service
 public class FileImporter {
@@ -84,5 +87,9 @@ public class FileImporter {
 
     public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
         return GlskDocumentImporters.importGlsk(urlValidationService.openUrlStream(glskUrl)).getZonalScalable(network, instant);
+    }
+
+    public RaoResult importRaoResult(String raoResultUrl, Crac crac) {
+        return new RaoResultImporter().importRaoResult(urlValidationService.openUrlStream(raoResultUrl), crac);
     }
 }

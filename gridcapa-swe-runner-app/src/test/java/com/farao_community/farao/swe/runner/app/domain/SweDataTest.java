@@ -8,10 +8,13 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
+import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,7 +38,8 @@ class SweDataTest {
 
     @Test
     void simpleTest() {
-        SweData sweData = new SweData(network, cimCrac, cracEsPt, cracFrEs, "CracEsPt", "CracFrEs");
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, cimCrac, cracEsPt, cracFrEs, "CracEsPt", "CracFrEs");
+        assertEquals(ProcessType.D2CC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetwork());
         assertEquals(this.cimCrac, sweData.getCimCrac());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());

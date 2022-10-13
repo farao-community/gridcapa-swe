@@ -27,10 +27,9 @@ public class DichotomyParallelization {
     public void launchDichotomy(SweData sweData) {
         final ExecutionResult executionResult = ParallelExecution
                 .of(() -> dichotomyRunner.run(sweData, Direction.ES_FR))
-               // .and(() -> dichotomyRunner.run(sweData, Direction.FR_ES))
-               // .and(() -> dichotomyRunner.run(sweData, Direction.ES_PT))
-               // .and(() -> dichotomyRunner.run(sweData, Direction.PT_ES))
+                // .and(() -> dichotomyRunner.run(sweData, Direction.FR_ES))
+                // .and(() -> dichotomyRunner.run(sweData, Direction.ES_PT))
+                // .and(() -> dichotomyRunner.run(sweData, Direction.PT_ES))
                 .close();
-        System.out.println(executionResult);
     }
 }

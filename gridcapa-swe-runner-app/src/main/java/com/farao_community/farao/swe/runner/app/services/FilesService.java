@@ -42,6 +42,6 @@ public class FilesService {
         Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(cimCrac, targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
         String jsonCracPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, sweRequest.getProcessType());
         String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());
-        return new SweData(network, cimCrac, cracEsPt, cracFrEs, jsonCracPathEsPt, jsonCracPathFrEs);
+        return new SweData("id", sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), network, cimCrac, cracEsPt, cracFrEs, jsonCracPathEsPt, jsonCracPathFrEs);
     }
 }

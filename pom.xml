@@ -55,6 +55,7 @@
         <farao.dichotomy.version>4.6.0</farao.dichotomy.version>
         <gridcapa.starter.minio.version>0.2.0</gridcapa.starter.minio.version>
         <gridcapa.task-manager.version>1.7.0</gridcapa.task-manager.version>
+        <gridcapa.rao.runner.version>1.6.1</gridcapa.rao.runner.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
         <logstash.version>7.0.1</logstash.version>
@@ -65,6 +66,11 @@
     <dependencyManagement>
         <dependencies>
             <!-- Compile dependencies -->
+            <dependency>
+                <groupId>com.farao-community.farao</groupId>
+                <artifactId>gridcapa-rao-runner-spring-boot-starter</artifactId>
+                <version>${gridcapa.rao.runner.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.farao-community.farao</groupId>
                 <artifactId>farao-dichotomy-api</artifactId>

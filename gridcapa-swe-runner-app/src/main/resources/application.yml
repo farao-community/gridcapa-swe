@@ -53,6 +53,7 @@ swe-runner:
         tolerance: 50
   whitelist:
     - http://localhost:9000/
+    - http://minio:9000/
     - file:/
 
 minio-adapter:
