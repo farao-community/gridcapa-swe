@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
@@ -18,18 +20,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class DichotomyParallelization {
 
+    private final DichotomyLogging dichotomyLogging;
     private final DichotomyRunner dichotomyRunner;
 
-    public DichotomyParallelization(DichotomyRunner dichotomyRunner) {
+    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner) {
+        this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
     }
 
     public void launchDichotomy(SweData sweData) {
         final ExecutionResult executionResult = ParallelExecution
-                .of(() -> dichotomyRunner.run(sweData, Direction.ES_FR))
-                // .and(() -> dichotomyRunner.run(sweData, Direction.FR_ES))
-                // .and(() -> dichotomyRunner.run(sweData, Direction.ES_PT))
-                // .and(() -> dichotomyRunner.run(sweData, Direction.PT_ES))
+                .of(() -> runDichotomyForOneDirection(sweData, Direction.ES_FR))
+                // .and(() -> runDichotomyForOneDirection(sweData, Direction.FR_ES))
+                // .and(() -> runDichotomyForOneDirection(sweData, Direction.ES_PT))
+                // .and(() -> runDichotomyForOneDirection(sweData, Direction.PT_ES))
                 .close();
+        dichotomyLogging.logEndAllDichotomies();
+    }
+
+    private DichotomyResult<RaoResponse> runDichotomyForOneDirection(SweData sweData, Direction direction) {
+        DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
+        dichotomyLogging.logEndOneDichotomy(direction);
+        return dichotomyResult;
     }
 }

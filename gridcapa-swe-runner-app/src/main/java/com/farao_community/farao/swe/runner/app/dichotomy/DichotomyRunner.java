@@ -10,8 +10,10 @@ import com.farao_community.farao.dichotomy.api.DichotomyEngine;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.index.RangeDivisionIndexStrategy;
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
+import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -50,7 +52,7 @@ public class DichotomyRunner {
         this.raoRunnerClient = raoRunnerClient;
     }
 
-    public String run(SweData sweData, Direction direction) {
+    public DichotomyResult<RaoResponse> run(SweData sweData, Direction direction) {
         Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
         dichotomyLogging.logStartDichotomy(direction, parameters);
         try {
@@ -59,11 +61,10 @@ public class DichotomyRunner {
                     INDEX_STRATEGY_CONFIGURATION,
                     networkShifterProvider.get(null, sweData.getNetwork()),
                     getNetworkValidator(sweData));
-            engine.run(sweData.getNetwork());
+            return engine.run(sweData.getNetwork());
         } catch (IOException e) {
-
+            throw new SweInternalException("");
         }
-        return null;
     }
 
     private NetworkValidator<RaoResponse> getNetworkValidator(SweData sweData) {

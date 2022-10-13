@@ -26,4 +26,12 @@ public class DichotomyLogging {
     public void logStartDichotomy(Direction direction, Parameters parameters) {
         eventsLogger.info("{} - Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction, parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
+
+    public void logEndOneDichotomy(Direction direction) {
+        eventsLogger.info("{} - Dichotomy finished", direction);
+    }
+
+    public void logEndAllDichotomies() {
+        eventsLogger.info("All - Dichotomies are done");
+    }
 }
