@@ -11,7 +11,6 @@ import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
-import com.farao_community.farao.swe.runner.app.utils.Direction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,7 +29,7 @@ public class DichotomyParallelization {
 
     public void launchDichotomy(SweData sweData) {
         final ExecutionResult executionResult = ParallelExecution
-                .of(() -> runDichotomyForOneDirection(sweData, Direction.ES_FR))
+                .of(() -> runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR))
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.FR_ES))
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.ES_PT))
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.PT_ES))
@@ -38,7 +37,7 @@ public class DichotomyParallelization {
         dichotomyLogging.logEndAllDichotomies();
     }
 
-    private DichotomyResult<RaoResponse> runDichotomyForOneDirection(SweData sweData, Direction direction) {
+    private DichotomyResult<RaoResponse> runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
         return dichotomyResult;

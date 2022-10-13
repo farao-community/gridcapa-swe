@@ -7,7 +7,7 @@
 package com.farao_community.farao.swe.runner.app.Configurations;
 
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
-import com.farao_community.farao.swe.runner.app.utils.Direction;
+import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,24 +25,24 @@ class DichotomyConfigurationTest {
 
     @Test
     void checkParameters() {
-        assertEquals(0, dichotomyConfiguration.getParameters().get(Direction.ES_FR).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(Direction.ES_FR).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(Direction.ES_FR).getPrecision());
-        assertEquals(10, dichotomyConfiguration.getParameters().get(Direction.ES_FR).getTolerance());
+        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getMinValue());
+        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getMaxValue());
+        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getPrecision());
+        assertEquals(10, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getTolerance());
 
-        assertEquals(0, dichotomyConfiguration.getParameters().get(Direction.FR_ES).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(Direction.FR_ES).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(Direction.FR_ES).getPrecision());
-        assertEquals(10, dichotomyConfiguration.getParameters().get(Direction.FR_ES).getTolerance());
+        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getMinValue());
+        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getMaxValue());
+        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getPrecision());
+        assertEquals(10, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getTolerance());
 
-        assertEquals(0, dichotomyConfiguration.getParameters().get(Direction.ES_PT).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(Direction.ES_PT).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(Direction.ES_PT).getPrecision());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(Direction.ES_PT).getTolerance());
+        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getMinValue());
+        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getMaxValue());
+        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getPrecision());
+        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getTolerance());
 
-        assertEquals(0, dichotomyConfiguration.getParameters().get(Direction.PT_ES).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(Direction.PT_ES).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(Direction.PT_ES).getPrecision());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(Direction.PT_ES).getTolerance());
+        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.PT_ES).getMinValue());
+        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.PT_ES).getMaxValue());
+        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.PT_ES).getPrecision());
+        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.PT_ES).getTolerance());
     }
 }

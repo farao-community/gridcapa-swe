@@ -19,7 +19,6 @@ import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfigur
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
-import com.farao_community.farao.swe.runner.app.utils.Direction;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -52,14 +51,14 @@ public class DichotomyRunner {
         this.raoRunnerClient = raoRunnerClient;
     }
 
-    public DichotomyResult<RaoResponse> run(SweData sweData, Direction direction) {
+    public DichotomyResult<RaoResponse> run(SweData sweData, DichotomyDirection direction) {
         Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
         dichotomyLogging.logStartDichotomy(direction, parameters);
         try {
             DichotomyEngine<RaoResponse> engine = new DichotomyEngine<>(
                     new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                     INDEX_STRATEGY_CONFIGURATION,
-                    networkShifterProvider.get(null, sweData.getNetwork()),
+                    networkShifterProvider.get(sweData, direction),
                     getNetworkValidator(sweData));
             return engine.run(sweData.getNetwork());
         } catch (IOException e) {

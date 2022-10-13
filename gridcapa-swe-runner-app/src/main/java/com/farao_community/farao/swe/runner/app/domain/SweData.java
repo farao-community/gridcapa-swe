@@ -25,10 +25,11 @@ public class SweData {
     private final CimCrac cimCrac;
     private final Crac cracEsPt;
     private final Crac cracFrEs;
+    private final String glskUrl;
     private final String jsonCracPathEsPt;
     private final String jsonCracPathFrEs;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network network, CimCrac cimCrac, Crac cracEsPt, Crac cracFrEs, String jsonCracPathEsPt, String jsonCracPathFrEs) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network network, CimCrac cimCrac, Crac cracEsPt, Crac cracFrEs, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
@@ -36,6 +37,7 @@ public class SweData {
         this.cimCrac = cimCrac;
         this.cracEsPt = cracEsPt;
         this.cracFrEs = cracFrEs;
+        this.glskUrl = glskUrl;
         this.jsonCracPathEsPt = jsonCracPathEsPt;
         this.jsonCracPathFrEs = jsonCracPathFrEs;
     }
@@ -66,6 +68,10 @@ public class SweData {
 
     public Crac getCracFrEs() {
         return cracFrEs;
+    }
+
+    public String getGlskUrl() {
+        return glskUrl;
     }
 
     public String getJsonCracPathEsPt() {

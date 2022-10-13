@@ -38,7 +38,7 @@ class SweDataTest {
 
     @Test
     void simpleTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, cimCrac, cracEsPt, cracFrEs, "CracEsPt", "CracFrEs");
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, cimCrac, cracEsPt, cracFrEs, "glskUrl", "CracEsPt", "CracFrEs");
         assertEquals(ProcessType.D2CC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetwork());
         assertEquals(this.cimCrac, sweData.getCimCrac());
@@ -46,5 +46,6 @@ class SweDataTest {
         assertEquals(this.cracFrEs, sweData.getCracFrEs());
         assertEquals("CracEsPt", sweData.getJsonCracPathEsPt());
         assertEquals("CracFrEs", sweData.getJsonCracPathFrEs());
+        assertEquals("glskUrl", sweData.getGlskUrl());
     }
 }

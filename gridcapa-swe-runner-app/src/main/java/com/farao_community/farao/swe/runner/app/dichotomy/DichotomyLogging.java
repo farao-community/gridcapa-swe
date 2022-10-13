@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
-import com.farao_community.farao.swe.runner.app.utils.Direction;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +22,11 @@ public class DichotomyLogging {
         this.eventsLogger = eventsLogger;
     }
 
-    public void logStartDichotomy(Direction direction, Parameters parameters) {
+    public void logStartDichotomy(DichotomyDirection direction, Parameters parameters) {
         eventsLogger.info("{} - Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction, parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 
-    public void logEndOneDichotomy(Direction direction) {
+    public void logEndOneDichotomy(DichotomyDirection direction) {
         eventsLogger.info("{} - Dichotomy finished", direction);
     }
 

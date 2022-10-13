@@ -20,8 +20,6 @@ import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */

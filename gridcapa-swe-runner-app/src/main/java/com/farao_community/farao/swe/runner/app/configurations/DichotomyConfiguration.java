@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.configurations;
 
-import com.farao_community.farao.swe.runner.app.utils.Direction;
+import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,13 +19,13 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "swe-runner.dichotomy")
 public class DichotomyConfiguration {
 
-    private Map<Direction, Parameters> parameters;
+    private Map<DichotomyDirection, Parameters> parameters;
 
-    public Map<Direction, Parameters> getParameters() {
+    public Map<DichotomyDirection, Parameters> getParameters() {
         return parameters;
     }
 
-    public void setParameters(Map<Direction, Parameters> parameters) {
+    public void setParameters(Map<DichotomyDirection, Parameters> parameters) {
         this.parameters = parameters;
     }
 

@@ -27,28 +27,9 @@
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>gridcapa-task-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>gridcapa-rao-runner-spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-rao-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-rao-result-json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-dichotomy-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-creator-cim</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gridcapa-swe-runner-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
@@ -60,6 +41,10 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-crac-creator-cim</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
             <artifactId>farao-crac-io-api</artifactId>
         </dependency>
         <dependency>
@@ -68,16 +53,31 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-task-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-starter-minio-adapter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-dichotomy-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
             <artifactId>farao-dichotomy-shift</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>gridcapa-swe-runner-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-rao-runner-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-rao-result-json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-rao-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
