@@ -10,7 +10,7 @@ import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Injection;
 
 /**
- * @author Sebastien Murgey {@literal <sebastien.murgey at rte-france.com>}
+ * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public final class NetworkUtil {
     private static final double MINIMAL_ABS_POWER_VALUE = 1e-5;
