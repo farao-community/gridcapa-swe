@@ -35,7 +35,7 @@ public class SweRunner {
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         SweData sweData = filesService.importFiles(sweRequest);
-       // dichotomyParallelization.launchDichotomy(sweData);
+        dichotomyParallelization.launchDichotomy(sweData);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return new SweResponse(sweRequest.getId());
     }

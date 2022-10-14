@@ -85,7 +85,7 @@ public class FileExporter {
                     minioAdapter.uploadOutputForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
                     break;
                 case ARTIFACT:
-                    minioAdapter.uploadArtifactForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
+                    minioAdapter.uploadArtifactForTimestamp(filePath.replace(":", ""), is, adaptTargetProcessName(processType), fileType, offsetDateTime);
                     break;
                 default:
                     throw new UnsupportedOperationException(String.format("File group %s not supported", fileGroup));
@@ -93,7 +93,7 @@ public class FileExporter {
         } catch (IOException e) {
             throw new SweInternalException("Error while trying to save network", e);
         }
-        return minioAdapter.generatePreSignedUrl(filePath);
+        return minioAdapter.generatePreSignedUrl(filePath.replace(":", ""));
     }
 
     private InputStream getNetworkInputStream(Network network, String format) throws IOException {

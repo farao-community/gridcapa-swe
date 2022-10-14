@@ -44,7 +44,7 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
     @Override
     public DichotomyStepResult<RaoResponse> validateNetwork(Network network) throws ValidationException {
         String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
-        String scaledNetworkName = network.getNameOrId() + ".xiidm";
+        String scaledNetworkName = network.getNameOrId().replace(":", "") + ".xiidm";
         String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
         RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, "SWE/" + scaledNetworkDirPath);
         try {
@@ -63,7 +63,7 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
     }
 
     private String generateScaledNetworkDirPath(Network network) {
-        String basePath = fileExporter.makeDestinationMinioPath(sweData.getTimestamp(), sweData.getProcessType(), FileExporter.FileKind.ARTIFACTS);
+        String basePath =  "artifacts"; // fileExporter.makeDestinationMinioPath(sweData.getTimestamp(), sweData.getProcessType(), FileExporter.FileKind.ARTIFACTS);
         String variantName = network.getVariantManager().getWorkingVariantId();
         return String.format("%s/%s-%s/", basePath, ++variantCounter, variantName);
     }

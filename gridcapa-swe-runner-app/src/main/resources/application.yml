@@ -56,6 +56,11 @@ swe-runner:
     - http://minio:9000/
     - file:/
 
+rao-runner-server:
+  amqp:
+    client-app-id: swe-runner
+    queue-name: rao-request-queue
+
 minio-adapter:
   bucket: gridcapa
   base-path: /SWE/D2CC
