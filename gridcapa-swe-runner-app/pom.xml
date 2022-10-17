@@ -84,6 +84,10 @@
             <artifactId>powsybl-cgmes-conversion</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-search-tree-rao</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-cgmes-model</artifactId>
         </dependency>
@@ -149,13 +153,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
         </dependency>
-
-        <!-- Test dependencies -->
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-config-test</artifactId>
-            <scope>test</scope>
+            <artifactId>powsybl-config-classic</artifactId>
         </dependency>
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>

@@ -29,6 +29,7 @@ import java.util.Properties;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service
 public class FileExporter {
@@ -54,7 +55,7 @@ public class FileExporter {
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save converted CRAC file.", e);
         }
-        String cracPath = makeDestinationMinioPath(processTargetDateTime, processType, FileKind.ARTIFACTS) + targetName;
+        String cracPath = makeDestinationMinioPath(processTargetDateTime, FileKind.ARTIFACTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
             minioAdapter.uploadArtifactForTimestamp(cracPath, is, processType.toString(), "", processTargetDateTime);
         } catch (IOException e) {
@@ -63,10 +64,9 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(cracPath);
     }
 
-    public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, ProcessType processType, FileKind filekind) {
+    public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {
         ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
-        return processType + MINIO_SEPARATOR
-                + targetDateTime.getYear() + MINIO_SEPARATOR
+        return targetDateTime.getYear() + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getHour()) + "_30" + MINIO_SEPARATOR
@@ -114,7 +114,7 @@ public class FileExporter {
         RaoParameters raoParameters = RaoParameters.load();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonRaoParameters.write(raoParameters, baos);
-        String raoParametersDestinationPath = makeDestinationMinioPath(sweData.getTimestamp(), sweData.getProcessType(), FileKind.ARTIFACTS) + RAO_PARAMETERS_FILE_NAME;
+        String raoParametersDestinationPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.ARTIFACTS) + RAO_PARAMETERS_FILE_NAME;
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         minioAdapter.uploadArtifactForTimestamp(raoParametersDestinationPath, bais, sweData.getProcessType().toString(), "", sweData.getTimestamp());
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);

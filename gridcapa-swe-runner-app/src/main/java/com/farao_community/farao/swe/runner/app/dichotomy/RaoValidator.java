@@ -63,7 +63,7 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
     }
 
     private String generateScaledNetworkDirPath(Network network) {
-        String basePath =  "artifacts"; // fileExporter.makeDestinationMinioPath(sweData.getTimestamp(), sweData.getProcessType(), FileExporter.FileKind.ARTIFACTS);
+        String basePath = fileExporter.makeDestinationMinioPath(sweData.getTimestamp(), FileExporter.FileKind.ARTIFACTS);
         String variantName = network.getVariantManager().getWorkingVariantId();
         return String.format("%s/%s-%s/", basePath, ++variantCounter, variantName);
     }

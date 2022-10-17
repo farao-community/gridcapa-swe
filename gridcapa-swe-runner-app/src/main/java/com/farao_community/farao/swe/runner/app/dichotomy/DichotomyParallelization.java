@@ -35,11 +35,13 @@ public class DichotomyParallelization {
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.PT_ES))
                 .close();
         dichotomyLogging.logEndAllDichotomies();
+        // generate common files (ttc)
     }
 
     private DichotomyResult<RaoResponse> runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
+        // Generate files specific for one direction (cne, cgm, voltage)
         return dichotomyResult;
     }
 }
