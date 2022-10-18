@@ -36,12 +36,11 @@ public class FilesService {
 
     public SweData importFiles(SweRequest sweRequest) {
         Network network = networkImporter.importNetwork(sweRequest);
-        CimCrac cimCrac = fileImporter.importCimCrac(sweRequest);
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
         Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
         String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());
         String jsonCracPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, sweRequest.getProcessType());
-        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), network, cimCrac, cracEsPt, cracFrEs, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs);
+        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), network, cracEsPt, cracFrEs, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs);
     }
 }

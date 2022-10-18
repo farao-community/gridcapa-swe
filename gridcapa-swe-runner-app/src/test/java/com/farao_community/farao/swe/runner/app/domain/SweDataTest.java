@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,6 @@ class SweDataTest {
     private Network network;
 
     @Mock
-    private CimCrac cimCrac;
-
-    @Mock
     private Crac cracEsPt;
 
     @Mock
@@ -38,10 +34,9 @@ class SweDataTest {
 
     @Test
     void simpleTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, cimCrac, cracEsPt, cracFrEs, "glskUrl", "CracEsPt", "CracFrEs");
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, cracEsPt, cracFrEs, "glskUrl", "CracEsPt", "CracFrEs");
         assertEquals(ProcessType.D2CC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetwork());
-        assertEquals(this.cimCrac, sweData.getCimCrac());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());
         assertEquals(this.cracFrEs, sweData.getCracFrEs());
         assertEquals("CracEsPt", sweData.getJsonCracPathEsPt());
