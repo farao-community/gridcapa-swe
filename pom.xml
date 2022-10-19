@@ -60,7 +60,7 @@
         <farao.dependencies.version>1.6.1</farao.dependencies.version>
         <farao.dichotomy.version>4.5.0</farao.dichotomy.version>
         <!--update verison for voltage here, and maybe use farao dependencies-->
-        <farao.voltage.version>4.1.5-4.1.4-RC-RTE</farao.voltage.version>
+        <farao.voltage.version>4.1.4</farao.voltage.version>
         <gridcapa.starter.minio.version>0.2.0</gridcapa.starter.minio.version>
         <gridcapa.task-manager.version>1.7.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
