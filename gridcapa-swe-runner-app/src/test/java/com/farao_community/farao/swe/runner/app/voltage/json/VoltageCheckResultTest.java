@@ -22,7 +22,7 @@ class VoltageCheckResultTest {
     @Test
     void testNullIsSecureParameter() {
         NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckResult(null, Collections.emptyList());
+            new VoltageCheckResult(null, null);
             fail("No is secure parameter");
         });
         assertEquals("The value of isSecure cannot be null in VoltageCheckResult", npe.getMessage());
