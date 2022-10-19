@@ -61,6 +61,10 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-voltage-monitoring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-task-manager-api</artifactId>
         </dependency>
         <dependency>
