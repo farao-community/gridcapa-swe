@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.DichotomyEngine;
+import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.index.RangeDivisionIndexStrategy;
@@ -19,6 +20,8 @@ import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfigur
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,6 +31,7 @@ import java.io.IOException;
  */
 @Service
 public class DichotomyRunner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DichotomyRunner.class);
     private static final RangeDivisionIndexStrategy INDEX_STRATEGY_CONFIGURATION = new RangeDivisionIndexStrategy(false);
 
     private final DichotomyConfiguration dichotomyConfiguration;
@@ -54,15 +58,23 @@ public class DichotomyRunner {
     public DichotomyResult<RaoResponse> run(SweData sweData, DichotomyDirection direction) {
         Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
         dichotomyLogging.logStartDichotomy(direction, parameters);
+        DichotomyEngine<RaoResponse> engine = buildDichotomyEngine(sweData, direction, parameters);
+        return engine.run(sweData.getNetwork());
+    }
+
+    DichotomyEngine<RaoResponse> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, Parameters parameters) {
+        return new DichotomyEngine<>(
+                new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
+                INDEX_STRATEGY_CONFIGURATION,
+                getNetworkShifter(sweData, direction),
+                getNetworkValidator(sweData));
+    }
+
+    private NetworkShifter getNetworkShifter(SweData sweData, DichotomyDirection direction) {
         try {
-            DichotomyEngine<RaoResponse> engine = new DichotomyEngine<>(
-                    new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
-                    INDEX_STRATEGY_CONFIGURATION,
-                    networkShifterProvider.get(sweData, direction),
-                    getNetworkValidator(sweData));
-            return engine.run(sweData.getNetwork());
+            return networkShifterProvider.get(sweData, direction);
         } catch (IOException e) {
-            throw new SweInternalException("");
+            throw new SweInternalException("Could not get network shifter: ", e);
         }
     }
 
