@@ -9,7 +9,9 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,21 @@ class FileExporterTest {
                 Mockito.any(OffsetDateTime.class)
         );
         assertEquals("cracUrl", cracUrl);
+    }
+
+    @Test
+    void saveVoltageMonitoringResultInJson() {
+        VoltageMonitoringResult voltageResult = VoltageMonitoringResultTestUtils.getMonitoringResult();
+        Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("voltageResult");
+        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJson(voltageResult, "voltageResult.json", dateTime, ProcessType.D2CC);
+        Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(
+                Mockito.anyString(),
+                Mockito.any(InputStream.class),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.any(OffsetDateTime.class)
+        );
+        assertEquals("voltageResult", voltageUrl);
     }
 
     @Test
