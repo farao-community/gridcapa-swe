@@ -14,10 +14,16 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -28,6 +34,7 @@ import static com.farao_community.farao.dichotomy.api.logging.DichotomyLoggerPro
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public final class SweNetworkShifter implements NetworkShifter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
     private static final int MAX_NUMBER_ITERATION = 4;
 
@@ -50,7 +57,7 @@ public final class SweNetworkShifter implements NetworkShifter {
     @Override
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
         BUSINESS_LOGS.info(String.format("Starting shift on network %s with step value %.2f",
-                network.getVariantManager().getWorkingVariantId(), stepValue)); //todo add direction to logs
+                network.getVariantManager().getWorkingVariantId(), stepValue)); // todo add direction to logs
 
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
@@ -87,7 +94,12 @@ public final class SweNetworkShifter implements NetworkShifter {
             }
 
             // Step 2: Compute exchanges mismatch
-            bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network, workingVariantCopyId);
+            LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), LoadFlowParameters.load());
+            if (!result.isOk()) {
+                LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
+                throw new ShiftingException(String.format("Loadflow computation diverged on network %s", network.getId()));
+            }
+            bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
             double mismatchEsPt = targetExchanges.get("ES_PT") - bordersExchanges.get("ES_PT");
             double mismatchEsFr = targetExchanges.get("ES_FR") -  bordersExchanges.get("ES_FR");
 
@@ -111,12 +123,12 @@ public final class SweNetworkShifter implements NetworkShifter {
         // Step 4 : check after iteration max and out of tolerane
         if (!shiftSucceed) {
             String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get("ES_PT"), bordersExchanges.get("ES_FR"));
-            throw new GlskLimitationException(message); //todo check rule  "out of tolerance" with PO
+            throw new ShiftingException(message); //todo check rule  "out of tolerance" with PO
         }
 
         // Step 5: Reset current variant with initial state
-        network.getVariantManager().removeVariant(workingVariantCopyId);
         network.getVariantManager().setWorkingVariant(initialVariantId);
+        network.getVariantManager().removeVariant(workingVariantCopyId);
     }
 
     private Map<String, Double> getTargetExchanges(double stepValue) {
