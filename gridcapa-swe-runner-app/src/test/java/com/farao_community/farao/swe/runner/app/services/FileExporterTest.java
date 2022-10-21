@@ -78,7 +78,6 @@ class FileExporterTest {
                 "2021/09/01/09_30/OUTPUTS/",
                 fileExporter.makeDestinationMinioPath(
                         OffsetDateTime.parse("2021-09-01T07:30Z"),
-                        ProcessType.IDCC,
                         FileExporter.FileKind.OUTPUTS)
         );
     }

@@ -84,7 +84,7 @@ public class FileExporter {
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
         }
-        String voltageResultPath =  makeDestinationMinioPath(processTargetDateTime, processType, FileKind.OUTPUTS) + targetName;
+        String voltageResultPath =  makeDestinationMinioPath(processTargetDateTime, FileKind.OUTPUTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
             minioAdapter.uploadArtifactForTimestamp(voltageResultPath, is, processType.toString(), "", processTargetDateTime);
         } catch (IOException e) {
@@ -93,7 +93,7 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(voltageResultPath);
     }
 
-    protected String makeDestinationMinioPath(OffsetDateTime offsetDateTime, ProcessType processType, FileKind filekind) {
+    public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {
         ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
         return targetDateTime.getYear() + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
