@@ -41,7 +41,8 @@ public class NetworkShifterProvider {
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) throws IOException {
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(sweData.getNetwork());
-        return new SweNetworkShifter(zonalScalableProvider.get(sweData.getGlskUrl(), sweData.getNetwork(), sweData.getTimestamp()),
+        return new SweNetworkShifter(sweData.getProcessType(), direction,
+                zonalScalableProvider.get(sweData.getGlskUrl(), sweData.getNetwork(), sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 DEFAULT_TOLERANCE_ES_PT,
                 dichotomyConfiguration.getParameters().get(direction).getTolerance()); //todo modify configuration with two values
