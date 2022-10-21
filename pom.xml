@@ -58,7 +58,7 @@
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
         <farao.dependencies.version>1.6.1</farao.dependencies.version>
-        <farao.dichotomy.version>4.5.0</farao.dichotomy.version>
+        <farao.dichotomy.version>4.6.0</farao.dichotomy.version>
         <!--update verison for voltage here, and maybe use farao dependencies-->
         <farao.voltage.version>4.1.4</farao.voltage.version>
         <gridcapa.starter.minio.version>0.2.0</gridcapa.starter.minio.version>
