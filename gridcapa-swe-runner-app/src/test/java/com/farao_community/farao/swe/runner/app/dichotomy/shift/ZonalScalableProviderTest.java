@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.swe.runner.app.dichotomy;
+package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.import_.Importers;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
@@ -32,7 +31,7 @@ class ZonalScalableProviderTest {
     private final String glskFilename = "cim_Glsk.xml";
 
     @Test
-    void testCountryGeneratorsScalableforFR() throws IOException {
+    void testCountryGeneratorsScalableforFR() {
         String glskUrl = Objects.requireNonNull(getClass().getResource(testDirectory + glskFilename)).toString(); //Glsk file does not contains FR
         OffsetDateTime timestamp = OffsetDateTime.parse("2021-02-09T19:30:00Z");
         Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
