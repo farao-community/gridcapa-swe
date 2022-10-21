@@ -37,7 +37,8 @@ public final class CountryBalanceComputation {
 
     public static Map<String, Double> computeSweCountriesBalances(Network network) {
         Map<String, Double> countriesBalances = new HashMap<>();
-        Map<String, Double> bordersExchanges = computeSweBordersExchanges(network, network.getVariantManager().getWorkingVariantId());
+        runLoadFlow(network, network.getVariantManager().getWorkingVariantId());
+        Map<String, Double> bordersExchanges = computeSweBordersExchanges(network);
         countriesBalances.put(toEic("PT"),  -bordersExchanges.get("ES_PT"));
         countriesBalances.put(toEic("ES"), bordersExchanges.values().stream().reduce(0., Double::sum));
         countriesBalances.put(toEic("FR"), -bordersExchanges.get("ES_FR"));
@@ -45,8 +46,7 @@ public final class CountryBalanceComputation {
         return countriesBalances;
     }
 
-    public static Map<String, Double> computeSweBordersExchanges(Network network, String workingVariantId) {
-        runLoadFlow(network, workingVariantId);
+    public static Map<String, Double> computeSweBordersExchanges(Network network) {
         Map<String, Double> borderExchanges = new HashMap<>();
         Map<Country, CountryArea> countryAreaPerCountry = Stream.of(Country.FR, Country.ES, Country.PT)
                 .collect(Collectors.toMap(Function.identity(), country -> new CountryAreaFactory(country).create(network)));
