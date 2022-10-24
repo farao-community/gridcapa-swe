@@ -31,8 +31,6 @@ public class NetworkShifterProvider {
 
     private final DichotomyConfiguration dichotomyConfiguration;
     private final ZonalScalableProvider zonalScalableProvider;
-    private static final double DEFAULT_TOLERANCE_ES_PT = 50;
-    private static final double DEFAULT_TOLERANCE_ES_FR = 10;
 
     public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider) {
         this.dichotomyConfiguration = dichotomyConfiguration;
@@ -44,8 +42,8 @@ public class NetworkShifterProvider {
         return new SweNetworkShifter(sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), sweData.getNetwork(), sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-                DEFAULT_TOLERANCE_ES_PT,
-                dichotomyConfiguration.getParameters().get(direction).getTolerance()); //todo modify configuration with two values
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr());
     }
 
     private ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
