@@ -33,7 +33,8 @@ public class DichotomyConfiguration {
         private double minValue;
         private double maxValue;
         private double precision;
-        private double tolerance;
+        private double toleranceEsPt;
+        private double toleranceEsFr;
 
         public double getMinValue() {
             return minValue;
@@ -59,12 +60,20 @@ public class DichotomyConfiguration {
             this.precision = precision;
         }
 
-        public double getTolerance() {
-            return tolerance;
+        public double getToleranceEsPt() {
+            return toleranceEsPt;
         }
 
-        public void setTolerance(double tolerance) {
-            this.tolerance = tolerance;
+        public void setToleranceEsPt(double toleranceEsPt) {
+            this.toleranceEsPt = toleranceEsPt;
+        }
+
+        public double getToleranceEsFr() {
+            return toleranceEsFr;
+        }
+
+        public void setToleranceEsFr(double toleranceEsFr) {
+            this.toleranceEsFr = toleranceEsFr;
         }
     }
 }
