@@ -18,13 +18,20 @@ import com.github.jasminb.jsonapi.annotations.Type;
 public class SweResponse {
     @Id
     private final String id;
+    private final String ttcDocUrl;
 
     @JsonCreator
-    public SweResponse(@JsonProperty("id") String id) {
+    public SweResponse(@JsonProperty("id") String id,
+                       @JsonProperty("ttcDocUrl") String ttcDocUrl) {
         this.id = id;
+        this.ttcDocUrl = ttcDocUrl;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getTtcDocUrl() {
+        return ttcDocUrl;
     }
 }

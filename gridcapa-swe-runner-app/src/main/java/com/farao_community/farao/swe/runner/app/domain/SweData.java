@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.powsybl.iidm.network.Network;
 
@@ -22,19 +21,17 @@ public class SweData {
     private final OffsetDateTime timestamp;
     private final ProcessType processType;
     private final Network network;
-    private final CimCrac cimCrac;
     private final Crac cracEsPt;
     private final Crac cracFrEs;
     private final String glskUrl;
     private final String jsonCracPathEsPt;
     private final String jsonCracPathFrEs;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network network, CimCrac cimCrac, Crac cracEsPt, Crac cracFrEs, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network network, Crac cracEsPt, Crac cracFrEs, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
         this.network = network;
-        this.cimCrac = cimCrac;
         this.cracEsPt = cracEsPt;
         this.cracFrEs = cracFrEs;
         this.glskUrl = glskUrl;
@@ -56,10 +53,6 @@ public class SweData {
 
     public Network getNetwork() {
         return network;
-    }
-
-    public CimCrac getCimCrac() {
-        return cimCrac;
     }
 
     public Crac getCracEsPt() {

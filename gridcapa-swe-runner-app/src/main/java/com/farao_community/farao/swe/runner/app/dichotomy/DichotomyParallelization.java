@@ -8,10 +8,15 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
+import com.farao_community.farao.swe.runner.app.services.OutputService;
 import org.springframework.stereotype.Service;
+
+import java.util.EnumMap;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -21,13 +26,15 @@ public class DichotomyParallelization {
 
     private final DichotomyLogging dichotomyLogging;
     private final DichotomyRunner dichotomyRunner;
+    private final OutputService outputService;
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner) {
+    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService) {
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
+        this.outputService = outputService;
     }
 
-    public void launchDichotomy(SweData sweData) {
+    public SweResponse launchDichotomy(SweData sweData) {
         final ExecutionResult executionResult = ParallelExecution
                 .of(() -> runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR))
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.FR_ES))
@@ -35,11 +42,24 @@ public class DichotomyParallelization {
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.PT_ES))
                 .close();
         dichotomyLogging.logEndAllDichotomies();
+        String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
+        SweResponse sweResponse = new SweResponse(sweData.getId(), ttcDocUrl);
+        // build swe response from every response
+        return sweResponse;
     }
 
-    private DichotomyResult<RaoResponse> runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
+    SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
-        return dichotomyResult;
+        // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
+        // fill response for one dichotomy
+        SweDichotomyResult sweDichotomyResult = new SweDichotomyResult(buildReturnedMap(direction, dichotomyResult));
+        return sweDichotomyResult;
+    }
+
+    private EnumMap<DichotomyDirection, DichotomyResult<RaoResponse>> buildReturnedMap(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult) {
+        EnumMap<DichotomyDirection, DichotomyResult<RaoResponse>> mapResult = new EnumMap<>(DichotomyDirection.class);
+        mapResult.put(direction, dichotomyResult);
+        return mapResult;
     }
 }

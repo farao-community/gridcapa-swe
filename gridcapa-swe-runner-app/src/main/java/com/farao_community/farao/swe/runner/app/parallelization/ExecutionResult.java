@@ -15,12 +15,17 @@ public class ExecutionResult {
 
     private final List<?> result;
 
-    ExecutionResult(final List<?> result) {
+    public ExecutionResult(final List<?> result) {
         this.result = result;
+    }
+
+    public List<?> getResult() {
+        return result;
     }
 
     @SuppressWarnings("unchecked")
     public <T> T get(final int index) {
         return (T) result.get(index);
     }
+
 }
