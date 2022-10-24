@@ -29,9 +29,37 @@ spring:
           destination: swe-d2cc-task-status-updated
 
 swe-runner:
+  dichotomy:
+    parameters:
+      ES_FR:
+        min-value: 0
+        max-value: 6400
+        precision: 50
+        tolerance: 10
+      FR_ES:
+        min-value: 0
+        max-value: 6400
+        precision: 50
+        tolerance: 10
+      ES_PT:
+        min-value: 0
+        max-value: 6400
+        precision: 50
+        tolerance: 50
+      PT_ES:
+        min-value: 0
+        max-value: 6400
+        precision: 50
+        tolerance: 50
   whitelist:
     - http://localhost:9000/
     - http://minio:9000/
+    - file:/
+
+rao-runner-server:
+  amqp:
+    client-app-id: swe-runner
+    queue-name: rao-request-queue
 
 minio-adapter:
   bucket: gridcapa

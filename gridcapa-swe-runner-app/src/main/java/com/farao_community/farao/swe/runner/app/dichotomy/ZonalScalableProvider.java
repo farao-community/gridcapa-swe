@@ -17,9 +17,10 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +34,7 @@ public class ZonalScalableProvider {
         this.fileImporter = fileImporter;
     }
 
-    public ZonalData<Scalable> get(String glskUrl, Network network, OffsetDateTime timestamp) throws IOException {
+    public ZonalData<Scalable> get(String glskUrl, Network network, OffsetDateTime timestamp) {
         ZonalData<Scalable> zonalScalable = fileImporter.importGlsk(glskUrl, network, timestamp.toInstant());
         String eicFR = new EICode(Country.FR).getAreaCode();
         if (zonalScalable.getData(eicFR) == null) {

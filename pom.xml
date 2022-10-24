@@ -58,10 +58,11 @@
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
         <farao.dependencies.version>1.6.1</farao.dependencies.version>
-        <farao.dichotomy.version>4.5.0</farao.dichotomy.version>
+        <farao.dichotomy.version>4.6.0</farao.dichotomy.version>
         <!--update verison for voltage here, and maybe use farao dependencies-->
         <farao.voltage.version>4.1.4</farao.voltage.version>
         <gridcapa.starter.minio.version>0.2.0</gridcapa.starter.minio.version>
+        <gridcapa.rao.runner.version>1.6.1</gridcapa.rao.runner.version>
         <gridcapa.task-manager.version>1.8.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
@@ -87,6 +88,11 @@
                 <groupId>com.farao-community.farao</groupId>
                 <artifactId>farao-voltage-monitoring</artifactId>
                 <version>${farao.voltage.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.farao-community.farao</groupId>
+                <artifactId>gridcapa-rao-runner-spring-boot-starter</artifactId>
+                <version>${gridcapa.rao.runner.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.farao-community.farao</groupId>

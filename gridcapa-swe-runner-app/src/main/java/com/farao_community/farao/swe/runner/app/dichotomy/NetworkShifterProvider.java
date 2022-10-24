@@ -13,9 +13,9 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.dichotomy.shift.SplittingFactors;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
-import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -27,19 +27,20 @@ import java.util.TreeMap;
  */
 @Service
 public class NetworkShifterProvider {
-    private static final double SHIFT_TOLERANCE = 10; //todo configure
 
+    private final DichotomyConfiguration dichotomyConfiguration;
     private final ZonalScalableProvider zonalScalableProvider;
 
-    public NetworkShifterProvider(ZonalScalableProvider zonalScalableProvider) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider) {
+        this.dichotomyConfiguration = dichotomyConfiguration;
         this.zonalScalableProvider = zonalScalableProvider;
     }
 
-    public NetworkShifter get(SweRequest request, Network network, DichotomyDirection direction) throws IOException {
+    public NetworkShifter get(SweData sweData, DichotomyDirection direction) throws IOException {
         return new LinearScaler(
-                zonalScalableProvider.get(request.getGlsk().getUrl(), network, request.getTargetProcessDateTime()),
-                getShiftDispatcher(request.getProcessType(), direction),
-                SHIFT_TOLERANCE);
+                zonalScalableProvider.get(sweData.getGlskUrl(), sweData.getNetwork(), sweData.getTimestamp()),
+                getShiftDispatcher(sweData.getProcessType(), direction),
+                dichotomyConfiguration.getParameters().get(direction).getTolerance());
     }
 
     private ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction) {

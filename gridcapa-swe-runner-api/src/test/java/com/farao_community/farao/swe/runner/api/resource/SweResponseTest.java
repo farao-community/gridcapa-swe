@@ -18,9 +18,10 @@ class SweResponseTest {
 
     @Test
     void simpleRequestTest() {
-        SweResponse sweResponse = new SweResponse("id");
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl");
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
+        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
     }
 
 }

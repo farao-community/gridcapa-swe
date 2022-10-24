@@ -64,7 +64,7 @@ public class RequestService {
                 LOGGER.info("Swe response sent: {}", resp.get());
             } else {
                 businessLogger.info("SWE run has been interrupted");
-                result = sendSweResponse(new SweResponse(sweRequest.getId()));
+                result = sendSweResponse(new SweResponse(sweRequest.getId(), null));
             }
         } catch (Exception e) {
             result = handleError(e, sweRequest.getId());

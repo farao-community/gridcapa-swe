@@ -9,8 +9,10 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -69,15 +71,24 @@ class FileExporterTest {
     @Test
     void makeDestinationMinioPath() {
         assertEquals(
-                "D2CC/2021/04/01/23_30/ARTIFACTS/",
-                fileExporter.makeDestinationMinioPath(dateTime, ProcessType.D2CC, FileExporter.FileKind.ARTIFACTS)
+                "2021/04/01/23_30/ARTIFACTS/",
+                fileExporter.makeDestinationMinioPath(dateTime, FileExporter.FileKind.ARTIFACTS)
         );
         assertEquals(
-                "IDCC/2021/09/01/09_30/OUTPUTS/",
+                "2021/09/01/09_30/OUTPUTS/",
                 fileExporter.makeDestinationMinioPath(
                         OffsetDateTime.parse("2021-09-01T07:30Z"),
-                        ProcessType.IDCC,
                         FileExporter.FileKind.OUTPUTS)
         );
+    }
+
+    @Test
+    void saveRaoParametersTest() {
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null);
+        RaoParameters raoParameters = RaoParameters.load();
+        Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("raoParametersUrl");
+        String raoParametersUrl = fileExporter.saveRaoParameters(sweData);
+        Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        assertEquals("raoParametersUrl", raoParametersUrl);
     }
 }
