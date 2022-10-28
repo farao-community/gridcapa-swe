@@ -60,11 +60,10 @@ public final class SweNetworkShifter implements NetworkShifter {
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
         int iterationCounter = 0;
         boolean shiftSucceed = false;
-        String initialVariantId = network.getVariantManager().getWorkingVariantId();
 
-        String workingStateId = network.getVariantManager().getWorkingVariantId();
-        String workingVariantCopyId = workingStateId + " COPY";
-        network.getVariantManager().cloneVariant(workingStateId, workingVariantCopyId);
+        String initialVariantId = network.getVariantManager().getWorkingVariantId();
+        String workingVariantCopyId = initialVariantId + " COPY";
+        network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId);
         network.getVariantManager().setWorkingVariant(workingVariantCopyId);
 
         List<String> limitingCountries = new ArrayList<>();
@@ -104,11 +103,11 @@ public final class SweNetworkShifter implements NetworkShifter {
             // Step 3: Checks balance adjustment results
             if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
                 LOGGER.info(String.format("Shift succeed after %s iteration ", ++iterationCounter));
-                network.getVariantManager().cloneVariant(workingVariantCopyId, workingStateId, true);
+                network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                 shiftSucceed = true;
             } else {
                 // Reset current variant with initial state for each iteration
-                network.getVariantManager().cloneVariant(workingStateId, workingVariantCopyId, true);
+                network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId, true);
 
                 scalingValuesByCountry.put(toEic("PT"), scalingValuesByCountry.get(toEic("PT")) - mismatchEsPt);
                 scalingValuesByCountry.put(toEic("FR"), scalingValuesByCountry.get(toEic("FR")) - mismatchEsFr);
