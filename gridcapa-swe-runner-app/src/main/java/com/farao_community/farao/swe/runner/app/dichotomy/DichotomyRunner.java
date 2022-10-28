@@ -67,7 +67,7 @@ public class DichotomyRunner {
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 INDEX_STRATEGY_CONFIGURATION,
                 getNetworkShifter(sweData, direction),
-                getNetworkValidator(sweData));
+                getNetworkValidator(sweData, direction));
     }
 
     private NetworkShifter getNetworkShifter(SweData sweData, DichotomyDirection direction) {
@@ -78,9 +78,9 @@ public class DichotomyRunner {
         }
     }
 
-    private NetworkValidator<RaoResponse> getNetworkValidator(SweData sweData) {
+    private NetworkValidator<RaoResponse> getNetworkValidator(SweData sweData, DichotomyDirection direction) {
         String raoParametersURL = fileExporter.saveRaoParameters(sweData);
-        return new RaoValidator(fileExporter, fileImporter, raoParametersURL, raoRunnerClient, sweData);
+        return new RaoValidator(fileExporter, fileImporter, raoParametersURL, raoRunnerClient, sweData, direction);
     }
 
 }

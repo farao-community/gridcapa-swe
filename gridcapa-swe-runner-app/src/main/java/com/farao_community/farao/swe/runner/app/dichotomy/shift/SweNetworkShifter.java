@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static com.farao_community.farao.dichotomy.api.logging.DichotomyLoggerProvider.BUSINESS_LOGS;
-import static com.farao_community.farao.dichotomy.api.logging.DichotomyLoggerProvider.BUSINESS_WARNS;
-
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
@@ -56,8 +53,8 @@ public final class SweNetworkShifter implements NetworkShifter {
 
     @Override
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
-        BUSINESS_LOGS.info(String.format("Starting shift on network %s with step value %.2f",
-                network.getVariantManager().getWorkingVariantId(), stepValue)); // todo add direction to logs
+        LOGGER.info(String.format("%s - Starting shift on network %s", direction,
+                network.getVariantManager().getWorkingVariantId()));
 
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
@@ -75,14 +72,14 @@ public final class SweNetworkShifter implements NetworkShifter {
 
         do {
             // Step 1: Perform the scaling
-            BUSINESS_LOGS.info(String.format("Applying shift iteration %s ", iterationCounter));
+            LOGGER.info(String.format("Applying shift iteration %s ", iterationCounter));
             for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
                 String zoneId = entry.getKey();
                 double asked = entry.getValue();
-                BUSINESS_LOGS.info(String.format("Applying variation on zone %s (target: %.2f)", zoneId, asked));
+                LOGGER.info(String.format("Applying variation on zone %s (target: %.2f)", zoneId, asked));
                 double done = zonalScalable.getData(zoneId).scale(network, asked);
                 if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    BUSINESS_WARNS.warn(String.format("Incomplete variation on zone %s (target: %.2f, done: %.2f)",
+                    LOGGER.warn(String.format("Incomplete variation on zone %s (target: %.2f, done: %.2f)",
                             zoneId, asked, done));
                     limitingCountries.add(zoneId);
                 }
@@ -90,6 +87,7 @@ public final class SweNetworkShifter implements NetworkShifter {
             if (!limitingCountries.isEmpty()) {
                 StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
                 limitingCountries.forEach(sj::add);
+                LOGGER.error(sj.toString());
                 throw new GlskLimitationException(sj.toString());
             }
 
@@ -105,7 +103,7 @@ public final class SweNetworkShifter implements NetworkShifter {
 
             // Step 3: Checks balance adjustment results
             if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
-                BUSINESS_LOGS.info(String.format("Shift succeed with %s iteration ", ++iterationCounter));
+                LOGGER.info(String.format("Shift succeed after %s iteration ", ++iterationCounter));
                 network.getVariantManager().cloneVariant(workingVariantCopyId, workingStateId, true);
                 shiftSucceed = true;
             } else {

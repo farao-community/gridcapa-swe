@@ -59,4 +59,6 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
+    <logger name="com.powsybl" level="error"/>
+
 </configuration>
