@@ -19,7 +19,6 @@ import com.farao_community.farao.swe.runner.app.dichotomy.shift.CountryBalanceCo
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweNetworkShifter;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweD2ccShiftDispatcher;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -37,7 +36,7 @@ public class NetworkShifterProvider {
         this.zonalScalableProvider = zonalScalableProvider;
     }
 
-    public NetworkShifter get(SweData sweData, DichotomyDirection direction) throws IOException {
+    public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(sweData.getNetwork());
         return new SweNetworkShifter(sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), sweData.getNetwork(), sweData.getTimestamp()),
