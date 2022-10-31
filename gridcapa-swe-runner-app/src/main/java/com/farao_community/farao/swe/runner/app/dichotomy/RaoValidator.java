@@ -31,14 +31,18 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
     private final String raoParametersUrl;
     private final RaoRunnerClient raoRunnerClient;
     private final SweData sweData;
+    private final DichotomyDirection direction;
     private int variantCounter = 0;
+    private static final String REGION = "SWE";
+    private static final String MINIO_SEPARATOR = "/";
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, String raoParametersUrl, RaoRunnerClient raoRunnerClient, SweData sweData) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, String raoParametersUrl, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoParametersUrl = raoParametersUrl;
         this.raoRunnerClient = raoRunnerClient;
         this.sweData = sweData;
+        this.direction = direction;
     }
 
     @Override
@@ -46,11 +50,11 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
         String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
         String scaledNetworkName = network.getNameOrId().replace(":", "") + ".xiidm";
         String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
-        RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, "SWE/" + scaledNetworkDirPath);
+        RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, scaledNetworkDirPath);
         try {
-            LOGGER.info("RAO request sent: {}", raoRequest);
+            LOGGER.info("{} - RAO request sent: {}", direction, raoRequest);
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
-            LOGGER.info("RAO response received: {}", raoResponse);
+            LOGGER.info("{} - RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, raoResponse);
         } catch (RuntimeException e) {
@@ -59,11 +63,12 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
     }
 
     private RaoRequest buildRaoRequest(String networkPresignedUrl, String scaledNetworkDirPath) {
-        return new RaoRequest(sweData.getId(), networkPresignedUrl, sweData.getJsonCracPathFrEs(), raoParametersUrl, scaledNetworkDirPath);
+        String resultsDestination = REGION + MINIO_SEPARATOR + sweData.getProcessType() + MINIO_SEPARATOR + scaledNetworkDirPath;
+        return new RaoRequest(sweData.getId(), networkPresignedUrl, sweData.getJsonCracPathFrEs(), raoParametersUrl, resultsDestination);
     }
 
     private String generateScaledNetworkDirPath(Network network) {
-        String basePath = fileExporter.makeDestinationMinioPath(sweData.getTimestamp(), FileExporter.FileKind.ARTIFACTS);
+        String basePath = fileExporter.makeDestinationDichotomyPath(sweData.getTimestamp(), FileExporter.FileKind.ARTIFACTS, direction);
         String variantName = network.getVariantManager().getWorkingVariantId();
         return String.format("%s/%s-%s/", basePath, ++variantCounter, variantName);
     }

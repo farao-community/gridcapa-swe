@@ -7,14 +7,12 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.DichotomyEngine;
-import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.index.RangeDivisionIndexStrategy;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
-import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -23,8 +21,6 @@ import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -66,21 +62,13 @@ public class DichotomyRunner {
         return new DichotomyEngine<>(
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 INDEX_STRATEGY_CONFIGURATION,
-                getNetworkShifter(sweData, direction),
-                getNetworkValidator(sweData));
+                networkShifterProvider.get(sweData, direction),
+                getNetworkValidator(sweData, direction));
     }
 
-    private NetworkShifter getNetworkShifter(SweData sweData, DichotomyDirection direction) {
-        try {
-            return networkShifterProvider.get(sweData, direction);
-        } catch (IOException e) {
-            throw new SweInternalException("Could not get network shifter: ", e);
-        }
-    }
-
-    private NetworkValidator<RaoResponse> getNetworkValidator(SweData sweData) {
+    private NetworkValidator<RaoResponse> getNetworkValidator(SweData sweData, DichotomyDirection direction) {
         String raoParametersURL = fileExporter.saveRaoParameters(sweData);
-        return new RaoValidator(fileExporter, fileImporter, raoParametersURL, raoRunnerClient, sweData);
+        return new RaoValidator(fileExporter, fileImporter, raoParametersURL, raoRunnerClient, sweData, direction);
     }
 
 }

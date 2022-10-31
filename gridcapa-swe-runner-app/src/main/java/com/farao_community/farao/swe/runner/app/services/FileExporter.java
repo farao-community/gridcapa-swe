@@ -16,6 +16,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
 import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
@@ -100,6 +101,16 @@ public class FileExporter {
                 + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getHour()) + "_30" + MINIO_SEPARATOR
                 + filekind + MINIO_SEPARATOR;
+    }
+
+    public String makeDestinationDichotomyPath(OffsetDateTime offsetDateTime, FileKind filekind, DichotomyDirection direction) {
+        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
+        return  targetDateTime.getYear() + MINIO_SEPARATOR
+                + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
+                + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
+                + String.format("%02d", targetDateTime.getHour()) + "_30" + MINIO_SEPARATOR
+                + filekind + MINIO_SEPARATOR
+                + direction + MINIO_SEPARATOR;
     }
 
     public String saveNetworkInArtifact(Network network, String networkFilePath, String fileType, OffsetDateTime processTargetDateTime, ProcessType processType) {
