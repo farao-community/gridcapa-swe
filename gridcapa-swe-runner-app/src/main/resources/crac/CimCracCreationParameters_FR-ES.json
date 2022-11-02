@@ -2,7 +2,7 @@
   "crac-factory": "CracImplFactory",
   "extensions": {
     "CimCracCreatorParameters": {
-      "timeseries-mrids" : [ "REE-TimeSeries-ESFR", "RTE-TimeSeries-1" ],
+      "timeseries-mrids" : [ "REE-TimeSeries-ESFR", "RTE-TimeSeries-1", "RTE-TimeSeries-2", "RTE-TimeSeries-3", "REE-TimeSeries-70CEP-ESFR", "REE-TimeSeries-70CEP-FRES" ],
       "range-action-groups" : [ "1_HVDC_FRES + 2_HVDC_FRES" ],
       "range-action-speeds": [
         {
