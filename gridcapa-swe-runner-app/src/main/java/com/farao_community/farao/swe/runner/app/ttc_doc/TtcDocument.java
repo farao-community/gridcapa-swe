@@ -40,14 +40,14 @@ public class TtcDocument {
     private static final Logger LOGGER = LoggerFactory.getLogger(TtcDocument.class);
     public static final String DIRECTION_SEPARATOR = "-";
 
-    private final ExecutionResult executionResult;
+    private final ExecutionResult<SweDichotomyResult> executionResult;
     private final Map<DichotomyDirection, String> mapWithValues;
     private Document doc;
 
     private Element additionalInfos;
     private Element physicalExchanges;
 
-    public TtcDocument(ExecutionResult executionResult) {
+    public TtcDocument(ExecutionResult<SweDichotomyResult> executionResult) {
         this.executionResult = executionResult;
         this.mapWithValues = new EnumMap<>(DichotomyDirection.class);
     }
@@ -62,8 +62,8 @@ public class TtcDocument {
     }
 
     private void buildMapResult() {
-        List<SweDichotomyResult> listDichotomyResults = castList(executionResult.getResult());
-        listDichotomyResults.forEach(r -> r.getMapDichotomyResult().forEach(this::addValueToResultMap));
+        List<SweDichotomyResult> listDichotomyResults = executionResult.getResult();
+        listDichotomyResults.forEach(r -> addValueToResultMap(r.getDichotomyDirection(), r.getDichotomyResult()));
     }
 
     private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<RaoResponse> result) {
@@ -142,17 +142,5 @@ public class TtcDocument {
         } catch (TransformerException e) {
             throw new SweInternalException("Could not export ttc document");
         }
-    }
-
-    private List<SweDichotomyResult> castList(Collection<?> rawCollection) {
-        List<SweDichotomyResult> listResult = new ArrayList<>(rawCollection.size());
-        for (Object o : rawCollection) {
-            try {
-                listResult.add((SweDichotomyResult) o);
-            } catch (ClassCastException e) {
-                LOGGER.error("Could not cast result to List");
-            }
-        }
-        return listResult;
     }
 }

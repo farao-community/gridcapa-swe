@@ -57,7 +57,7 @@ class FileExporterTest {
     void saveVoltageMonitoringResultInJson() {
         VoltageMonitoringResult voltageResult = VoltageMonitoringResultTestUtils.getMonitoringResult();
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("voltageResult");
-        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJson(voltageResult, "voltageResult.json", dateTime, ProcessType.D2CC);
+        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJsonZip(voltageResult, "voltageResult.json", dateTime, ProcessType.D2CC);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(
                 Mockito.anyString(),
                 Mockito.any(InputStream.class),

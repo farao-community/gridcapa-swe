@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.export.Exporters;
 import com.powsybl.iidm.network.Network;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -32,6 +33,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -73,15 +76,18 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(cracPath);
     }
 
-    public String saveVoltageMonitoringResultInJson(VoltageMonitoringResult result,
-                                                    String targetName,
-                                                    OffsetDateTime processTargetDateTime,
-                                                    ProcessType processType) {
+    public String saveVoltageMonitoringResultInJsonZip(VoltageMonitoringResult result,
+                                                       String targetName,
+                                                       OffsetDateTime processTargetDateTime,
+                                                       ProcessType processType) {
         MemDataSource memDataSource = new MemDataSource();
-        try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
+        try (OutputStream os = memDataSource.newOutputStream(targetName, false);
+             ZipOutputStream zipOs = new ZipOutputStream(os)) {
             VoltageCheckResult voltageCheckResult = voltageResultMapper.mapVoltageResult(result);
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            os.write(objectWriter.writeValueAsBytes(voltageCheckResult));
+            zipOs.putNextEntry(new ZipEntry(zipTargetNameToJsonName(targetName)));
+            zipOs.write(objectWriter.writeValueAsBytes(voltageCheckResult));
+            zipOs.closeEntry();
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
         }
@@ -92,6 +98,15 @@ public class FileExporter {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
         return minioAdapter.generatePreSignedUrl(voltageResultPath);
+    }
+
+    private String zipTargetNameToJsonName(String targetName) {
+        if (StringUtils.isNotBlank(targetName) &&
+                (targetName.contains(".ZIP") || targetName.contains(".zip"))) {
+            return targetName.replace(".ZIP", ".JSON").replace(".zip", ".json");
+        }
+        //default
+        return targetName;
     }
 
     public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {
