@@ -53,7 +53,7 @@ public class OutputService {
             Optional<VoltageMonitoringResult> voltageResult = sweResult.getVoltageMonitoringResult();
             if (voltageResult.isPresent()) {
                 VoltageMonitoringResult voltageRes = voltageResult.get();
-                return fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, ProcessType.D2CC, "Voltage_" + directionString);
+                return fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, ProcessType.D2CC, "VOLTAGE_" + directionString);
             }
         }
         throw new SweInvalidDataException("No voltage monitoring result data for file: " + zipName);
