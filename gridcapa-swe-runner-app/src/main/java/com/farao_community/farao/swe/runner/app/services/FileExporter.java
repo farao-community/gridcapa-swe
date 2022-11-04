@@ -160,8 +160,8 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    public String exportTtcDocument(SweData sweData, InputStream inputStream) {
-        String filePath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + "ttc_doc.xml";
+    public String exportTtcDocument(SweData sweData, InputStream inputStream, String filename) {
+        String filePath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + filename;
         minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "", sweData.getTimestamp());
         return minioAdapter.generatePreSignedUrl(filePath);
     }
