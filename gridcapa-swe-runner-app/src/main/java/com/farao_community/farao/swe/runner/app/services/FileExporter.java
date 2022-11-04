@@ -79,7 +79,8 @@ public class FileExporter {
     public String saveVoltageMonitoringResultInJsonZip(VoltageMonitoringResult result,
                                                        String targetName,
                                                        OffsetDateTime processTargetDateTime,
-                                                       ProcessType processType) {
+                                                       ProcessType processType,
+                                                       String fileType) {
         MemDataSource memDataSource = new MemDataSource();
         try (OutputStream os = memDataSource.newOutputStream(targetName, false);
              ZipOutputStream zipOs = new ZipOutputStream(os)) {
@@ -93,7 +94,7 @@ public class FileExporter {
         }
         String voltageResultPath =  makeDestinationMinioPath(processTargetDateTime, FileKind.OUTPUTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
-            minioAdapter.uploadArtifactForTimestamp(voltageResultPath, is, processType.toString(), "", processTargetDateTime);
+            minioAdapter.uploadOutputForTimestamp(voltageResultPath, is, processType.toString(), fileType, processTargetDateTime);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
@@ -101,8 +102,7 @@ public class FileExporter {
     }
 
     private String zipTargetNameToJsonName(String targetName) {
-        if (StringUtils.isNotBlank(targetName) &&
-                (targetName.contains(".ZIP") || targetName.contains(".zip"))) {
+        if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(".zip")) {
             return targetName.replace(".ZIP", ".JSON").replace(".zip", ".json");
         }
         //default

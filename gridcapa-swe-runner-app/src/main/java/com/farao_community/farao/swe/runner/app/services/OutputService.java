@@ -38,21 +38,14 @@ public class OutputService {
         return fileExporter.exportTtcDocument(sweData, inputStream);
     }
 
-    public String buildAndExportEsFrVoltageDoc(SweData sweData, ExecutionResult<SweDichotomyResult> result) {
-        return buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, result);
-    }
-
-    public String buildAndExportFrEsVoltageDoc(SweData sweData, ExecutionResult<SweDichotomyResult> result) {
-        return buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, result);
-    }
-
-    private String buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, ExecutionResult<SweDichotomyResult> result) {
+    public String buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, ExecutionResult<SweDichotomyResult> result) {
         OffsetDateTime timestamp = sweData.getTimestamp();
+        String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
         String zipName = timestamp.getYear()
                 + String.format("%02d", timestamp.getMonthValue())
                 + String.format("%02d", timestamp.getDayOfMonth()) + "_"
                 + String.format("%02d", timestamp.getHour()) + "30_Voltage_"
-                + (direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR")
+                + directionString
                 + ".zip";
         Optional<SweDichotomyResult> directionResult = result.getResult().stream().filter(res -> res.getDichotomyDirection() == direction).findFirst();
         if (directionResult.isPresent()) {
@@ -60,7 +53,7 @@ public class OutputService {
             Optional<VoltageMonitoringResult> voltageResult = sweResult.getVoltageMonitoringResult();
             if (voltageResult.isPresent()) {
                 VoltageMonitoringResult voltageRes = voltageResult.get();
-                return fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, ProcessType.D2CC);
+                return fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, ProcessType.D2CC, "Voltage" + directionString);
             }
         }
         throw new SweInvalidDataException("No voltage monitoring result data for file: " + zipName);

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
@@ -22,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
+ */
 class OutputServiceTest {
 
     public static final String TTC_DOCUMENT_URL_STRING = "ttcDocumentUrl";
@@ -38,7 +47,7 @@ class OutputServiceTest {
     static void init() {
         fileExporter = Mockito.mock(FileExporter.class);
         Mockito.when(fileExporter.exportTtcDocument(Mockito.any(SweData.class), Mockito.any(InputStream.class))).thenReturn(TTC_DOCUMENT_URL_STRING);
-        Mockito.when(fileExporter.saveVoltageMonitoringResultInJsonZip(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(fileExporter.saveVoltageMonitoringResultInJsonZip(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(VOLTAGE_DOCUMENT_URL_STRING);
         outputService = new OutputService(fileExporter);
         List<SweDichotomyResult> resultList = new ArrayList<>();
@@ -64,12 +73,7 @@ class OutputServiceTest {
 
     @Test
     void buildAndExportEsFrVoltageDoc() {
-        Assertions.assertEquals(VOLTAGE_DOCUMENT_URL_STRING, outputService.buildAndExportEsFrVoltageDoc(sweData, executionResult));
-    }
-
-    @Test
-    void buildAndExportFrEsVoltageDoc() {
-        Assertions.assertEquals(VOLTAGE_DOCUMENT_URL_STRING, outputService.buildAndExportFrEsVoltageDoc(sweData, executionResult));
+        Assertions.assertEquals(VOLTAGE_DOCUMENT_URL_STRING, outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult));
     }
 
     @NotNull

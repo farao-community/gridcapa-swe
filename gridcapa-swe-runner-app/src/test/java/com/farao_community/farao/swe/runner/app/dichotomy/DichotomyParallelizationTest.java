@@ -79,7 +79,7 @@ class DichotomyParallelizationTest {
     void testParallelization() {
         when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(outputService.buildAndExportEsFrVoltageDoc(any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");
+        when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");
         when(parallelExecution.close()).thenReturn(executionResult);
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
