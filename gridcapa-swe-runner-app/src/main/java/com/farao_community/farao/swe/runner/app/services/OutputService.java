@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
@@ -53,12 +54,14 @@ public class OutputService {
                 + String.format("%02d", timestamp.getHour()) + "30_Voltage_"
                 + (direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR")
                 + ".zip";
-        Optional<SweDichotomyResult> esFrResult = result.getResult().stream().filter(res -> {
-            return res.getVoltageMonitoringResult().isPresent()
-                && res.getDichotomyDirection() == direction;
-        }).findFirst();
-        if (esFrResult.isPresent()) {
-            return fileExporter.saveVoltageMonitoringResultInJsonZip(esFrResult.get().getVoltageMonitoringResult().get(), zipName, timestamp, ProcessType.D2CC);
+        Optional<SweDichotomyResult> directionResult = result.getResult().stream().filter(res -> res.getDichotomyDirection() == direction ).findFirst();
+        if (directionResult.isPresent()) {
+            SweDichotomyResult sweResult = directionResult.get();
+            Optional<VoltageMonitoringResult> voltageResult = sweResult.getVoltageMonitoringResult();
+            if (voltageResult.isPresent()) {
+                VoltageMonitoringResult voltageRes = voltageResult.get();
+                return fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, ProcessType.D2CC);
+            }
         }
         throw new SweInvalidDataException("No voltage monitoring result data for file: " + zipName);
     }

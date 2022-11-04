@@ -46,7 +46,7 @@ public final class ParallelExecution<V> {
     }
 
     public ExecutionResult<V> close() {
-        return new ExecutionResult<V>(futureStream
+        return new ExecutionResult<>(futureStream
                 .map(CompletableFuture<V>::join)
                 .collect(Collectors.toList()));
     }
