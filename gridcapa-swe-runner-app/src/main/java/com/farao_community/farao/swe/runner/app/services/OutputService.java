@@ -54,7 +54,7 @@ public class OutputService {
                 + String.format("%02d", timestamp.getHour()) + "30_Voltage_"
                 + (direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR")
                 + ".zip";
-        Optional<SweDichotomyResult> directionResult = result.getResult().stream().filter(res -> res.getDichotomyDirection() == direction ).findFirst();
+        Optional<SweDichotomyResult> directionResult = result.getResult().stream().filter(res -> res.getDichotomyDirection() == direction).findFirst();
         if (directionResult.isPresent()) {
             SweDichotomyResult sweResult = directionResult.get();
             Optional<VoltageMonitoringResult> voltageResult = sweResult.getVoltageMonitoringResult();
