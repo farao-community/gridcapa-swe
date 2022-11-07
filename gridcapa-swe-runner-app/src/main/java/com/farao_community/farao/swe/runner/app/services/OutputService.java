@@ -17,6 +17,7 @@ import com.farao_community.farao.swe.runner.app.ttc_doc.TtcDocument;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ import java.util.Optional;
 @Service
 public class OutputService {
 
+    public static final String TTC_DOC_NAME_REGEX = "'SWE_'yyyyMMdd'_'HHmm'_TTCdoc.xml'";
     private final FileExporter fileExporter;
 
     public OutputService(FileExporter fileExporter) {
@@ -35,7 +37,12 @@ public class OutputService {
     public String buildAndExportTtcDocument(SweData sweData, ExecutionResult<SweDichotomyResult> result) {
         TtcDocument ttcDoc = new TtcDocument(result);
         InputStream inputStream = ttcDoc.buildTtcDocFile();
-        return fileExporter.exportTtcDocument(sweData, inputStream);
+        return fileExporter.exportTtcDocument(sweData, inputStream, buildTtcDocName(sweData));
+    }
+
+    private String buildTtcDocName(SweData sweData) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(TTC_DOC_NAME_REGEX);
+        return df.format(sweData.getTimestamp());
     }
 
     public String buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, ExecutionResult<SweDichotomyResult> result) {
