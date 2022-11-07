@@ -6,13 +6,20 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.data.crac_api.Crac;
+import com.farao_community.farao.data.crac_api.CracFactory;
+import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
+import com.powsybl.iidm.import_.Importers;
+import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -50,19 +57,37 @@ class DichotomyParallelizationTest {
     private DichotomyResult<RaoResponse> sweDichotomyResult;
 
     @Mock
-    private ExecutionResult executionResult;
+    private DichotomyStepResult<RaoResponse> highestValidStep;
+
+    @Mock
+    private RaoResult raoResult;
+
+    @Mock
+    private ExecutionResult<SweDichotomyResult> executionResult;
+
+    private Network network;
+    private Crac crac;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        network = Importers.loadNetwork("network.xiidm", getClass().getResourceAsStream("/network/network.xiidm"));
+        crac = CracFactory.findDefault().create("test-crac");
     }
 
     @Test
     void testParallelization() {
         when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
+        when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");
         when(parallelExecution.close()).thenReturn(executionResult);
+        when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
+        when(highestValidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweData.getCracFrEs()).thenReturn(crac);
+        when(sweData.getNetwork()).thenReturn(network);
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertEquals("esFrVoltageZipUrl.zip", sweResponse.getVoltageEsFrZipUrl());
+
     }
 }

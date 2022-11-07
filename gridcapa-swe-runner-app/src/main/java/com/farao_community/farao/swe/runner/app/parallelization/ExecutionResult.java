@@ -11,21 +11,20 @@ import java.util.List;
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
-public class ExecutionResult {
+public class ExecutionResult<T> {
 
-    private final List<?> result;
+    private final List<T> result;
 
-    public ExecutionResult(final List<?> result) {
+    public ExecutionResult(final List<T> result) {
         this.result = result;
     }
 
-    public List<?> getResult() {
+    public List<T> getResult() {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T get(final int index) {
-        return (T) result.get(index);
+    public T get(final int index) {
+        return result.get(index);
     }
 
 }
