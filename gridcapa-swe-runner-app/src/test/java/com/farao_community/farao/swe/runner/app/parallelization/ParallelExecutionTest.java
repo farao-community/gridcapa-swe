@@ -19,7 +19,7 @@ class ParallelExecutionTest {
 
     @Test
     void testParallelization() {
-        final ExecutionResult executionResult = ParallelExecution.of(() -> slowService(1))
+        final ExecutionResult<Integer> executionResult = ParallelExecution.of(() -> slowService(1))
                 .and(() -> slowService(2))
                 .and(() -> slowService(3))
                 .close();
