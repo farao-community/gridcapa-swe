@@ -46,7 +46,7 @@ class OutputServiceTest {
     @BeforeAll
     static void init() {
         fileExporter = Mockito.mock(FileExporter.class);
-        Mockito.when(fileExporter.exportTtcDocument(Mockito.any(SweData.class), Mockito.any(InputStream.class))).thenReturn(TTC_DOCUMENT_URL_STRING);
+        Mockito.when(fileExporter.exportTtcDocument(Mockito.any(SweData.class), Mockito.any(InputStream.class), Mockito.anyString())).thenReturn(TTC_DOCUMENT_URL_STRING);
         Mockito.when(fileExporter.saveVoltageMonitoringResultInJsonZip(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(VOLTAGE_DOCUMENT_URL_STRING);
         outputService = new OutputService(fileExporter);
@@ -63,7 +63,6 @@ class OutputServiceTest {
         sweData = Mockito.mock(SweData.class);
         Mockito.when(sweData.getTimestamp()).thenReturn(dateTime);
         Mockito.when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-
     }
 
     @Test
