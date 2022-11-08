@@ -21,6 +21,7 @@ import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.export.Exporters;
 import com.powsybl.iidm.import_.ImportConfig;
 import com.powsybl.iidm.import_.Importers;
+import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
@@ -155,4 +156,5 @@ public class NetworkService {
         }
         minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", OffsetDateTime.now());
     }
+
 }
