@@ -68,7 +68,7 @@ public class TtcDocument {
 
     private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<RaoResponse> result) {
         if (result.hasValidStep()) {
-            mapWithValues.put(direction, String.valueOf(result.getHighestValidStepValue()));
+            mapWithValues.put(direction, String.valueOf((int) result.getHighestValidStepValue()));
         } else {
             mapWithValues.put(direction, "");
         }
