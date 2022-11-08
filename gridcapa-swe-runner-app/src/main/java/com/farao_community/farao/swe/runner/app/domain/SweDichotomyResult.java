@@ -7,23 +7,38 @@
 package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweDichotomyResult {
 
-    private final Map<DichotomyDirection, DichotomyResult<RaoResponse>> mapDichotomyResult;
+    private final DichotomyDirection dichotomyDirection;
+    private final DichotomyResult<RaoResponse> dichotomyResult;
+    private final Optional<VoltageMonitoringResult> voltageMonitoringResult;
 
-    public SweDichotomyResult(Map<DichotomyDirection, DichotomyResult<RaoResponse>> mapDichotomyResult) {
-        this.mapDichotomyResult = mapDichotomyResult;
+    public SweDichotomyResult(DichotomyDirection dichotomyDirection,
+                              DichotomyResult<RaoResponse> dichotomyResult,
+                              Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+        this.dichotomyDirection = dichotomyDirection;
+        this.dichotomyResult = dichotomyResult;
+        this.voltageMonitoringResult = voltageMonitoringResult;
     }
 
-    public Map<DichotomyDirection, DichotomyResult<RaoResponse>> getMapDichotomyResult() {
-        return mapDichotomyResult;
+    public DichotomyDirection getDichotomyDirection() {
+        return dichotomyDirection;
+    }
+
+    public DichotomyResult<RaoResponse> getDichotomyResult() {
+        return dichotomyResult;
+    }
+
+    public Optional<VoltageMonitoringResult> getVoltageMonitoringResult() {
+        return voltageMonitoringResult;
     }
 }

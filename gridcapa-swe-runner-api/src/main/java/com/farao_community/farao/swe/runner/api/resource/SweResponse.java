@@ -19,12 +19,15 @@ public class SweResponse {
     @Id
     private final String id;
     private final String ttcDocUrl;
+    private final String voltageEsFrZipUrl;
 
     @JsonCreator
     public SweResponse(@JsonProperty("id") String id,
-                       @JsonProperty("ttcDocUrl") String ttcDocUrl) {
+                       @JsonProperty("ttcDocUrl") String ttcDocUrl,
+                       @JsonProperty("voltageEsFrZipUrl") String voltageEsFrZipUrl) {
         this.id = id;
         this.ttcDocUrl = ttcDocUrl;
+        this.voltageEsFrZipUrl = voltageEsFrZipUrl;
     }
 
     public String getId() {
@@ -33,5 +36,9 @@ public class SweResponse {
 
     public String getTtcDocUrl() {
         return ttcDocUrl;
+    }
+
+    public String getVoltageEsFrZipUrl() {
+        return voltageEsFrZipUrl;
     }
 }
