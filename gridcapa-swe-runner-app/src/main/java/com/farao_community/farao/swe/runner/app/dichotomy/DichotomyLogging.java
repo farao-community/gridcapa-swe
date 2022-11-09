@@ -16,21 +16,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class DichotomyLogging {
 
-    private final Logger eventsLogger;
+    private final Logger businessLogger;
 
-    public DichotomyLogging(Logger eventsLogger) {
-        this.eventsLogger = eventsLogger;
+    public DichotomyLogging(Logger businessLogger) {
+        this.businessLogger = businessLogger;
     }
 
     public void logStartDichotomy(DichotomyDirection direction, Parameters parameters) {
-        eventsLogger.info("{} - Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction, parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
+        businessLogger.info("[{}] : Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction, parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 
     public void logEndOneDichotomy(DichotomyDirection direction) {
-        eventsLogger.info("{} - Dichotomy finished", direction);
+        businessLogger.info("[{}] : Dichotomy finished", direction);
     }
 
     public void logEndAllDichotomies() {
-        eventsLogger.info("All - Dichotomies are done");
+        businessLogger.info("All - Dichotomies are done");
     }
 }

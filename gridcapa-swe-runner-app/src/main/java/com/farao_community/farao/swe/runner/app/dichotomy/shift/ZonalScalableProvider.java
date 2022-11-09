@@ -15,6 +15,8 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class ZonalScalableProvider {
     private final FileImporter fileImporter;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZonalScalableProvider.class);
 
     public ZonalScalableProvider(FileImporter fileImporter) {
         this.fileImporter = fileImporter;
@@ -38,6 +41,7 @@ public class ZonalScalableProvider {
         ZonalData<Scalable> zonalScalable = fileImporter.importGlsk(glskUrl, network, timestamp.toInstant());
         String eicFR = new EICode(Country.FR).getAreaCode();
         if (zonalScalable.getData(eicFR) == null) {
+            LOGGER.warn("Glsk file does not contains FR scalable for timestamp {}, a Country generators scalable is added", timestamp);
             Scalable scalableFR = getCountryGeneratorsScalablefoFR(network);
             zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(eicFR, scalableFR)));
         }

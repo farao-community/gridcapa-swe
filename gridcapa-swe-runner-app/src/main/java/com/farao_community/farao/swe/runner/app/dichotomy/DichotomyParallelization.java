@@ -14,6 +14,8 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
+import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.util.EnumMap;
@@ -23,12 +25,23 @@ import java.util.EnumMap;
  */
 @Service
 public class DichotomyParallelization {
-
+    private final Logger businessLogger;
     private final DichotomyLogging dichotomyLogging;
     private final DichotomyRunner dichotomyRunner;
     private final OutputService outputService;
+    public static final String SUMMARY = "Summary [{}] :  " +
+            "Limiting event : {},  " +
+            "Limiting element : {},  " +
+            "PRAs : {},  " +
+            "CRAs : {}.";
+    public static final String SUMMARY_BD = "Summary BD [{}] :  " +
+            "Current TTC : {},  " +
+            "Previous TTC : {},  " +
+            "Voltage Check : {},  " +
+            "Angle Check : {}.";
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService) {
+    public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService) {
+        this.businessLogger = businessLogger;
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
         this.outputService = outputService;
@@ -49,8 +62,20 @@ public class DichotomyParallelization {
     }
 
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
+        // propagate in logs MDC the task requestId as an extra field to be able to send logs with calculation tasks.
+        MDC.put("gridcapa-task-id", sweData.getId());
+        String limitingCause = "NONE";
+        String limitingElement = "NONE";
+        String printablePrasIds = "NONE";
+        String printableCrasIds = "NONE";
+        String currentTtc = "NONE";
+        String previousTtc = "NONE";
+        String voltageCheckStatus = "NONE";
+        String angleCheckStatus = "NONE";
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
+        businessLogger.info(SUMMARY, direction, limitingCause, limitingElement, printablePrasIds, printableCrasIds); // todo add elements
+        businessLogger.info(SUMMARY_BD, direction, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
         // fill response for one dichotomy
         SweDichotomyResult sweDichotomyResult = new SweDichotomyResult(buildReturnedMap(direction, dichotomyResult));

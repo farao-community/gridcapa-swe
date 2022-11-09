@@ -36,6 +36,7 @@ public final class CountryBalanceComputation {
     }
 
     public static Map<String, Double> computeSweCountriesBalances(Network network) {
+        LOGGER.info("Computing initial SWE countries balance");
         Map<String, Double> countriesBalances = new HashMap<>();
         runLoadFlow(network, network.getVariantManager().getWorkingVariantId());
         Map<String, Double> bordersExchanges = computeSweBordersExchanges(network);

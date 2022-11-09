@@ -34,6 +34,7 @@ public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
     private static final int MAX_NUMBER_ITERATION = 4;
+    private final Logger businessLogger;
 
     private final ProcessType processType;
     private final DichotomyDirection direction;
@@ -42,7 +43,8 @@ public final class SweNetworkShifter implements NetworkShifter {
     private final double toleranceEsPt;
     private final double toleranceEsFr;
 
-    public SweNetworkShifter(ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr) {
+    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr) {
+        this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
         this.zonalScalable = zonalScalable;
@@ -53,10 +55,11 @@ public final class SweNetworkShifter implements NetworkShifter {
 
     @Override
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
-        LOGGER.info(String.format("%s - Starting shift on network %s", direction,
+        businessLogger.info(String.format("[%s] : Starting shift on network %s", direction,
                 network.getVariantManager().getWorkingVariantId()));
 
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
+        businessLogger.info(String.format("[%s] : Target shift on countries %s", direction, scalingValuesByCountry));
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
         int iterationCounter = 0;
         boolean shiftSucceed = false;
@@ -71,22 +74,22 @@ public final class SweNetworkShifter implements NetworkShifter {
 
         do {
             // Step 1: Perform the scaling
-            LOGGER.info(String.format("Applying shift iteration %s ", iterationCounter));
+            LOGGER.info(String.format("[%s] : Applying shift iteration %s ", direction, iterationCounter));
             for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
                 String zoneId = entry.getKey();
                 double asked = entry.getValue();
-                LOGGER.info(String.format("Applying variation on zone %s (target: %.2f)", zoneId, asked));
+                LOGGER.info(String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked));
                 double done = zonalScalable.getData(zoneId).scale(network, asked);
                 if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    LOGGER.warn(String.format("Incomplete variation on zone %s (target: %.2f, done: %.2f)",
-                            zoneId, asked, done));
+                    LOGGER.warn(String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
+                            direction, zoneId, asked, done));
                     limitingCountries.add(zoneId);
                 }
             }
             if (!limitingCountries.isEmpty()) {
                 StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
                 limitingCountries.forEach(sj::add);
-                LOGGER.error(sj.toString());
+                LOGGER.error("[{}] : {}", direction, sj);
                 throw new GlskLimitationException(sj.toString());
             }
 
@@ -102,7 +105,8 @@ public final class SweNetworkShifter implements NetworkShifter {
 
             // Step 3: Checks balance adjustment results
             if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
-                LOGGER.info(String.format("Shift succeed after %s iteration ", ++iterationCounter));
+                LOGGER.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
+                businessLogger.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
                 network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                 shiftSucceed = true;
             } else {

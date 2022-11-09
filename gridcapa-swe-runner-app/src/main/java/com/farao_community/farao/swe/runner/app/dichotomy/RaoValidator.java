@@ -52,9 +52,9 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
         String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
         RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, scaledNetworkDirPath);
         try {
-            LOGGER.info("{} - RAO request sent: {}", direction, raoRequest);
+            LOGGER.info("[{}] : RAO request sent: {}", direction, raoRequest);
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
-            LOGGER.info("{} - RAO response received: {}", direction, raoResponse);
+            LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, raoResponse);
         } catch (RuntimeException e) {

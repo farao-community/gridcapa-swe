@@ -19,7 +19,6 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DichotomyRunner {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DichotomyRunner.class);
     private static final RangeDivisionIndexStrategy INDEX_STRATEGY_CONFIGURATION = new RangeDivisionIndexStrategy(false);
 
     private final DichotomyConfiguration dichotomyConfiguration;
@@ -37,7 +35,7 @@ public class DichotomyRunner {
     private final NetworkShifterProvider networkShifterProvider;
     private final RaoRunnerClient raoRunnerClient;
 
-    public DichotomyRunner(DichotomyConfiguration dichotomyConfiguration,
+    public DichotomyRunner(Logger businessLogger, DichotomyConfiguration dichotomyConfiguration,
                            DichotomyLogging dichotomyLogging,
                            FileExporter fileExporter,
                            FileImporter fileImporter,

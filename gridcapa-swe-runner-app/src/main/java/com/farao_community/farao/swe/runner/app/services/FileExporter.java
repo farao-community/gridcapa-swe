@@ -25,6 +25,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.export.Exporters;
 import com.powsybl.iidm.network.Network;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -39,7 +41,7 @@ import java.util.Properties;
  */
 @Service
 public class FileExporter {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
     private static final String ZONE_ID = "Europe/Paris";
@@ -67,6 +69,7 @@ public class FileExporter {
         String cracPath = makeDestinationMinioPath(processTargetDateTime, FileKind.ARTIFACTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
             minioAdapter.uploadArtifactForTimestamp(cracPath, is, processType.toString(), "", processTargetDateTime);
+            LOGGER.info("Crac file {} is available", cracPath);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
