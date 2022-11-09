@@ -82,13 +82,10 @@ public class FileExporter {
                                                        ProcessType processType,
                                                        String fileType) {
         MemDataSource memDataSource = new MemDataSource();
-        try (OutputStream os = memDataSource.newOutputStream(targetName, false);
-             ZipOutputStream zipOs = new ZipOutputStream(os)) {
+        try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
             VoltageCheckResult voltageCheckResult = voltageResultMapper.mapVoltageResult(result);
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            zipOs.putNextEntry(new ZipEntry(zipTargetNameToJsonName(targetName)));
-            zipOs.write(objectWriter.writeValueAsBytes(voltageCheckResult));
-            zipOs.closeEntry();
+            zipSingleFile(os, objectWriter.writeValueAsBytes(voltageCheckResult), zipTargetNameChangeExtension(targetName, ".json"));
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
         }
@@ -101,12 +98,21 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(voltageResultPath);
     }
 
-    private String zipTargetNameToJsonName(String targetName) {
+    public String zipTargetNameChangeExtension(String targetName, String extension) {
         if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(".zip")) {
-            return targetName.replace(".ZIP", ".JSON").replace(".zip", ".json");
+            return targetName.replace(".ZIP", extension).replace(".zip", extension);
         }
-        //default
         return targetName;
+    }
+
+    public void zipSingleFile(OutputStream os, byte[] fileContent, String fileName) {
+        try (ZipOutputStream zipOs = new ZipOutputStream(os)) {
+            zipOs.putNextEntry(new ZipEntry(fileName));
+            zipOs.write(fileContent);
+            zipOs.closeEntry();
+        } catch (IOException e) {
+            throw new SweInvalidDataException(String.format("Error while trying to zip file [%s].", fileName), e);
+        }
     }
 
     public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {

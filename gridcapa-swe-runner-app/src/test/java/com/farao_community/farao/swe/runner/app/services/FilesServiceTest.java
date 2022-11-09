@@ -8,6 +8,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
+import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
@@ -48,7 +49,7 @@ class FilesServiceTest {
     void simpleImport() {
         when(networkService.importNetwork(any(SweRequest.class))).thenReturn(mock(Network.class));
         when(fileImporter.importCimCrac(any(SweRequest.class))).thenReturn(mock(CimCrac.class));
-        when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString())).thenReturn(mock(Crac.class));
+        when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString())).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");
         SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(), null, null, null, null, null, null, null, null, null, null, null, null, null, new SweFileResource("name", "url"));
         SweData sweData = filesService.importFiles(sweRequest);

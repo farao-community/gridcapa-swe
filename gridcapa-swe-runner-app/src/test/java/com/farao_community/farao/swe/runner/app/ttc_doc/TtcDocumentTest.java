@@ -28,7 +28,7 @@ class TtcDocumentTest {
 
     @Test
     void simpleTest() {
-        SweDichotomyResult dichotomyResult = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), Optional.empty());
+        SweDichotomyResult dichotomyResult = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), Optional.empty(), "", "");
         ExecutionResult<SweDichotomyResult> executionResult = new ExecutionResult<>(List.of(dichotomyResult));
         TtcDocument document = new TtcDocument(executionResult);
         InputStream inputStream = document.buildTtcDocFile();

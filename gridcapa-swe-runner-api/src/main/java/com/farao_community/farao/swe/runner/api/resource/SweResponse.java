@@ -20,14 +20,20 @@ public class SweResponse {
     private final String id;
     private final String ttcDocUrl;
     private final String voltageEsFrZipUrl;
+    private final String esFrHighestValidStepUrl;
+    private final String esFrLowestInvalidStepUrl;
 
     @JsonCreator
     public SweResponse(@JsonProperty("id") String id,
                        @JsonProperty("ttcDocUrl") String ttcDocUrl,
-                       @JsonProperty("voltageEsFrZipUrl") String voltageEsFrZipUrl) {
+                       @JsonProperty("voltageEsFrZipUrl") String voltageEsFrZipUrl,
+                       @JsonProperty("esFrHighestValidStepUrl") String esFrHighestValidStepUrl,
+                       @JsonProperty("esFrLowestInvalidStepUrl") String esFrLowestInvalidStepUrl) {
         this.id = id;
         this.ttcDocUrl = ttcDocUrl;
         this.voltageEsFrZipUrl = voltageEsFrZipUrl;
+        this.esFrHighestValidStepUrl = esFrHighestValidStepUrl;
+        this.esFrLowestInvalidStepUrl = esFrLowestInvalidStepUrl;
     }
 
     public String getId() {
@@ -40,5 +46,13 @@ public class SweResponse {
 
     public String getVoltageEsFrZipUrl() {
         return voltageEsFrZipUrl;
+    }
+
+    public String getEsFrHighestValidStepUrl() {
+        return esFrHighestValidStepUrl;
+    }
+
+    public String getEsFrLowestInvalidStepUrl() {
+        return esFrLowestInvalidStepUrl;
     }
 }
