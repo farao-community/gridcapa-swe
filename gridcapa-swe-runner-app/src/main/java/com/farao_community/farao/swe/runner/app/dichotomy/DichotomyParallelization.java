@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -14,11 +15,10 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
-import org.slf4j.Logger;
-import org.slf4j.MDC;
+import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import org.springframework.stereotype.Service;
 
-import java.util.EnumMap;
+import java.util.Optional;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -29,6 +29,7 @@ public class DichotomyParallelization {
     private final DichotomyLogging dichotomyLogging;
     private final DichotomyRunner dichotomyRunner;
     private final OutputService outputService;
+    private final VoltageCheckService voltageCheckService;
     public static final String SUMMARY = "Summary [{}] :  " +
             "Limiting event : {},  " +
             "Limiting element : {},  " +
@@ -40,25 +41,27 @@ public class DichotomyParallelization {
             "Voltage Check : {},  " +
             "Angle Check : {}.";
 
+    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService) {
     public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService) {
         this.businessLogger = businessLogger;
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
         this.outputService = outputService;
+        this.voltageCheckService = voltageCheckService;
     }
 
     public SweResponse launchDichotomy(SweData sweData) {
-        final ExecutionResult executionResult = ParallelExecution
+        final ExecutionResult<SweDichotomyResult> executionResult = ParallelExecution
                 .of(() -> runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR))
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.FR_ES))
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.ES_PT))
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.PT_ES))
                 .close();
         dichotomyLogging.logEndAllDichotomies();
-        String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
-        SweResponse sweResponse = new SweResponse(sweData.getId(), ttcDocUrl);
         // build swe response from every response
-        return sweResponse;
+        String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
+        String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
+        return  new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl);
     }
 
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
@@ -77,14 +80,8 @@ public class DichotomyParallelization {
         businessLogger.info(SUMMARY, direction, limitingCause, limitingElement, printablePrasIds, printableCrasIds); // todo add elements
         businessLogger.info(SUMMARY_BD, direction, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
+        Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         // fill response for one dichotomy
-        SweDichotomyResult sweDichotomyResult = new SweDichotomyResult(buildReturnedMap(direction, dichotomyResult));
-        return sweDichotomyResult;
-    }
-
-    private EnumMap<DichotomyDirection, DichotomyResult<RaoResponse>> buildReturnedMap(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult) {
-        EnumMap<DichotomyDirection, DichotomyResult<RaoResponse>> mapResult = new EnumMap<>(DichotomyDirection.class);
-        mapResult.put(direction, dichotomyResult);
-        return mapResult;
+        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult);
     }
 }
