@@ -16,6 +16,8 @@ import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
+import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -41,8 +43,7 @@ public class DichotomyParallelization {
             "Voltage Check : {},  " +
             "Angle Check : {}.";
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService) {
-    public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService) {
+    public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService) {
         this.businessLogger = businessLogger;
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
