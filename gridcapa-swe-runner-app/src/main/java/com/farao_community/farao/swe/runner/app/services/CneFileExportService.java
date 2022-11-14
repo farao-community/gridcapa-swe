@@ -53,6 +53,7 @@ public class CneFileExportService {
 
         OffsetDateTime timestamp = sweData.getTimestamp();
         //TODO wait for Farao implementation of parameters
+        // limit size to 35 characters, a UUID is 36 characters long
         String mRid =  UUID.randomUUID().toString().substring(1);
         CneExporterParameters cneExporterParameters = new CneExporterParameters(
                 mRid, 1, "", CneExporterParameters.ProcessType.DAY_AHEAD_CC,
