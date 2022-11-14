@@ -32,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -95,6 +96,7 @@ class DichotomyParallelizationTest {
         when(parallelExecution.close()).thenReturn(executionResult);
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweDichotomyResult.hasValidStep()).thenReturn(true);
         when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
@@ -106,6 +108,26 @@ class DichotomyParallelizationTest {
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertEquals("esFrVoltageZipUrl.zip", sweResponse.getVoltageEsFrZipUrl());
         assertEquals("esFrHighestValidStepUrl.zip", sweResponse.getEsFrHighestValidStepUrl());
+        assertEquals("esFrLowestInvalidStepUrl.zip", sweResponse.getEsFrLowestInvalidStepUrl());
+    }
+
+    @Test
+    void testParallelizationWithInvalidResult() {
+        when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
+        when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
+        when(parallelExecution.close()).thenReturn(executionResult);
+        when(sweDichotomyResult.hasValidStep()).thenReturn(false);
+        when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(sweData.getNetwork()).thenReturn(network);
+        when(cneFileExportService.exportCneUrl(sweData, raoResult, false, ProcessType.D2CC, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
+        when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
+        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertEquals("esFrVoltageZipUrl.zip", sweResponse.getVoltageEsFrZipUrl());
+        assertNull(sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl.zip", sweResponse.getEsFrLowestInvalidStepUrl());
     }
 }

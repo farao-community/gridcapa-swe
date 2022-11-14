@@ -64,7 +64,10 @@ public class DichotomyParallelization {
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
-        String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult.getHighestValidStep().getRaoResult(), true, ProcessType.D2CC, direction);
+        String highestValidStepUrl = null;
+        if (dichotomyResult.hasValidStep()) {
+            highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult.getHighestValidStep().getRaoResult(), true, ProcessType.D2CC, direction);
+        }
         String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult.getLowestInvalidStep().getRaoResult(), false, ProcessType.D2CC, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         // fill response for one dichotomy

@@ -7,6 +7,7 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.commons.FaraoException;
 import com.farao_community.farao.data.cne_exporter_commons.CneExporterParameters;
 import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
@@ -52,8 +53,9 @@ public class CneFileExportService {
 
         OffsetDateTime timestamp = sweData.getTimestamp();
         //TODO wait for Farao implementation of parameters
+        String mRid =  UUID.randomUUID().toString().substring(1);
         CneExporterParameters cneExporterParameters = new CneExporterParameters(
-                UUID.randomUUID().toString(), 1, "domainId", CneExporterParameters.ProcessType.DAY_AHEAD_CC,
+                mRid, 1, "", CneExporterParameters.ProcessType.DAY_AHEAD_CC,
                 "10XFR-RTE------Q", CneExporterParameters.RoleType.REGIONAL_SECURITY_COORDINATOR,
                 "22XCORESO------S", CneExporterParameters.RoleType.CAPACITY_COORDINATOR,
                 extractTimeIntervalFileHeader(timestamp));
@@ -72,7 +74,7 @@ public class CneFileExportService {
             sweCneExporter.exportCne(cracCreationContext.getCrac(), sweData.getNetwork(), cracCreationContext,
                     raoResult, RaoParameters.load(), cneExporterParameters, zipOs);
             zipOs.closeEntry();
-        } catch (IOException e) {
+        } catch (IOException | FaraoException e) {
             throw new SweInvalidDataException(String.format("Error while trying to save cne result file [%s].", targetZipFileName), e);
         }
         String cneResultPath =  fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;

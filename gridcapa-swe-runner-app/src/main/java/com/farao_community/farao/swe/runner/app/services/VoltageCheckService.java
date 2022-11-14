@@ -29,7 +29,7 @@ public class VoltageCheckService {
 
     public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, DichotomyDirection direction) {
 
-        if (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) {
+        if ((direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) && dichotomyResult.hasValidStep()) {
             Crac crac = sweData.getCracFrEs().getCrac();
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, sweData.getNetwork(), dichotomyResult.getHighestValidStep().getRaoResult());
             return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));
