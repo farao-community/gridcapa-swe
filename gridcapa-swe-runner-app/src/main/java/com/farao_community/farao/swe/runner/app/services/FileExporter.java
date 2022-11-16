@@ -10,10 +10,10 @@ import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_io_api.CracExporters;
 import com.farao_community.farao.minio_adapter.starter.GridcapaFileGroup;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_api.json.JsonRaoParameters;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
-import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
@@ -32,6 +32,8 @@ import java.io.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -42,7 +44,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Service
 public class FileExporter {
-
+    private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
     private static final String ZONE_ID = "Europe/Paris";
@@ -92,7 +94,7 @@ public class FileExporter {
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
         }
-        String voltageResultPath =  makeDestinationMinioPath(processTargetDateTime, FileKind.OUTPUTS) + targetName;
+        String voltageResultPath = makeDestinationMinioPath(processTargetDateTime, FileKind.OUTPUTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
             minioAdapter.uploadOutputForTimestamp(voltageResultPath, is, processType.toString(), fileType, processTargetDateTime);
         } catch (IOException e) {
@@ -120,7 +122,7 @@ public class FileExporter {
 
     public String makeDestinationDichotomyPath(OffsetDateTime offsetDateTime, FileKind filekind, DichotomyDirection direction) {
         ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
-        return  targetDateTime.getYear() + MINIO_SEPARATOR
+        return targetDateTime.getYear() + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getHour()) + "_30" + MINIO_SEPARATOR
@@ -179,6 +181,34 @@ public class FileExporter {
         String filePath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + filename;
         minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "", sweData.getTimestamp());
         return minioAdapter.generatePreSignedUrl(filePath);
+    }
+
+    public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction) throws IOException {
+        String cgmesFilename = cgmesFormatter.format(sweData.getTimestamp()).replace("[direction]", direction.getDirection().replace("-", ""));
+        String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ZipOutputStream zipOs = new ZipOutputStream(baos)) {
+
+            for (var entry : mapCgmesFiles.entrySet()) {
+                zipOs.putNextEntry(new ZipEntry(entry.getKey()));
+                byte[] bytes = new byte[1024];
+                int length;
+                InputStream is = new ByteArrayInputStream(entry.getValue().toByteArray());
+                while ((length = is.read(bytes)) >= 0) {
+                    zipOs.write(bytes, 0, length);
+                }
+                zipOs.closeEntry();
+                is.close();
+            }
+
+            try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
+                minioAdapter.uploadOutputForTimestamp(cgmesPath, is, sweData.getProcessType().toString(), "CGMES", sweData.getTimestamp());
+            } catch (IOException e) {
+                throw new SweInvalidDataException("Error while trying to upload zipped CGMES file.", e);
+            }
+        }
+
+        return minioAdapter.generatePreSignedUrl(cgmesPath);
     }
 
     private String adaptTargetProcessName(ProcessType processType) {

@@ -14,6 +14,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
+import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import org.springframework.stereotype.Service;
@@ -30,12 +31,14 @@ public class DichotomyParallelization {
     private final DichotomyRunner dichotomyRunner;
     private final OutputService outputService;
     private final VoltageCheckService voltageCheckService;
+    private final CgmesExportService cgmesExportService;
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService) {
+    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService, CgmesExportService cgmesExportService) {
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
         this.outputService = outputService;
         this.voltageCheckService = voltageCheckService;
+        this.cgmesExportService = cgmesExportService;
     }
 
     public SweResponse launchDichotomy(SweData sweData) {
@@ -49,13 +52,13 @@ public class DichotomyParallelization {
         // build swe response from every response
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
-        return  new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl);
+        return new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl);
     }
 
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
-        // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
+        String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         // fill response for one dichotomy
         return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult);

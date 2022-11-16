@@ -17,6 +17,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
+import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.network.Network;
@@ -46,6 +47,9 @@ class DichotomyParallelizationTest {
 
     @MockBean
     private OutputService outputService;
+
+    @MockBean
+    private CgmesExportService cgmesExportService;
 
     @Mock
     private ParallelExecution parallelExecution;
@@ -80,6 +84,7 @@ class DichotomyParallelizationTest {
         when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
         when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");
+        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any())).thenReturn("ok");
         when(parallelExecution.close()).thenReturn(executionResult);
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);

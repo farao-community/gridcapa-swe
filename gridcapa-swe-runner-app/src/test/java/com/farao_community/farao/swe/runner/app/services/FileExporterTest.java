@@ -9,8 +9,8 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
+import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
@@ -23,7 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -84,7 +84,7 @@ class FileExporterTest {
 
     @Test
     void saveRaoParametersTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null);
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null, null);
         RaoParameters raoParameters = RaoParameters.load();
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("raoParametersUrl");
         String raoParametersUrl = fileExporter.saveRaoParameters(sweData);

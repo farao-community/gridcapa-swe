@@ -21,7 +21,6 @@ import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.export.Exporters;
 import com.powsybl.iidm.import_.ImportConfig;
 import com.powsybl.iidm.import_.Importers;
-import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
@@ -63,8 +62,7 @@ public class NetworkService {
         String zipPath = buildZipFromCgms(listCgms);
         Network network = importFromZip(zipPath);
         deleteFile(new File(zipPath));
-        addhvdc(network);
-        addPst(network);
+        addHvdcAndPstToNetwork(network);
         exportToMinio(network, sweRequest.getTargetProcessDateTime());
         return network;
     }
@@ -127,6 +125,11 @@ public class NetworkService {
         } catch (IOException e) {
             LOGGER.warn("Temporary file could not be deleted, check for full storage error");
         }
+    }
+
+    public void addHvdcAndPstToNetwork(Network network) {
+        addhvdc(network);
+        addPst(network);
     }
 
     private void addhvdc(Network network) {

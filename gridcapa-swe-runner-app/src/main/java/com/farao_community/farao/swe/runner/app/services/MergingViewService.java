@@ -10,7 +10,6 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
-import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FileUtils;
@@ -34,12 +33,18 @@ import java.util.zip.ZipOutputStream;
 public class MergingViewService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergingViewService.class);
 
-    public MergingViewData importMergingView(SweRequest sweRequest) {
-        Network networkFr = Importers.loadNetwork(buildZipFile(sweRequest, Country.FR));
-        Network networkEs = Importers.loadNetwork(buildZipFile(sweRequest, Country.ES));
-        Network networkPt = Importers.loadNetwork(buildZipFile(sweRequest, Country.PT));
+    private final NetworkService networkService;
 
-        MergingView mergingView = MergingView.create("merge", "test");
+    public MergingViewService(NetworkService networkService) {
+        this.networkService = networkService;
+    }
+
+    public MergingViewData importMergingView(SweRequest sweRequest) {
+        Network networkFr = networkService.importFromZip(buildZipFile(sweRequest, Country.FR));
+        Network networkEs = networkService.importFromZip(buildZipFile(sweRequest, Country.ES));
+        Network networkPt = networkService.importFromZip(buildZipFile(sweRequest, Country.PT));
+
+        MergingView mergingView = MergingView.create("MergingViewService", "iidm");
         mergingView.merge(networkFr, networkEs, networkPt);
         return new MergingViewData(networkFr, networkEs, networkPt, mergingView);
     }
@@ -52,6 +57,8 @@ public class MergingViewService {
     private List<SweFileResource> getFiles(SweRequest sweRequest, Country country) {
         List<SweFileResource> listFiles = new ArrayList<>();
         listFiles.add(sweRequest.getCoresoSv());
+        listFiles.add(sweRequest.getBoundaryEq());
+        listFiles.add(sweRequest.getBoundaryTp());
 
         if (country.equals(Country.FR)) {
             listFiles.add(sweRequest.getRteEq());
