@@ -58,9 +58,8 @@ public class DichotomyParallelization {
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
-        String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
-        // fill response for one dichotomy
-        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult);
+        String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
+        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl);
     }
 }

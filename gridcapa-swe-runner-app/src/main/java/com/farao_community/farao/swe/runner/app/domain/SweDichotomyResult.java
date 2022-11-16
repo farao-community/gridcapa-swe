@@ -21,13 +21,16 @@ public class SweDichotomyResult {
     private final DichotomyDirection dichotomyDirection;
     private final DichotomyResult<RaoResponse> dichotomyResult;
     private final Optional<VoltageMonitoringResult> voltageMonitoringResult;
+    private final String exportedCgmesUrl;
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<RaoResponse> dichotomyResult,
-                              Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+                              Optional<VoltageMonitoringResult> voltageMonitoringResult,
+                              String exportedCgmesUrl) {
         this.dichotomyDirection = dichotomyDirection;
         this.dichotomyResult = dichotomyResult;
         this.voltageMonitoringResult = voltageMonitoringResult;
+        this.exportedCgmesUrl = exportedCgmesUrl;
     }
 
     public DichotomyDirection getDichotomyDirection() {
@@ -40,5 +43,9 @@ public class SweDichotomyResult {
 
     public Optional<VoltageMonitoringResult> getVoltageMonitoringResult() {
         return voltageMonitoringResult;
+    }
+
+    public String getExportedCgmesUrl() {
+        return exportedCgmesUrl;
     }
 }

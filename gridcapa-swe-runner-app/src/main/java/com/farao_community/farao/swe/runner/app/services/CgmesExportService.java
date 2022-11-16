@@ -55,10 +55,14 @@ public class CgmesExportService {
     }
 
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<RaoResponse> dichotomyResult) {
-        LOGGER.info("Start export of the CGMES files");
-        this.mergingView = sweData.getMergingViewData().getMergingView();
-        applyRemedialActions(direction, sweData, dichotomyResult);
-        return exportMergingView(sweData, direction);
+        if (dichotomyResult.hasValidStep()) {
+            LOGGER.info("Start export of the CGMES files");
+            this.mergingView = sweData.getMergingViewData().getMergingView();
+            applyRemedialActions(direction, sweData, dichotomyResult);
+            return exportMergingView(sweData, direction);
+        } else {
+            return null;
+        }
     }
 
     private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<RaoResponse> dichotomyResult) {
