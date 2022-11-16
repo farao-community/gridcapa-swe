@@ -86,8 +86,10 @@
         <dependency>
             <groupId>com.farao-community.farao</groupId>
             <artifactId>farao-swe-cne-exporter</artifactId>
-            <!-- TODO while waiting for release should be removed when in farao dependencies !-->
-            <version>4.1.5-4.1.4-RC-RTE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-cne-exporter-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>

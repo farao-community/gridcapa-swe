@@ -91,7 +91,7 @@ public class FileExporter {
         }
         String voltageResultPath =  makeDestinationMinioPath(processTargetDateTime, FileKind.OUTPUTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
-            minioAdapter.uploadOutputForTimestamp(voltageResultPath, is, processType.toString(), fileType, processTargetDateTime);
+            minioAdapter.uploadOutputForTimestamp(voltageResultPath, is, adaptTargetProcessName(processType), fileType, processTargetDateTime);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
@@ -183,11 +183,11 @@ public class FileExporter {
 
     public String exportTtcDocument(SweData sweData, InputStream inputStream, String filename) {
         String filePath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + filename;
-        minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "", sweData.getTimestamp());
+        minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "TTC", sweData.getTimestamp());
         return minioAdapter.generatePreSignedUrl(filePath);
     }
 
-    private String adaptTargetProcessName(ProcessType processType) {
+    public String adaptTargetProcessName(ProcessType processType) {
         return PROCESS_TYPE_PREFIX + processType;
     }
 

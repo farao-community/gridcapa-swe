@@ -81,7 +81,7 @@ class CneFileExportServiceTest {
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESFR_lastSecure.zip", cneFileExportService.exportCneUrl(sweData, raoResult, true, ProcessType.D2CC, DichotomyDirection.ES_FR));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESFR_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, true, ProcessType.D2CC, DichotomyDirection.ES_FR));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 
@@ -94,7 +94,7 @@ class CneFileExportServiceTest {
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_FRES_firstUnsecure.zip", cneFileExportService.exportCneUrl(sweData, raoResult, false, ProcessType.D2CC, DichotomyDirection.FR_ES));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_FRES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, false, ProcessType.D2CC, DichotomyDirection.FR_ES));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 
@@ -107,7 +107,7 @@ class CneFileExportServiceTest {
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESPT_lastSecure.zip", cneFileExportService.exportCneUrl(sweData, raoResult, true, ProcessType.D2CC, DichotomyDirection.ES_PT));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESPT_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, true, ProcessType.D2CC, DichotomyDirection.ES_PT));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 
@@ -120,7 +120,7 @@ class CneFileExportServiceTest {
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_PTES_firstUnsecure.zip", cneFileExportService.exportCneUrl(sweData, raoResult, false, ProcessType.D2CC, DichotomyDirection.PT_ES));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_PTES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, false, ProcessType.D2CC, DichotomyDirection.PT_ES));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 }

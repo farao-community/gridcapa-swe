@@ -52,15 +52,13 @@ public class CneFileExportService {
     public String exportCneUrl(SweData sweData, RaoResult raoResult, boolean isHighestValid, ProcessType processType, DichotomyDirection direction) {
 
         OffsetDateTime timestamp = sweData.getTimestamp();
-        //TODO wait for Farao implementation of parameters
         // limit size to 35 characters, a UUID is 36 characters long
         String mRid =  UUID.randomUUID().toString().substring(1);
         CneExporterParameters cneExporterParameters = new CneExporterParameters(
-                mRid, 1, "", CneExporterParameters.ProcessType.DAY_AHEAD_CC,
-                "10XFR-RTE------Q", CneExporterParameters.RoleType.REGIONAL_SECURITY_COORDINATOR,
+                mRid, 1, "", CneExporterParameters.ProcessType.Z01,
+                "10XFR-RTE------Q", CneExporterParameters.RoleType.SYSTEM_OPERATOR,
                 "22XCORESO------S", CneExporterParameters.RoleType.CAPACITY_COORDINATOR,
                 extractTimeIntervalFileHeader(timestamp));
-        //TODO end
 
         CimCracCreationContext cracCreationContext = sweData.getCracFrEs();
         if (direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES) {
@@ -73,14 +71,14 @@ public class CneFileExportService {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
             SweCneExporter sweCneExporter = new SweCneExporter();
             sweCneExporter.exportCne(cracCreationContext.getCrac(), sweData.getNetwork(), cracCreationContext,
-                    raoResult, RaoParameters.load(), cneExporterParameters, zipOs);
+                    raoResult, null, RaoParameters.load(), cneExporterParameters, zipOs);
             zipOs.closeEntry();
         } catch (IOException | FaraoException e) {
             throw new SweInvalidDataException(String.format("Error while trying to save cne result file [%s].", targetZipFileName), e);
         }
         String cneResultPath =  fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
         try (InputStream is = memDataSource.newInputStream(targetZipFileName)) {
-            minioAdapter.uploadOutputForTimestamp(cneResultPath, is, processType.toString(), generateFileTypeString(isHighestValid, direction), timestamp);
+            minioAdapter.uploadOutputForTimestamp(cneResultPath, is, fileExporter.adaptTargetProcessName(processType), generateFileTypeString(isHighestValid, direction), timestamp);
         } catch (IOException e) {
             throw new SweInvalidDataException(String.format("Error while trying to upload cne file [%s].", targetZipFileName), e);
         }
@@ -122,9 +120,9 @@ public class CneFileExportService {
                 break;
         }
         if (isHighestValid) {
-            buffer.append("_lastSecure");
+            buffer.append("_LAST_SECURE");
         } else {
-            buffer.append("_firstUnsecure");
+            buffer.append("_FIRST_UNSECURE");
         }
         return buffer.toString();
     }
