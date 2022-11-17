@@ -11,7 +11,11 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
+import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -56,6 +60,9 @@ class CneFileExportServiceTest {
     private RaoResult raoResult;
 
     @Mock
+    DichotomyResult<RaoResponse> dichotomyResult;
+
+    @Mock
     private CimCracCreationContext cracCreationContext;
 
     @Mock
@@ -63,6 +70,12 @@ class CneFileExportServiceTest {
 
     @Mock
     private Network network;
+
+    @Mock
+    private DichotomyStepResult<RaoResponse> highestValidStep;
+
+    @Mock
+    private DichotomyStepResult<RaoResponse> lowestInvalidStep;
 
     private final OffsetDateTime offsetDateTime = OffsetDateTime.parse(DATE_STRING);
     private final DateTime dateTime = DateTime.parse(DATE_STRING);
@@ -81,7 +94,10 @@ class CneFileExportServiceTest {
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESFR_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, true, ProcessType.D2CC, DichotomyDirection.ES_FR));
+        when(dichotomyResult.hasValidStep()).thenReturn(true);
+        when(dichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
+        when(highestValidStep.getRaoResult()).thenReturn(raoResult);
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESFR_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, DichotomyDirection.ES_FR));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 
@@ -94,7 +110,9 @@ class CneFileExportServiceTest {
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_FRES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, false, ProcessType.D2CC, DichotomyDirection.FR_ES));
+        when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_FRES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, DichotomyDirection.FR_ES));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 
@@ -106,8 +124,11 @@ class CneFileExportServiceTest {
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(dichotomyResult.hasValidStep()).thenReturn(true);
+        when(dichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
+        when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESPT_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, true, ProcessType.D2CC, DichotomyDirection.ES_PT));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESPT_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, DichotomyDirection.ES_PT));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 
@@ -119,8 +140,40 @@ class CneFileExportServiceTest {
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
-        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_PTES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, raoResult, false, ProcessType.D2CC, DichotomyDirection.PT_ES));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_PTES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, DichotomyDirection.PT_ES));
+        verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
+    }
+
+    @Test
+    void exportLowestInvalidCneUrlFailConditionKOAndReturnNull() {
+        when(sweData.getTimestamp()).thenReturn(offsetDateTime);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
+        when(sweData.getNetwork()).thenReturn(network);
+        when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(dichotomyResult.getLimitingCause()).thenReturn(LimitingCause.GLSK_LIMITATION);
+        when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_PTES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, DichotomyDirection.PT_ES));
+        verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
+    }
+
+    @Test
+    void exportHighestValidCneUrlFailConditionKOAndReturnNull() {
+        when(sweData.getTimestamp()).thenReturn(offsetDateTime);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
+        when(sweData.getNetwork()).thenReturn(network);
+        when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(dichotomyResult.hasValidStep()).thenReturn(false);
+        when(dichotomyResult.getLimitingCause()).thenReturn(LimitingCause.COMPUTATION_FAILURE);
+        when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_1930_CNE_ESPT_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, DichotomyDirection.ES_PT));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
 }

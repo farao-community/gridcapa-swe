@@ -56,7 +56,7 @@ public class DichotomyParallelization {
         // build swe response from every response
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
-        SweDichotomyResult esFrResult = getByDirection(executionResult, DichotomyDirection.ES_FR);
+        SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
         return  new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl());
     }
 
@@ -64,17 +64,14 @@ public class DichotomyParallelization {
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
-        String highestValidStepUrl = null;
-        if (dichotomyResult.hasValidStep()) {
-            highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult.getHighestValidStep().getRaoResult(), true, ProcessType.D2CC, direction);
-        }
-        String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult.getLowestInvalidStep().getRaoResult(), false, ProcessType.D2CC, direction);
+        String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, direction);
+        String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         // fill response for one dichotomy
         return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, highestValidStepUrl, lowestInvalidStepUrl);
     }
 
-    private SweDichotomyResult getByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {
+    private SweDichotomyResult getDichotomyResultByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {
         Optional<SweDichotomyResult> result = executionResult.getResult().stream().filter(dichotomyResult -> dichotomyResult.getDichotomyDirection() == direction).findFirst();
         if (result.isEmpty()) {
             throw new SweInvalidDataException(String.format("No dichotomy result found for direction: [ %s ]", direction.name()));
