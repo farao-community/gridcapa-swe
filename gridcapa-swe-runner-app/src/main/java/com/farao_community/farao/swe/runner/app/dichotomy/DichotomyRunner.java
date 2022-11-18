@@ -18,7 +18,6 @@ import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfigur
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 /**
