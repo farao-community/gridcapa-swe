@@ -32,6 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,6 +84,7 @@ class CneFileExportServiceTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Paris"));
     }
 
     @Test
