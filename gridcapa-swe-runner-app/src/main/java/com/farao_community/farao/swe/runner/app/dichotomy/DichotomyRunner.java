@@ -35,7 +35,7 @@ public class DichotomyRunner {
     private final NetworkShifterProvider networkShifterProvider;
     private final RaoRunnerClient raoRunnerClient;
 
-    public DichotomyRunner(Logger businessLogger, DichotomyConfiguration dichotomyConfiguration,
+    public DichotomyRunner(DichotomyConfiguration dichotomyConfiguration,
                            DichotomyLogging dichotomyLogging,
                            FileExporter fileExporter,
                            FileImporter fileImporter,

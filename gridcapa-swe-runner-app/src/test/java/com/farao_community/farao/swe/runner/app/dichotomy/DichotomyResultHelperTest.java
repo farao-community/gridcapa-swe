@@ -16,6 +16,7 @@ import com.farao_community.farao.data.crac_creation.creator.cim.parameters.CimCr
 import com.farao_community.farao.data.crac_creation.creator.cim.parameters.RangeActionSpeed;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.data.rao_result_json.RaoResultImporter;
+import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,6 +61,12 @@ class DichotomyResultHelperTest {
         InputStream raoResultIs = getClass().getResourceAsStream("/dichotomy/RaoResult.json");
         raoResult = new RaoResultImporter().importRaoResult(raoResultIs, crac);
 
+    }
+
+    @Test
+    void getimiting() {
+        String messsage = DichotomyResultHelper.limitingCauseToString(LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION);
+        assertEquals("None", messsage);
     }
 
     @Test
