@@ -14,6 +14,8 @@ import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoring
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,6 +40,11 @@ class FileExporterTest {
     private MinioAdapter minioAdapter;
 
     private final OffsetDateTime dateTime = OffsetDateTime.parse("2021-04-01T21:30Z");
+
+    @BeforeEach
+    void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Paris"));
+    }
 
     @Test
     void saveCracInJsonFormat() {
