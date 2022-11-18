@@ -9,16 +9,23 @@ import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 public class VoltageCheckService {
+    private final Logger businessLogger;
+
+    public VoltageCheckService(Logger businessLogger) {
+        this.businessLogger = businessLogger;
+    }
 
     public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, DichotomyDirection direction) {
 
         if (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) {
+            businessLogger.info("[{}] : Running voltage check", direction);
             Crac crac = sweData.getCracFrEs();
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, sweData.getNetwork(), dichotomyResult.getHighestValidStep().getRaoResult());
             return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));

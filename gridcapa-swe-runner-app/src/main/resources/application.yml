@@ -1,7 +1,3 @@
-logback:
-  amqp:
-    exchange: swe-d2cc-task-manager-logs-exchange
-    routing-key: "#"
 spring:
   application:
     name: swe-d2cc-runner
@@ -27,6 +23,11 @@ spring:
           destination: swe-d2cc-response
         task-status-update:
           destination: swe-d2cc-task-status-updated
+
+logback:
+  amqp:
+    exchange: swe-d2cc-task-manager-logs-exchange
+    routing-key: "#"
 
 swe-runner:
   dichotomy:

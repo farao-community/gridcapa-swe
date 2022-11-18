@@ -33,7 +33,7 @@ import java.util.*;
 public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
-    private static final int MAX_NUMBER_ITERATION = 4;
+    private static final int MAX_NUMBER_ITERATION = 5;
     private final Logger businessLogger;
 
     private final ProcessType processType;
@@ -59,7 +59,7 @@ public final class SweNetworkShifter implements NetworkShifter {
                 network.getVariantManager().getWorkingVariantId()));
 
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
-        businessLogger.info(String.format("[%s] : Target shift on countries %s", direction, scalingValuesByCountry));
+        businessLogger.info(String.format("[%s] : Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", direction, scalingValuesByCountry.get(toEic("ES")),  scalingValuesByCountry.get(toEic("FR")),  scalingValuesByCountry.get(toEic("PT"))));
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
         int iterationCounter = 0;
         boolean shiftSucceed = false;
@@ -97,7 +97,7 @@ public final class SweNetworkShifter implements NetworkShifter {
             LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), LoadFlowParameters.load());
             if (!result.isOk()) {
                 LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
-                throw new ShiftingException(String.format("Loadflow computation diverged on network %s", network.getId()));
+                throw new ShiftingException("Loadflow computation diverged during balancing adjustment");
             }
             bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
             double mismatchEsPt = targetExchanges.get("ES_PT") - bordersExchanges.get("ES_PT");
@@ -107,6 +107,7 @@ public final class SweNetworkShifter implements NetworkShifter {
             if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
                 LOGGER.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
                 businessLogger.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
+                businessLogger.info(String.format("[%s] : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", direction, bordersExchanges.get("ES_PT"), bordersExchanges.get("ES_FR")));
                 network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                 shiftSucceed = true;
             } else {
@@ -124,7 +125,8 @@ public final class SweNetworkShifter implements NetworkShifter {
         // Step 4 : check after iteration max and out of tolerane
         if (!shiftSucceed) {
             String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get("ES_PT"), bordersExchanges.get("ES_FR"));
-            throw new ShiftingException(message); //todo check rule  "out of tolerance" with PO
+            businessLogger.error(message);
+            throw new ShiftingException(message);
         }
 
         // Step 5: Reset current variant with initial state

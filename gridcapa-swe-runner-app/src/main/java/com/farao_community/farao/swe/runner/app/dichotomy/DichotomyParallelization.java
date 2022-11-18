@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.data.crac_api.Crac;
+import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
@@ -20,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -33,14 +37,14 @@ public class DichotomyParallelization {
     private final OutputService outputService;
     private final VoltageCheckService voltageCheckService;
     public static final String SUMMARY = "Summary [{}] :  " +
-            "Limiting event : {},  " +
-            "Limiting element : {},  " +
-            "PRAs : {},  " +
+            "Limiting event : {},  \n" +
+            "Limiting element : {},  \n" +
+            "PRAs : {},  \n" +
             "CRAs : {}.";
     public static final String SUMMARY_BD = "Summary BD [{}] :  " +
-            "Current TTC : {},  " +
-            "Previous TTC : {},  " +
-            "Voltage Check : {},  " +
+            "Current TTC : {},  \n" +
+            "Previous TTC : {},  \n" +
+            "Voltage Check : {},  \n" +
             "Angle Check : {}.";
 
     public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService) {
@@ -68,21 +72,37 @@ public class DichotomyParallelization {
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
         // propagate in logs MDC the task requestId as an extra field to be able to send logs with calculation tasks.
         MDC.put("gridcapa-task-id", sweData.getId());
-        String limitingCause = "NONE";
+        DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
+        // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
+        Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
+        dichotomyLogging.logEndOneDichotomy(direction);
+        generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult);
+        // fill response for one dichotomy
+        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult);
+    }
+
+    private void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
         String limitingElement = "NONE";
         String printablePrasIds = "NONE";
         String printableCrasIds = "NONE";
-        String currentTtc = "NONE";
-        String previousTtc = "NONE";
-        String voltageCheckStatus = "NONE";
-        String angleCheckStatus = "NONE";
-        DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
-        dichotomyLogging.logEndOneDichotomy(direction);
-        businessLogger.info(SUMMARY, direction, limitingCause, limitingElement, printablePrasIds, printableCrasIds); // todo add elements
+        String currentTtc = String.valueOf(dichotomyResult.getHighestValidStepValue());
+        String previousTtc = String.valueOf(dichotomyResult.getLowestInvalidStepValue());
+        String voltageCheckStatus =  voltageMonitoringResult.isPresent() ? String.valueOf(voltageMonitoringResult.get().getStatus()) : "NONE";
+        String angleCheckStatus = "NONE"; // todo after angle check monitoring for ES-PT
+        String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : "NONE";
+        Crac crac = sweData.getCrac(direction);
+        if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getRaoResult() != null) {
+            RaoResult raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
+            limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
+            printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
+            printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
+        }
+
+        businessLogger.info(SUMMARY, direction, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
         businessLogger.info(SUMMARY_BD, direction, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
-        // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
-        Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
-        // fill response for one dichotomy
-        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult);
+    }
+
+    private static String toString(Collection<String> c) {
+        return c.stream().map(Object::toString).collect(Collectors.joining(", "));
     }
 }
