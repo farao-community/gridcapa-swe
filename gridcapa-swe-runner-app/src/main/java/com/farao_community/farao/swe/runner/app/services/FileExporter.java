@@ -33,6 +33,7 @@ import java.io.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -48,6 +49,7 @@ public class FileExporter {
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
 
+    public static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
     private final MinioAdapter minioAdapter;
 
     private final VoltageResultMapper voltageResultMapper;
@@ -120,21 +122,13 @@ public class FileExporter {
 
     public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {
         ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(processConfiguration.getZoneId()));
-        return targetDateTime.getYear() + MINIO_SEPARATOR
-                + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
-                + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
-                + String.format("%02d", targetDateTime.getHour()) + "_30" + MINIO_SEPARATOR
-                + filekind + MINIO_SEPARATOR;
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(MINIO_DESTINATION_PATH_REGEX);
+        return df.format(targetDateTime).replace("[filekind]", filekind.name());
     }
 
     public String makeDestinationDichotomyPath(OffsetDateTime offsetDateTime, FileKind filekind, DichotomyDirection direction) {
         ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(processConfiguration.getZoneId()));
-        return  targetDateTime.getYear() + MINIO_SEPARATOR
-                + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
-                + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
-                + String.format("%02d", targetDateTime.getHour()) + "_30" + MINIO_SEPARATOR
-                + filekind + MINIO_SEPARATOR
-                + direction + MINIO_SEPARATOR;
+        return  makeDestinationMinioPath(offsetDateTime, filekind) + direction + MINIO_SEPARATOR;
     }
 
     public String saveNetworkInArtifact(Network network, String networkFilePath, String fileType, OffsetDateTime processTargetDateTime, ProcessType processType) {
