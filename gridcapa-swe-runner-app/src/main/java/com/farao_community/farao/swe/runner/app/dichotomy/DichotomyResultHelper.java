@@ -61,6 +61,8 @@ public final class DichotomyResultHelper {
     private static double computeFlowMargin(RaoResult raoResult, FlowCnec flowCnec) {
         if (flowCnec.getState().getInstant() == Instant.CURATIVE) {
             return raoResult.getMargin(OptimizationState.AFTER_CRA, flowCnec, Unit.AMPERE);
+        } else if (flowCnec.getState().getInstant() == Instant.AUTO) {
+            return raoResult.getMargin(OptimizationState.AFTER_ARA, flowCnec, Unit.AMPERE);
         } else {
             return raoResult.getMargin(OptimizationState.AFTER_PRA, flowCnec, Unit.AMPERE);
         }
@@ -73,6 +75,7 @@ public final class DichotomyResultHelper {
     }
 
     public static List<String> getActivatedActionInCurative(Crac crac, RaoResult raoResult) {
+        //CURATIVE && AUTO
         Set<String> crasNames = new HashSet<>();
         crac.getStates(Instant.CURATIVE).forEach(state -> {
             crasNames.addAll(raoResult.getActivatedNetworkActionsDuringState(state).stream().map(NetworkAction::getName).collect(Collectors.toSet()));
