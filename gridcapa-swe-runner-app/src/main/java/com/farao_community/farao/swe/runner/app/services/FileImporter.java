@@ -11,6 +11,7 @@ import com.farao_community.farao.data.crac_creation.creator.api.CracCreators;
 import com.farao_community.farao.data.crac_creation.creator.api.parameters.CracCreationParameters;
 import com.farao_community.farao.data.crac_creation.creator.api.parameters.JsonCracCreationParameters;
 import com.farao_community.farao.data.crac_creation.creator.cim.CimCrac;
+import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCracImporter;
 import com.farao_community.farao.data.crac_io_api.CracImporters;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
@@ -55,7 +56,7 @@ public class FileImporter {
         return cimCracImporter.importNativeCrac(cracInputStream);
     }
 
-    public Crac importCracFromCimCracAndNetwork(CimCrac cimCrac, OffsetDateTime processDateTime, Network network, String cracCreationParams) {
+    public CimCracCreationContext importCracFromCimCracAndNetwork(CimCrac cimCrac, OffsetDateTime processDateTime, Network network, String cracCreationParams) {
         return importCrac(
                 cimCrac,
                 processDateTime,
@@ -72,9 +73,9 @@ public class FileImporter {
         }
     }
 
-    private Crac importCrac(CimCrac cimCrac, OffsetDateTime targetProcessDateTime, Network network, CracCreationParameters params) {
+    private CimCracCreationContext importCrac(CimCrac cimCrac, OffsetDateTime targetProcessDateTime, Network network, CracCreationParameters params) {
         LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", targetProcessDateTime);
-        return CracCreators.createCrac(cimCrac, network, targetProcessDateTime, params).getCrac();
+        return (CimCracCreationContext) CracCreators.createCrac(cimCrac, network, targetProcessDateTime, params);
     }
 
     private CracCreationParameters getCimCracCreationParameters(String paramFilePath) {
