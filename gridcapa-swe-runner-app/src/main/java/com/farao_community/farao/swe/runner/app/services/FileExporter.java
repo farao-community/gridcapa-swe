@@ -45,6 +45,7 @@ public class FileExporter {
 
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
+    public static final String ZONE_ID = "Europe/Paris";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
 
     private final MinioAdapter minioAdapter;
@@ -115,7 +116,7 @@ public class FileExporter {
     }
 
     public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {
-        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault());
+        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
         return targetDateTime.getYear() + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
@@ -124,7 +125,7 @@ public class FileExporter {
     }
 
     public String makeDestinationDichotomyPath(OffsetDateTime offsetDateTime, FileKind filekind, DichotomyDirection direction) {
-        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault());
+        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
         return  targetDateTime.getYear() + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR

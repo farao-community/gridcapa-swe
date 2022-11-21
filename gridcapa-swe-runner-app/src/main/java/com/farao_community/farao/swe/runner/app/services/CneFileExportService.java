@@ -206,7 +206,7 @@ public class CneFileExportService {
 
     private String generateCneZipFileName(OffsetDateTime timestamp, boolean isHighestValid, DichotomyDirection direction) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(FILENAME_TIMESTAMP_REGEX);
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(FileExporter.ZONE_ID));
         return df.format(localTime).replace("[direction]", direction.getDirection().replace("-", ""))
                 .replace("[secureType]", isHighestValid ? LAST_SECURE_STRING : FIRST_UNSECURE_STRING);
 

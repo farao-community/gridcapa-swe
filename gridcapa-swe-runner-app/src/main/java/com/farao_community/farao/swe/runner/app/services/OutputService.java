@@ -43,14 +43,14 @@ public class OutputService {
 
     private String buildTtcDocName(SweData sweData) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(TTC_DOC_NAME_REGEX);
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.systemDefault());
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.of(FileExporter.ZONE_ID));
         return df.format(localTime);
     }
 
     public String buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, ExecutionResult<SweDichotomyResult> result) {
         OffsetDateTime timestamp = sweData.getTimestamp();
         String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(FileExporter.ZONE_ID));
         String zipName = localTime.getYear()
                 + String.format("%02d", localTime.getMonthValue())
                 + String.format("%02d", localTime.getDayOfMonth()) + "_"
