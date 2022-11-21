@@ -85,31 +85,37 @@ public class FileExporter {
                                                        ProcessType processType,
                                                        String fileType) {
         MemDataSource memDataSource = new MemDataSource();
-        try (OutputStream os = memDataSource.newOutputStream(targetName, false);
-             ZipOutputStream zipOs = new ZipOutputStream(os)) {
+        try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
             VoltageCheckResult voltageCheckResult = voltageResultMapper.mapVoltageResult(result);
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            zipOs.putNextEntry(new ZipEntry(zipTargetNameToJsonName(targetName)));
-            zipOs.write(objectWriter.writeValueAsBytes(voltageCheckResult));
-            zipOs.closeEntry();
+            zipSingleFile(os, objectWriter.writeValueAsBytes(voltageCheckResult), zipTargetNameChangeExtension(targetName, ".json"));
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
         }
         String voltageResultPath =  makeDestinationMinioPath(processTargetDateTime, FileKind.OUTPUTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
-            minioAdapter.uploadOutputForTimestamp(voltageResultPath, is, processType.toString(), fileType, processTargetDateTime);
+            minioAdapter.uploadOutputForTimestamp(voltageResultPath, is, adaptTargetProcessName(processType), fileType, processTargetDateTime);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
         return minioAdapter.generatePreSignedUrl(voltageResultPath);
     }
 
-    private String zipTargetNameToJsonName(String targetName) {
+    public String zipTargetNameChangeExtension(String targetName, String extension) {
         if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(".zip")) {
-            return targetName.replace(".ZIP", ".JSON").replace(".zip", ".json");
+            return targetName.replace(".ZIP", extension).replace(".zip", extension);
         }
-        //default
         return targetName;
+    }
+
+    public void zipSingleFile(OutputStream os, byte[] fileContent, String fileName) {
+        try (ZipOutputStream zipOs = new ZipOutputStream(os)) {
+            zipOs.putNextEntry(new ZipEntry(fileName));
+            zipOs.write(fileContent);
+            zipOs.closeEntry();
+        } catch (IOException e) {
+            throw new SweInvalidDataException(String.format("Error while trying to zip file [%s].", fileName), e);
+        }
     }
 
     public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {
@@ -180,11 +186,11 @@ public class FileExporter {
 
     public String exportTtcDocument(SweData sweData, InputStream inputStream, String filename) {
         String filePath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + filename;
-        minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "", sweData.getTimestamp());
+        minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "TTC", sweData.getTimestamp());
         return minioAdapter.generatePreSignedUrl(filePath);
     }
 
-    private String adaptTargetProcessName(ProcessType processType) {
+    public String adaptTargetProcessName(ProcessType processType) {
         return PROCESS_TYPE_PREFIX + processType;
     }
 

@@ -11,11 +11,14 @@ import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
+import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
+import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import org.slf4j.Logger;
@@ -36,6 +39,7 @@ public class DichotomyParallelization {
     private final DichotomyRunner dichotomyRunner;
     private final OutputService outputService;
     private final VoltageCheckService voltageCheckService;
+    private final CneFileExportService cneFileExportService;
     public static final String SUMMARY = "Summary [{}] :  " +
             "Limiting event : {},  \n" +
             "Limiting element : {},  \n" +
@@ -47,12 +51,14 @@ public class DichotomyParallelization {
             "Voltage Check : {},  \n" +
             "Angle Check : {}.";
 
-    public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService) {
-        this.businessLogger = businessLogger;
+    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner,
+                                    OutputService outputService, VoltageCheckService voltageCheckService,
+                                    CneFileExportService cneFileExportService) {
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
         this.outputService = outputService;
         this.voltageCheckService = voltageCheckService;
+        this.cneFileExportService = cneFileExportService;
     }
 
     public SweResponse launchDichotomy(SweData sweData) {
@@ -66,7 +72,8 @@ public class DichotomyParallelization {
         // build swe response from every response
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
-        return  new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl);
+        SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
+        return  new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl());
     }
 
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
@@ -74,11 +81,21 @@ public class DichotomyParallelization {
         MDC.put("gridcapa-task-id", sweData.getId());
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
+        String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, direction);
+        String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
         generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult);
         // fill response for one dichotomy
-        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult);
+        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, highestValidStepUrl, lowestInvalidStepUrl);
+    }
+
+    private SweDichotomyResult getDichotomyResultByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {
+        Optional<SweDichotomyResult> result = executionResult.getResult().stream().filter(dichotomyResult -> dichotomyResult.getDichotomyDirection() == direction).findFirst();
+        if (result.isEmpty()) {
+            throw new SweInvalidDataException(String.format("No dichotomy result found for direction: [ %s ]", direction.name()));
+        }
+        return result.get();
     }
 
     private void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {

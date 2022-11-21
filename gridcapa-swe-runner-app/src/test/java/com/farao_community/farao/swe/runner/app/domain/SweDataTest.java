@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.farao_community.farao.data.crac_api.Crac;
+import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.powsybl.iidm.network.Network;
@@ -28,10 +28,10 @@ class SweDataTest {
     private Network network;
 
     @Mock
-    private Crac cracEsPt;
+    private CimCracCreationContext cracEsPt;
 
     @Mock
-    private Crac cracFrEs;
+    private CimCracCreationContext cracFrEs;
 
     @Test
     void simpleTest() {

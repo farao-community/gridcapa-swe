@@ -80,7 +80,7 @@ class OutputServiceTest {
         DichotomyResult<RaoResponse> dichotomyResult1 = Mockito.mock(DichotomyResult.class);
         Mockito.when(dichotomyResult1.hasValidStep()).thenReturn(true);
         Mockito.when(dichotomyResult1.getHighestValidStepValue()).thenReturn(12345.90);
-        SweDichotomyResult sweDichotomyResult1 = new SweDichotomyResult(direction, dichotomyResult1, voltageMonitoringResult);
+        SweDichotomyResult sweDichotomyResult1 = new SweDichotomyResult(direction, dichotomyResult1, voltageMonitoringResult, "", "");
         return sweDichotomyResult1;
     }
 }

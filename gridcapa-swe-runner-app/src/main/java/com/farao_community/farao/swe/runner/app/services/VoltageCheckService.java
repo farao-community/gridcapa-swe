@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
+ */
+
 @Service
 public class VoltageCheckService {
     private final Logger businessLogger;
@@ -24,9 +28,9 @@ public class VoltageCheckService {
 
     public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, DichotomyDirection direction) {
 
-        if (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) {
+        if ((direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) && dichotomyResult.hasValidStep()) {
             businessLogger.info("[{}] : Running voltage check", direction);
-            Crac crac = sweData.getCracFrEs();
+            Crac crac = sweData.getCracFrEs().getCrac();
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, sweData.getNetwork(), dichotomyResult.getHighestValidStep().getRaoResult());
             return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));
         }

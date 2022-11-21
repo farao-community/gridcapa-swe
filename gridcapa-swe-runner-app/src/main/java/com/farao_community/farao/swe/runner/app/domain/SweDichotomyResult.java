@@ -21,13 +21,19 @@ public class SweDichotomyResult {
     private final DichotomyDirection dichotomyDirection;
     private final DichotomyResult<RaoResponse> dichotomyResult;
     private final Optional<VoltageMonitoringResult> voltageMonitoringResult;
+    private final String highestValidStepUrl;
+    private final String lowestInvalidStepUrl;
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<RaoResponse> dichotomyResult,
-                              Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+                              Optional<VoltageMonitoringResult> voltageMonitoringResult,
+                              String highestValidStepUrl,
+                              String lowestInvalidStepUrl) {
         this.dichotomyDirection = dichotomyDirection;
         this.dichotomyResult = dichotomyResult;
         this.voltageMonitoringResult = voltageMonitoringResult;
+        this.highestValidStepUrl = highestValidStepUrl;
+        this.lowestInvalidStepUrl = lowestInvalidStepUrl;
     }
 
     public DichotomyDirection getDichotomyDirection() {
@@ -40,5 +46,13 @@ public class SweDichotomyResult {
 
     public Optional<VoltageMonitoringResult> getVoltageMonitoringResult() {
         return voltageMonitoringResult;
+    }
+
+    public String getHighestValidStepUrl() {
+        return highestValidStepUrl;
+    }
+
+    public String getLowestInvalidStepUrl() {
+        return lowestInvalidStepUrl;
     }
 }

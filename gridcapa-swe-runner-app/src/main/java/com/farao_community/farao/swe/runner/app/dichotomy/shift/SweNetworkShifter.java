@@ -33,7 +33,7 @@ import java.util.*;
 public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
-    private static final int MAX_NUMBER_ITERATION = 5;
+    private static final int MAX_NUMBER_ITERATION = 10;
     private final Logger businessLogger;
 
     private final ProcessType processType;
