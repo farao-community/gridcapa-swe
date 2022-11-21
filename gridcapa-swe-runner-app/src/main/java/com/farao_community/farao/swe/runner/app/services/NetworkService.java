@@ -144,8 +144,8 @@ public class NetworkService {
 
     private void addPst(Network network) {
         try {
-            network.getTwoWindingsTransformer("_e071a1d4-fef5-1bd9-5278-d195c5597b6e").getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
-            network.getTwoWindingsTransformer("_7824bc48-fc86-51db-8f9c-01b44933839e").getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
+            network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
+            network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
             businessLogger.info("Regulation mode of the PSTs modified");
         } catch (NullPointerException e) {
             businessLogger.warn("The PST mode could not be changed because it was not found");

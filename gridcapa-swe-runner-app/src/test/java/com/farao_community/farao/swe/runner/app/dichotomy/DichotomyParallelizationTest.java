@@ -100,7 +100,6 @@ class DichotomyParallelizationTest {
         when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getCrac(any(DichotomyDirection.class))).thenReturn(crac);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetwork()).thenReturn(network);
         when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, true, ProcessType.D2CC, DichotomyDirection.ES_FR)).thenReturn("esFrHighestValidStepUrl.zip");
