@@ -16,6 +16,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
@@ -45,16 +46,18 @@ public class FileExporter {
 
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
-    public static final String ZONE_ID = "Europe/Paris";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
 
     private final MinioAdapter minioAdapter;
 
     private final VoltageResultMapper voltageResultMapper;
 
-    public FileExporter(MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper) {
+    private final ProcessConfiguration processConfiguration;
+
+    public FileExporter(MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper, ProcessConfiguration processConfiguration) {
         this.minioAdapter = minioAdapter;
         this.voltageResultMapper = voltageResultMapper;
+        this.processConfiguration = processConfiguration;
     }
 
     /**
@@ -116,7 +119,7 @@ public class FileExporter {
     }
 
     public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, FileKind filekind) {
-        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
+        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(processConfiguration.getZoneId()));
         return targetDateTime.getYear() + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
@@ -125,7 +128,7 @@ public class FileExporter {
     }
 
     public String makeDestinationDichotomyPath(OffsetDateTime offsetDateTime, FileKind filekind, DichotomyDirection direction) {
-        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
+        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(processConfiguration.getZoneId()));
         return  targetDateTime.getYear() + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
                 + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR

@@ -23,6 +23,7 @@ import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.commons.datasource.MemDataSource;
@@ -62,10 +63,12 @@ public class CneFileExportService {
 
     private final FileExporter fileExporter;
     private final MinioAdapter minioAdapter;
+    private final ProcessConfiguration processConfiguration;
 
-    public CneFileExportService(FileExporter fileExporter, MinioAdapter minioAdapter) {
+    public CneFileExportService(FileExporter fileExporter, MinioAdapter minioAdapter, ProcessConfiguration processConfiguration) {
         this.fileExporter = fileExporter;
         this.minioAdapter = minioAdapter;
+        this.processConfiguration = processConfiguration;
     }
 
     public String exportCneUrl(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, boolean isHighestValid, ProcessType processType, DichotomyDirection direction) {
@@ -206,7 +209,7 @@ public class CneFileExportService {
 
     private String generateCneZipFileName(OffsetDateTime timestamp, boolean isHighestValid, DichotomyDirection direction) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(FILENAME_TIMESTAMP_REGEX);
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(FileExporter.ZONE_ID));
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
         return df.format(localTime).replace("[direction]", direction.getDirection().replace("-", ""))
                 .replace("[secureType]", isHighestValid ? LAST_SECURE_STRING : FIRST_UNSECURE_STRING);
 

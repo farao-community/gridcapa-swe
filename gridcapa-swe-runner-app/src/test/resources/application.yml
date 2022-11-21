@@ -36,6 +36,7 @@ swe-runner:
   whitelist:
     - http://localhost:9000/
     - file:/
+  zone-id: "Europe/Paris"
 
 minio-adapter:
   bucket: gridcapa
