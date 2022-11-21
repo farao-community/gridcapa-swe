@@ -54,11 +54,10 @@ public class DichotomyParallelization {
                 // .and(() -> runDichotomyForOneDirection(sweData, Direction.PT_ES))
                 .close();
         dichotomyLogging.logEndAllDichotomies();
-        // build swe response from every response
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
         SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
-        return  new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl());
+        return new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), esFrResult.getExportedCgmesUrl());
     }
 
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
@@ -68,9 +67,7 @@ public class DichotomyParallelization {
         String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
-        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl);
-        // fill response for one dichotomy
-        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, highestValidStepUrl, lowestInvalidStepUrl);
+        return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl);
     }
 
     private SweDichotomyResult getDichotomyResultByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {

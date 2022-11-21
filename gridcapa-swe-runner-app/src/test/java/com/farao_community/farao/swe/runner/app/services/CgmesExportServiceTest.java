@@ -8,27 +8,13 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
-import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
-import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.time.OffsetDateTime;
-import java.util.Collections;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -53,13 +39,5 @@ public class CgmesExportServiceTest {
 
     @Mock
     private Crac cracEsPt;
-
-    @Test
-    void testBuildAndExport() {
-        MergingViewData mergingViewData = new MergingViewData(networkAll, networkAll, networkAll, mergingView);
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, networkAll, mergingViewData, cracEsPt, cracFrEs, "", "", "");
-     //   when(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedNetworkActionsDuringState(any())).thenReturn(Collections.emptySet());
-       // cgmesExportService.buildAndExportCgmesFiles(DichotomyDirection.ES_FR, sweData, dichotomyResult);
-    }
 
 }

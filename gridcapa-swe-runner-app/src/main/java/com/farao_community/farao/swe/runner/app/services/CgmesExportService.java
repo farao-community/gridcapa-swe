@@ -61,6 +61,7 @@ public class CgmesExportService {
             applyRemedialActions(direction, sweData, dichotomyResult);
             return exportMergingView(sweData, direction);
         } else {
+            LOGGER.error("Not valid step, CGMES files wont be exported");
             return null;
         }
     }
@@ -75,9 +76,9 @@ public class CgmesExportService {
 
     private Crac getMatchingCrac(DichotomyDirection direction, SweData sweData) {
         if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
-            return sweData.getCracFrEs();
+            return sweData.getCracFrEs().getCrac();
         } else if (direction.equals(DichotomyDirection.ES_PT) || direction.equals(DichotomyDirection.PT_ES)) {
-            return sweData.getCracEsPt();
+            return sweData.getCracEsPt().getCrac();
         }
         throw new SweInvalidDataException("Unknown direction");
     }
