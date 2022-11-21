@@ -127,7 +127,6 @@ public class FileExporter {
     }
 
     public String makeDestinationDichotomyPath(OffsetDateTime offsetDateTime, FileKind filekind, DichotomyDirection direction) {
-        ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(processConfiguration.getZoneId()));
         return  makeDestinationMinioPath(offsetDateTime, filekind) + direction + MINIO_SEPARATOR;
     }
 
