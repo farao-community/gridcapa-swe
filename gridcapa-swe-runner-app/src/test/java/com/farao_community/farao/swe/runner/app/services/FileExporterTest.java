@@ -91,4 +91,11 @@ class FileExporterTest {
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
         assertEquals("raoParametersUrl", raoParametersUrl);
     }
+
+    @Test
+    void adaptTargetProcessName() {
+        assertEquals("SWE_D2CC", fileExporter.adaptTargetProcessName(ProcessType.D2CC));
+        assertEquals("SWE_IDCC", fileExporter.adaptTargetProcessName(ProcessType.IDCC));
+
+    }
 }

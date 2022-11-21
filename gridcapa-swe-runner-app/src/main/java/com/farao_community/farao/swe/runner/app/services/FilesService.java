@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
+import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -40,10 +41,12 @@ public class FilesService {
         Network network = networkService.importNetwork(sweRequest);
         MergingViewData mergingViewData = mergingViewService.importMergingView(sweRequest);
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
-        Crac cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
-        Crac cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
+        CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
+        CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, network, CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
+        Crac cracFrEs = cracCreationContextFrEs.getCrac();
+        Crac cracEsPt = cracCreationContextEsPt.getCrac();
         String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());
         String jsonCracPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, sweRequest.getProcessType());
-        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), network, mergingViewData, cracEsPt, cracFrEs, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs);
+        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), network, mergingViewData, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs);
     }
 }
