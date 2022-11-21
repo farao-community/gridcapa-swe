@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
+import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
@@ -78,9 +79,9 @@ public class SweData {
 
     public Crac getCrac(DichotomyDirection direction) {
         if (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) {
-            return cracFrEs;
+            return cracFrEs.getCrac();
         } else {
-            return cracEsPt;
+            return cracEsPt.getCrac();
         }
     }
 }

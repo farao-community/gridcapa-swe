@@ -15,7 +15,6 @@ import com.farao_community.farao.data.crac_api.range_action.RangeAction;
 import com.farao_community.farao.data.rao_result_api.OptimizationState;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,7 +54,7 @@ public final class DichotomyResultHelper {
             }
         }
 
-        return worstCnec.orElseThrow(() -> new SweInvalidDataException("Exception occurred while retrieving the most limiting element in preventive state.")).getName();
+        return worstCnec.isPresent() ? worstCnec.get().getName() : "None";
     }
 
     private static double computeFlowMargin(RaoResult raoResult, FlowCnec flowCnec) {

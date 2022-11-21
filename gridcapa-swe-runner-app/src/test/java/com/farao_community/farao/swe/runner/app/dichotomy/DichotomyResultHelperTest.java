@@ -64,7 +64,7 @@ class DichotomyResultHelperTest {
     }
 
     @Test
-    void getimiting() {
+    void getLimitingCauseTest() {
         String messsage = DichotomyResultHelper.limitingCauseToString(LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION);
         assertEquals("None", messsage);
     }

@@ -51,9 +51,10 @@ public class DichotomyParallelization {
             "Voltage Check : {},  \n" +
             "Angle Check : {}.";
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner,
+    public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner,
                                     OutputService outputService, VoltageCheckService voltageCheckService,
                                     CneFileExportService cneFileExportService) {
+        this.businessLogger = businessLogger;
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
         this.outputService = outputService;

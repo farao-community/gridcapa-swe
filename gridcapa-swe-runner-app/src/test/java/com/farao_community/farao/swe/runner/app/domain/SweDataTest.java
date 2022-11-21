@@ -8,7 +8,6 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -39,9 +38,7 @@ class SweDataTest {
         assertEquals(ProcessType.D2CC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetwork());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());
-        assertEquals(this.cracEsPt, sweData.getCrac(DichotomyDirection.ES_PT));
         assertEquals(this.cracFrEs, sweData.getCracFrEs());
-        assertEquals(this.cracFrEs, sweData.getCrac(DichotomyDirection.ES_FR));
         assertEquals("CracEsPt", sweData.getJsonCracPathEsPt());
         assertEquals("CracFrEs", sweData.getJsonCracPathFrEs());
         assertEquals("glskUrl", sweData.getGlskUrl());
