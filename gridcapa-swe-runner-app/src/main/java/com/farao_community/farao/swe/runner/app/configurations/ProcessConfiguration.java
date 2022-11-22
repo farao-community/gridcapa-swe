@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
+ * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
+
 @Configuration
 public class ProcessConfiguration {
 
