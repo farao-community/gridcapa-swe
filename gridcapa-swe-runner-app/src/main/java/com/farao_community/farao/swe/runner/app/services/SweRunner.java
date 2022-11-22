@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
-
     private final DichotomyParallelization dichotomyParallelization;
     private final FilesService filesService;
 

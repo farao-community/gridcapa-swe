@@ -12,6 +12,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.hvdc.HvdcLinkProcessor;
+import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.google.common.base.Suppliers;
@@ -38,6 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -47,13 +49,17 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class NetworkService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkService.class);
+    public static final String PST_1 = "_e071a1d4-fef5-1bd9-5278-d195c5597b6e";
+    public static final String PST_2 = "_7824bc48-fc86-51db-8f9c-01b44933839e";
 
     private final MinioAdapter minioAdapter;
 
     private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
+    private final Logger businessLogger;
 
-    public NetworkService(MinioAdapter minioAdapter) {
+    public NetworkService(MinioAdapter minioAdapter, Logger businessLogger) {
         this.minioAdapter = minioAdapter;
+        this.businessLogger = businessLogger;
     }
 
     public Network importNetwork(SweRequest sweRequest) {
@@ -135,16 +141,18 @@ public class NetworkService {
     private void addhvdc(Network network) {
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
-        LOGGER.info("HVDC added to network");
+        List<String> hvdcIds = params.getHvdcCreationParametersSet().stream().map(HvdcCreationParameters::getId).collect(Collectors.toList());
+        LOGGER.info("HVDC {} added to network", hvdcIds);
+        businessLogger.info("HVDC {} added to network", hvdcIds);
     }
 
     private void addPst(Network network) {
         try {
-            network.getTwoWindingsTransformer("_e071a1d4-fef5-1bd9-5278-d195c5597b6e").getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
-            network.getTwoWindingsTransformer("_7824bc48-fc86-51db-8f9c-01b44933839e").getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
-            LOGGER.info("Regulation mode of the PSTs modified");
+            network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
+            network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
+            businessLogger.info("Regulation mode of the PSTs modified");
         } catch (NullPointerException e) {
-            LOGGER.warn("The PST mode could not be changed because it was not found");
+            businessLogger.warn("The PST mode could not be changed because it was not found");
         }
     }
 
@@ -157,7 +165,7 @@ public class NetworkService {
         } catch (IOException e) {
             throw new SweInternalException("Could not export XIIDM file");
         }
-        minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", OffsetDateTime.now());
+        minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", targetDateTime);
     }
 
 }

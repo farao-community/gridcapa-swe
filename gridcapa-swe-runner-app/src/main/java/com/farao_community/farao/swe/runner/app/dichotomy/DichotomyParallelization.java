@@ -20,6 +20,8 @@ import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
+import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,7 +31,7 @@ import java.util.Optional;
  */
 @Service
 public class DichotomyParallelization {
-
+    private final Logger businessLogger;
     private final DichotomyLogging dichotomyLogging;
     private final DichotomyRunner dichotomyRunner;
     private final OutputService outputService;
@@ -37,7 +39,10 @@ public class DichotomyParallelization {
     private final CgmesExportService cgmesExportService;
     private final CneFileExportService cneFileExportService;
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner, OutputService outputService, VoltageCheckService voltageCheckService, CgmesExportService cgmesExportService, CneFileExportService cneFileExportService) {
+    public DichotomyParallelization(Logger businessLogger, DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner,
+                                    OutputService outputService, VoltageCheckService voltageCheckService,
+                                    CgmesExportService cgmesExportService, CneFileExportService cneFileExportService) {
+        this.businessLogger = businessLogger;
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
         this.outputService = outputService;
@@ -61,12 +66,15 @@ public class DichotomyParallelization {
     }
 
     SweDichotomyResult runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
+        // propagate in logs MDC the task requestId as an extra field to be able to send logs with calculation tasks.
+        MDC.put("gridcapa-task-id", sweData.getId());
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
         String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, direction);
         String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
+        dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult);
         return new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl);
     }
 

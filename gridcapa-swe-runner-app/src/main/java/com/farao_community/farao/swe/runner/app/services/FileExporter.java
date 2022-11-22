@@ -26,6 +26,8 @@ import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.export.Exporters;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -44,6 +46,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Service
 public class FileExporter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
@@ -72,6 +75,7 @@ public class FileExporter {
         String cracPath = makeDestinationMinioPath(processTargetDateTime, FileKind.ARTIFACTS) + targetName;
         try (InputStream is = memDataSource.newInputStream(targetName)) {
             minioAdapter.uploadArtifactForTimestamp(cracPath, is, processType.toString(), "", processTargetDateTime);
+            LOGGER.info("Crac file {} is available", cracPath);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
