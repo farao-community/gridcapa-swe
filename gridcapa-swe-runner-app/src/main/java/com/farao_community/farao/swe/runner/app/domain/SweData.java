@@ -74,4 +74,5 @@ public class SweData {
     public String getJsonCracPathFrEs() {
         return jsonCracPathFrEs;
     }
+
 }

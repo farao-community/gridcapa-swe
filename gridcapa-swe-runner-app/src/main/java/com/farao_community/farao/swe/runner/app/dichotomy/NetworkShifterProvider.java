@@ -13,6 +13,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.ZonalScalableProvider;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.CountryBalanceComputation;
@@ -30,15 +31,17 @@ public class NetworkShifterProvider {
 
     private final DichotomyConfiguration dichotomyConfiguration;
     private final ZonalScalableProvider zonalScalableProvider;
+    private final Logger businessLogger;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider, Logger businessLogger) {
         this.dichotomyConfiguration = dichotomyConfiguration;
         this.zonalScalableProvider = zonalScalableProvider;
+        this.businessLogger = businessLogger;
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(sweData.getNetwork());
-        return new SweNetworkShifter(sweData.getProcessType(), direction,
+        return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), sweData.getNetwork(), sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),

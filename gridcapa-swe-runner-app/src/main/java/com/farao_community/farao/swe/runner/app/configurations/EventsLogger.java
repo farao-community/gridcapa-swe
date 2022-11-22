@@ -19,7 +19,7 @@ class EventsLogger {
 
     @Bean
     public Logger getLogger() {
-        return LoggerFactory.getLogger("BUSINESS_LOGGER");
+        return LoggerFactory.getLogger("SWE_BUSINESS_LOGGER");
     }
 
 }
