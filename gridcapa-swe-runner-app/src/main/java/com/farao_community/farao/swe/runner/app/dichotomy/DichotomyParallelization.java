@@ -69,8 +69,8 @@ public class DichotomyParallelization {
         MDC.put("gridcapa-task-id", sweData.getId());
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
-        String highestValidStepUrl = ""; //cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, direction);
-        String lowestInvalidStepUrl = ""; //cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, direction);
+        String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, ProcessType.D2CC, direction);
+        String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, ProcessType.D2CC, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
         String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
         dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult);
