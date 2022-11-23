@@ -207,9 +207,10 @@ public class FileExporter {
                 while ((length = is.read(bytes)) >= 0) {
                     zipOs.write(bytes, 0, length);
                 }
-                zipOs.closeEntry();
                 is.close();
             }
+            zipOs.close();
+            baos.close();
 
             try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
                 minioAdapter.uploadOutputForTimestamp(cgmesPath, is, sweData.getProcessType().toString(), filetype, sweData.getTimestamp());
