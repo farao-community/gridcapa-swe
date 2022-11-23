@@ -138,7 +138,7 @@ public class NetworkService {
         addPst(network);
     }
 
-    private void addhvdc(Network network) {
+    void addhvdc(Network network) {
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         List<String> hvdcIds = params.getHvdcCreationParametersSet().stream().map(HvdcCreationParameters::getId).collect(Collectors.toList());

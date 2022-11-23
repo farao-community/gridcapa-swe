@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-class NetworkImporterTest {
+class NetworkServiceTest {
 
     @Autowired
     private NetworkService networkImporter;

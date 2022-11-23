@@ -193,7 +193,7 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(filePath);
     }
 
-    public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction) throws IOException {
+    public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction, String filetype) throws IOException {
         String cgmesFilename = cgmesFormatter.format(sweData.getTimestamp()).replace("[direction]", direction.getDirection().replace("-", ""));
         String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -212,7 +212,7 @@ public class FileExporter {
             }
 
             try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
-                minioAdapter.uploadOutputForTimestamp(cgmesPath, is, sweData.getProcessType().toString(), "CGMES", sweData.getTimestamp());
+                minioAdapter.uploadOutputForTimestamp(cgmesPath, is, sweData.getProcessType().toString(), filetype, sweData.getTimestamp());
             } catch (IOException e) {
                 throw new SweInvalidDataException("Error while trying to upload zipped CGMES file.", e);
             }
