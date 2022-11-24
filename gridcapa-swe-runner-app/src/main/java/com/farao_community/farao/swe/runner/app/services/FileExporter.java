@@ -53,11 +53,12 @@ public class FileExporter {
     private static final String ZONE_ID = "Europe/Paris";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
 
+    private final Logger businessLogger;
     private final MinioAdapter minioAdapter;
-
     private final VoltageResultMapper voltageResultMapper;
 
-    public FileExporter(MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper) {
+    public FileExporter(Logger businessLogger, MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper) {
+        this.businessLogger = businessLogger;
         this.minioAdapter = minioAdapter;
         this.voltageResultMapper = voltageResultMapper;
     }
@@ -218,7 +219,7 @@ public class FileExporter {
                 throw new SweInvalidDataException("Error while trying to upload zipped CGMES file.", e);
             }
         }
-
+        businessLogger.info("[{}] : CGMES file exported", direction);
         return minioAdapter.generatePreSignedUrl(cgmesPath);
     }
 

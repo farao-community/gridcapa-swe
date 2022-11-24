@@ -57,7 +57,7 @@ public class DichotomyRunner {
 
     DichotomyEngine<RaoResponse> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, Parameters parameters) {
         return new DichotomyEngine<>(
-                new Index<>(2400, 2425, parameters.getPrecision()),
+                new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 INDEX_STRATEGY_CONFIGURATION,
                 networkShifterProvider.get(sweData, direction),
                 getNetworkValidator(sweData, direction));
