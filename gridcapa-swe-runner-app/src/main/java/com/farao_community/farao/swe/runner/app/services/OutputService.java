@@ -9,6 +9,7 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
@@ -17,6 +18,7 @@ import com.farao_community.farao.swe.runner.app.ttc_doc.TtcDocument;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -29,9 +31,11 @@ public class OutputService {
 
     public static final String TTC_DOC_NAME_REGEX = "'SWE_'yyyyMMdd'_'HHmm'_TTCdoc.xml'";
     private final FileExporter fileExporter;
+    private final ProcessConfiguration processConfiguration;
 
-    public OutputService(FileExporter fileExporter) {
+    public OutputService(FileExporter fileExporter, ProcessConfiguration processConfiguration) {
         this.fileExporter = fileExporter;
+        this.processConfiguration = processConfiguration;
     }
 
     public String buildAndExportTtcDocument(SweData sweData, ExecutionResult<SweDichotomyResult> result) {
@@ -42,16 +46,18 @@ public class OutputService {
 
     private String buildTtcDocName(SweData sweData) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(TTC_DOC_NAME_REGEX);
-        return df.format(sweData.getTimestamp());
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+        return df.format(localTime);
     }
 
     public String buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, ExecutionResult<SweDichotomyResult> result) {
         OffsetDateTime timestamp = sweData.getTimestamp();
         String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
-        String zipName = timestamp.getYear()
-                + String.format("%02d", timestamp.getMonthValue())
-                + String.format("%02d", timestamp.getDayOfMonth()) + "_"
-                + String.format("%02d", timestamp.getHour()) + "30_Voltage_"
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+        String zipName = localTime.getYear()
+                + String.format("%02d", localTime.getMonthValue())
+                + String.format("%02d", localTime.getDayOfMonth()) + "_"
+                + String.format("%02d", localTime.getHour()) + "30_Voltage_"
                 + directionString
                 + ".zip";
         Optional<SweDichotomyResult> directionResult = result.getResult().stream().filter(res -> res.getDichotomyDirection() == direction).findFirst();
