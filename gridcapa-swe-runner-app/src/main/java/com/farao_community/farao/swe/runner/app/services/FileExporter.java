@@ -213,7 +213,7 @@ public class FileExporter {
             baos.close();
 
             try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
-                minioAdapter.uploadOutputForTimestamp(cgmesPath, is, sweData.getProcessType().toString(), filetype, sweData.getTimestamp());
+                minioAdapter.uploadOutputForTimestamp(cgmesPath, is, adaptTargetProcessName(sweData.getProcessType()), filetype, sweData.getTimestamp());
             } catch (IOException e) {
                 throw new SweInvalidDataException("Error while trying to upload zipped CGMES file.", e);
             }

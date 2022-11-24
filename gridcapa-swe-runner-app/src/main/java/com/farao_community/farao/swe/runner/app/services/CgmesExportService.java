@@ -7,10 +7,8 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_api.Instant;
 import com.farao_community.farao.data.crac_api.network_action.NetworkAction;
 import com.farao_community.farao.data.crac_api.range_action.RangeAction;
-import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
@@ -33,7 +31,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static com.powsybl.iidm.xml.IidmXmlConstants.INDENT;
 
@@ -69,8 +69,9 @@ public class CgmesExportService {
     private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<RaoResponse> dichotomyResult) {
         LOGGER.info("Applying remedial actions to the network");
         Crac matchingCrac = getMatchingCrac(direction, sweData);
-        applyNetworkActions(dichotomyResult.getHighestValidStep().getRaoResult(), matchingCrac);
-        applyRangeActions(dichotomyResult.getHighestValidStep().getRaoResult(), matchingCrac);
+        applyNetworkActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedNetworkActionsDuringState(matchingCrac.getPreventiveState()));
+        applyRangeActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedRangeActionsDuringState(matchingCrac.getPreventiveState()),
+                dichotomyResult.getHighestValidStep().getRaoResult().getOptimizedSetPointsOnState(matchingCrac.getPreventiveState()));
     }
 
     private Crac getMatchingCrac(DichotomyDirection direction, SweData sweData) {
@@ -82,32 +83,13 @@ public class CgmesExportService {
         throw new SweInvalidDataException("Unknown direction");
     }
 
-    private void applyNetworkActions(RaoResult raoResult, Crac matchingCrac) {
-        List<NetworkAction> crasNames = new ArrayList<>(raoResult.getActivatedNetworkActionsDuringState(matchingCrac.getPreventiveState()));
-        matchingCrac.getStates(Instant.CURATIVE).forEach(state ->
-                crasNames.addAll(new ArrayList<>(raoResult.getActivatedNetworkActionsDuringState(state))));
-        matchingCrac.getStates(Instant.AUTO).forEach(state ->
-                crasNames.addAll(new ArrayList<>(raoResult.getActivatedNetworkActionsDuringState(state))));
-        for (NetworkAction action : crasNames) {
+    private void applyNetworkActions(Set<NetworkAction> activatedNetworkActionsDuringState) {
+        for (NetworkAction action : activatedNetworkActionsDuringState) {
             action.apply(mergingView);
         }
     }
 
-    private void applyRangeActions(RaoResult raoResult, Crac crac) {
-        Set<RangeAction<?>> activatedRangeActionsDuringState = raoResult.getActivatedRangeActionsDuringState(crac.getPreventiveState());
-        crac.getStates(Instant.CURATIVE).forEach(state -> {
-            activatedRangeActionsDuringState.addAll(new HashSet<>(raoResult.getActivatedRangeActionsDuringState(state)));
-        });
-        crac.getStates(Instant.AUTO).forEach(state -> {
-            activatedRangeActionsDuringState.addAll(new HashSet<>(raoResult.getActivatedRangeActionsDuringState(state)));
-        });
-
-        Map<RangeAction<?>, Double> optimizedSetPointsOnState = raoResult.getOptimizedSetPointsOnState(crac.getPreventiveState());
-        crac.getStates(Instant.CURATIVE).forEach(state ->
-                optimizedSetPointsOnState.putAll(raoResult.getOptimizedSetPointsOnState(state)));
-        crac.getStates(Instant.AUTO).forEach(state ->
-                optimizedSetPointsOnState.putAll(raoResult.getOptimizedSetPointsOnState(state)));
-
+    private void applyRangeActions(Set<RangeAction<?>> activatedRangeActionsDuringState, Map<RangeAction<?>, Double> optimizedSetPointsOnState) {
         for (RangeAction<?> action : activatedRangeActionsDuringState) {
             action.apply(mergingView, optimizedSetPointsOnState.get(action));
         }
