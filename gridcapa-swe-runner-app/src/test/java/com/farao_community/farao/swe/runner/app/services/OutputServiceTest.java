@@ -10,6 +10,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
@@ -38,6 +39,7 @@ class OutputServiceTest {
 
     private static OutputService outputService;
     private static FileExporter fileExporter;
+    private static ProcessConfiguration processConfiguration;
     private SweData sweData;
     private static ExecutionResult<SweDichotomyResult> executionResult;
 
@@ -46,10 +48,12 @@ class OutputServiceTest {
     @BeforeAll
     static void init() {
         fileExporter = Mockito.mock(FileExporter.class);
+        processConfiguration = Mockito.mock(ProcessConfiguration.class);
         Mockito.when(fileExporter.exportTtcDocument(Mockito.any(SweData.class), Mockito.any(InputStream.class), Mockito.anyString())).thenReturn(TTC_DOCUMENT_URL_STRING);
         Mockito.when(fileExporter.saveVoltageMonitoringResultInJsonZip(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(VOLTAGE_DOCUMENT_URL_STRING);
-        outputService = new OutputService(fileExporter);
+        Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Paris");
+        outputService = new OutputService(fileExporter, processConfiguration);
         List<SweDichotomyResult> resultList = new ArrayList<>();
         resultList.add(getSweDichotomyResult(DichotomyDirection.FR_ES, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult())));
         resultList.add(getSweDichotomyResult(DichotomyDirection.ES_FR, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult())));
