@@ -23,15 +23,17 @@ public class SweData {
     private final Network network;
     private final CimCracCreationContext cracEsPt;
     private final CimCracCreationContext cracFrEs;
+    private final MergingViewData mergingViewData;
     private final String glskUrl;
     private final String jsonCracPathEsPt;
     private final String jsonCracPathFrEs;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network network, CimCracCreationContext cracEsPt, CimCracCreationContext cracFrEs, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network network, MergingViewData mergingViewData, CimCracCreationContext cracEsPt, CimCracCreationContext cracFrEs, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
         this.network = network;
+        this.mergingViewData = mergingViewData;
         this.cracEsPt = cracEsPt;
         this.cracFrEs = cracFrEs;
         this.glskUrl = glskUrl;
@@ -53,6 +55,10 @@ public class SweData {
 
     public Network getNetwork() {
         return network;
+    }
+
+    public MergingViewData getMergingViewData() {
+        return mergingViewData;
     }
 
     public CimCracCreationContext getCracEsPt() {

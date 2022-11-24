@@ -30,6 +30,7 @@ logback:
     routing-key: "#"
 
 swe-runner:
+  zone-id: "Europe/Paris"
   dichotomy:
     parameters:
       ES_FR:
@@ -60,7 +61,6 @@ swe-runner:
     - http://localhost:9000/
     - http://minio:9000/
     - file:/
-  zone-id: "Europe/Paris"
 
 rao-runner-server:
   amqp:

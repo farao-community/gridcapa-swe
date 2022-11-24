@@ -12,6 +12,7 @@ import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.Cim
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ class FilesServiceTest {
     private NetworkService networkService;
 
     @MockBean
+    private MergingViewService mergingViewService;
+
+    @MockBean
     private FileImporter fileImporter;
 
     @MockBean
@@ -48,6 +52,7 @@ class FilesServiceTest {
     @Test
     void simpleImport() {
         when(networkService.importNetwork(any(SweRequest.class))).thenReturn(mock(Network.class));
+        when(mergingViewService.importMergingView(any(SweRequest.class))).thenReturn(mock(MergingViewData.class));
         when(fileImporter.importCimCrac(any(SweRequest.class))).thenReturn(mock(CimCrac.class));
         when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString())).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");

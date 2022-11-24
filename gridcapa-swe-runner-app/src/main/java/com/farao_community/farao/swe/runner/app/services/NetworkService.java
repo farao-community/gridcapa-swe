@@ -68,8 +68,7 @@ public class NetworkService {
         String zipPath = buildZipFromCgms(listCgms);
         Network network = importFromZip(zipPath);
         deleteFile(new File(zipPath));
-        addhvdc(network);
-        addPst(network);
+        addHvdcAndPstToNetwork(network);
         exportToMinio(network, sweRequest.getTargetProcessDateTime());
         return network;
     }
@@ -93,7 +92,7 @@ public class NetworkService {
 
     String buildZipFromCgms(List<SweFileResource> listCgmFiles) {
         try {
-            Path tmp = Files.createTempDirectory(null);
+            Path tmp = Files.createTempDirectory("pref_");
             byte[] buffer = new byte[1024];
             String zipPath = tmp.toAbsolutePath() + "/networktmp.zip";
             FileOutputStream fos = new FileOutputStream(zipPath);
@@ -134,7 +133,12 @@ public class NetworkService {
         }
     }
 
-    private void addhvdc(Network network) {
+    public void addHvdcAndPstToNetwork(Network network) {
+        addhvdc(network);
+        addPst(network);
+    }
+
+    void addhvdc(Network network) {
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         List<String> hvdcIds = params.getHvdcCreationParametersSet().stream().map(HvdcCreationParameters::getId).collect(Collectors.toList());
@@ -163,4 +167,5 @@ public class NetworkService {
         }
         minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", targetDateTime);
     }
+
 }

@@ -107,6 +107,11 @@
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-iidm-mergingview</artifactId>
+                <version>4.10.1</version>
+            </dependency>
 
             <!-- Runtime dependencies -->
             <dependency>

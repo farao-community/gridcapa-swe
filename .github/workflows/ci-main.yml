@@ -37,7 +37,7 @@ jobs:
       - name: Build and publish Docker image
         uses: elgohr/Publish-Docker-Github-Action@main
         with:
-          name: farao/gridcapa-swe
+          name: farao/gridcapa-swe-runner
           username: farao
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 

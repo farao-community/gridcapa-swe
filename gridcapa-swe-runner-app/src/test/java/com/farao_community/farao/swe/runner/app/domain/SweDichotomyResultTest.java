@@ -17,8 +17,8 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -38,7 +38,7 @@ class SweDichotomyResultTest {
 
     @Test
     void simpleTestEmptyOptional() {
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.empty(), "highestValidStepUrl", "lowestValidStepUrl");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.empty(), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(dichotomyResult, result.getDichotomyResult());
         assertTrue(result.getVoltageMonitoringResult().isEmpty());
@@ -48,7 +48,7 @@ class SweDichotomyResultTest {
 
     @Test
     void simpleTestWithOptional() {
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "highestValidStepUrl", "lowestValidStepUrl");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(dichotomyResult, result.getDichotomyResult());
         assertTrue(result.getVoltageMonitoringResult().isPresent());
