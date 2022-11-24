@@ -71,7 +71,7 @@ public class CneFileExportService {
         this.processConfiguration = processConfiguration;
     }
 
-    public String exportCneUrl(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, boolean isHighestValid, ProcessType processType, DichotomyDirection direction) {
+    public String exportCneUrl(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, boolean isHighestValid, DichotomyDirection direction) {
         OffsetDateTime timestamp = sweData.getTimestamp();
         CneExporterParameters cneExporterParameters = getCneExporterParameters(timestamp);
         CimCracCreationContext cracCreationContext = getCimCracCreationContext(sweData, direction);
@@ -79,7 +79,7 @@ public class CneFileExportService {
         String targetZipFileName = generateCneZipFileName(timestamp, isHighestValid, direction);
         exportAndZipCneFile(sweData, dichotomyResult, cneExporterParameters, cracCreationContext, memDataSource, targetZipFileName, isHighestValid);
         String cneResultPath =  fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
-        uploadFileToMinio(isHighestValid, processType, direction, timestamp, memDataSource, targetZipFileName, cneResultPath);
+        uploadFileToMinio(isHighestValid, sweData.getProcessType(), direction, timestamp, memDataSource, targetZipFileName, cneResultPath);
         return minioAdapter.generatePreSignedUrl(cneResultPath);
     }
 

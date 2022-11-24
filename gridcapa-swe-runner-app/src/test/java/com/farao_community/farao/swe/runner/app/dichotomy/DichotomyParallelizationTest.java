@@ -100,10 +100,11 @@ class DichotomyParallelizationTest {
         when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetwork()).thenReturn(network);
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, true, ProcessType.D2CC, DichotomyDirection.ES_FR)).thenReturn("esFrHighestValidStepUrl.zip");
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, ProcessType.D2CC, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
+        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, true, DichotomyDirection.ES_FR)).thenReturn("esFrHighestValidStepUrl.zip");
+        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertEquals("esFrVoltageZipUrl.zip", sweResponse.getEsFrVoltageZipUrl());
@@ -122,7 +123,8 @@ class DichotomyParallelizationTest {
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetwork()).thenReturn(network);
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, ProcessType.D2CC, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
         when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
