@@ -37,7 +37,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -132,7 +131,7 @@ public class FileExporter {
     }
 
     public String makeDestinationDichotomyPath(OffsetDateTime offsetDateTime, FileKind filekind, DichotomyDirection direction) {
-        return  makeDestinationMinioPath(offsetDateTime, filekind) + direction + MINIO_SEPARATOR;
+        return makeDestinationMinioPath(offsetDateTime, filekind) + direction + MINIO_SEPARATOR;
     }
 
     public String saveNetworkInArtifact(Network network, String networkFilePath, String fileType, OffsetDateTime processTargetDateTime, ProcessType processType) {
