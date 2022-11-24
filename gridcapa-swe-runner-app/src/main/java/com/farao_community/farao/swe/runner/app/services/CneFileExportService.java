@@ -90,7 +90,7 @@ public class CneFileExportService {
                 raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
             }
         } else {
-            if (dichotomyResult.getLowestInvalidStep() != null) {
+            if (Double.isNaN(dichotomyResult.getLowestInvalidStepValue()) {
                 raoResult = dichotomyResult.getLowestInvalidStep().getRaoResult();
             }
         }
