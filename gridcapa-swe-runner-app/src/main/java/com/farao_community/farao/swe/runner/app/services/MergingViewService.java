@@ -79,7 +79,7 @@ public class MergingViewService {
 
     private String buildZipFromListOfFiles(List<SweFileResource> listFiles, Country country) {
         try {
-            Path tmp = Files.createTempDirectory(null);
+            Path tmp = Files.createTempDirectory("pref_");
             byte[] buffer = new byte[1024];
             String zipPath = tmp.toAbsolutePath() + "/network_" + country.toString() + ".zip";
             FileOutputStream fos = new FileOutputStream(zipPath);

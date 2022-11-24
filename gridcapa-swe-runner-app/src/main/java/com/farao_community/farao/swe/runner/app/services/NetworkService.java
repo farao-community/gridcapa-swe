@@ -92,7 +92,7 @@ public class NetworkService {
 
     String buildZipFromCgms(List<SweFileResource> listCgmFiles) {
         try {
-            Path tmp = Files.createTempDirectory(null);
+            Path tmp = Files.createTempDirectory("pref_");
             byte[] buffer = new byte[1024];
             String zipPath = tmp.toAbsolutePath() + "/networktmp.zip";
             FileOutputStream fos = new FileOutputStream(zipPath);
