@@ -20,7 +20,7 @@ public class SweForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinWork
         return new SweForkJoinWorkerThread(pool);
     }
 
-    private final static class SweForkJoinWorkerThread extends ForkJoinWorkerThread {
+    private static final class SweForkJoinWorkerThread extends ForkJoinWorkerThread {
 
         private SweForkJoinWorkerThread(final ForkJoinPool pool) {
             super(pool);
