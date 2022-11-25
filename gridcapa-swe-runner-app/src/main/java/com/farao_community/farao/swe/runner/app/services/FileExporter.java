@@ -13,6 +13,7 @@ import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_api.json.JsonRaoParameters;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
+import com.farao_community.farao.search_tree_rao.castor.parameters.SearchTreeRaoParameters;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
@@ -56,6 +57,10 @@ public class FileExporter {
     public static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
     private final MinioAdapter minioAdapter;
     private final VoltageResultMapper voltageResultMapper;
+    private static final Map<String, String> UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS = Map.of(
+            " _0a3cbdb0-cd71-52b0-b93d-cb48c9fea3e2 + _6f6b15b3-9bcc-7864-7669-522e9f06e931", "_7824bc48-fc86-51db-8f9c-01b44933839e",
+            "_1d9c658e-1a01-c0ee-d127-a22e1270a242 + _2e81de07-4c22-5aa1-9683-5e51b054f7f8", "_e071a1d4-fef5-1bd9-5278-d195c5597b6e"
+    );
 
     private final ProcessConfiguration processConfiguration;
 
@@ -172,13 +177,20 @@ public class FileExporter {
     }
 
     public String saveRaoParameters(SweData sweData) {
-        RaoParameters raoParameters = RaoParameters.load();
+        RaoParameters raoParameters = getSweRaoParameters();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonRaoParameters.write(raoParameters, baos);
         String raoParametersDestinationPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.ARTIFACTS) + RAO_PARAMETERS_FILE_NAME;
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         minioAdapter.uploadArtifactForTimestamp(raoParametersDestinationPath, bais, sweData.getProcessType().toString(), "", sweData.getTimestamp());
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
+    }
+
+    RaoParameters getSweRaoParameters() {
+        RaoParameters raoParameters = RaoParameters.load();
+        SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
+        searchTreeRaoParameters.setUnoptimizedCnecsInSeriesWithPstsIds(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
+        return raoParameters;
     }
 
     public String exportTtcDocument(SweData sweData, InputStream inputStream, String filename) {
