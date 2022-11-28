@@ -37,13 +37,21 @@ class SweRunnerTest {
     void run() {
         when(filesService.importFiles(any(SweRequest.class))).thenReturn(mock(SweData.class));
         when(dichotomyParallelization.launchDichotomy(any(SweData.class))).thenReturn(new SweResponse("id", "ttcUrl",
-                "voltageEsFrZipUrl", "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl", "esFrCgmesZipUrl"));
+                "esFrVoltageZipUrl", "frEsVoltageZipUrl",
+                "esFrCgmesZipUrl", "frEsCgmesZipUrl",
+                "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl",
+                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl"));
+
         SweResponse sweResponse = sweRunner.run(mock(SweRequest.class));
         assertNotNull(sweResponse);
         assertEquals("ttcUrl", sweResponse.getTtcDocUrl());
-        assertEquals("voltageEsFrZipUrl", sweResponse.getEsFrVoltageZipUrl());
+        assertEquals("esFrVoltageZipUrl", sweResponse.getEsFrVoltageZipUrl());
+        assertEquals("frEsVoltageZipUrl", sweResponse.getFrEsVoltageZipUrl());
+        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
+        assertEquals("frEsCgmesZipUrl", sweResponse.getFrEsCgmesZipUrl());
         assertEquals("esFrHighestValidStepUrl", sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl", sweResponse.getEsFrLowestInvalidStepUrl());
-        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
+        assertEquals("frEsHighestValidStepUrl", sweResponse.getFrEsHighestValidStepUrl());
+        assertEquals("frEsLowestInvalidStepUrl", sweResponse.getFrEsLowestInvalidStepUrl());
     }
 }

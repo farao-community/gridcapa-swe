@@ -18,7 +18,6 @@ import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
-import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecution;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
@@ -59,9 +58,6 @@ class DichotomyParallelizationTest {
     private CgmesExportService cgmesExportService;
 
     @Mock
-    private ParallelExecution parallelExecution;
-
-    @Mock
     private SweData sweData;
 
     @Mock
@@ -98,7 +94,6 @@ class DichotomyParallelizationTest {
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
         when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");
         when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any())).thenReturn("ok");
-        when(parallelExecution.close()).thenReturn(executionResult);
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -107,27 +102,34 @@ class DichotomyParallelizationTest {
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(cracCreationContext.getCrac()).thenReturn(crac);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
+        when(sweData.getNetworkFrEs()).thenReturn(network);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
         when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, true, DichotomyDirection.ES_FR)).thenReturn("esFrHighestValidStepUrl.zip");
         when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
+        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, true, DichotomyDirection.FR_ES)).thenReturn("frEsHighestValidStepUrl.zip");
+        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.FR_ES)).thenReturn("frEsLowestInvalidStepUrl.zip");
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertEquals("esFrVoltageZipUrl.zip", sweResponse.getEsFrVoltageZipUrl());
+        assertEquals("esFrVoltageZipUrl.zip", sweResponse.getFrEsVoltageZipUrl());
         assertEquals("esFrHighestValidStepUrl.zip", sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl.zip", sweResponse.getEsFrLowestInvalidStepUrl());
+        assertEquals("frEsHighestValidStepUrl.zip", sweResponse.getFrEsHighestValidStepUrl());
+        assertEquals("frEsLowestInvalidStepUrl.zip", sweResponse.getFrEsLowestInvalidStepUrl());
     }
 
     @Test
     void testParallelizationWithInvalidResult() {
         when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(parallelExecution.close()).thenReturn(executionResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(false);
         when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(cracCreationContext.getCrac()).thenReturn(crac);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
         when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(ExecutionResult.class))).thenReturn("esFrVoltageZipUrl.zip");

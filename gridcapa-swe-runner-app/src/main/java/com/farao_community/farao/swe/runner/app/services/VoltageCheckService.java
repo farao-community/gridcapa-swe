@@ -6,7 +6,9 @@ import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoring
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.dichotomy.NetworkShifterProvider;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
@@ -31,7 +33,8 @@ public class VoltageCheckService {
         if ((direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) && dichotomyResult.hasValidStep()) {
             businessLogger.info("[{}] : Running voltage check", direction);
             Crac crac = sweData.getCracFrEs().getCrac();
-            VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, sweData.getNetwork(), dichotomyResult.getHighestValidStep().getRaoResult());
+            Network network = NetworkShifterProvider.getNetworkByDirection(sweData, direction);
+            VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
             return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));
         }
         return Optional.empty();

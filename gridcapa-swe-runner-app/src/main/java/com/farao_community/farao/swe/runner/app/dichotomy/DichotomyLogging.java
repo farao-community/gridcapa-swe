@@ -54,6 +54,10 @@ public class DichotomyLogging {
         businessLogger.info("All - Dichotomies are done");
     }
 
+    public void logErrorOnDirection(DichotomyDirection direction, Throwable e) {
+        businessLogger.error("[{}] : Error running dichotomy on this direction", direction, e);
+    }
+
     public  void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
         String limitingElement = "NONE";
         String printablePrasIds = "NONE";
