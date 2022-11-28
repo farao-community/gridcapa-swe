@@ -18,14 +18,21 @@ class SweResponseTest {
 
     @Test
     void simpleRequestTest() {
-        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl",
-                "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl", "esFrCgmesZipUrl");
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", "esFrVoltageZipUrl", "frEsVoltageZipUrl",
+                "esFrCgmesZipUrl", "frEsCgmesZipUrl",
+                "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl",
+                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl");
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertEquals("esFrVoltageZipUrl", sweResponse.getEsFrVoltageZipUrl());
+        assertEquals("frEsVoltageZipUrl", sweResponse.getFrEsVoltageZipUrl());
         assertEquals("esFrHighestValidStepUrl", sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl", sweResponse.getEsFrLowestInvalidStepUrl());
         assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
+        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
+        assertEquals("frEsHighestValidStepUrl", sweResponse.getFrEsHighestValidStepUrl());
+        assertEquals("frEsLowestInvalidStepUrl", sweResponse.getFrEsLowestInvalidStepUrl());
     }
 
 }

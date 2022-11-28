@@ -41,10 +41,10 @@ public class FilesService {
 
         MergingViewData mergingViewData = mergingViewService.importMergingView(sweRequest);
         Network networkEsFr = networkService.importNetwork(sweRequest);
+        Network networkFrEs = networkService.importNetwork(sweRequest);
+        Network networkEsPt = networkService.importNetwork(sweRequest);
+        Network networkPtEs = networkService.importNetwork(sweRequest);
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
-        Network networkFrEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
-        Network networkEsPt = networkService.loadNetworkFromMinio(targetProcessDateTime);
-        Network networkPtEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
         CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsFr, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
         CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsPt, CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
         Crac cracFrEs = cracCreationContextFrEs.getCrac();

@@ -25,7 +25,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
+import com.farao_community.farao.swe.runner.app.dichotomy.NetworkShifterProvider;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.commons.datasource.MemDataSource;
 import org.springframework.stereotype.Service;
@@ -114,7 +114,7 @@ public class CneFileExportService {
                 marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
             } else {
                 SweCneExporter sweCneExporter = new SweCneExporter();
-                sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkUtil.getNetworkByDirection(sweData, direction), cracCreationContext,
+                sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkShifterProvider.getNetworkByDirection(sweData, direction), cracCreationContext,
                         raoResult, null, RaoParameters.load(), cneExporterParameters, zipOs);
             }
             zipOs.closeEntry();
@@ -146,7 +146,7 @@ public class CneFileExportService {
         marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterParameters.getReceiverRole().getCode());
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterParameters.getTimeInterval()));
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkUtil.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkShifterProvider.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
 

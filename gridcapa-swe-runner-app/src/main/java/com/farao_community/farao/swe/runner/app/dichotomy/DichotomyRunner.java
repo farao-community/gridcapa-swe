@@ -54,7 +54,7 @@ public class DichotomyRunner {
         Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
         dichotomyLogging.logStartDichotomy(parameters);
         DichotomyEngine<RaoResponse> engine = buildDichotomyEngine(sweData, direction, parameters);
-        Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
+        Network network = NetworkShifterProvider.getNetworkByDirection(sweData, direction);
         return engine.run(network);
     }
 
