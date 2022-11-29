@@ -36,25 +36,14 @@ class SweRunnerTest {
     @Test
     void run() {
         when(filesService.importFiles(any(SweRequest.class))).thenReturn(mock(SweData.class));
-        when(dichotomyParallelization.launchDichotomy(any(SweData.class))).thenReturn(new SweResponse("id", "ttcDocUrl",
-                "esFrVoltageZipUrl", "frEsVoltageZipUrl",
-                "esFrCgmesZipUrl", "frEsCgmesZipUrl",
-                "esPtCgmesZipUrl", "ptEsCgmesZipUrl",
-                "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl",
-                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl",
-                "esPtHighestValidStepUrl", "esPtLowestInvalidStepUrl",
-                "ptEsHighestValidStepUrl", "ptEsLowestInvalidStepUrl"));
-
+        when(dichotomyParallelization.launchDichotomy(any(SweData.class))).thenReturn(new SweResponse("id", "ttcUrl",
+                "voltageEsFrZipUrl", "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl", "esFrCgmesZipUrl"));
         SweResponse sweResponse = sweRunner.run(mock(SweRequest.class));
         assertNotNull(sweResponse);
-        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
-        assertEquals("esFrVoltageZipUrl", sweResponse.getEsFrVoltageZipUrl());
-        assertEquals("frEsVoltageZipUrl", sweResponse.getFrEsVoltageZipUrl());
-        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
-        assertEquals("frEsCgmesZipUrl", sweResponse.getFrEsCgmesZipUrl());
+        assertEquals("ttcUrl", sweResponse.getTtcDocUrl());
+        assertEquals("voltageEsFrZipUrl", sweResponse.getEsFrVoltageZipUrl());
         assertEquals("esFrHighestValidStepUrl", sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl", sweResponse.getEsFrLowestInvalidStepUrl());
-        assertEquals("frEsHighestValidStepUrl", sweResponse.getFrEsHighestValidStepUrl());
-        assertEquals("frEsLowestInvalidStepUrl", sweResponse.getFrEsLowestInvalidStepUrl());
+        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
     }
 }

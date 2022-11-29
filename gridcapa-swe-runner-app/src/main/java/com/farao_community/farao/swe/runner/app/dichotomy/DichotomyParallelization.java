@@ -43,15 +43,9 @@ public class DichotomyParallelization {
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
-        String voltageFrEsZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, executionResult);
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, executionResult);
         SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
-        SweDichotomyResult frEsResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.FR_ES);
-        SweDichotomyResult esPtResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_PT);
-        SweDichotomyResult ptEsResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.PT_ES);
-        return  new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl, voltageFrEsZipUrl, esFrResult.getExportedCgmesUrl(), frEsResult.getExportedCgmesUrl(),
-                esPtResult.getExportedCgmesUrl(), ptEsResult.getExportedCgmesUrl(),
-                esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), frEsResult.getHighestValidStepUrl(), frEsResult.getLowestInvalidStepUrl(),
-                esPtResult.getHighestValidStepUrl(), esPtResult.getLowestInvalidStepUrl(), ptEsResult.getHighestValidStepUrl(), ptEsResult.getLowestInvalidStepUrl());
+        return new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), esFrResult.getExportedCgmesUrl());
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData) {

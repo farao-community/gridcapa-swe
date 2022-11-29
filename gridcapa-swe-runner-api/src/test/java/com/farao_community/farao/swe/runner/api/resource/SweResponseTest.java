@@ -18,32 +18,15 @@ class SweResponseTest {
 
     @Test
     void simpleRequestTest() {
-
-        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", "esFrVoltageZipUrl", "frEsVoltageZipUrl",
-                "esFrCgmesZipUrl", "frEsCgmesZipUrl",
-                "esPtCgmesZipUrl", "ptEsCgmesZipUrl",
-                "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl",
-                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl",
-                "esPtHighestValidStepUrl", "esPtLowestInvalidStepUrl",
-                "ptEsHighestValidStepUrl", "ptEsLowestInvalidStepUrl");
-
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", "esFrVoltageZipUrl",
+                "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl", "esFrCgmesZipUrl");
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertEquals("esFrVoltageZipUrl", sweResponse.getEsFrVoltageZipUrl());
-        assertEquals("frEsVoltageZipUrl", sweResponse.getFrEsVoltageZipUrl());
         assertEquals("esFrHighestValidStepUrl", sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl", sweResponse.getEsFrLowestInvalidStepUrl());
-        assertEquals("frEsHighestValidStepUrl", sweResponse.getFrEsHighestValidStepUrl());
-        assertEquals("frEsLowestInvalidStepUrl", sweResponse.getFrEsLowestInvalidStepUrl());
         assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
-        assertEquals("frEsCgmesZipUrl", sweResponse.getFrEsCgmesZipUrl());
-        assertEquals("esPtCgmesZipUrl", sweResponse.getEsPtCgmesZipUrl());
-        assertEquals("ptEsCgmesZipUrl", sweResponse.getPtEsCgmesZipUrl());
-        assertEquals("ptEsHighestValidStepUrl", sweResponse.getPtEsHighestValidStepUrl());
-        assertEquals("ptEsLowestInvalidStepUrl", sweResponse.getPtEsLowestInvalidStepUrl());
-        assertEquals("esPtHighestValidStepUrl", sweResponse.getEsPtHighestValidStepUrl());
-        assertEquals("esPtLowestInvalidStepUrl", sweResponse.getEsPtLowestInvalidStepUrl());
     }
 
 }
