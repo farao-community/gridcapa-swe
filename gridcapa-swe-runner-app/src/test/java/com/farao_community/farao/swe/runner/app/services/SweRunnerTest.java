@@ -36,15 +36,18 @@ class SweRunnerTest {
     @Test
     void run() {
         when(filesService.importFiles(any(SweRequest.class))).thenReturn(mock(SweData.class));
-        when(dichotomyParallelization.launchDichotomy(any(SweData.class))).thenReturn(new SweResponse("id", "ttcUrl",
+        when(dichotomyParallelization.launchDichotomy(any(SweData.class))).thenReturn(new SweResponse("id", "ttcDocUrl",
                 "esFrVoltageZipUrl", "frEsVoltageZipUrl",
                 "esFrCgmesZipUrl", "frEsCgmesZipUrl",
+                "esPtCgmesZipUrl", "ptEsCgmesZipUrl",
                 "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl",
-                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl"));
+                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl",
+                "esPtHighestValidStepUrl", "esPtLowestInvalidStepUrl",
+                "ptEsHighestValidStepUrl", "ptEsLowestInvalidStepUrl"));
 
         SweResponse sweResponse = sweRunner.run(mock(SweRequest.class));
         assertNotNull(sweResponse);
-        assertEquals("ttcUrl", sweResponse.getTtcDocUrl());
+        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertEquals("esFrVoltageZipUrl", sweResponse.getEsFrVoltageZipUrl());
         assertEquals("frEsVoltageZipUrl", sweResponse.getFrEsVoltageZipUrl());
         assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());

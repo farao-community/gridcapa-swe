@@ -21,8 +21,11 @@ class SweResponseTest {
 
         SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", "esFrVoltageZipUrl", "frEsVoltageZipUrl",
                 "esFrCgmesZipUrl", "frEsCgmesZipUrl",
+                "esPtCgmesZipUrl", "ptEsCgmesZipUrl",
                 "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl",
-                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl");
+                "frEsHighestValidStepUrl", "frEsLowestInvalidStepUrl",
+                "esPtHighestValidStepUrl", "esPtLowestInvalidStepUrl",
+                "ptEsHighestValidStepUrl", "ptEsLowestInvalidStepUrl");
 
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
@@ -31,10 +34,16 @@ class SweResponseTest {
         assertEquals("frEsVoltageZipUrl", sweResponse.getFrEsVoltageZipUrl());
         assertEquals("esFrHighestValidStepUrl", sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl", sweResponse.getEsFrLowestInvalidStepUrl());
-        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
-        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
         assertEquals("frEsHighestValidStepUrl", sweResponse.getFrEsHighestValidStepUrl());
         assertEquals("frEsLowestInvalidStepUrl", sweResponse.getFrEsLowestInvalidStepUrl());
+        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
+        assertEquals("frEsCgmesZipUrl", sweResponse.getFrEsCgmesZipUrl());
+        assertEquals("esPtCgmesZipUrl", sweResponse.getEsPtCgmesZipUrl());
+        assertEquals("ptEsCgmesZipUrl", sweResponse.getPtEsCgmesZipUrl());
+        assertEquals("ptEsHighestValidStepUrl", sweResponse.getPtEsHighestValidStepUrl());
+        assertEquals("ptEsLowestInvalidStepUrl", sweResponse.getPtEsLowestInvalidStepUrl());
+        assertEquals("esPtHighestValidStepUrl", sweResponse.getEsPtHighestValidStepUrl());
+        assertEquals("esPtLowestInvalidStepUrl", sweResponse.getEsPtLowestInvalidStepUrl());
     }
 
 }
