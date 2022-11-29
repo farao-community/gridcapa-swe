@@ -39,18 +39,7 @@ public class DichotomyParallelization {
     }
 
     public SweResponse launchDichotomy(SweData sweData) {
-        ExecutionResult<SweDichotomyResult> executionResult = null;
-        CompletableFuture<SweDichotomyResult> dichoEsFr = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR);
-        CompletableFuture<SweDichotomyResult> dichoFrEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES);
-        //CompletableFuture<SweDichotomyResult> dichoEsPt = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT);
-        //CompletableFuture<SweDichotomyResult> dichoPtEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES);
-        List<SweDichotomyResult> results = new ArrayList<>();
-        waitAndAddToReults(dichoEsFr, results, DichotomyDirection.ES_FR);
-        waitAndAddToReults(dichoFrEs, results, DichotomyDirection.FR_ES);
-        //waitAndAddToReults(dichoEsPt, results, DichotomyDirection.ES_PT)
-        //waitAndAddToReults(dichoPtEs, results, DichotomyDirection.PT_ES);
-        executionResult = new ExecutionResult<>(results);
-
+        ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData);
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
@@ -61,6 +50,21 @@ public class DichotomyParallelization {
                 esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), frEsResult.getHighestValidStepUrl(), frEsResult.getLowestInvalidStepUrl());
     }
 
+    private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData) {
+        ExecutionResult<SweDichotomyResult> executionResult = null;
+        CompletableFuture<SweDichotomyResult> dichoEsFr = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR);
+        CompletableFuture<SweDichotomyResult> dichoFrEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES);
+        CompletableFuture<SweDichotomyResult> dichoEsPt = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT);
+        CompletableFuture<SweDichotomyResult> dichoPtEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES);
+        List<SweDichotomyResult> results = new ArrayList<>();
+        waitAndAddToReults(dichoEsFr, results, DichotomyDirection.ES_FR);
+        waitAndAddToReults(dichoFrEs, results, DichotomyDirection.FR_ES);
+        waitAndAddToReults(dichoEsPt, results, DichotomyDirection.ES_PT);
+        waitAndAddToReults(dichoPtEs, results, DichotomyDirection.PT_ES);
+        executionResult = new ExecutionResult<>(results);
+        return executionResult;
+    }
+
     private void waitAndAddToReults(CompletableFuture<SweDichotomyResult> dichotomy, List<SweDichotomyResult> results, DichotomyDirection direction) {
         try {
             results.add(dichotomy.get());
@@ -68,6 +72,7 @@ public class DichotomyParallelization {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             dichotomyLogging.logErrorOnDirection(direction, e);
+            results.add(new SweDichotomyResult(direction, null, null, null, null, null));
         }
     }
 
