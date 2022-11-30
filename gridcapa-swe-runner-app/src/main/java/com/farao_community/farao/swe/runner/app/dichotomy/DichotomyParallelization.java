@@ -42,10 +42,8 @@ public class DichotomyParallelization {
         ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData);
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
-        String voltageEsFrZipUrl = outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult);
-        outputService.buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, executionResult);
         SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
-        return new SweResponse(sweData.getId(), ttcDocUrl, voltageEsFrZipUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), esFrResult.getExportedCgmesUrl());
+        return new SweResponse(sweData.getId(), ttcDocUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), esFrResult.getExportedCgmesUrl());
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData) {

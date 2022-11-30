@@ -76,7 +76,7 @@ class OutputServiceTest {
 
     @Test
     void buildAndExportEsFrVoltageDoc() {
-        Assertions.assertEquals(VOLTAGE_DOCUMENT_URL_STRING, outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, executionResult));
+        Assertions.assertEquals(VOLTAGE_DOCUMENT_URL_STRING, outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult())));
     }
 
     @NotNull
