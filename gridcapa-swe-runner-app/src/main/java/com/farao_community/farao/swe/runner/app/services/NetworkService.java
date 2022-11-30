@@ -63,10 +63,11 @@ public class NetworkService {
     }
 
     public Network loadNetworkFromMinio(OffsetDateTime targetDateTime) {
-        try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + networkFormatter.format(targetDateTime))) {
-            return Importers.loadNetwork("xiidmNetwork", xiidm);
+        String fileName = networkFormatter.format(targetDateTime);
+        try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + fileName)) {
+            return Importers.loadNetwork(fileName, xiidm);
         } catch (IOException e) {
-            throw new SweInternalException("Could not export XIIDM file");
+            throw new SweInternalException("Could not load network from XIIDM file");
         }
     }
 
