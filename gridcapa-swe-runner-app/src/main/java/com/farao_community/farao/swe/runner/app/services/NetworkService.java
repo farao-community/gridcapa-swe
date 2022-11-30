@@ -62,6 +62,14 @@ public class NetworkService {
         this.businessLogger = businessLogger;
     }
 
+    public Network loadNetworkFromMinio(OffsetDateTime targetDateTime) {
+        try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + networkFormatter.format(targetDateTime))) {
+            return Importers.loadNetwork("xiidmNetwork", xiidm);
+        } catch (IOException e) {
+            throw new SweInternalException("Could not export XIIDM file");
+        }
+    }
+
     public Network importNetwork(SweRequest sweRequest) {
         LOGGER.info("Importing CGMES network");
         List<SweFileResource> listCgms = getCgmAndBoundaryFilesFromRequest(sweRequest);
