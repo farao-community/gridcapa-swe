@@ -31,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -94,7 +92,6 @@ class DichotomyParallelizationTest {
     void testParallelization() {
         when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(Optional.class))).thenReturn("esFrVoltageZipUrl.zip");
         when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
@@ -130,7 +127,6 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
-        when(outputService.buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(Optional.class))).thenReturn("esFrVoltageZipUrl.zip");
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertNull(sweResponse.getEsFrHighestValidStepUrl());

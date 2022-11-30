@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -50,7 +49,7 @@ public class OutputService {
         return df.format(localTime);
     }
 
-    public String buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+    public void buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
         if (voltageMonitoringResult.isPresent()) {
             OffsetDateTime timestamp = sweData.getTimestamp();
             String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
@@ -58,8 +57,7 @@ public class OutputService {
             DateTimeFormatter df = DateTimeFormatter.ofPattern(VOLTAGE_DOC_NAME_REGEX);
             String zipName = df.format(localTime).replace("[direction]", directionString);
             VoltageMonitoringResult voltageRes = voltageMonitoringResult.get();
-            return fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, ProcessType.D2CC, "VOLTAGE_" + directionString);
+            fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, sweData.getProcessType(), "VOLTAGE_" + directionString);
         }
-        return null;
     }
 }

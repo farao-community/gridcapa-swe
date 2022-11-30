@@ -12,14 +12,11 @@ import com.farao_community.farao.dichotomy.shift.SplittingFactors;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
+import com.farao_community.farao.swe.runner.app.dichotomy.shift.*;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.ZonalScalableProvider;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.CountryBalanceComputation;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweNetworkShifter;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweD2ccShiftDispatcher;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,27 +38,13 @@ public class NetworkShifterProvider {
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
-        Network network = getNetworkByDirection(sweData, direction);
+        Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr());
-    }
-
-    public static Network getNetworkByDirection(SweData sweData, DichotomyDirection direction) {
-        Network network = null;
-        if (direction == DichotomyDirection.ES_FR) {
-            network = sweData.getNetworkEsFr();
-        } else if (direction == DichotomyDirection.FR_ES) {
-            network = sweData.getNetworkFrEs();
-        } else if (direction == DichotomyDirection.PT_ES) {
-            network = sweData.getNetworkPtEs();
-        } else if (direction == DichotomyDirection.ES_PT) {
-            network = sweData.getNetworkEsPt();
-        }
-        return network;
     }
 
     private ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {

@@ -47,29 +47,27 @@ public class DichotomyParallelization {
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData) {
-        ExecutionResult<SweDichotomyResult> executionResult = null;
         CompletableFuture<SweDichotomyResult> dichoEsFr = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR);
         CompletableFuture<SweDichotomyResult> dichoFrEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES);
         CompletableFuture<SweDichotomyResult> dichoEsPt = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT);
         CompletableFuture<SweDichotomyResult> dichoPtEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES);
         List<SweDichotomyResult> results = new ArrayList<>();
-        waitAndAddToReults(dichoEsFr, results, DichotomyDirection.ES_FR);
-        waitAndAddToReults(dichoFrEs, results, DichotomyDirection.FR_ES);
-        waitAndAddToReults(dichoEsPt, results, DichotomyDirection.ES_PT);
-        waitAndAddToReults(dichoPtEs, results, DichotomyDirection.PT_ES);
-        executionResult = new ExecutionResult<>(results);
-        return executionResult;
+        results.add(waitAndGet(dichoEsFr, DichotomyDirection.ES_FR));
+        results.add(waitAndGet(dichoFrEs, DichotomyDirection.FR_ES));
+        results.add(waitAndGet(dichoEsPt, DichotomyDirection.ES_PT));
+        results.add(waitAndGet(dichoPtEs, DichotomyDirection.PT_ES));
+        return  new ExecutionResult<>(results);
     }
 
-    private void waitAndAddToReults(CompletableFuture<SweDichotomyResult> dichotomy, List<SweDichotomyResult> results, DichotomyDirection direction) {
+    private SweDichotomyResult waitAndGet(CompletableFuture<SweDichotomyResult> dichotomy, DichotomyDirection direction) {
         try {
-            results.add(dichotomy.get());
+            return dichotomy.get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             dichotomyLogging.logErrorOnDirection(direction, e);
-            results.add(new SweDichotomyResult(direction, null, null, null, null, null));
         }
+        return new SweDichotomyResult(direction, null, null, null, null, null);
     }
 
     private SweDichotomyResult getDichotomyResultByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {

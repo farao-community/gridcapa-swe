@@ -76,7 +76,8 @@ class OutputServiceTest {
 
     @Test
     void buildAndExportEsFrVoltageDoc() {
-        Assertions.assertEquals(VOLTAGE_DOCUMENT_URL_STRING, outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult())));
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult()));
+        Mockito.verify(fileExporter, Mockito.times(1)).saveVoltageMonitoringResultInJsonZip(Mockito.any(VoltageMonitoringResult.class), Mockito.anyString(), Mockito.any(OffsetDateTime.class), Mockito.any(ProcessType.class), Mockito.anyString());
     }
 
     @NotNull
