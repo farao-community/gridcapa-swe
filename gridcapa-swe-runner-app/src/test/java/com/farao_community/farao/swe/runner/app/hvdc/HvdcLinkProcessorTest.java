@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.app.hvdc;
 
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
-import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
@@ -26,7 +25,7 @@ class HvdcLinkProcessorTest {
     @Test
     void testHvdcCreationRoundTrip() {
         // Test that when we create the HVDC then remove it, the network is the same
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         HvdcLinkProcessor.replaceHvdcByEquivalentModel(network, params.getHvdcCreationParametersSet());
@@ -36,7 +35,7 @@ class HvdcLinkProcessorTest {
     @Test
     void testHvdcCreation() {
         // Inspect the contents of the created HVDC lines
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs.xiidm", getClass());
@@ -46,7 +45,7 @@ class HvdcLinkProcessorTest {
     void testHvdcCreationRoundTripInverted() {
         // Test that when we create the HVDC then remove it, the network is the same
         // in this case the power flow on HVDC_FR4-DE1 is inverted
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes_inverted.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes_inverted.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes_inverted.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes_inverted.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         HvdcLinkProcessor.replaceHvdcByEquivalentModel(network, params.getHvdcCreationParametersSet());
@@ -57,7 +56,7 @@ class HvdcLinkProcessorTest {
     void testHvdcCreationInverted() {
         // Inspect the contents of the created HVDC lines
         // in this case the power flow on HVDC_FR4-DE1 is inverted
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes_inverted.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes_inverted.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes_inverted.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes_inverted.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs_inverted.xiidm", getClass());
@@ -65,7 +64,7 @@ class HvdcLinkProcessorTest {
 
     @Test
     void testHvdcCreationAndSetpointModification() {
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         // Modify the state of the HVDC lines and check that this state is impacted on equivalent AC model
@@ -82,7 +81,7 @@ class HvdcLinkProcessorTest {
 
     @Test
     void testDisconnectedAcLine() {
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         network.getLine("FFR4AA1  DDE1AA1  1").getTerminal1().disconnect();
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
@@ -92,7 +91,7 @@ class HvdcLinkProcessorTest {
 
     @Test
     void testDisconnectedAcLine2() {
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         network.getHvdcLine("HVDC_FR4-DE1").getConverterStation(HvdcLine.Side.TWO).getTerminal().disconnect();

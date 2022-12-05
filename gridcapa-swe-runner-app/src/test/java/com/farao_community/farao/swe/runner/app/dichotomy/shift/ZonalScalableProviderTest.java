@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ class ZonalScalableProviderTest {
     void testCountryGeneratorsScalableforFR() {
         String glskUrl = Objects.requireNonNull(getClass().getResource(testDirectory + glskFilename)).toString(); //Glsk file does not contains FR
         OffsetDateTime timestamp = OffsetDateTime.parse("2021-02-09T19:30:00Z");
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         ZonalData<Scalable>  zonalData = zonalScalableProvider.get(glskUrl, network, timestamp);
         Scalable scalableFR = zonalData.getData("10YFR-RTE------C");
         assertNotNull(scalableFR);

@@ -15,9 +15,9 @@ import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.google.common.base.Suppliers;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.iidm.import_.ImportConfig;
-import com.powsybl.iidm.import_.Importers;
+
 import com.powsybl.iidm.modification.scalable.Scalable;
+import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +56,7 @@ class FileImporterTest {
     void setUp() {
         Properties importParams = new Properties();
         importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
-        network = Importers.loadNetwork(
+        network = Network.read(
                 Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
                 LocalComputationManager.getDefault(),
                 Suppliers.memoize(ImportConfig::load).get(),
@@ -74,7 +74,7 @@ class FileImporterTest {
     void testImportCimCracFromUrlWithNetwork() {
         Properties importParams = new Properties();
         importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
-        Network network = Importers.loadNetwork(
+        Network network = Network.read(
                 Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
                 LocalComputationManager.getDefault(),
                 Suppliers.memoize(ImportConfig::load).get(),
