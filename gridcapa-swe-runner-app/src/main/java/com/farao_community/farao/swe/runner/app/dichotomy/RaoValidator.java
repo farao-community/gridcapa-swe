@@ -6,25 +6,31 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.data.rao_result_api.OptimizationState;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
+import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoring;
+import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
-public class RaoValidator implements NetworkValidator<RaoResponse> {
+public class RaoValidator implements NetworkValidator<SweDichotomyValidationData> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RaoValidator.class);
 
     private final FileExporter fileExporter;
@@ -47,7 +53,7 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
     }
 
     @Override
-    public DichotomyStepResult<RaoResponse> validateNetwork(Network network, DichotomyStepResult<RaoResponse> dichotomyStepResult) throws ValidationException {
+    public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(Network network, DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException {
         String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
         String scaledNetworkName = network.getNameOrId().replace(":", "") + ".xiidm";
         String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
@@ -57,7 +63,12 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
-            return DichotomyStepResult.fromNetworkValidationResult(raoResult, raoResponse);
+            if (isPortugalInDirection() && raoResultIsSecure(raoResult)) {
+                AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
+                AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
+                return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, angleMonitoringResult), angleMonitoringResult.isSecure());
+            }
+            return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, null));
         } catch (RuntimeException e) {
             throw new ValidationException("RAO run failed. Nested exception: " + e.getMessage());
         }
@@ -81,5 +92,13 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
             return sweData.getJsonCracPathEsPt();
         }
         throw new SweInvalidDataException("Unknown direction");
+    }
+    
+    private boolean isPortugalInDirection() {
+        return direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES;
+    }
+
+    private boolean raoResultIsSecure(RaoResult raoResult) {
+        return raoResult.getFunctionalCost(OptimizationState.AFTER_CRA) <= 0.0;
     }
 }

@@ -20,6 +20,7 @@ import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
@@ -72,13 +73,13 @@ class DichotomyParallelizationTest {
     private SweData sweData;
 
     @Mock
-    private DichotomyResult<RaoResponse> sweDichotomyResult;
+    private DichotomyResult<SweDichotomyValidationData> sweDichotomyResult;
 
     @Mock
-    private DichotomyStepResult<RaoResponse> highestValidStep;
+    private DichotomyStepResult<SweDichotomyValidationData> highestValidStep;
 
     @Mock
-    private DichotomyStepResult<RaoResponse> lowestInvalidStep;
+    private DichotomyStepResult<SweDichotomyValidationData> lowestInvalidStep;
 
     @Mock
     private RaoResult raoResult;
@@ -113,6 +114,7 @@ class DichotomyParallelizationTest {
         when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);

@@ -7,11 +7,11 @@
 package com.farao_community.farao.swe.runner.app.ttc_doc;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +66,9 @@ public class TtcDocument {
         listDichotomyResults.forEach(r -> addValueToResultMap(r.getDichotomyDirection(), r.getDichotomyResult()));
     }
 
-    private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<RaoResponse> result) {
-        if (result != null && result.hasValidStep()) {
+
+    private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> result) {
+        if (result.hasValidStep()) {
             mapWithValues.put(direction, String.valueOf((int) result.getHighestValidStepValue()));
         } else {
             mapWithValues.put(direction, "");
