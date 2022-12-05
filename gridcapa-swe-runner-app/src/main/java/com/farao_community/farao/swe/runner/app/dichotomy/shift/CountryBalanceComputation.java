@@ -8,6 +8,7 @@ package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 
 import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
+
 import com.powsybl.balances_adjustment.util.CountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.computation.local.LocalComputationManager;

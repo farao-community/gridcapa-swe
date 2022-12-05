@@ -22,7 +22,6 @@ import com.farao_community.farao.swe.runner.app.parallelization.ParallelExecutio
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
-import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +87,7 @@ class DichotomyParallelizationTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        network = Importers.loadNetwork("network.xiidm", getClass().getResourceAsStream("/network/network.xiidm"));
+        network = Network.read("network.xiidm", getClass().getResourceAsStream("/network/network.xiidm"));
         crac = CracFactory.findDefault().create("test-crac");
     }
 
