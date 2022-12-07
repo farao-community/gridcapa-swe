@@ -31,7 +31,6 @@ public class SweData {
     private final String jsonCracPathEsPt;
     private final String jsonCracPathFrEs;
 
-
     public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
         this.id = id;
         this.timestamp = timestamp;
