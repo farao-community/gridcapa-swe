@@ -20,7 +20,10 @@ public class SweData {
     private final String id;
     private final OffsetDateTime timestamp;
     private final ProcessType processType;
-    private final Network network;
+    private final Network networkEsFr;
+    private final Network networkFrEs;
+    private final Network networkEsPt;
+    private final Network networkPtEs;
     private final CimCracCreationContext cracEsPt;
     private final CimCracCreationContext cracFrEs;
     private final MergingViewData mergingViewData;
@@ -28,11 +31,14 @@ public class SweData {
     private final String jsonCracPathEsPt;
     private final String jsonCracPathFrEs;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network network, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
-        this.network = network;
+        this.networkEsFr = networkEsFr;
+        this.networkFrEs = networkFrEs;
+        this.networkEsPt = networkEsPt;
+        this.networkPtEs = networkPtEs;
         this.mergingViewData = mergingViewData;
         this.cracEsPt = cracEsPt;
         this.cracFrEs = cracFrEs;
@@ -53,8 +59,20 @@ public class SweData {
         return processType;
     }
 
-    public Network getNetwork() {
-        return network;
+    public Network getNetworkEsFr() {
+        return networkEsFr;
+    }
+
+    public Network getNetworkFrEs() {
+        return networkFrEs;
+    }
+
+    public Network getNetworkEsPt() {
+        return networkEsPt;
+    }
+
+    public Network getNetworkPtEs() {
+        return networkPtEs;
     }
 
     public MergingViewData getMergingViewData() {

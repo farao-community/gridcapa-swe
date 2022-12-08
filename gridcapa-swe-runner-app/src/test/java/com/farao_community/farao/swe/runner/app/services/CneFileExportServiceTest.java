@@ -91,7 +91,7 @@ class CneFileExportServiceTest {
     void exportCneUrlEsFrHighestValid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -108,7 +108,7 @@ class CneFileExportServiceTest {
     void exportCneUrlFrEsLowestInvalid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -124,7 +124,7 @@ class CneFileExportServiceTest {
     void exportCneUrlEsPtHighestValid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -141,7 +141,7 @@ class CneFileExportServiceTest {
     void exportCneUrlPtEsLowestInvalid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -157,7 +157,7 @@ class CneFileExportServiceTest {
     void exportLowestInvalidCneUrlFailConditionKOAndReturnNull() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -173,7 +173,7 @@ class CneFileExportServiceTest {
     void exportHighestValidCneUrlFailConditionKOAndReturnNull() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);

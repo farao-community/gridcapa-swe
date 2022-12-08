@@ -15,9 +15,11 @@ import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
+import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
+import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,7 +54,8 @@ public class DichotomyRunner {
         Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
         dichotomyLogging.logStartDichotomy(direction, parameters);
         DichotomyEngine<RaoResponse> engine = buildDichotomyEngine(sweData, direction, parameters);
-        return engine.run(sweData.getNetwork());
+        Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
+        return engine.run(network);
     }
 
     DichotomyEngine<RaoResponse> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, Parameters parameters) {

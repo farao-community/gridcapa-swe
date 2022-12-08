@@ -15,6 +15,7 @@ import java.util.concurrent.ForkJoinWorkerThread;
  */
 
 public class SweForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinWorkerThreadFactory {
+
     @Override
     public final ForkJoinWorkerThread newThread(ForkJoinPool pool) {
         return new SweForkJoinWorkerThread(pool);

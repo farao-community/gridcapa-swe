@@ -25,6 +25,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.commons.datasource.MemDataSource;
 import org.springframework.stereotype.Service;
@@ -77,7 +78,7 @@ public class CneFileExportService {
         CimCracCreationContext cracCreationContext = getCimCracCreationContext(sweData, direction);
         MemDataSource memDataSource = new MemDataSource();
         String targetZipFileName = generateCneZipFileName(timestamp, isHighestValid, direction);
-        exportAndZipCneFile(sweData, dichotomyResult, cneExporterParameters, cracCreationContext, memDataSource, targetZipFileName, isHighestValid);
+        exportAndZipCneFile(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext, memDataSource, targetZipFileName, isHighestValid);
         String cneResultPath =  fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
         uploadFileToMinio(isHighestValid, sweData.getProcessType(), direction, timestamp, memDataSource, targetZipFileName, cneResultPath);
         return minioAdapter.generatePreSignedUrl(cneResultPath);
@@ -104,16 +105,16 @@ public class CneFileExportService {
         return sweData.getCracFrEs();
     }
 
-    private void exportAndZipCneFile(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext, MemDataSource memDataSource, String targetZipFileName, boolean isHighestValid) {
+    private void exportAndZipCneFile(SweData sweData, DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext, MemDataSource memDataSource, String targetZipFileName, boolean isHighestValid) {
         try (OutputStream os = memDataSource.newOutputStream(targetZipFileName, false);
              ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
             RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
             if (raoResult == null) {
-                marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, dichotomyResult, cneExporterParameters, cracCreationContext));
+                marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
             } else {
                 SweCneExporter sweCneExporter = new SweCneExporter();
-                sweCneExporter.exportCne(cracCreationContext.getCrac(), sweData.getNetwork(), cracCreationContext,
+                sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkUtil.getNetworkByDirection(sweData, direction), cracCreationContext,
                         raoResult, null, RaoParameters.load(), cneExporterParameters, zipOs);
             }
             zipOs.closeEntry();
@@ -122,8 +123,8 @@ public class CneFileExportService {
         }
     }
 
-    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
-        CriticalNetworkElementMarketDocument marketDocument = createErrorMarketDocumentAndInitializeHeader(sweData, cneExporterParameters);
+    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction,  DichotomyResult<RaoResponse> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
+        CriticalNetworkElementMarketDocument marketDocument = createErrorMarketDocumentAndInitializeHeader(sweData, direction, cneExporterParameters);
         OffsetDateTime offsetDateTime = cracCreationContext.getTimeStamp().withMinute(0);
         Point point = SweCneClassCreator.newPoint(1);
         SeriesPeriod period = SweCneClassCreator.newPeriod(offsetDateTime, "PT60M", point);
@@ -133,7 +134,7 @@ public class CneFileExportService {
         return marketDocument;
     }
 
-    private CriticalNetworkElementMarketDocument createErrorMarketDocumentAndInitializeHeader(SweData sweData, CneExporterParameters cneExporterParameters) {
+    private CriticalNetworkElementMarketDocument createErrorMarketDocumentAndInitializeHeader(SweData sweData, DichotomyDirection direction, CneExporterParameters cneExporterParameters) {
         CriticalNetworkElementMarketDocument marketDocument = new CriticalNetworkElementMarketDocument();
         marketDocument.setMRID(cneExporterParameters.getDocumentId());
         marketDocument.setRevisionNumber(String.valueOf(cneExporterParameters.getRevisionNumber()));
@@ -145,7 +146,7 @@ public class CneFileExportService {
         marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterParameters.getReceiverRole().getCode());
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterParameters.getTimeInterval()));
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(sweData.getNetwork().getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkUtil.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
 

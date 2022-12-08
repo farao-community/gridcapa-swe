@@ -52,6 +52,7 @@ class FilesServiceTest {
     @Test
     void simpleImport() {
         when(networkService.importNetwork(any(SweRequest.class))).thenReturn(mock(Network.class));
+        when(networkService.loadNetworkFromMinio(any(OffsetDateTime.class))).thenReturn(mock(Network.class));
         when(mergingViewService.importMergingView(any(SweRequest.class))).thenReturn(mock(MergingViewData.class));
         when(fileImporter.importCimCrac(any(SweRequest.class))).thenReturn(mock(CimCrac.class));
         when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString())).thenReturn(mock(CimCracCreationContext.class));
