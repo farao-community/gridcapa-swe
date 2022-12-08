@@ -36,7 +36,7 @@ public class NetworkShifterProvider {
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
-        Network network = getNetworkByDirection(sweData, direction);
+        Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
@@ -44,20 +44,6 @@ public class NetworkShifterProvider {
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
                 initialNetPositions);
-    }
-
-    public static Network getNetworkByDirection(SweData sweData, DichotomyDirection direction) {
-        Network network = null;
-        if (direction == DichotomyDirection.ES_FR) {
-            network = sweData.getNetworkEsFr();
-        } else if (direction == DichotomyDirection.FR_ES) {
-            network = sweData.getNetworkFrEs();
-        } else if (direction == DichotomyDirection.PT_ES) {
-            network = sweData.getNetworkPtEs();
-        } else if (direction == DichotomyDirection.ES_PT) {
-            network = sweData.getNetworkEsPt();
-        }
-        return network;
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
@@ -70,6 +56,5 @@ public class NetworkShifterProvider {
                 throw new SweInvalidDataException(String.format("Unknown target process for SWE: %s", processType));
         }
     }
-
 }
 

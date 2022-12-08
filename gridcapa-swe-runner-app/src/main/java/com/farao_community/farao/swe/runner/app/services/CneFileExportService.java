@@ -25,7 +25,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.app.dichotomy.NetworkShifterProvider;
+import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
@@ -162,7 +162,7 @@ public class CneFileExportService {
         marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterParameters.getReceiverRole().getCode());
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterParameters.getTimeInterval()));
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkShifterProvider.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkUtil.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
 

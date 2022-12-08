@@ -128,12 +128,8 @@ class DichotomyParallelizationTest {
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
-        assertEquals("esFrVoltageZipUrl.zip", sweResponse.getEsFrVoltageZipUrl());
-        assertEquals("esFrVoltageZipUrl.zip", sweResponse.getFrEsVoltageZipUrl());
         assertEquals("esFrHighestValidStepUrl.zip", sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl.zip", sweResponse.getEsFrLowestInvalidStepUrl());
-        assertEquals("frEsHighestValidStepUrl.zip", sweResponse.getFrEsHighestValidStepUrl());
-        assertEquals("frEsLowestInvalidStepUrl.zip", sweResponse.getFrEsLowestInvalidStepUrl());
     }
 
     @Test

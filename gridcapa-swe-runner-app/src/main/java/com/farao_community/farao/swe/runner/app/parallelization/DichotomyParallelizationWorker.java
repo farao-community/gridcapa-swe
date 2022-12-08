@@ -17,6 +17,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
+import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
@@ -38,15 +39,17 @@ public class DichotomyParallelizationWorker {
     private final VoltageCheckService voltageCheckService;
     private final CneFileExportService cneFileExportService;
     private final CgmesExportService cgmesExportService;
+    private final OutputService outputService;
 
     public DichotomyParallelizationWorker(DichotomyLogging dichotomyLogging, DichotomyRunner dichotomyRunner,
-                                    VoltageCheckService voltageCheckService, CneFileExportService cneFileExportService,
-                                          CgmesExportService cgmesExportService) {
+                                          VoltageCheckService voltageCheckService, CneFileExportService cneFileExportService,
+                                          CgmesExportService cgmesExportService, OutputService outputService) {
         this.dichotomyLogging = dichotomyLogging;
         this.dichotomyRunner = dichotomyRunner;
         this.voltageCheckService = voltageCheckService;
         this.cneFileExportService = cneFileExportService;
         this.cgmesExportService = cgmesExportService;
+        this.outputService = outputService;
     }
 
     @Async("threadPoolTaskExecutor")
@@ -61,6 +64,7 @@ public class DichotomyParallelizationWorker {
         String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, direction);
         String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, direction);
+        outputService.buildAndExportVoltageDoc(direction, sweData, voltageMonitoringResult);
         dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult);
         // fill response for one dichotomy
         return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl));

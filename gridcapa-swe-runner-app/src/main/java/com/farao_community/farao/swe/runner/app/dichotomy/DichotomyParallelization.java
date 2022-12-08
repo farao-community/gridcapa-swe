@@ -71,6 +71,7 @@ public class DichotomyParallelization {
         } catch (ExecutionException e) {
             throw new SweInternalException("Error on dichotomy direction", e);
         }
+        return new SweDichotomyResult(direction, null, null, null, null, null);
     }
 
     private SweDichotomyResult getDichotomyResultByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {

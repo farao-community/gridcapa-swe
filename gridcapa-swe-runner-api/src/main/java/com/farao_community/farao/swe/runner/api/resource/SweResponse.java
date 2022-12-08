@@ -19,35 +19,21 @@ public class SweResponse {
     @Id
     private final String id;
     private final String ttcDocUrl;
-    private final String esFrVoltageZipUrl;
-    private final String frEsVoltageZipUrl;
-    private final String esFrCgmesZipUrl;
-    private final String frEsCgmesZipUrl;
     private final String esFrHighestValidStepUrl;
     private final String esFrLowestInvalidStepUrl;
-    private final String frEsHighestValidStepUrl;
-    private final String frEsLowestInvalidStepUrl;
+    private final String esFrCgmesZipUrl;
 
     @JsonCreator
     public SweResponse(@JsonProperty("id") String id,
                        @JsonProperty("ttcDocUrl") String ttcDocUrl,
-                       @JsonProperty("voltageEsFrZipUrl") String esFrVoltageZipUrl,
-                       @JsonProperty("voltageFrEsZipUrl") String frEsVoltageZipUrl,
-                       @JsonProperty("esFrCgmesZipUrl") String esFrCgmesZipUrl,
-                       @JsonProperty("frEsCgmesZipUrl") String frEsCgmesZipUrl,
                        @JsonProperty("esFrHighestValidStepUrl") String esFrHighestValidStepUrl,
                        @JsonProperty("esFrLowestInvalidStepUrl") String esFrLowestInvalidStepUrl,
-                       @JsonProperty("frEsHighestValidStepUrl") String frEsHighestValidStepUrl,
-                       @JsonProperty("frEsLowestInvalidStepUrl") String frEsLowestInvalidStepUrl) {
+                       @JsonProperty("esFrCgmesZipUrl") String esFrCgmesZipUrl) {
         this.id = id;
         this.ttcDocUrl = ttcDocUrl;
         this.esFrHighestValidStepUrl = esFrHighestValidStepUrl;
         this.esFrLowestInvalidStepUrl = esFrLowestInvalidStepUrl;
         this.esFrCgmesZipUrl = esFrCgmesZipUrl;
-        this.frEsCgmesZipUrl = frEsCgmesZipUrl;
-        this.frEsVoltageZipUrl = frEsVoltageZipUrl;
-        this.frEsHighestValidStepUrl = frEsHighestValidStepUrl;
-        this.frEsLowestInvalidStepUrl = frEsLowestInvalidStepUrl;
     }
 
     public String getId() {
@@ -58,16 +44,8 @@ public class SweResponse {
         return ttcDocUrl;
     }
 
-    public String getEsFrVoltageZipUrl() {
-        return esFrVoltageZipUrl;
-    }
-
     public String getEsFrCgmesZipUrl() {
         return esFrCgmesZipUrl;
-    }
-
-    public String getFrEsCgmesZipUrl() {
-        return frEsCgmesZipUrl;
     }
 
     public String getEsFrHighestValidStepUrl() {
@@ -76,17 +54,5 @@ public class SweResponse {
 
     public String getEsFrLowestInvalidStepUrl() {
         return esFrLowestInvalidStepUrl;
-    }
-
-    public String getFrEsVoltageZipUrl() {
-        return frEsVoltageZipUrl;
-    }
-
-    public String getFrEsHighestValidStepUrl() {
-        return frEsHighestValidStepUrl;
-    }
-
-    public String getFrEsLowestInvalidStepUrl() {
-        return frEsLowestInvalidStepUrl;
     }
 }
