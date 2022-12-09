@@ -19,7 +19,6 @@ class SweResponseTest {
     @Test
     void simpleRequestTest() {
         SweResponse sweResponse = new SweResponse("id", "ttcDocUrl",
-
                 "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl", "esFrCgmesZipUrl");
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());

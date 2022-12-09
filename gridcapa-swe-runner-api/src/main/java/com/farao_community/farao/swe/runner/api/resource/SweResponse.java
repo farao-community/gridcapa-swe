@@ -44,15 +44,15 @@ public class SweResponse {
         return ttcDocUrl;
     }
 
-    public String getEsFrCgmesZipUrl() {
-        return esFrCgmesZipUrl;
-    }
-
     public String getEsFrHighestValidStepUrl() {
         return esFrHighestValidStepUrl;
     }
 
     public String getEsFrLowestInvalidStepUrl() {
         return esFrLowestInvalidStepUrl;
+    }
+
+    public String getEsFrCgmesZipUrl() {
+        return esFrCgmesZipUrl;
     }
 }
