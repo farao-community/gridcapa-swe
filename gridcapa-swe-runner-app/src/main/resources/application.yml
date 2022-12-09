@@ -35,7 +35,7 @@ swe-runner:
     parameters:
       ES_FR:
         min-value: 0
-        max-value: 800
+        max-value: 6400
         precision: 50
         tolerance-Es-Fr: 10
         tolerance-Es-Pt: 50
@@ -61,7 +61,6 @@ swe-runner:
     - http://localhost:9000/
     - http://minio:9000/
     - file:/
-    - http://172.17.0.1:9000/
 
 rao-runner-server:
   amqp:
@@ -73,4 +72,4 @@ minio-adapter:
   base-path: /SWE/D2CC
   access-key: gridcapa
   secret-key: gridcapa
-  url: http://172.17.0.1:9000/
+  url: http://localhost:9000
