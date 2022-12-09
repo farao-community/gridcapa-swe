@@ -63,7 +63,7 @@ public class NetworkService {
     public Network loadNetworkFromMinio(OffsetDateTime targetDateTime) {
         String fileName = networkFormatter.format(targetDateTime);
         try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + fileName)) {
-            return Importers.loadNetwork(fileName, xiidm);
+            return Network.read(fileName, xiidm);
         } catch (IOException e) {
             throw new SweInternalException("Could not load network from XIIDM file");
         }

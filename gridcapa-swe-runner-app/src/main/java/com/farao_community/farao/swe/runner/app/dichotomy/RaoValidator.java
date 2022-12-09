@@ -13,6 +13,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
+import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
@@ -64,12 +65,21 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
 
     private RaoRequest buildRaoRequest(String networkPresignedUrl, String scaledNetworkDirPath) {
         String resultsDestination = REGION + MINIO_SEPARATOR + sweData.getProcessType() + MINIO_SEPARATOR + scaledNetworkDirPath;
-        return new RaoRequest(sweData.getId(), networkPresignedUrl, sweData.getJsonCracPathFrEs(), raoParametersUrl, resultsDestination);
+        return new RaoRequest(sweData.getId(), networkPresignedUrl, getMatchingCracPath(direction, sweData), raoParametersUrl, resultsDestination);
     }
 
     private String generateScaledNetworkDirPath(Network network) {
         String basePath = fileExporter.makeDestinationDichotomyPath(sweData.getTimestamp(), FileExporter.FileKind.ARTIFACTS, direction);
         String variantName = network.getVariantManager().getWorkingVariantId();
         return String.format("%s/%s-%s/", basePath, ++variantCounter, variantName);
+    }
+
+    private String getMatchingCracPath(DichotomyDirection direction, SweData sweData) {
+        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
+            return sweData.getJsonCracPathFrEs();
+        } else if (direction.equals(DichotomyDirection.ES_PT) || direction.equals(DichotomyDirection.PT_ES)) {
+            return sweData.getJsonCracPathEsPt();
+        }
+        throw new SweInvalidDataException("Unknown direction");
     }
 }
