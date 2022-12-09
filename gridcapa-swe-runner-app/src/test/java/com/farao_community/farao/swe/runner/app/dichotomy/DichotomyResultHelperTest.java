@@ -17,7 +17,6 @@ import com.farao_community.farao.data.crac_creation.creator.cim.parameters.Range
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.data.rao_result_json.RaoResultImporter;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
-import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ class DichotomyResultHelperTest {
 
     @BeforeAll
     void setUp() {
-        Network network = Importers.loadNetwork("/dichotomy/TestCase16NodesWith2Hvdc.xiidm", getClass().getResourceAsStream("/dichotomy/TestCase16NodesWith2Hvdc.xiidm"));
+        Network network = Network.read("/dichotomy/TestCase16NodesWith2Hvdc.xiidm", getClass().getResourceAsStream("/dichotomy/TestCase16NodesWith2Hvdc.xiidm"));
         InputStream cracIs = getClass().getResourceAsStream("/dichotomy/CIM_CRAC.xml");
         CimCracImporter cracImporter = new CimCracImporter();
         CimCrac cimCrac = cracImporter.importNativeCrac(cracIs);

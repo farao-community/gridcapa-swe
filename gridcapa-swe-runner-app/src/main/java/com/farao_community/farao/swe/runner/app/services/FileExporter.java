@@ -24,7 +24,6 @@ import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
-import com.powsybl.iidm.export.Exporters;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -161,10 +160,10 @@ public class FileExporter {
         MemDataSource memDataSource = new MemDataSource();
         switch (format) {
             case "UCTE":
-                Exporters.export("UCTE", network, new Properties(), memDataSource);
+                network.write("UCTE", new Properties(), memDataSource);
                 return memDataSource.newInputStream("", "uct");
             case "XIIDM":
-                Exporters.export("XIIDM", network, new Properties(), memDataSource);
+                network.write("XIIDM", new Properties(), memDataSource);
                 return memDataSource.newInputStream("", "xiidm");
             default:
                 throw new UnsupportedOperationException(String.format("Network format %s not supported", format));

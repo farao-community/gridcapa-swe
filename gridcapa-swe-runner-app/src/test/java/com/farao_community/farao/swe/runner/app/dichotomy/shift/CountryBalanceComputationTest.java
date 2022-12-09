@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 
-import com.powsybl.iidm.import_.Importers;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +22,7 @@ class CountryBalanceComputationTest {
 
     @Test
     void testCountryGeneratorsScalableforFR() {
-        Network network = Importers.loadNetwork("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         Map<String, Double> countriesBalances = CountryBalanceComputation.computeSweCountriesBalances(network);
         assertEquals(3, countriesBalances.size());
 
