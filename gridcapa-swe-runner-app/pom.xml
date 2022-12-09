@@ -73,9 +73,7 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-voltage-monitoring</artifactId>
-            <!-- TODO remove once farao dependencies updated -->
-            <version>4.2.0</version>
+            <artifactId>farao-angle-monitoring</artifactId>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
