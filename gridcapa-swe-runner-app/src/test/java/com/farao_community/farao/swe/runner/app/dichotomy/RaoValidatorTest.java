@@ -91,6 +91,35 @@ class RaoValidatorTest {
         }
     }
 
+
+    @Test
+    void simpleTestPortugal2() {
+
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.ES_PT);
+        when(network.getVariantManager()).thenReturn(variantManager);
+        when(network.getNameOrId()).thenReturn("network-id");
+        when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
+        when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
+        when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
+        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
+        when(raoResult.getFunctionalCost(OptimizationState.AFTER_CRA)).thenReturn(22.0);
+        when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
+        when(sweData.getGlskUrl()).thenReturn("glsk-url");
+        when(cimCracCreationContext.getCrac()).thenReturn(crac);
+        when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+        try {
+            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
+            assertNotNull(result);
+            assertFalse(result.isFailed());
+        } catch (ValidationException e) {
+            fail("RaoValidator shouldn't throw exception here", e);
+        }
+    }
+
     @Test
     void simpleTestFrance() {
 
