@@ -93,7 +93,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         }
         throw new SweInvalidDataException("Unknown direction");
     }
-    
+
     private boolean isPortugalInDirection() {
         return direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES;
     }
