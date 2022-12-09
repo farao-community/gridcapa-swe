@@ -25,7 +25,6 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -119,5 +118,4 @@ class RaoValidatorTest {
             fail("RaoValidator shouldn't throw exception here", e);
         }
     }
-
 }
