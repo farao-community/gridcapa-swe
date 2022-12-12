@@ -17,6 +17,7 @@ import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
+import com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
@@ -29,6 +30,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -55,6 +59,9 @@ class DichotomyParallelizationTest {
 
     @MockBean
     private CgmesExportService cgmesExportService;
+
+    @MockBean
+    private DichotomyParallelizationWorker worker;
 
     @Mock
     private SweData sweData;
@@ -104,10 +111,11 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getNetworkPtEs()).thenReturn(network);
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, true, DichotomyDirection.ES_FR)).thenReturn("esFrHighestValidStepUrl.zip");
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, true, DichotomyDirection.FR_ES)).thenReturn("frEsHighestValidStepUrl.zip");
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.FR_ES)).thenReturn("frEsLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertEquals("esFrHighestValidStepUrl.zip", sweResponse.getEsFrHighestValidStepUrl());
@@ -125,7 +133,11 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        when(cneFileExportService.exportCneUrl(sweData, sweDichotomyResult, false, DichotomyDirection.ES_FR)).thenReturn("esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrLowestInvalidStepUrl.zip");
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertNull(sweResponse.getEsFrHighestValidStepUrl());
