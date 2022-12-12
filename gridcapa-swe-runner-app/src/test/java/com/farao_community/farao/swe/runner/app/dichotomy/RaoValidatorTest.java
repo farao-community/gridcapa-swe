@@ -25,6 +25,7 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -45,6 +46,8 @@ class RaoValidatorTest {
     private FileImporter fileImporter;
     @MockBean
     private RaoRunnerClient raoRunnerClient;
+    @MockBean
+    private Logger businessLogger;
 
     @Mock
     private SweData sweData;
@@ -66,7 +69,7 @@ class RaoValidatorTest {
     @Test
     void simpleTestPortugal() {
 
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.ES_PT);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.ES_PT, businessLogger);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -93,7 +96,7 @@ class RaoValidatorTest {
 
     @Test
     void simpleTestPortugal2() {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.ES_PT);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.ES_PT, businessLogger);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -121,7 +124,7 @@ class RaoValidatorTest {
     @Test
     void simpleTestFrance() {
 
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.FR_ES);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.FR_ES, businessLogger);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");

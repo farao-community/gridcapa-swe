@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 public class RaoValidator implements NetworkValidator<SweDichotomyValidationData> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RaoValidator.class);
 
+    private final Logger businessLogger;
+
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
     private final String raoParametersUrl;
@@ -43,13 +45,14 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, String raoParametersUrl, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, String raoParametersUrl, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, Logger businessLogger) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoParametersUrl = raoParametersUrl;
         this.raoRunnerClient = raoRunnerClient;
         this.sweData = sweData;
         this.direction = direction;
+        this.businessLogger = businessLogger;
     }
 
     @Override
@@ -66,6 +69,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             if (isPortugalInDirection() && raoResultIsSecure(raoResult)) {
                 AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
                 AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
+                businessLogger.info("[{}] : Angle monitoring result {}", direction, angleMonitoringResult.getStatus());
                 return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, angleMonitoringResult), angleMonitoringResult.isSecure());
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, null));

@@ -20,6 +20,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationDat
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.iidm.network.Network;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,18 +37,22 @@ public class DichotomyRunner {
     private final NetworkShifterProvider networkShifterProvider;
     private final RaoRunnerClient raoRunnerClient;
 
+    private final Logger businessLogger;
+
     public DichotomyRunner(DichotomyConfiguration dichotomyConfiguration,
                            DichotomyLogging dichotomyLogging,
                            FileExporter fileExporter,
                            FileImporter fileImporter,
                            NetworkShifterProvider networkShifterProvider,
-                           RaoRunnerClient raoRunnerClient) {
+                           RaoRunnerClient raoRunnerClient,
+                           Logger businessLogger) {
         this.dichotomyConfiguration = dichotomyConfiguration;
         this.dichotomyLogging = dichotomyLogging;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.networkShifterProvider = networkShifterProvider;
         this.raoRunnerClient = raoRunnerClient;
+        this.businessLogger = businessLogger;
     }
 
     public DichotomyResult<SweDichotomyValidationData> run(SweData sweData, DichotomyDirection direction) {
@@ -68,7 +73,7 @@ public class DichotomyRunner {
 
     private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction) {
         String raoParametersURL = fileExporter.saveRaoParameters(sweData);
-        return new RaoValidator(fileExporter, fileImporter, raoParametersURL, raoRunnerClient, sweData, direction);
+        return new RaoValidator(fileExporter, fileImporter, raoParametersURL, raoRunnerClient, sweData, direction, businessLogger);
     }
 
 }
