@@ -43,11 +43,11 @@ public class DichotomyLogging {
     }
 
     public void logStartDichotomy(DichotomyDirection direction, Parameters parameters) {
-        businessLogger.info("[{}] : Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction, parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
+        businessLogger.info("[{}] : Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction.getName(), parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 
     public void logEndOneDichotomy(DichotomyDirection direction) {
-        businessLogger.info("[{}] : Dichotomy finished", direction);
+        businessLogger.info("[{}] : Dichotomy finished", direction.getName());
     }
 
     public void logEndAllDichotomies() {
@@ -55,7 +55,7 @@ public class DichotomyLogging {
     }
 
     public void logErrorOnDirection(DichotomyDirection direction, Throwable e) {
-        businessLogger.error("[{}] : Error running dichotomy on this direction", direction, e);
+        businessLogger.error("[{}] : Error running dichotomy on this direction", direction.getName(), e);
     }
 
     public  void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
@@ -74,8 +74,8 @@ public class DichotomyLogging {
             printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
             printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
         }
-        businessLogger.info(SUMMARY, direction, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
-        businessLogger.info(SUMMARY_BD, direction, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
+        businessLogger.info(SUMMARY, direction.getName(), limitingCause, limitingElement, printablePrasIds, printableCrasIds);
+        businessLogger.info(SUMMARY_BD, direction.getName(), currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
     }
 
     private static String toString(Collection<String> c) {
