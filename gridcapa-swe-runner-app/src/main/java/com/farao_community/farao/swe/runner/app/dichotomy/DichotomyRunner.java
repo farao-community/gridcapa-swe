@@ -63,8 +63,7 @@ public class DichotomyRunner {
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 INDEX_STRATEGY_CONFIGURATION,
                 networkShifterProvider.get(sweData, direction),
-                getNetworkValidator(sweData, direction),
-                direction.getName());
+                getNetworkValidator(sweData, direction));
     }
 
     private NetworkValidator<RaoResponse> getNetworkValidator(SweData sweData, DichotomyDirection direction) {

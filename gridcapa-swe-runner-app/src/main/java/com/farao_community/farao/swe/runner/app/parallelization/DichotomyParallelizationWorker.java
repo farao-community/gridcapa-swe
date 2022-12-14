@@ -55,6 +55,7 @@ public class DichotomyParallelizationWorker {
     public CompletableFuture<SweDichotomyResult> runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
         // propagate in logs MDC the task requestId as an extra field to be able to send logs with calculation tasks.
         MDC.put("gridcapa-task-id", sweData.getId());
+        MDC.put("eventPrefix", direction.getName());
         DichotomyResult<RaoResponse> dichotomyResult = dichotomyRunner.run(sweData, direction);
         dichotomyLogging.logEndOneDichotomy(direction);
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)

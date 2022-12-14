@@ -31,7 +31,7 @@ public class VoltageCheckService {
     public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, DichotomyDirection direction) {
 
         if ((direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) && dichotomyResult.hasValidStep()) {
-            businessLogger.info("[{}] : Running voltage check", direction.getName());
+            businessLogger.info("Running voltage check");
             Crac crac = sweData.getCracFrEs().getCrac();
             Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
