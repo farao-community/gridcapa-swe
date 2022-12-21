@@ -53,7 +53,6 @@ public class DichotomyParallelizationWorker {
 
     @Async("threadPoolTaskExecutor")
     public CompletableFuture<SweDichotomyResult> runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
-        Thread.currentThread().setName(sweData.getId());
         // propagate in logs MDC the task requestId as an extra field to be able to send logs with calculation tasks.
         MDC.put("gridcapa-task-id", sweData.getId());
         MDC.put("eventPrefix", direction.getName());

@@ -143,4 +143,27 @@ class DichotomyParallelizationTest {
         assertNull(sweResponse.getEsFrHighestValidStepUrl());
         assertEquals("esFrLowestInvalidStepUrl.zip", sweResponse.getEsFrLowestInvalidStepUrl());
     }
+
+    @Test
+    void testParallelizationWithNoResult() {
+        when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
+        when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
+        when(sweDichotomyResult.hasValidStep()).thenReturn(false);
+        when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, null, null, null, null, null);
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
+        assertNull(sweResponse.getTtcDocUrl());
+        assertNull(sweResponse.getEsFrHighestValidStepUrl());
+        assertNull(sweResponse.getEsFrLowestInvalidStepUrl());
+    }
+
 }
