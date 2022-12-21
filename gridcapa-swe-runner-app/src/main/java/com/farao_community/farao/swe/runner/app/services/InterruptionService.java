@@ -9,8 +9,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -19,18 +18,18 @@ import java.util.stream.Collectors;
 public class InterruptionService {
 
     public void interruption(String taskId) {
-        List<Thread> threads = isRunning(taskId);
-        while (threads != null && !threads.isEmpty()) {
-            threads.stream().forEach(Thread::interrupt);
-            threads = isRunning(taskId);
+        Optional<Thread> thread = isRunning(taskId);
+        while (thread.isPresent()) {
+            thread.get().interrupt();
+            thread = isRunning(taskId);
         }
     }
 
-    private List<Thread> isRunning(String id) {
+    private Optional<Thread> isRunning(String id) {
         return Thread.getAllStackTraces()
                 .keySet()
                 .stream()
                 .filter(t -> t.getName().equals(id))
-                .collect(Collectors.toUnmodifiableList());
+                .findFirst();
     }
 }

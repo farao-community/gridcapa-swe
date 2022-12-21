@@ -55,7 +55,7 @@ public class DichotomyLogging {
     }
 
     public void logErrorOnDirection(DichotomyDirection direction, Throwable e) {
-        businessLogger.error("[{}] : Error running dichotomy on this direction", direction, e);
+        businessLogger.error("[{}] : Error running dichotomy on this direction: {}", direction, e.getMessage());
     }
 
     public  void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
