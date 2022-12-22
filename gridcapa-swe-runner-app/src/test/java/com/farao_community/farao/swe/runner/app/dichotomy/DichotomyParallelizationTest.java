@@ -14,6 +14,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
+import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -27,6 +28,7 @@ import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,9 +36,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -83,6 +88,9 @@ class DichotomyParallelizationTest {
 
     @Mock
     private CimCracCreationContext cracCreationContext;
+
+    @Mock
+    private Future future;
 
     private Network network;
     private Crac crac;
@@ -183,5 +191,26 @@ class DichotomyParallelizationTest {
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         assertThrows(SweInternalException.class, () -> dichotomyParallelization.launchDichotomy(sweData));
+    }
+
+    @Test
+    void testParallelizationWithException() throws ExecutionException, InterruptedException {
+        when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
+        when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
+        when(sweDichotomyResult.hasValidStep()).thenReturn(false);
+        when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, null, null, null, null, null);
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(future);
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(future);
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(future);
+        when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(future);
+        when(future.get()).thenThrow(InterruptedException.class);
+        assertThrows(SweInvalidDataException.class, () -> dichotomyParallelization.launchDichotomy(sweData));
+        verify(future, Mockito.times(4)).cancel(true);
     }
 }
