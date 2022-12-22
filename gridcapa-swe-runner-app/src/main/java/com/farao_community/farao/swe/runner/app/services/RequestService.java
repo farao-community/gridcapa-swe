@@ -66,7 +66,6 @@ public class RequestService {
                 LOGGER.info("Swe response sent: {}", resp.get());
             } else {
                 businessLogger.info("SWE run has been interrupted");
-                streamBridge.send(STOP_RAO_BINDING, sweRequestId);
                 result = sendSweResponse(new SweResponse(sweRequestId, null, null, null, null));
             }
         } catch (Exception e) {
@@ -77,6 +76,7 @@ public class RequestService {
 
     private byte[] sendSweResponse(SweResponse sweResponse) {
         if (sweResponse.getTtcDocUrl() == null) {
+            streamBridge.send(STOP_RAO_BINDING, sweResponse.getId());
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.INTERRUPTED));
         } else {
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.SUCCESS));

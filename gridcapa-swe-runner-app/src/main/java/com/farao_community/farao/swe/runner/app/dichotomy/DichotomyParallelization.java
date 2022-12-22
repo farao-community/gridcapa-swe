@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -41,44 +42,37 @@ public class DichotomyParallelization {
     public SweResponse launchDichotomy(SweData sweData) {
         ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData);
         dichotomyLogging.logEndAllDichotomies();
-        if (isAllEmptyResults(executionResult)) {
-            return new SweResponse(sweData.getId(), null, null, null, null);
-        } else {
-            String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
-            SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
-            return new SweResponse(sweData.getId(), ttcDocUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), esFrResult.getExportedCgmesUrl());
-        }
+        String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
+        SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
+        return new SweResponse(sweData.getId(), ttcDocUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), esFrResult.getExportedCgmesUrl());
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData) {
         List<SweDichotomyResult> results = new ArrayList<>();
-        CompletableFuture<SweDichotomyResult> dichoEsFr = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR);
-        CompletableFuture<SweDichotomyResult> dichoFrEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES);
-        CompletableFuture<SweDichotomyResult> dichoEsPt = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT);
-        CompletableFuture<SweDichotomyResult> dichoPtEs = worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES);
+        List<Future<SweDichotomyResult>> futures = new ArrayList<>();
         try {
-            results.add(waitAndGet(dichoEsFr, DichotomyDirection.ES_FR));
-            results.add(waitAndGet(dichoFrEs, DichotomyDirection.FR_ES));
-            results.add(waitAndGet(dichoEsPt, DichotomyDirection.ES_PT));
-            results.add(waitAndGet(dichoPtEs, DichotomyDirection.PT_ES));
+            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR));
+            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES));
+            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT));
+            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES));
+            for (Future<SweDichotomyResult> future : futures) {
+                results.add(waitAndGet(future));
+            }
         } catch (InterruptedException e) {
-            dichoEsFr.cancel(true);
-            dichoFrEs.cancel(true);
-            dichoEsPt.cancel(true);
-            dichoPtEs.cancel(true);
+            futures.stream().forEach(f -> f.cancel(true));
+            Thread.currentThread().interrupt();
         }
         return new ExecutionResult<>(results);
     }
 
-    private SweDichotomyResult waitAndGet(CompletableFuture<SweDichotomyResult> dichotomy, DichotomyDirection direction) throws InterruptedException {
+    private SweDichotomyResult waitAndGet(Future<SweDichotomyResult> dichotomy) throws InterruptedException {
         try {
             return dichotomy.get();
         } catch (InterruptedException e) {
             throw e;
         } catch (ExecutionException e) {
-            dichotomyLogging.logErrorOnDirection(e);
+            throw new SweInternalException("Error on dichotomy direction", e);
         }
-        return new SweDichotomyResult(direction, null, null, null, null, null);
     }
 
     private SweDichotomyResult getDichotomyResultByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {
@@ -87,10 +81,5 @@ public class DichotomyParallelization {
             throw new SweInvalidDataException(String.format("No dichotomy result found for direction: [ %s ]", direction.name()));
         }
         return result.get();
-    }
-
-    private boolean isAllEmptyResults(ExecutionResult<SweDichotomyResult> executionResult) {
-        List<SweDichotomyResult> results = executionResult.getResult();
-        return results.isEmpty() || results.stream().allMatch(sweDR -> sweDR.getDichotomyResult() == null && sweDR.getExportedCgmesUrl() == null);
     }
 }
