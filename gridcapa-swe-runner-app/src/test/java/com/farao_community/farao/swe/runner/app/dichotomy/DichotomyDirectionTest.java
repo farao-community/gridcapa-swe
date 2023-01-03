@@ -14,6 +14,6 @@ class DichotomyDirectionTest {
     @Test
     void simpleTest() {
         DichotomyDirection directionEsFr = DichotomyDirection.ES_FR;
-        assertEquals("ES-FR", directionEsFr.getDirection());
+        assertEquals("ES-FR", directionEsFr.getName());
     }
 }

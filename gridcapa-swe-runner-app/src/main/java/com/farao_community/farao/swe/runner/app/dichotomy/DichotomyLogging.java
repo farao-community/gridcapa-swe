@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 public class DichotomyLogging {
 
     private final Logger businessLogger;
-    private static final String SUMMARY = "Summary [{}] :  " +
+    private static final String SUMMARY = "Summary :  " +
             "Limiting event : {},  \n" +
             "Limiting element : {},  \n" +
             "PRAs : {},  \n" +
             "CRAs : {}.";
-    private static final String SUMMARY_BD = "Summary BD [{}] :  " +
+    private static final String SUMMARY_BD = "Summary BD :  " +
             "Current TTC : {},  \n" +
             "Previous TTC : {},  \n" +
             "Voltage Check : {},  \n" +
@@ -42,20 +42,20 @@ public class DichotomyLogging {
         this.businessLogger = businessLogger;
     }
 
-    public void logStartDichotomy(DichotomyDirection direction, Parameters parameters) {
-        businessLogger.info("[{}] : Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", direction, parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
+    public void logStartDichotomy(Parameters parameters) {
+        businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 
-    public void logEndOneDichotomy(DichotomyDirection direction) {
-        businessLogger.info("[{}] : Dichotomy finished", direction);
+    public void logEndOneDichotomy() {
+        businessLogger.info("Dichotomy finished");
     }
 
     public void logEndAllDichotomies() {
         businessLogger.info("All - Dichotomies are done");
     }
 
-    public void logErrorOnDirection(DichotomyDirection direction, Throwable e) {
-        businessLogger.error("[{}] : Error running dichotomy on this direction", direction, e);
+    public void logErrorOnDirection(Throwable e) {
+        businessLogger.error("Error running dichotomy on direction", e);
     }
 
     public  void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
@@ -74,8 +74,8 @@ public class DichotomyLogging {
             printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
             printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
         }
-        businessLogger.info(SUMMARY, direction, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
-        businessLogger.info(SUMMARY_BD, direction, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
+        businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
+        businessLogger.info(SUMMARY_BD, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
     }
 
     private static String toString(Collection<String> c) {
