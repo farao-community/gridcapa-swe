@@ -59,7 +59,6 @@ class SweNetworkShifterTest {
         assertEquals(0., shifts.get("ES_FR"), 0.001);
     }
 
-
     @Test
     void checkIdccEsFrTargetExchangesCalculatedCorrectly() {
         Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
