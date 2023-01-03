@@ -61,7 +61,7 @@ public final class SweNetworkShifter implements NetworkShifter {
 
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
         businessLogger.info(String.format("[%s] : Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", direction, scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT"))));
-        Map<String, Double> targetExchanges = processType.equals(ProcessType.IDCC) ? getIdccTargetExchanges(stepValue, initialNetPositions) : getD2ccTargetExchanges(stepValue);
+        Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
         int iterationCounter = 0;
         boolean shiftSucceed = false;
 
@@ -133,6 +133,10 @@ public final class SweNetworkShifter implements NetworkShifter {
         // Step 5: Reset current variant with initial state
         network.getVariantManager().setWorkingVariant(initialVariantId);
         network.getVariantManager().removeVariant(workingVariantCopyId);
+    }
+
+    Map<String, Double> getTargetExchanges(double stepValue) {
+        return processType.equals(ProcessType.IDCC) ? getIdccTargetExchanges(stepValue, initialNetPositions) : getD2ccTargetExchanges(stepValue);
     }
 
     private Map<String, Double> getIdccTargetExchanges(double stepValue, Map<String, Double> initialNetPositions) {

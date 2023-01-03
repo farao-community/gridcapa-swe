@@ -42,7 +42,8 @@ public class NetworkShifterProvider {
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(), initialNetPositions);
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
+                initialNetPositions);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
