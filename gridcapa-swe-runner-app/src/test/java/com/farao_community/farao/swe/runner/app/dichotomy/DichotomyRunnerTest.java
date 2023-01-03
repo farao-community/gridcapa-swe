@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -49,7 +47,7 @@ class DichotomyRunnerTest {
     private Parameters parameters;
 
     @Test
-    void testBuildDichotomyEngine() throws IOException {
+    void testBuildDichotomyEngine() {
         when(networkShifterProvider.get(any(SweData.class), any(DichotomyDirection.class))).thenReturn(networkShifter);
         when(fileExporter.saveRaoParameters(sweData)).thenReturn("raoParameters.json");
         DichotomyEngine<RaoResponse> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, parameters);

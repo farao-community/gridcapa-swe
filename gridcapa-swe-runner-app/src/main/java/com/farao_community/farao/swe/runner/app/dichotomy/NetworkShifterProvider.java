@@ -45,7 +45,7 @@ public class NetworkShifterProvider {
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(), initialNetPositions);
     }
 
-    private ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
+    ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
         switch (processType) {
             case D2CC:
                 return new SweD2ccShiftDispatcher(direction, initialNetPositions);
