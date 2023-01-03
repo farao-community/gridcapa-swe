@@ -11,19 +11,14 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweD2ccShiftDispatcher;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweIdccShiftDispatcher;
-import com.farao_community.farao.swe.runner.app.domain.SweData;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.OffsetDateTime;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
@@ -50,12 +45,4 @@ class NetworkShifterProviderTest {
         assertTrue(shiftDispatcher instanceof SweIdccShiftDispatcher);
     }
 
-    @Test
-    void checkNetworkShifterProviderInstantiation() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs");
-        NetworkShifterProvider networkShifterProviderMock = mock(NetworkShifterProvider.class);
-        when(networkShifterProviderMock.get(any(SweData.class), any(DichotomyDirection.class))).thenReturn(networkShifter);
-        NetworkShifter ns = networkShifterProviderMock.get(sweData, DichotomyDirection.FR_ES);
-        assertNotNull(ns);
-    }
 }
