@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweD2ccShiftDispatcher;
@@ -29,15 +30,23 @@ class NetworkShifterProviderTest {
     private final Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
 
     @Test
-    void checkThatD2ccShiftDispatcherIsChosen() {
-        ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.D2CC, DichotomyDirection.ES_FR, intialNetPositions);
+    void checkThatD2ccShiftDispatcherIsChosen() throws ShiftingException {
+        ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.D2CC, DichotomyDirection.FR_ES, intialNetPositions);
         assertTrue(shiftDispatcher instanceof SweD2ccShiftDispatcher);
+        Map<String, Double> shifts = shiftDispatcher.dispatch(1000);
+        assertEquals(900, shifts.get("10YFR-RTE------C"));
+        assertEquals(-150, shifts.get("10YPT-REN------W"));
+        assertEquals(-1050, shifts.get("10YES-REE------0"));
     }
 
     @Test
-    void checkThatIdccShiftDispatcherIsChosen() {
-        ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.IDCC, DichotomyDirection.ES_FR, intialNetPositions);
+    void checkThatIdccShiftDispatcherIsChosen() throws ShiftingException {
+        ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.IDCC, DichotomyDirection.ES_PT, intialNetPositions);
         assertTrue(shiftDispatcher instanceof SweIdccShiftDispatcher);
+        Map<String, Double> shifts = shiftDispatcher.dispatch(500);
+        assertEquals(-200, shifts.get("10YFR-RTE------C"));
+        assertEquals(-500, shifts.get("10YPT-REN------W"));
+        assertEquals(700, shifts.get("10YES-REE------0"));
     }
 
 }
