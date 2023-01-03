@@ -17,8 +17,8 @@ public enum DichotomyDirection {
 
     private final String name;
 
-    DichotomyDirection(String direction) {
-        this.name = direction;
+    DichotomyDirection(String name) {
+        this.name = name;
     }
 
     public String getName() {

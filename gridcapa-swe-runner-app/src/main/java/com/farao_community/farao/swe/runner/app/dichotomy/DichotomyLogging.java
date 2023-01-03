@@ -42,11 +42,11 @@ public class DichotomyLogging {
         this.businessLogger = businessLogger;
     }
 
-    public void logStartDichotomy(DichotomyDirection direction, Parameters parameters) {
+    public void logStartDichotomy(Parameters parameters) {
         businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 
-    public void logEndOneDichotomy(DichotomyDirection direction) {
+    public void logEndOneDichotomy() {
         businessLogger.info("Dichotomy finished");
     }
 
