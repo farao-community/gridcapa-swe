@@ -74,7 +74,7 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
         return String.format("%s/%s-%s/", basePath, ++variantCounter, variantName);
     }
 
-    private String getMatchingCracPath(DichotomyDirection direction, SweData sweData) {
+    String getMatchingCracPath(DichotomyDirection direction, SweData sweData) {
         if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
             return sweData.getJsonCracPathFrEs();
         } else if (direction.equals(DichotomyDirection.ES_PT) || direction.equals(DichotomyDirection.PT_ES)) {
