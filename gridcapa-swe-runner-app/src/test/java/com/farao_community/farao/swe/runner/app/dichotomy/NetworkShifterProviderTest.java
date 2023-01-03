@@ -6,22 +6,33 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweD2ccShiftDispatcher;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweIdccShiftDispatcher;
-import org.junit.jupiter.api.Assertions;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.OffsetDateTime;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
  */
 @SpringBootTest
 class NetworkShifterProviderTest {
+
+    @Mock
+    private NetworkShifter networkShifter;
 
     @Autowired
     private NetworkShifterProvider networkShifterProvider;
@@ -30,13 +41,21 @@ class NetworkShifterProviderTest {
     @Test
     void checkThatD2ccShiftDispatcherIsChosen() {
         ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.D2CC, DichotomyDirection.ES_FR, intialNetPositions);
-        Assertions.assertTrue(shiftDispatcher instanceof SweD2ccShiftDispatcher);
+        assertTrue(shiftDispatcher instanceof SweD2ccShiftDispatcher);
     }
 
     @Test
     void checkThatIdccShiftDispatcherIsChosen() {
         ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.IDCC, DichotomyDirection.ES_FR, intialNetPositions);
-        Assertions.assertTrue(shiftDispatcher instanceof SweIdccShiftDispatcher);
+        assertTrue(shiftDispatcher instanceof SweIdccShiftDispatcher);
     }
 
+    @Test
+    void checkNetworkShifterProviderInstantiation() {
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs");
+        NetworkShifterProvider networkShifterProviderMock = mock(NetworkShifterProvider.class);
+        when(networkShifterProviderMock.get(any(SweData.class), any(DichotomyDirection.class))).thenReturn(networkShifter);
+        NetworkShifter ns = networkShifterProviderMock.get(sweData, DichotomyDirection.FR_ES);
+        assertNotNull(ns);
+    }
 }
