@@ -65,7 +65,7 @@ public class DichotomyParallelization {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            dichotomyLogging.logErrorOnDirection(direction, e);
+            dichotomyLogging.logErrorOnDirection(e);
         }
         return new SweDichotomyResult(direction, null, null, null, null, null);
     }

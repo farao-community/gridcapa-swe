@@ -65,7 +65,7 @@ public class RaoValidator implements NetworkValidator<RaoResponse> {
 
     private RaoRequest buildRaoRequest(String networkPresignedUrl, String scaledNetworkDirPath) {
         String resultsDestination = REGION + MINIO_SEPARATOR + sweData.getProcessType() + MINIO_SEPARATOR + scaledNetworkDirPath;
-        return new RaoRequest(sweData.getId(), networkPresignedUrl, getMatchingCracPath(direction, sweData), raoParametersUrl, resultsDestination);
+        return new RaoRequest(sweData.getId(), networkPresignedUrl, getMatchingCracPath(direction, sweData), raoParametersUrl, resultsDestination, direction.getName());
     }
 
     private String generateScaledNetworkDirPath(Network network) {

@@ -106,8 +106,8 @@ public class TtcDocument {
     }
 
     private void addAttributes(Element border, DichotomyDirection direction) {
-        border.setAttribute("from", getCountryNameFromInitial(direction.getDirection().split(DIRECTION_SEPARATOR)[0]));
-        border.setAttribute("to", getCountryNameFromInitial(direction.getDirection().split(DIRECTION_SEPARATOR)[1]));
+        border.setAttribute("from", getCountryNameFromInitial(direction.getName().split(DIRECTION_SEPARATOR)[0]));
+        border.setAttribute("to", getCountryNameFromInitial(direction.getName().split(DIRECTION_SEPARATOR)[1]));
     }
 
     private String getCountryNameFromInitial(String direction) {
