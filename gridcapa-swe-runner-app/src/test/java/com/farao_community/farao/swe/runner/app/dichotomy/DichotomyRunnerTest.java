@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 import com.farao_community.farao.dichotomy.api.DichotomyEngine;
 import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
-import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
