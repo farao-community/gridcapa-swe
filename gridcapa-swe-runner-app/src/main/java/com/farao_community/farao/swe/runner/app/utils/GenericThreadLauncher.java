@@ -87,15 +87,15 @@ public class GenericThreadLauncher<T, U> extends Thread {
     }
 
     private boolean checkInterruption(Exception exception) {
-        boolean isInterrupt = false;
+        boolean isInterrupted = false;
         Throwable e = exception;
-        while (e != null && !isInterrupt) {
+        while (e != null && !isInterrupted) {
             if (StringUtils.containsIgnoreCase(e.getMessage(), "interrupted")
                 || StringUtils.containsIgnoreCase(e.getClass().getName(), "interrupt")) {
-                isInterrupt = true;
+                isInterrupted = true;
             }
             e = e.getCause();
         }
-        return isInterrupt;
+        return isInterrupted;
     }
 }
