@@ -9,9 +9,9 @@ package com.farao_community.farao.swe.runner.app.utils;
 
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.resource.ThreadLauncherResult;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
