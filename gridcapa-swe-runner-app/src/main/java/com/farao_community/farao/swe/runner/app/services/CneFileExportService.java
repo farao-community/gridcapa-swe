@@ -213,12 +213,12 @@ public class CneFileExportService {
     private String generateCneZipFileName(OffsetDateTime timestamp, boolean isHighestValid, DichotomyDirection direction) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(FILENAME_TIMESTAMP_REGEX);
         OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-        return df.format(localTime).replace("[direction]", direction.getDirection().replace("-", ""))
+        return df.format(localTime).replace("[direction]", direction.getName().replace("-", ""))
                 .replace("[secureType]", isHighestValid ? LAST_SECURE_STRING : FIRST_UNSECURE_STRING);
 
     }
 
     private String generateFileTypeString(boolean isHighestValid, DichotomyDirection direction) {
-        return "CNE_" + direction.getDirection().replace("-", "") + "_" + (isHighestValid ? LAST_SECURE_STRING : FIRST_UNSECURE_STRING);
+        return "CNE_" + direction.getName().replace("-", "") + "_" + (isHighestValid ? LAST_SECURE_STRING : FIRST_UNSECURE_STRING);
     }
 }

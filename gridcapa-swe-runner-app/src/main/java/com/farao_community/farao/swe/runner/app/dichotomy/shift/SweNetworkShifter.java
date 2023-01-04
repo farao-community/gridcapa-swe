@@ -55,11 +55,10 @@ public final class SweNetworkShifter implements NetworkShifter {
 
     @Override
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
-        businessLogger.info(String.format("[%s] : Starting shift on network %s", direction,
-                network.getVariantManager().getWorkingVariantId()));
+        businessLogger.info("Starting shift on network {}", network.getVariantManager().getWorkingVariantId());
 
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
-        businessLogger.info(String.format("[%s] : Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", direction, scalingValuesByCountry.get(toEic("ES")),  scalingValuesByCountry.get(toEic("FR")),  scalingValuesByCountry.get(toEic("PT"))));
+        businessLogger.info(String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")),  scalingValuesByCountry.get(toEic("FR")),  scalingValuesByCountry.get(toEic("PT"))));
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
         int iterationCounter = 0;
         boolean shiftSucceed = false;
@@ -106,8 +105,9 @@ public final class SweNetworkShifter implements NetworkShifter {
             // Step 3: Checks balance adjustment results
             if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
                 LOGGER.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
-                businessLogger.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
-                businessLogger.info(String.format("[%s] : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", direction, bordersExchanges.get("ES_PT"), bordersExchanges.get("ES_FR")));
+                businessLogger.info("Shift succeed after {} iteration ", ++iterationCounter);
+                String msg = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get("ES_PT"), bordersExchanges.get("ES_FR"));
+                businessLogger.info(msg);
                 network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                 shiftSucceed = true;
             } else {

@@ -9,9 +9,9 @@ package com.farao_community.farao.swe.runner.app.utils;
 
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.resource.ThreadLauncherResult;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,15 +87,15 @@ public class GenericThreadLauncher<T, U> extends Thread {
     }
 
     private boolean checkInterruption(Exception exception) {
-        boolean isInterrupt = false;
+        boolean isInterrupted = false;
         Throwable e = exception;
-        while (e != null && !isInterrupt) {
+        while (e != null && !isInterrupted) {
             if (StringUtils.containsIgnoreCase(e.getMessage(), "interrupted")
                 || StringUtils.containsIgnoreCase(e.getClass().getName(), "interrupt")) {
-                isInterrupt = true;
+                isInterrupted = true;
             }
             e = e.getCause();
         }
-        return isInterrupt;
+        return isInterrupted;
     }
 }

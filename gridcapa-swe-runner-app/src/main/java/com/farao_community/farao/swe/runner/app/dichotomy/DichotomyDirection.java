@@ -15,13 +15,13 @@ public enum DichotomyDirection {
     ES_PT("ES-PT"),
     PT_ES("PT-ES");
 
-    private final String direction;
+    private final String name;
 
-    DichotomyDirection(String direction) {
-        this.direction = direction;
+    DichotomyDirection(String name) {
+        this.name = name;
     }
 
-    public String getDirection() {
-        return direction;
+    public String getName() {
+        return name;
     }
 }

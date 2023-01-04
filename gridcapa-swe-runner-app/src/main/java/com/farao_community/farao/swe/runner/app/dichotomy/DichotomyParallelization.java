@@ -68,8 +68,6 @@ public class DichotomyParallelization {
     private SweDichotomyResult waitAndGet(Future<SweDichotomyResult> dichotomy) throws InterruptedException {
         try {
             return dichotomy.get();
-        } catch (InterruptedException e) {
-            throw e;
         } catch (ExecutionException e) {
             throw new SweInternalException("Error on dichotomy direction", e);
         }
