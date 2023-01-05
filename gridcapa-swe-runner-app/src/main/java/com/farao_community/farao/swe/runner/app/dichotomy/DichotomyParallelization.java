@@ -43,8 +43,7 @@ public class DichotomyParallelization {
         ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData);
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
-        SweDichotomyResult esFrResult = getDichotomyResultByDirection(executionResult, DichotomyDirection.ES_FR);
-        return new SweResponse(sweData.getId(), ttcDocUrl, esFrResult.getHighestValidStepUrl(), esFrResult.getLowestInvalidStepUrl(), esFrResult.getExportedCgmesUrl());
+        return new SweResponse(sweData.getId(), ttcDocUrl);
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData) {
@@ -59,7 +58,7 @@ public class DichotomyParallelization {
                 results.add(waitAndGet(future));
             }
         } catch (InterruptedException e) {
-            futures.stream().forEach(f -> f.cancel(true));
+            futures.forEach(f -> f.cancel(true));
             Thread.currentThread().interrupt();
         }
         return new ExecutionResult<>(results);
@@ -71,13 +70,5 @@ public class DichotomyParallelization {
         } catch (ExecutionException e) {
             throw new SweInternalException("Error on dichotomy direction", e);
         }
-    }
-
-    private SweDichotomyResult getDichotomyResultByDirection(ExecutionResult<SweDichotomyResult> executionResult, DichotomyDirection direction) {
-        Optional<SweDichotomyResult> result = executionResult.getResult().stream().filter(dichotomyResult -> dichotomyResult.getDichotomyDirection() == direction).findFirst();
-        if (result.isEmpty()) {
-            throw new SweInvalidDataException(String.format("No dichotomy result found for direction: [ %s ]", direction.name()));
-        }
-        return result.get();
     }
 }

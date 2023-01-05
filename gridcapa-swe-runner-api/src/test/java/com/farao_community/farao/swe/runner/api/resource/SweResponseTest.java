@@ -18,14 +18,10 @@ class SweResponseTest {
 
     @Test
     void simpleRequestTest() {
-        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl",
-                "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl", "esFrCgmesZipUrl");
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl");
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
-        assertEquals("esFrHighestValidStepUrl", sweResponse.getEsFrHighestValidStepUrl());
-        assertEquals("esFrLowestInvalidStepUrl", sweResponse.getEsFrLowestInvalidStepUrl());
-        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
     }
 
 }

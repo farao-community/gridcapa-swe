@@ -126,8 +126,6 @@ class DichotomyParallelizationTest {
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
-        assertEquals("esFrHighestValidStepUrl.zip", sweResponse.getEsFrHighestValidStepUrl());
-        assertEquals("esFrLowestInvalidStepUrl.zip", sweResponse.getEsFrLowestInvalidStepUrl());
     }
 
     @Test
@@ -148,8 +146,6 @@ class DichotomyParallelizationTest {
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
-        assertNull(sweResponse.getEsFrHighestValidStepUrl());
-        assertEquals("esFrLowestInvalidStepUrl.zip", sweResponse.getEsFrLowestInvalidStepUrl());
     }
 
     @Test
@@ -170,8 +166,6 @@ class DichotomyParallelizationTest {
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
-        assertNull(sweResponse.getEsFrHighestValidStepUrl());
-        assertNull(sweResponse.getEsFrLowestInvalidStepUrl());
     }
 
     @Test
