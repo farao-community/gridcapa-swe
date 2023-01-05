@@ -66,9 +66,8 @@ public class TtcDocument {
         listDichotomyResults.forEach(r -> addValueToResultMap(r.getDichotomyDirection(), r.getDichotomyResult()));
     }
 
-
     private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> result) {
-        if (result.hasValidStep()) {
+        if (result != null && result.hasValidStep()) {
             mapWithValues.put(direction, String.valueOf((int) result.getHighestValidStepValue()));
         } else {
             mapWithValues.put(direction, "");

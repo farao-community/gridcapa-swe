@@ -69,7 +69,7 @@ class DichotomyRunnerTest {
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
         Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), Mockito.any(Parameters.class));
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
-        DichotomyResult<RaoResponse> dichotomyResult = spyDichotomyRunner.run(sweData, DichotomyDirection.ES_FR);
+        DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, DichotomyDirection.ES_FR);
         assertEquals(mockDichotomyResult, dichotomyResult);
     }
 }
