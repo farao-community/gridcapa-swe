@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
