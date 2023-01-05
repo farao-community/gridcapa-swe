@@ -8,7 +8,6 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
-import com.farao_community.farao.dichotomy.shift.SplittingFactors;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
@@ -19,7 +18,6 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -44,24 +42,19 @@ public class NetworkShifterProvider {
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr());
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
+                initialNetPositions);
     }
 
-    private ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
+    ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
         switch (processType) {
             case D2CC:
                 return new SweD2ccShiftDispatcher(direction, initialNetPositions);
             case IDCC:
-                return getIdccSplittingFactors(direction);
+                return new SweIdccShiftDispatcher(direction, initialNetPositions);
             default:
                 throw new SweInvalidDataException(String.format("Unknown target process for SWE: %s", processType));
         }
-    }
-
-    private SplittingFactors getIdccSplittingFactors(DichotomyDirection direction) {
-        Map<String, Double> factors = new TreeMap<>();
-        // todo
-        return new SplittingFactors(factors);
     }
 
 }

@@ -33,9 +33,21 @@ class SweDataTest {
     private CimCracCreationContext cracFrEs;
 
     @Test
-    void simpleTest() {
+    void simpleD2ccTest() {
         SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs");
         assertEquals(ProcessType.D2CC, sweData.getProcessType());
+        assertEquals(this.network, sweData.getNetworkEsFr());
+        assertEquals(this.cracEsPt, sweData.getCracEsPt());
+        assertEquals(this.cracFrEs, sweData.getCracFrEs());
+        assertEquals("CracEsPt", sweData.getJsonCracPathEsPt());
+        assertEquals("CracFrEs", sweData.getJsonCracPathFrEs());
+        assertEquals("glskUrl", sweData.getGlskUrl());
+    }
+
+    @Test
+    void simpleIdccTest() {
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.IDCC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs");
+        assertEquals(ProcessType.IDCC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetworkEsFr());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());
         assertEquals(this.cracFrEs, sweData.getCracFrEs());
