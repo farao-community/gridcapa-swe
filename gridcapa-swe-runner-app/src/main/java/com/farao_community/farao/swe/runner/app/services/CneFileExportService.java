@@ -102,7 +102,7 @@ public class CneFileExportService {
     private AngleMonitoringResult extractAngleMonitoringResult(DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid) {
         AngleMonitoringResult angleMonitoringResult = null;
         if (isHighestValid) {
-            if (dichotomyResult.getHighestValidStep() != null && dichotomyResult.getHighestValidStep().getValidationData() != null) {
+            if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getValidationData() != null) {
                 angleMonitoringResult = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult();
             }
         } else {
