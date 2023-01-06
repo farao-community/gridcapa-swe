@@ -96,7 +96,7 @@ class RaoValidatorTest {
 
     @Test
     void simpleTestPortugal2() {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.ES_PT, businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, "", raoRunnerClient, sweData, DichotomyDirection.PT_ES, businessLogger);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
