@@ -26,7 +26,7 @@ class SweIdccShiftDispatcherTest {
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
         assertEquals(0, shifts.get("10YPT-REN------W"), 0.001);
         assertEquals(-150 - 50 + 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(-800., shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(-800 - 100., shifts.get("10YFR-RTE------C"), 0.001);
     }
 
     @Test
@@ -36,7 +36,7 @@ class SweIdccShiftDispatcherTest {
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
         assertEquals(0, shifts.get("10YPT-REN------W"), 0.001);
         assertEquals(-150 - 50 - 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(1200, shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(1200 - 100., shifts.get("10YFR-RTE------C"), 0.001);
     }
 
     @Test
@@ -45,7 +45,7 @@ class SweIdccShiftDispatcherTest {
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
         assertEquals(-1000. - 150, shifts.get("10YPT-REN------W"), 0.001);
         assertEquals(150 + 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(0, shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(0 - 100., shifts.get("10YFR-RTE------C"), 0.001);
     }
 
     @Test
@@ -54,6 +54,6 @@ class SweIdccShiftDispatcherTest {
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
         assertEquals(1000 - 150, shifts.get("10YPT-REN------W"), 0.001);
         assertEquals(150 - 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(0, shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(0 - 100., shifts.get("10YFR-RTE------C"), 0.001);
     }
 }

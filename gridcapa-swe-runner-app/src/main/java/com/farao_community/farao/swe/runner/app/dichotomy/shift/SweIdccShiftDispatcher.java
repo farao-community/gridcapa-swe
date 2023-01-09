@@ -34,22 +34,22 @@ public class SweIdccShiftDispatcher implements ShiftDispatcher {
             case ES_FR:
                 factors.put(toEic("PT"), 0.);
                 factors.put(toEic("ES"), -initialNetPositions.get(toEic("PT")) - initialNetPositions.get(toEic("ES")) + stepExchangeValue);
-                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))));
+                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))) - initialNetPositions.get(toEic("FR")));
                 break;
             case FR_ES:
                 factors.put(toEic("PT"), 0.);
                 factors.put(toEic("ES"), -initialNetPositions.get(toEic("PT")) - initialNetPositions.get(toEic("ES")) - stepExchangeValue);
-                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))));
+                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))) - initialNetPositions.get(toEic("FR")));
                 break;
             case ES_PT:
                 factors.put(toEic("PT"), -stepExchangeValue - initialNetPositions.get(toEic("PT")));
                 factors.put(toEic("ES"), initialNetPositions.get(toEic("PT")) + stepExchangeValue);
-                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))));
+                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))) - initialNetPositions.get(toEic("FR")));
                 break;
             case PT_ES:
                 factors.put(toEic("PT"), stepExchangeValue - initialNetPositions.get(toEic("PT")));
                 factors.put(toEic("ES"), initialNetPositions.get(toEic("PT")) - stepExchangeValue);
-                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))));
+                factors.put(toEic("FR"), -(factors.get(toEic("PT")) + factors.get(toEic("ES"))) - initialNetPositions.get(toEic("FR")));
                 break;
             default:
                 throw new SweInvalidDataException(String.format("Unknown dichotomy direction for SWE: %s", direction));

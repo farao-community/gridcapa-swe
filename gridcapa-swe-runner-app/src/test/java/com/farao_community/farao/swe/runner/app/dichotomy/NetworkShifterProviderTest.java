@@ -44,7 +44,7 @@ class NetworkShifterProviderTest {
         ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.IDCC, DichotomyDirection.ES_PT, intialNetPositions);
         assertTrue(shiftDispatcher instanceof SweIdccShiftDispatcher);
         Map<String, Double> shifts = shiftDispatcher.dispatch(500);
-        assertEquals(-0., shifts.get("10YFR-RTE------C"));
+        assertEquals(-100., shifts.get("10YFR-RTE------C"));
         assertEquals(-650, shifts.get("10YPT-REN------W"));
         assertEquals(650, shifts.get("10YES-REE------0"));
     }
