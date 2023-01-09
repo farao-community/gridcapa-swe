@@ -24,9 +24,9 @@ class SweIdccShiftDispatcherTest {
     void dispatchEsFrTest() {
         SweIdccShiftDispatcher sweIdccShiftDispatcher = new SweIdccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
-        assertEquals(150., shifts.get("10YPT-REN------W"), 0.001);
-        assertEquals(-150 + 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(-1000., shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(0, shifts.get("10YPT-REN------W"), 0.001);
+        assertEquals(-150 - 50 + 1000, shifts.get("10YES-REE------0"), 0.001);
+        assertEquals(-800., shifts.get("10YFR-RTE------C"), 0.001);
     }
 
     @Test
@@ -34,26 +34,26 @@ class SweIdccShiftDispatcherTest {
         Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
         SweIdccShiftDispatcher sweIdccShiftDispatcher = new SweIdccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
-        assertEquals(150., shifts.get("10YPT-REN------W"), 0.001);
-        assertEquals(-150 - 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(1000, shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(0, shifts.get("10YPT-REN------W"), 0.001);
+        assertEquals(-150 - 50 - 1000, shifts.get("10YES-REE------0"), 0.001);
+        assertEquals(1200, shifts.get("10YFR-RTE------C"), 0.001);
     }
 
     @Test
     void dispatchEsPtTest() {
         SweIdccShiftDispatcher sweIdccShiftDispatcher = new SweIdccShiftDispatcher(DichotomyDirection.ES_PT, intialNetPositions);
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
-        assertEquals(-1000., shifts.get("10YPT-REN------W"), 0.001);
-        assertEquals(50 + 150 + 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(-50 - 150, shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(-1000. - 150, shifts.get("10YPT-REN------W"), 0.001);
+        assertEquals(150 + 1000, shifts.get("10YES-REE------0"), 0.001);
+        assertEquals(0, shifts.get("10YFR-RTE------C"), 0.001);
     }
 
     @Test
     void dispatchPtEsTest() {
         SweIdccShiftDispatcher sweIdccShiftDispatcher = new SweIdccShiftDispatcher(DichotomyDirection.PT_ES, intialNetPositions);
         Map<String, Double> shifts = sweIdccShiftDispatcher.dispatch(1000);
-        assertEquals(1000, shifts.get("10YPT-REN------W"), 0.001);
-        assertEquals(50 + 150 - 1000, shifts.get("10YES-REE------0"), 0.001);
-        assertEquals(-50 - 150, shifts.get("10YFR-RTE------C"), 0.001);
+        assertEquals(1000 - 150, shifts.get("10YPT-REN------W"), 0.001);
+        assertEquals(150 - 1000, shifts.get("10YES-REE------0"), 0.001);
+        assertEquals(0, shifts.get("10YFR-RTE------C"), 0.001);
     }
 }
