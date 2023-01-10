@@ -11,6 +11,7 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.*;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
@@ -28,11 +29,13 @@ public class NetworkShifterProvider {
     private final DichotomyConfiguration dichotomyConfiguration;
     private final ZonalScalableProvider zonalScalableProvider;
     private final Logger businessLogger;
+    private final ProcessConfiguration processConfiguration;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider, Logger businessLogger) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider, Logger businessLogger, ProcessConfiguration processConfiguration) {
         this.dichotomyConfiguration = dichotomyConfiguration;
         this.zonalScalableProvider = zonalScalableProvider;
         this.businessLogger = businessLogger;
+        this.processConfiguration = processConfiguration;
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
@@ -43,7 +46,8 @@ public class NetworkShifterProvider {
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
-                initialNetPositions);
+                initialNetPositions,
+                processConfiguration);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {

@@ -12,6 +12,7 @@ import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationExceptio
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
@@ -32,7 +33,7 @@ import java.util.*;
 public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
-    private static final int MAX_NUMBER_ITERATION = 20;
+    private final ProcessConfiguration processConfiguration;
     private final Logger businessLogger;
 
     private final ProcessType processType;
@@ -43,7 +44,7 @@ public final class SweNetworkShifter implements NetworkShifter {
     private final double toleranceEsFr;
     private final Map<String, Double> initialNetPositions;
 
-    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions) {
+    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
@@ -52,6 +53,7 @@ public final class SweNetworkShifter implements NetworkShifter {
         this.toleranceEsPt = toleranceEsPt;
         this.toleranceEsFr = toleranceEsFr;
         this.initialNetPositions = initialNetPositions;
+        this.processConfiguration = processConfiguration;
     }
 
     @Override
@@ -72,6 +74,7 @@ public final class SweNetworkShifter implements NetworkShifter {
         List<String> limitingCountries = new ArrayList<>();
         Map<String, Double> bordersExchanges;
 
+        int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
         do {
             // Step 1: Perform the scaling
             LOGGER.info(String.format("[%s] : Applying shift iteration %s ", direction, iterationCounter));
@@ -121,7 +124,7 @@ public final class SweNetworkShifter implements NetworkShifter {
                 ++iterationCounter;
             }
 
-        } while (iterationCounter < MAX_NUMBER_ITERATION && !shiftSucceed);
+        } while (iterationCounter < maxIterationNumber && !shiftSucceed);
 
         // Step 4 : check after iteration max and out of tolerane
         if (!shiftSucceed) {
