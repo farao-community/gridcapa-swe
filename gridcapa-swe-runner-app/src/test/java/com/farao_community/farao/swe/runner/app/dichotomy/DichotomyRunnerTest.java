@@ -12,6 +12,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
+import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweNetworkShifter;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.powsybl.iidm.network.Network;
@@ -70,5 +71,15 @@ class DichotomyRunnerTest {
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
         DichotomyResult<RaoResponse> dichotomyResult = spyDichotomyRunner.run(sweData, DichotomyDirection.ES_FR);
         assertEquals(mockDichotomyResult, dichotomyResult);
+    }
+
+    @Test
+    void testTolerances() {
+        double toleranceEsPt = 0.01;
+        double toleranceEsFr = 0.05;
+        SweNetworkShifter.Tolerances tolerances = new SweNetworkShifter.Tolerances(toleranceEsPt, toleranceEsFr);
+
+        assertEquals(toleranceEsPt, tolerances.getToleranceEsPt(), 0);
+        assertEquals(toleranceEsFr, tolerances.getToleranceEsFr(), 0);
     }
 }
