@@ -12,6 +12,7 @@ import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationExceptio
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
@@ -32,6 +33,7 @@ import java.util.*;
 public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
+    private final ProcessConfiguration processConfiguration;
     private static final int MAX_NUMBER_ITERATION = 20;
     public static final String ES_PT = "ES_PT";
     public static final String ES_FR = "ES_FR";
@@ -52,6 +54,7 @@ public final class SweNetworkShifter implements NetworkShifter {
         this.shiftDispatcher = shiftDispatcher;
         this.tolerances = tolerances;
         this.initialNetPositions = initialNetPositions;
+        this.processConfiguration = processConfiguration;
     }
 
     @Override
@@ -72,6 +75,7 @@ public final class SweNetworkShifter implements NetworkShifter {
         List<String> limitingCountries = new ArrayList<>();
         Map<String, Double> bordersExchanges;
 
+        int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
         do {
             // Step 1: Perform the scaling
             LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
@@ -120,7 +124,7 @@ public final class SweNetworkShifter implements NetworkShifter {
                 ++iterationCounter;
             }
 
-        } while (iterationCounter < MAX_NUMBER_ITERATION && !shiftSucceed);
+        } while (iterationCounter < maxIterationNumber && !shiftSucceed);
 
         // Step 4 : check after iteration max and out of tolerane
         if (!shiftSucceed) {

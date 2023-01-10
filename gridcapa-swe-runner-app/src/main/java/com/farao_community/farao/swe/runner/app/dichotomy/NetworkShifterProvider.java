@@ -28,11 +28,13 @@ public class NetworkShifterProvider {
     private final DichotomyConfiguration dichotomyConfiguration;
     private final ZonalScalableProvider zonalScalableProvider;
     private final Logger businessLogger;
+    private final ProcessConfiguration processConfiguration;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider, Logger businessLogger) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider, Logger businessLogger, ProcessConfiguration processConfiguration) {
         this.dichotomyConfiguration = dichotomyConfiguration;
         this.zonalScalableProvider = zonalScalableProvider;
         this.businessLogger = businessLogger;
+        this.processConfiguration = processConfiguration;
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
@@ -42,7 +44,7 @@ public class NetworkShifterProvider {
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 new SweNetworkShifter.Tolerances(dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(), dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr()),
-                initialNetPositions);
+                initialNetPositions,processConfiguration);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {

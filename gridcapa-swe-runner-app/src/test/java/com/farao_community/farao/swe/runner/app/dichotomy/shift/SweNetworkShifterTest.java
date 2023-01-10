@@ -23,7 +23,7 @@ class SweNetworkShifterTest {
     void checkD2ccEsFrTargetExchangesCalculatedCorrectly() {
         Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
-            DichotomyDirection.ES_FR, null, null, new SweNetworkShifter.Tolerances(0., 0.), intialNetPositions);
+            DichotomyDirection.ES_FR, null, null, new SweNetworkShifter.Tolerances(0., 0.), intialNetPositions, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(0., shifts.get("ES_PT"), 0.001);
         assertEquals(1000., shifts.get("ES_FR"), 0.001);

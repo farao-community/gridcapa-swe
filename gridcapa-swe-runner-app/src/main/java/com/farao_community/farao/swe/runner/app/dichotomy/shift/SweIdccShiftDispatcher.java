@@ -32,24 +32,24 @@ public class SweIdccShiftDispatcher implements ShiftDispatcher {
         Map<String, Double> factors = new TreeMap<>();
         switch (direction) {
             case ES_FR:
-                factors.put(toEic("PT"), initialNetPositions.get(toEic("PT")));
-                factors.put(toEic("ES"), -initialNetPositions.get(toEic("PT")) + stepExchangeValue);
-                factors.put(toEic("FR"), -stepExchangeValue);
+                factors.put(toEic("PT"), 0.);
+                factors.put(toEic("ES"), -initialNetPositions.get(toEic("PT")) - initialNetPositions.get(toEic("ES")) + stepExchangeValue);
+                factors.put(toEic("FR"), -stepExchangeValue - initialNetPositions.get(toEic("FR")));
                 break;
             case FR_ES:
-                factors.put(toEic("PT"), initialNetPositions.get(toEic("PT")));
-                factors.put(toEic("ES"), -initialNetPositions.get(toEic("PT")) - stepExchangeValue);
-                factors.put(toEic("FR"), stepExchangeValue);
+                factors.put(toEic("PT"), 0.);
+                factors.put(toEic("ES"), -initialNetPositions.get(toEic("PT")) - initialNetPositions.get(toEic("ES")) - stepExchangeValue);
+                factors.put(toEic("FR"), stepExchangeValue - initialNetPositions.get(toEic("FR")));
                 break;
             case ES_PT:
-                factors.put(toEic("PT"), -stepExchangeValue);
-                factors.put(toEic("ES"), initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")) + stepExchangeValue);
-                factors.put(toEic("FR"), -initialNetPositions.get(toEic("ES")) - initialNetPositions.get(toEic("PT")));
+                factors.put(toEic("PT"), -stepExchangeValue - initialNetPositions.get(toEic("PT")));
+                factors.put(toEic("ES"), initialNetPositions.get(toEic("PT")) + stepExchangeValue);
+                factors.put(toEic("FR"), -initialNetPositions.get(toEic("PT")) - initialNetPositions.get(toEic("ES")) - initialNetPositions.get(toEic("FR")));
                 break;
             case PT_ES:
-                factors.put(toEic("PT"), stepExchangeValue);
-                factors.put(toEic("ES"), initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")) - stepExchangeValue);
-                factors.put(toEic("FR"), -initialNetPositions.get(toEic("ES")) - initialNetPositions.get(toEic("PT")));
+                factors.put(toEic("PT"), stepExchangeValue - initialNetPositions.get(toEic("PT")));
+                factors.put(toEic("ES"), initialNetPositions.get(toEic("PT")) - stepExchangeValue);
+                factors.put(toEic("FR"), -initialNetPositions.get(toEic("PT")) - initialNetPositions.get(toEic("ES")) - initialNetPositions.get(toEic("FR")));
                 break;
             default:
                 throw new SweInvalidDataException(String.format("Unknown dichotomy direction for SWE: %s", direction));
