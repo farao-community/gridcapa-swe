@@ -48,10 +48,10 @@ public class DichotomyParallelization {
         List<SweDichotomyResult> results = new ArrayList<>();
         List<Future<SweDichotomyResult>> futures = new ArrayList<>();
         try {
-            //futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR));
+            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR));
             futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES));
-            //futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT));
-            //futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES));
+            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT));
+            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES));
             for (Future<SweDichotomyResult> future : futures) {
                 results.add(waitAndGet(future));
             }
