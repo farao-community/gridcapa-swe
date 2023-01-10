@@ -11,6 +11,7 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
+import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.*;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
@@ -44,7 +45,8 @@ public class NetworkShifterProvider {
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
                 new SweNetworkShifter.Tolerances(dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(), dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr()),
-                initialNetPositions,processConfiguration);
+                initialNetPositions,
+                processConfiguration);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {

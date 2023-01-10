@@ -33,7 +33,6 @@ import java.util.*;
 public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
-    private final ProcessConfiguration processConfiguration;
     private static final int MAX_NUMBER_ITERATION = 20;
     public static final String ES_PT = "ES_PT";
     public static final String ES_FR = "ES_FR";
@@ -45,8 +44,9 @@ public final class SweNetworkShifter implements NetworkShifter {
     private final ShiftDispatcher shiftDispatcher;
     private final Tolerances tolerances;
     private final Map<String, Double> initialNetPositions;
+    private final ProcessConfiguration processConfiguration;
 
-    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, Tolerances tolerances, Map<String, Double> initialNetPositions) {
+    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, Tolerances tolerances, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
@@ -60,7 +60,6 @@ public final class SweNetworkShifter implements NetworkShifter {
     @Override
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
         businessLogger.info("Starting shift on network {}", network.getVariantManager().getWorkingVariantId());
-
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
         businessLogTargetCountriesShift(scalingValuesByCountry);
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
