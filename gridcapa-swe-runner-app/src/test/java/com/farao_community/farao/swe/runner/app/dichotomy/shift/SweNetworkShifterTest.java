@@ -137,7 +137,7 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworkSuccessTest() throws GlskLimitationException, ShiftingException {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration);
@@ -154,7 +154,7 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworWithGlskLimitation() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration);
@@ -165,7 +165,7 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworWithShiftingException() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration);
