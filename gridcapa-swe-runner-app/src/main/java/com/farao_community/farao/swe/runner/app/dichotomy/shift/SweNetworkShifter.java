@@ -186,22 +186,4 @@ public final class SweNetworkShifter implements NetworkShifter {
     private static String toEic(String country) {
         return new EICode(Country.valueOf(country)).getAreaCode();
     }
-
-    public static class Tolerances {
-        private final double toleranceEsPt;
-        private final double toleranceEsFr;
-
-        public Tolerances(double toleranceEsPt, double toleranceEsFr) {
-            this.toleranceEsPt = toleranceEsPt;
-            this.toleranceEsFr = toleranceEsFr;
-        }
-
-        public double getToleranceEsPt() {
-            return toleranceEsPt;
-        }
-
-        public double getToleranceEsFr() {
-            return toleranceEsFr;
-        }
-    }
 }
