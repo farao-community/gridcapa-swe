@@ -44,7 +44,8 @@ public class NetworkShifterProvider {
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-                new SweNetworkShifter.Tolerances(dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(), dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr()),
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
                 initialNetPositions,
                 processConfiguration);
     }

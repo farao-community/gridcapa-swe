@@ -33,7 +33,6 @@ import java.util.*;
 public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
-    private static final int MAX_NUMBER_ITERATION = 20;
     public static final String ES_PT = "ES_PT";
     public static final String ES_FR = "ES_FR";
     private final Logger businessLogger;
@@ -42,17 +41,19 @@ public final class SweNetworkShifter implements NetworkShifter {
     private final DichotomyDirection direction;
     private final ZonalData<Scalable> zonalScalable;
     private final ShiftDispatcher shiftDispatcher;
-    private final Tolerances tolerances;
+    private final double toleranceEsPt;
+    private final double toleranceEsFr;
     private final Map<String, Double> initialNetPositions;
     private final ProcessConfiguration processConfiguration;
 
-    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, Tolerances tolerances, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration) {
+    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
         this.zonalScalable = zonalScalable;
         this.shiftDispatcher = shiftDispatcher;
-        this.tolerances = tolerances;
+        this.toleranceEsPt = toleranceEsPt;
+        this.toleranceEsFr = toleranceEsFr;
         this.initialNetPositions = initialNetPositions;
         this.processConfiguration = processConfiguration;
     }
@@ -61,7 +62,8 @@ public final class SweNetworkShifter implements NetworkShifter {
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
         businessLogger.info("Starting shift on network {}", network.getVariantManager().getWorkingVariantId());
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
-        businessLogTargetCountriesShift(scalingValuesByCountry);
+        String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT")));
+        businessLogger.info(logTargetCountriesShift);
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
         int iterationCounter = 0;
         boolean shiftSucceed = false;
@@ -81,10 +83,13 @@ public final class SweNetworkShifter implements NetworkShifter {
             for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
                 String zoneId = entry.getKey();
                 double asked = entry.getValue();
-                logInfoApplyingVariationOnZone(zoneId, asked);
+                String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
+                LOGGER.info(logApplyingVariationOnZone);
                 double done = zonalScalable.getData(zoneId).scale(network, asked);
                 if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    logWarnIncompleteVariation(zoneId, asked, done);
+                    String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
+                            direction, zoneId, asked, done);
+                    LOGGER.warn(logWarnIncompleteVariation);
                     limitingCountries.add(zoneId);
                 }
             }
@@ -106,8 +111,9 @@ public final class SweNetworkShifter implements NetworkShifter {
             double mismatchEsFr = targetExchanges.get(ES_FR) - bordersExchanges.get(ES_FR);
 
             // Step 3: Checks balance adjustment results
-            if (Math.abs(mismatchEsPt) < tolerances.getToleranceEsPt() && Math.abs(mismatchEsFr) < tolerances.getToleranceEsFr()) {
-                LOGGER.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
+            if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
+                String logShiftSucceded = String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter);
+                LOGGER.info(logShiftSucceded);
                 businessLogger.info("Shift succeed after {} iteration ", ++iterationCounter);
                 String msg = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
                 businessLogger.info(msg);
@@ -179,22 +185,6 @@ public final class SweNetworkShifter implements NetworkShifter {
 
     private static String toEic(String country) {
         return new EICode(Country.valueOf(country)).getAreaCode();
-    }
-
-    private void businessLogTargetCountriesShift(Map<String, Double> scalingValuesByCountry) {
-        String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")),  scalingValuesByCountry.get(toEic("FR")),  scalingValuesByCountry.get(toEic("PT")));
-        businessLogger.info(logTargetCountriesShift);
-    }
-
-    private void logInfoApplyingVariationOnZone(String zoneId, double asked) {
-        String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
-        LOGGER.info(logApplyingVariationOnZone);
-    }
-
-    private void logWarnIncompleteVariation(String zoneId, double asked, double done) {
-        String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
-                direction, zoneId, asked, done);
-        LOGGER.warn(logWarnIncompleteVariation);
     }
 
     public static class Tolerances {
