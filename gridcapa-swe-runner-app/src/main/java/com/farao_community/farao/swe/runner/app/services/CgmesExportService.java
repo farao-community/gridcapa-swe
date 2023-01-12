@@ -190,12 +190,12 @@ public class CgmesExportService {
         return context;
     }
 
-    private String buildCgmesFilename(SweData sweData, String country, String type) {
+    String buildCgmesFilename(SweData sweData, String country, String type) {
         String formattedFilename = cgmesFormatter.format(sweData.getTimestamp());
         return formattedFilename.replace("[process]", sweData.getProcessType().getCode()).replace("[country]", country).replace("[type]", type);
     }
 
-    private String createFileType(DichotomyDirection direction) {
+    String createFileType(DichotomyDirection direction) {
         StringBuilder sb = new StringBuilder();
         sb.append("CGM_");
         switch (direction) {

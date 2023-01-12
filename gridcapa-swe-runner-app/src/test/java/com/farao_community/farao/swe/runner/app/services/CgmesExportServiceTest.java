@@ -6,38 +6,56 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
-import com.powsybl.iidm.mergingview.MergingView;
-import com.powsybl.iidm.network.Network;
-import org.mockito.Mock;
+import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @SpringBootTest
-public class CgmesExportServiceTest {
+class CgmesExportServiceTest {
 
     @Autowired
     private CgmesExportService cgmesExportService;
 
-    @MockBean
-    private DichotomyResult<RaoResponse> dichotomyResult;
+    @Test
+    void testBuildCgmesFilename() {
+        SweData sweData = mock(SweData.class);
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.systemDefault()));
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        String result = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
+        assertEquals("20221130T0100Z_2D_FR_ESFR_001.xml", result);
+    }
 
-    @Mock
-    private Network networkAll;
+    @Test
+    void testCreateFileType() {
+        DichotomyDirection directionEsFr = DichotomyDirection.ES_FR;
+        String resultEsFr = cgmesExportService.createFileType(directionEsFr);
+        assertEquals("CGM_ESFR", resultEsFr);
 
-    @Mock
-    private MergingView mergingView;
+        DichotomyDirection directionFrEs = DichotomyDirection.FR_ES;
+        String resultFrEs = cgmesExportService.createFileType(directionFrEs);
+        assertEquals("CGM_FRES", resultFrEs);
 
-    @Mock
-    private Crac cracFrEs;
+        DichotomyDirection directionEsPt = DichotomyDirection.ES_PT;
+        String resultEsPt = cgmesExportService.createFileType(directionEsPt);
+        assertEquals("CGM_ESPT", resultEsPt);
 
-    @Mock
-    private Crac cracEsPt;
+        DichotomyDirection directionPtEs = DichotomyDirection.PT_ES;
+        String resultPtEs = cgmesExportService.createFileType(directionPtEs);
+        assertEquals("CGM_PTES", resultPtEs);
+    }
 
 }

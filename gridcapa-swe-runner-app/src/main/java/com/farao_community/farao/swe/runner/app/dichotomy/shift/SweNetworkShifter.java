@@ -33,7 +33,8 @@ import java.util.*;
 public final class SweNetworkShifter implements NetworkShifter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweNetworkShifter.class);
     private static final double DEFAULT_SHIFT_EPSILON = 1;
-    private final ProcessConfiguration processConfiguration;
+    public static final String ES_PT = "ES_PT";
+    public static final String ES_FR = "ES_FR";
     private final Logger businessLogger;
 
     private final ProcessType processType;
@@ -43,6 +44,7 @@ public final class SweNetworkShifter implements NetworkShifter {
     private final double toleranceEsPt;
     private final double toleranceEsFr;
     private final Map<String, Double> initialNetPositions;
+    private final ProcessConfiguration processConfiguration;
 
     public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
@@ -59,9 +61,9 @@ public final class SweNetworkShifter implements NetworkShifter {
     @Override
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
         businessLogger.info("Starting shift on network {}", network.getVariantManager().getWorkingVariantId());
-
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
-        businessLogger.info(String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")),  scalingValuesByCountry.get(toEic("FR")),  scalingValuesByCountry.get(toEic("PT"))));
+        String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT")));
+        businessLogger.info(logTargetCountriesShift);
         Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
         int iterationCounter = 0;
         boolean shiftSucceed = false;
@@ -77,15 +79,17 @@ public final class SweNetworkShifter implements NetworkShifter {
         int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
         do {
             // Step 1: Perform the scaling
-            LOGGER.info(String.format("[%s] : Applying shift iteration %s ", direction, iterationCounter));
+            LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
             for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
                 String zoneId = entry.getKey();
                 double asked = entry.getValue();
-                LOGGER.info(String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked));
+                String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
+                LOGGER.info(logApplyingVariationOnZone);
                 double done = zonalScalable.getData(zoneId).scale(network, asked);
                 if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    LOGGER.warn(String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
-                            direction, zoneId, asked, done));
+                    String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
+                            direction, zoneId, asked, done);
+                    LOGGER.warn(logWarnIncompleteVariation);
                     limitingCountries.add(zoneId);
                 }
             }
@@ -103,14 +107,15 @@ public final class SweNetworkShifter implements NetworkShifter {
                 throw new ShiftingException("Loadflow computation diverged during balancing adjustment");
             }
             bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
-            double mismatchEsPt = targetExchanges.get("ES_PT") - bordersExchanges.get("ES_PT");
-            double mismatchEsFr = targetExchanges.get("ES_FR") - bordersExchanges.get("ES_FR");
+            double mismatchEsPt = targetExchanges.get(ES_PT) - bordersExchanges.get(ES_PT);
+            double mismatchEsFr = targetExchanges.get(ES_FR) - bordersExchanges.get(ES_FR);
 
             // Step 3: Checks balance adjustment results
             if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
-                LOGGER.info(String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter));
+                String logShiftSucceded = String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter);
+                LOGGER.info(logShiftSucceded);
                 businessLogger.info("Shift succeed after {} iteration ", ++iterationCounter);
-                String msg = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get("ES_PT"), bordersExchanges.get("ES_FR"));
+                String msg = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
                 businessLogger.info(msg);
                 network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                 shiftSucceed = true;
@@ -128,7 +133,7 @@ public final class SweNetworkShifter implements NetworkShifter {
 
         // Step 4 : check after iteration max and out of tolerane
         if (!shiftSucceed) {
-            String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get("ES_PT"), bordersExchanges.get("ES_FR"));
+            String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
             businessLogger.error(message);
             throw new ShiftingException(message);
         }
@@ -145,17 +150,17 @@ public final class SweNetworkShifter implements NetworkShifter {
     private Map<String, Double> getIdccTargetExchanges(double stepValue, Map<String, Double> initialNetPositions) {
         Map<String, Double> target = new HashMap<>();
         if (DichotomyDirection.ES_FR.equals(direction)) {
-            target.put("ES_PT", -initialNetPositions.get(toEic("PT")));
-            target.put("ES_FR", stepValue);
+            target.put(ES_PT, -initialNetPositions.get(toEic("PT")));
+            target.put(ES_FR, stepValue);
         } else if (DichotomyDirection.FR_ES.equals(direction)) {
-            target.put("ES_PT", -initialNetPositions.get(toEic("PT")));
-            target.put("ES_FR", -stepValue);
+            target.put(ES_PT, -initialNetPositions.get(toEic("PT")));
+            target.put(ES_FR, -stepValue);
         } else if (DichotomyDirection.ES_PT.equals(direction)) {
-            target.put("ES_PT", stepValue);
-            target.put("ES_FR", initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")));
+            target.put(ES_PT, stepValue);
+            target.put(ES_FR, initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")));
         } else if (DichotomyDirection.PT_ES.equals(direction)) {
-            target.put("ES_PT", -stepValue);
-            target.put("ES_FR", initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")));
+            target.put(ES_PT, -stepValue);
+            target.put(ES_FR, initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")));
         }
         return target;
     }
@@ -163,17 +168,17 @@ public final class SweNetworkShifter implements NetworkShifter {
     private Map<String, Double> getD2ccTargetExchanges(double stepValue) {
         Map<String, Double> target = new HashMap<>();
         if (DichotomyDirection.ES_FR.equals(direction)) {
-            target.put("ES_PT", 0.);
-            target.put("ES_FR", stepValue);
+            target.put(ES_PT, 0.);
+            target.put(ES_FR, stepValue);
         } else if (DichotomyDirection.FR_ES.equals(direction)) {
-            target.put("ES_PT", 0.);
-            target.put("ES_FR", -stepValue);
+            target.put(ES_PT, 0.);
+            target.put(ES_FR, -stepValue);
         } else if (DichotomyDirection.ES_PT.equals(direction)) {
-            target.put("ES_PT", stepValue);
-            target.put("ES_FR", 0.);
+            target.put(ES_PT, stepValue);
+            target.put(ES_FR, 0.);
         } else if (DichotomyDirection.PT_ES.equals(direction)) {
-            target.put("ES_PT", -stepValue);
-            target.put("ES_FR", 0.);
+            target.put(ES_PT, -stepValue);
+            target.put(ES_FR, 0.);
         }
         return target;
     }
