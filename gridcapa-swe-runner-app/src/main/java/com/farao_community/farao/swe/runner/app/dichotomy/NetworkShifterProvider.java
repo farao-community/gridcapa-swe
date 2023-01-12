@@ -60,6 +60,5 @@ public class NetworkShifterProvider {
                 throw new SweInvalidDataException(String.format("Unknown target process for SWE: %s", processType));
         }
     }
-
 }
 

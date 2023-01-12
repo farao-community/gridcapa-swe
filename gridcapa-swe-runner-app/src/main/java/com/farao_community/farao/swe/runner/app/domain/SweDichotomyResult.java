@@ -8,7 +8,6 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 
 import java.util.Optional;
@@ -19,14 +18,14 @@ import java.util.Optional;
 public class SweDichotomyResult {
 
     private final DichotomyDirection dichotomyDirection;
-    private final DichotomyResult<RaoResponse> dichotomyResult;
+    private final DichotomyResult<SweDichotomyValidationData> dichotomyResult;
     private final Optional<VoltageMonitoringResult> voltageMonitoringResult;
     private final String exportedCgmesUrl;
     private final String highestValidStepUrl;
     private final String lowestInvalidStepUrl;
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
-                              DichotomyResult<RaoResponse> dichotomyResult,
+                              DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                               Optional<VoltageMonitoringResult> voltageMonitoringResult,
                               String exportedCgmesUrl,
                               String highestValidStepUrl,
@@ -43,7 +42,7 @@ public class SweDichotomyResult {
         return dichotomyDirection;
     }
 
-    public DichotomyResult<RaoResponse> getDichotomyResult() {
+    public DichotomyResult<SweDichotomyValidationData> getDichotomyResult() {
         return dichotomyResult;
     }
 
