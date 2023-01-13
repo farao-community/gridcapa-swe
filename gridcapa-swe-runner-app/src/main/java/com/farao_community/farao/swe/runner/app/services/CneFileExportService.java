@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2023, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -19,14 +19,15 @@ import com.farao_community.farao.data.swe_cne_exporter.xsd.*;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +73,7 @@ public class CneFileExportService {
         this.processConfiguration = processConfiguration;
     }
 
-    public String exportCneUrl(SweData sweData, DichotomyResult<RaoResponse> dichotomyResult, boolean isHighestValid, DichotomyDirection direction) {
+    public String exportCneUrl(SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid, DichotomyDirection direction) {
         OffsetDateTime timestamp = sweData.getTimestamp();
         CneExporterParameters cneExporterParameters = getCneExporterParameters(timestamp);
         CimCracCreationContext cracCreationContext = getCimCracCreationContext(sweData, direction);
@@ -84,7 +85,7 @@ public class CneFileExportService {
         return minioAdapter.generatePreSignedUrl(cneResultPath);
     }
 
-    private RaoResult extractRaoResult(DichotomyResult<RaoResponse> dichotomyResult, boolean isHighestValid) {
+    private RaoResult extractRaoResult(DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid) {
         RaoResult raoResult = null;
         if (isHighestValid) {
             if (dichotomyResult.hasValidStep()) {
@@ -98,6 +99,20 @@ public class CneFileExportService {
         return raoResult;
     }
 
+    private AngleMonitoringResult extractAngleMonitoringResult(DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid) {
+        AngleMonitoringResult angleMonitoringResult = null;
+        if (isHighestValid) {
+            if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getValidationData() != null) {
+                angleMonitoringResult = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult();
+            }
+        } else {
+            if ((!Double.isNaN(dichotomyResult.getLowestInvalidStepValue())) && dichotomyResult.getLowestInvalidStep().getValidationData() != null) {
+                angleMonitoringResult = dichotomyResult.getLowestInvalidStep().getValidationData().getAngleMonitoringResult();
+            }
+        }
+        return angleMonitoringResult;
+    }
+
     private CimCracCreationContext getCimCracCreationContext(SweData sweData, DichotomyDirection direction) {
         if (direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES) {
             return sweData.getCracEsPt();
@@ -105,17 +120,18 @@ public class CneFileExportService {
         return sweData.getCracFrEs();
     }
 
-    private void exportAndZipCneFile(SweData sweData, DichotomyDirection direction, DichotomyResult<RaoResponse> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext, MemDataSource memDataSource, String targetZipFileName, boolean isHighestValid) {
+    private void exportAndZipCneFile(SweData sweData, DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext, MemDataSource memDataSource, String targetZipFileName, boolean isHighestValid) {
         try (OutputStream os = memDataSource.newOutputStream(targetZipFileName, false);
              ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
             RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
+            AngleMonitoringResult angleMonitoringResult = extractAngleMonitoringResult(dichotomyResult, isHighestValid);
             if (raoResult == null) {
                 marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
             } else {
                 SweCneExporter sweCneExporter = new SweCneExporter();
                 sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkUtil.getNetworkByDirection(sweData, direction), cracCreationContext,
-                        raoResult, null, RaoParameters.load(), cneExporterParameters, zipOs);
+                        raoResult, angleMonitoringResult, RaoParameters.load(), cneExporterParameters, zipOs);
             }
             zipOs.closeEntry();
         } catch (IOException | JAXBException | DatatypeConfigurationException | FaraoException e) {
@@ -123,7 +139,7 @@ public class CneFileExportService {
         }
     }
 
-    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction,  DichotomyResult<RaoResponse> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
+    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction,  DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
         CriticalNetworkElementMarketDocument marketDocument = createErrorMarketDocumentAndInitializeHeader(sweData, direction, cneExporterParameters);
         OffsetDateTime offsetDateTime = cracCreationContext.getTimeStamp().withMinute(0);
         Point point = SweCneClassCreator.newPoint(1);

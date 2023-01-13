@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2023, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -13,6 +13,7 @@ import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ class DichotomyRunnerTest {
     void testBuildDichotomyEngine() {
         when(networkShifterProvider.get(any(SweData.class), any(DichotomyDirection.class))).thenReturn(networkShifter);
         when(fileExporter.saveRaoParameters(sweData)).thenReturn("raoParameters.json");
-        DichotomyEngine<RaoResponse> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, parameters);
+        DichotomyEngine<SweDichotomyValidationData> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, parameters);
         assertNotNull(engine);
     }
 
@@ -68,7 +69,7 @@ class DichotomyRunnerTest {
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
         Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), Mockito.any(Parameters.class));
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
-        DichotomyResult<RaoResponse> dichotomyResult = spyDichotomyRunner.run(sweData, DichotomyDirection.ES_FR);
+        DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, DichotomyDirection.ES_FR);
         assertEquals(mockDichotomyResult, dichotomyResult);
     }
 }

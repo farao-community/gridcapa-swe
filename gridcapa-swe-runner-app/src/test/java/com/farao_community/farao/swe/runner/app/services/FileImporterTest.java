@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2023, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,6 +14,7 @@ import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.google.common.base.Suppliers;
 import com.powsybl.computation.local.LocalComputationManager;
+import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.glsk.commons.ZonalData;
 
 import com.powsybl.iidm.modification.scalable.Scalable;
@@ -120,4 +121,18 @@ class FileImporterTest {
 
     }
 
+    @Test
+    void importCimGlskTest() {
+        Instant instant = Instant.parse("2021-02-09T19:30:00Z");
+        CimGlskDocument cimGlskDocument = fileImporter.importCimGlskDocument(getClass().getResource(testDirectory + glskFilename).toString());
+        ZonalData<Scalable> zonalScalables = cimGlskDocument.getZonalScalable(network, instant);
+        assertEquals(2, zonalScalables.getDataPerZone().size());
+        Scalable scalableNL = zonalScalables.getData("10YNL----------L"); //type B45 curve type A03
+        assertEquals(3, scalableNL.filterInjections(network).size());
+        Scalable scalableBE = zonalScalables.getData("10YBE----------2"); //type B45 curve type A01
+        assertEquals(4, scalableBE.filterInjections(network).size());
+        assertEquals(192., scalableBE.scale(network, 192), 0.001);
+        assertEquals(-450., scalableBE.scale(network, -500), 0.001);
+
+    }
 }
