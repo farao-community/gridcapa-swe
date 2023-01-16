@@ -69,7 +69,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             if (isPortugalInDirection() && raoResultIsSecure(raoResult)) {
                 AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
                 AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
-                businessLogger.info("[{}] : Angle monitoring result {}", direction, angleMonitoringResult.getStatus());
+                businessLogger.info("Angle monitoring result {}", angleMonitoringResult.getStatus());
                 return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, angleMonitoringResult), angleMonitoringResult.isSecure());
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse));
