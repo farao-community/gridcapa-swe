@@ -33,10 +33,10 @@ class CgmesExportServiceTest {
     @Test
     void testBuildCgmesFilename() {
         SweData sweData = mock(SweData.class);
-        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.systemDefault()));
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.of("UTC")));
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         String result = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
-        assertEquals("20221130T0100Z_2D_FR_ESFR_001.xml", result);
+        assertEquals("20221130T0000Z_2D_FR_ESFR_001.xml", result);
     }
 
     @Test
