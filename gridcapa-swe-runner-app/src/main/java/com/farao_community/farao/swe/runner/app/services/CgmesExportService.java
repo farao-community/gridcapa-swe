@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2023, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -10,11 +10,11 @@ import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_api.network_action.NetworkAction;
 import com.farao_community.farao.data.crac_api.range_action.RangeAction;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.cgmes.conversion.export.*;
 import com.powsybl.cgmes.extensions.CgmesSvMetadata;
 import com.powsybl.commons.xml.XmlUtil;
@@ -54,7 +54,7 @@ public class CgmesExportService {
         this.fileExporter = fileExporter;
     }
 
-    public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<RaoResponse> dichotomyResult) {
+    public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
         if (dichotomyResult.hasValidStep()) {
             LOGGER.info("Start export of the CGMES files");
             this.mergingView = sweData.getMergingViewData().getMergingView();
@@ -66,7 +66,7 @@ public class CgmesExportService {
         }
     }
 
-    private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<RaoResponse> dichotomyResult) {
+    private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
         LOGGER.info("Applying remedial actions to the network");
         Crac matchingCrac = getMatchingCrac(direction, sweData);
         applyNetworkActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedNetworkActionsDuringState(matchingCrac.getPreventiveState()));
@@ -190,12 +190,12 @@ public class CgmesExportService {
         return context;
     }
 
-    private String buildCgmesFilename(SweData sweData, String country, String type) {
+    String buildCgmesFilename(SweData sweData, String country, String type) {
         String formattedFilename = cgmesFormatter.format(sweData.getTimestamp());
         return formattedFilename.replace("[process]", sweData.getProcessType().getCode()).replace("[country]", country).replace("[type]", type);
     }
 
-    private String createFileType(DichotomyDirection direction) {
+    String createFileType(DichotomyDirection direction) {
         StringBuilder sb = new StringBuilder();
         sb.append("CGM_");
         switch (direction) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2023, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -15,10 +15,10 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.iidm.network.Network;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +61,7 @@ class CneFileExportServiceTest {
     private RaoResult raoResult;
 
     @Mock
-    DichotomyResult<RaoResponse> dichotomyResult;
+    DichotomyResult<SweDichotomyValidationData> dichotomyResult;
 
     @Mock
     private CimCracCreationContext cracCreationContext;
@@ -73,10 +73,10 @@ class CneFileExportServiceTest {
     private Network network;
 
     @Mock
-    private DichotomyStepResult<RaoResponse> highestValidStep;
+    private DichotomyStepResult<SweDichotomyValidationData> highestValidStep;
 
     @Mock
-    private DichotomyStepResult<RaoResponse> lowestInvalidStep;
+    private DichotomyStepResult<SweDichotomyValidationData> lowestInvalidStep;
 
     private final OffsetDateTime offsetDateTime = OffsetDateTime.parse(DATE_STRING);
     private final DateTime dateTime = DateTime.parse(DATE_STRING);
@@ -91,7 +91,7 @@ class CneFileExportServiceTest {
     void exportCneUrlEsFrHighestValid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -108,7 +108,7 @@ class CneFileExportServiceTest {
     void exportCneUrlFrEsLowestInvalid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -124,7 +124,9 @@ class CneFileExportServiceTest {
     void exportCneUrlEsPtHighestValid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        //TODO
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -141,7 +143,9 @@ class CneFileExportServiceTest {
     void exportCneUrlPtEsLowestInvalid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        //TODO
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -157,7 +161,9 @@ class CneFileExportServiceTest {
     void exportLowestInvalidCneUrlFailConditionKOAndReturnNull() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
+        //TODO
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -173,7 +179,10 @@ class CneFileExportServiceTest {
     void exportHighestValidCneUrlFailConditionKOAndReturnNull() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetwork()).thenReturn(network);
+
+        //TODO
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);

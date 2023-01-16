@@ -13,8 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -52,6 +51,24 @@ class GenericThreadLauncherTest {
                 result += i * i;
             }
             return result;
+        }
+
+    }
+
+    private static class LaunchWithThreadableAnnotationThrowsException {
+
+        @Threadable
+        public Integer run(int steps) {
+            throw new SweInternalException("throwing exception");
+        }
+
+    }
+
+    private static class LaunchWithThreadableAnnotationThrowsInterruptionException {
+
+        @Threadable
+        public Integer run(int steps) {
+            throw new SweInternalException("throwing from interrupt", new InterruptedException());
         }
 
     }
@@ -121,4 +138,35 @@ class GenericThreadLauncherTest {
         }
         assertEquals(1, exception);
     }
+
+    @Test
+    void launchGenericThreadThrowsInterruptedException() {
+        GenericThreadLauncher<LaunchWithThreadableAnnotationThrowsInterruptionException, Integer> gtl = new GenericThreadLauncher<>(
+                new LaunchWithThreadableAnnotationThrowsInterruptionException(),
+                "withThreadable",
+                10);
+
+        gtl.start();
+        ThreadLauncherResult<Integer> result = gtl.getResult();
+
+        assertTrue(result.getResult().isEmpty());
+        assertFalse(result.hasError());
+        assertNull(result.getException());
+    }
+
+    @Test
+    void launchGenericThreadThrowsException() {
+        GenericThreadLauncher<LaunchWithThreadableAnnotationThrowsException, Integer> gtl = new GenericThreadLauncher<>(
+                new LaunchWithThreadableAnnotationThrowsException(),
+                "withThreadable",
+                10);
+
+        gtl.start();
+        ThreadLauncherResult<Integer> result = gtl.getResult();
+
+        assertTrue(result.getResult().isEmpty());
+        assertTrue(result.hasError());
+        assertNotNull(result.getException());
+    }
+
 }

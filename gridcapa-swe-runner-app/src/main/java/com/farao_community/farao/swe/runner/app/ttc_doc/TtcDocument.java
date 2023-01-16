@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2023, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -7,11 +7,11 @@
 package com.farao_community.farao.swe.runner.app.ttc_doc;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +66,8 @@ public class TtcDocument {
         listDichotomyResults.forEach(r -> addValueToResultMap(r.getDichotomyDirection(), r.getDichotomyResult()));
     }
 
-    private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<RaoResponse> result) {
-        if (result.hasValidStep()) {
+    private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> result) {
+        if (result != null && result.hasValidStep()) {
             mapWithValues.put(direction, String.valueOf((int) result.getHighestValidStepValue()));
         } else {
             mapWithValues.put(direction, "");
@@ -106,8 +106,8 @@ public class TtcDocument {
     }
 
     private void addAttributes(Element border, DichotomyDirection direction) {
-        border.setAttribute("from", getCountryNameFromInitial(direction.getDirection().split(DIRECTION_SEPARATOR)[0]));
-        border.setAttribute("to", getCountryNameFromInitial(direction.getDirection().split(DIRECTION_SEPARATOR)[1]));
+        border.setAttribute("from", getCountryNameFromInitial(direction.getName().split(DIRECTION_SEPARATOR)[0]));
+        border.setAttribute("to", getCountryNameFromInitial(direction.getName().split(DIRECTION_SEPARATOR)[1]));
     }
 
     private String getCountryNameFromInitial(String direction) {

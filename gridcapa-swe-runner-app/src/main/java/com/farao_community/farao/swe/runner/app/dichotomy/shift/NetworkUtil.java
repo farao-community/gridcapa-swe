@@ -6,8 +6,11 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 
+import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Injection;
+import com.powsybl.iidm.network.Network;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -28,5 +31,24 @@ public final class NetworkUtil {
                injection.getTerminal().isConnected() &&
                injection.getTerminal().getBusView().getBus() != null &&
                injection.getTerminal().getBusView().getBus().isInMainSynchronousComponent();
+    }
+
+    public static Network getNetworkByDirection(SweData sweData, DichotomyDirection direction) {
+        Network network = null;
+        switch (direction) {
+            case ES_FR:
+                network = sweData.getNetworkEsFr();
+                break;
+            case ES_PT:
+                network =  sweData.getNetworkEsPt();
+                break;
+            case FR_ES:
+                network =  sweData.getNetworkFrEs();
+                break;
+            case PT_ES:
+                network =  sweData.getNetworkPtEs();
+                break;
+        }
+        return network;
     }
 }

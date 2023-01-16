@@ -19,7 +19,14 @@ public class ProcessConfiguration {
     @Value("${swe-runner.zone-id}")
     private String zoneId;
 
+    @Value("${swe-runner.shift-max-iteration-number}")
+    private Integer shiftMaxIterationNumber;
+
     public String getZoneId() {
         return zoneId;
+    }
+
+    public Integer getShiftMaxIterationNumber() {
+        return shiftMaxIterationNumber;
     }
 }

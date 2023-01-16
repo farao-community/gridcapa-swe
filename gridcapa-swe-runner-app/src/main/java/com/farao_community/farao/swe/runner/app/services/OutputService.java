@@ -7,8 +7,6 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -30,6 +28,7 @@ import java.util.Optional;
 public class OutputService {
 
     public static final String TTC_DOC_NAME_REGEX = "'SWE_'yyyyMMdd'_'HHmm'_TTCdoc.xml'";
+    public static final String VOLTAGE_DOC_NAME_REGEX = "yyyyMMdd'_'HH'30_Voltage_[direction].zip'";
     private final FileExporter fileExporter;
     private final ProcessConfiguration processConfiguration;
 
@@ -50,25 +49,15 @@ public class OutputService {
         return df.format(localTime);
     }
 
-    public String buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, ExecutionResult<SweDichotomyResult> result) {
-        OffsetDateTime timestamp = sweData.getTimestamp();
-        String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-        String zipName = localTime.getYear()
-                + String.format("%02d", localTime.getMonthValue())
-                + String.format("%02d", localTime.getDayOfMonth()) + "_"
-                + String.format("%02d", localTime.getHour()) + "30_Voltage_"
-                + directionString
-                + ".zip";
-        Optional<SweDichotomyResult> directionResult = result.getResult().stream().filter(res -> res.getDichotomyDirection() == direction).findFirst();
-        if (directionResult.isPresent()) {
-            SweDichotomyResult sweResult = directionResult.get();
-            Optional<VoltageMonitoringResult> voltageResult = sweResult.getVoltageMonitoringResult();
-            if (voltageResult.isPresent()) {
-                VoltageMonitoringResult voltageRes = voltageResult.get();
-                return fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, ProcessType.D2CC, "VOLTAGE_" + directionString);
-            }
+    public void buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+        if (voltageMonitoringResult.isPresent()) {
+            OffsetDateTime timestamp = sweData.getTimestamp();
+            String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
+            OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+            DateTimeFormatter df = DateTimeFormatter.ofPattern(VOLTAGE_DOC_NAME_REGEX);
+            String zipName = df.format(localTime).replace("[direction]", directionString);
+            VoltageMonitoringResult voltageRes = voltageMonitoringResult.get();
+            fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, sweData.getProcessType(), "VOLTAGE_" + directionString);
         }
-        throw new SweInvalidDataException("No voltage monitoring result data for file: " + zipName);
     }
 }

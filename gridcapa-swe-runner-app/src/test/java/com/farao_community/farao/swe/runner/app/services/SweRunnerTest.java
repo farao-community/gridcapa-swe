@@ -36,14 +36,9 @@ class SweRunnerTest {
     @Test
     void run() {
         when(filesService.importFiles(any(SweRequest.class))).thenReturn(mock(SweData.class));
-        when(dichotomyParallelization.launchDichotomy(any(SweData.class))).thenReturn(new SweResponse("id", "ttcUrl",
-                "voltageEsFrZipUrl", "esFrHighestValidStepUrl", "esFrLowestInvalidStepUrl", "esFrCgmesZipUrl"));
+        when(dichotomyParallelization.launchDichotomy(any(SweData.class))).thenReturn(new SweResponse("id", "ttcUrl"));
         SweResponse sweResponse = sweRunner.run(mock(SweRequest.class));
         assertNotNull(sweResponse);
         assertEquals("ttcUrl", sweResponse.getTtcDocUrl());
-        assertEquals("voltageEsFrZipUrl", sweResponse.getEsFrVoltageZipUrl());
-        assertEquals("esFrHighestValidStepUrl", sweResponse.getEsFrHighestValidStepUrl());
-        assertEquals("esFrLowestInvalidStepUrl", sweResponse.getEsFrLowestInvalidStepUrl());
-        assertEquals("esFrCgmesZipUrl", sweResponse.getEsFrCgmesZipUrl());
     }
 }

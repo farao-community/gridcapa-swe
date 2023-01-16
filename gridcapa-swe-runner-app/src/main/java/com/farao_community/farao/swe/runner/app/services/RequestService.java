@@ -31,6 +31,7 @@ import java.util.UUID;
 @Service
 public class RequestService {
     private static final String TASK_STATUS_UPDATE = "task-status-update";
+    private static final String STOP_RAO_BINDING = "stop-rao";
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestService.class);
     private final SweRunner sweRunner;
     private final Logger businessLogger;
@@ -48,7 +49,8 @@ public class RequestService {
         SweRequest sweRequest = jsonApiConverter.fromJsonMessage(req, SweRequest.class);
         // propagate in logs MDC the task id as an extra field to be able to match microservices logs with calculation tasks.
         // This should be done only once, as soon as the information to add in mdc is available.
-        MDC.put("gridcapa-task-id", sweRequest.getId());
+        final String sweRequestId = sweRequest.getId();
+        MDC.put("gridcapa-task-id", sweRequestId);
         try {
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweRequest.getId()), TaskStatus.RUNNING));
             LOGGER.info("Swe request received : {}", sweRequest);
@@ -64,16 +66,17 @@ public class RequestService {
                 LOGGER.info("Swe response sent: {}", resp.get());
             } else {
                 businessLogger.info("SWE run has been interrupted");
-                result = sendSweResponse(new SweResponse(sweRequest.getId(), null, null, null, null, null));
+                result = sendSweResponse(new SweResponse(sweRequestId, null));
             }
         } catch (Exception e) {
-            result = handleError(e, sweRequest.getId());
+            result = handleError(e, sweRequestId);
         }
         return result;
     }
 
     private byte[] sendSweResponse(SweResponse sweResponse) {
-        if (sweResponse.getTtcDocUrl() == null && sweResponse.getEsFrVoltageZipUrl() == null) {
+        if (sweResponse.getTtcDocUrl() == null) {
+            streamBridge.send(STOP_RAO_BINDING, sweResponse.getId());
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.INTERRUPTED));
         } else {
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.SUCCESS));

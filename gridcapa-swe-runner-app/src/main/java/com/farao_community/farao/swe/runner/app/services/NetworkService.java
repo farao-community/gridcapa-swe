@@ -19,9 +19,7 @@ import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.computation.local.LocalComputationManager;
-import com.powsybl.iidm.export.Exporters;
-import com.powsybl.iidm.import_.ImportConfig;
-import com.powsybl.iidm.import_.Importers;
+import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
@@ -60,6 +58,15 @@ public class NetworkService {
     public NetworkService(MinioAdapter minioAdapter, Logger businessLogger) {
         this.minioAdapter = minioAdapter;
         this.businessLogger = businessLogger;
+    }
+
+    public Network loadNetworkFromMinio(OffsetDateTime targetDateTime) {
+        String fileName = networkFormatter.format(targetDateTime);
+        try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + fileName)) {
+            return Network.read(fileName, xiidm);
+        } catch (IOException e) {
+            throw new SweInternalException("Could not load network from XIIDM file");
+        }
     }
 
     public Network importNetwork(SweRequest sweRequest) {
@@ -122,7 +129,7 @@ public class NetworkService {
     Network importFromZip(String zipPath) {
         Properties importParams = new Properties();
         importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
-        return Importers.loadNetwork(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
+        return Network.read(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
     }
 
     private void deleteFile(File srcFile) {
@@ -158,7 +165,7 @@ public class NetworkService {
 
     private void exportToMinio(Network network, OffsetDateTime targetDateTime) {
         MemDataSource memDataSource = new MemDataSource();
-        Exporters.export("XIIDM", network, new Properties(), memDataSource);
+        network.write("XIIDM", new Properties(), memDataSource);
         InputStream xiidm;
         try {
             xiidm = memDataSource.newInputStream("", "xiidm");

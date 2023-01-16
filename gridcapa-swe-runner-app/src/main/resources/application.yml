@@ -19,10 +19,13 @@ spring:
           destination: swe-d2cc-stop-task
         request-in-0:
           destination: swe-d2cc-request
+          group: swe-d2cc-runner
         request-out-0:
           destination: swe-d2cc-response
         task-status-update:
           destination: swe-d2cc-task-status-updated
+        stop-rao:
+          destination: stop-rao-runner
 
 logback:
   amqp:
@@ -31,6 +34,7 @@ logback:
 
 swe-runner:
   zone-id: "Europe/Paris"
+  shift-max-iteration-number: 20
   dichotomy:
     parameters:
       ES_FR:
