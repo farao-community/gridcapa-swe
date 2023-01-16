@@ -93,7 +93,6 @@ class FileExporterTest {
     @Test
     void saveRaoParametersTest() {
         SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null, null, null, null, null);
-        RaoParameters raoParameters = RaoParameters.load();
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("raoParametersUrl");
         String raoParametersUrl = fileExporter.saveRaoParameters(sweData);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
