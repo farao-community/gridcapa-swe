@@ -104,6 +104,7 @@ class FileExporterTest {
         RaoParameters raoParameters = fileExporter.getSweRaoParameters();
         SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
         assertEquals(2, searchTreeRaoParameters.getUnoptimizedCnecsInSeriesWithPstsIds().size());
+        assertEquals(5, searchTreeRaoParameters.getMaxCurativeRaPerTso().get("RTE"));
     }
 
     @Test
