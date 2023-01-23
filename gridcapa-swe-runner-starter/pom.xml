@@ -5,14 +5,14 @@
     <parent>
         <artifactId>gridcapa-swe</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gridcapa-swe-runner-starter</artifactId>
     <name>GridCapa SWE runner service client SpringBoot starter</name>
     <description>Starter to be used in Spring application to use SWE capacity calculation</description>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
 
     <properties>
