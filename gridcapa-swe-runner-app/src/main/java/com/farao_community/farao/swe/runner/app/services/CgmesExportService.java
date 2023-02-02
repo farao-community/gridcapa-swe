@@ -15,13 +15,12 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.export.*;
 import com.powsybl.cgmes.extensions.CgmesSvMetadata;
 import com.powsybl.commons.xml.XmlUtil;
 import com.powsybl.iidm.mergingview.MergingView;
-import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.TieLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,9 +49,11 @@ public class CgmesExportService {
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[country]_[type]_001.xml'");
     private final FileExporter fileExporter;
     private MergingView mergingView;
+    private final UrlValidationService urlValidationService;
 
-    public CgmesExportService(FileExporter fileExporter) {
+    public CgmesExportService(FileExporter fileExporter, UrlValidationService urlValidationService) {
         this.fileExporter = fileExporter;
+        this.urlValidationService = urlValidationService;
     }
 
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
@@ -59,11 +61,21 @@ public class CgmesExportService {
             LOGGER.info("Start export of the CGMES files");
             this.mergingView = sweData.getMergingViewData().getMergingView();
             applyRemedialActions(direction, sweData, dichotomyResult);
+            String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
+            applyLastShiftSecureToMergingView(networkWithPraUrl, mergingView);
             return exportMergingView(sweData, direction);
         } else {
             LOGGER.error("Not valid step, CGMES files wont be exported");
             return null;
         }
+    }
+
+    void applyLastShiftSecureToMergingView(String networkWithPraUrl, MergingView mergingView) {
+        InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl);
+        Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
+
+        mergingView.getGenerators().forEach(generator ->  generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP()));
+        mergingView.getLoads().forEach(load -> load.setP0(networkWithPra.getLoad(load.getId()).getP0()));
     }
 
     private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
@@ -161,15 +173,6 @@ public class CgmesExportService {
 
     private Map<String, ByteArrayOutputStream> createCommonFile(Network n1, Network n2, Network n3, SweData sweData) throws XMLStreamException, IOException {
         LOGGER.info("Building SV file");
-        // todo remove this foreach block when pumping to powsybl 5.0.0
-        for (Line l : mergingView.getLines()) {
-            if (l instanceof TieLine) {
-                TieLine tl = (TieLine) l;
-                tl.removeProperty("CGMES." + tl.getHalf1().getId() + ".Terminal_Boundary");
-                tl.removeProperty("CGMES." + tl.getHalf2().getId() + ".Terminal_Boundary");
-            }
-        }
-
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
             StateVariablesExport.write(mergingView, writer, createContext(mergingView, n1, n2, n3));
