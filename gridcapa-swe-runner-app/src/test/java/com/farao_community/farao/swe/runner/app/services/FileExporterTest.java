@@ -11,6 +11,7 @@ import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
+import com.farao_community.farao.search_tree_rao.castor.parameters.SearchTreeRaoParameters;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
@@ -92,11 +93,18 @@ class FileExporterTest {
     @Test
     void saveRaoParametersTest() {
         SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null, null, null, null, null);
-        RaoParameters raoParameters = RaoParameters.load();
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("raoParametersUrl");
         String raoParametersUrl = fileExporter.saveRaoParameters(sweData);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
         assertEquals("raoParametersUrl", raoParametersUrl);
+    }
+
+    @Test
+    void sweRaoParametersTest() {
+        RaoParameters raoParameters = fileExporter.getSweRaoParameters();
+        SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
+        assertEquals(2, searchTreeRaoParameters.getUnoptimizedCnecsInSeriesWithPstsIds().size());
+        assertEquals(5, searchTreeRaoParameters.getMaxCurativeRaPerTso().get("RTE"));
     }
 
     @Test
