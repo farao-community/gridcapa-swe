@@ -15,6 +15,10 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.hvdc.HvdcLinkProcessor;
+import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationParameters;
+import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
+import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.export.*;
 import com.powsybl.cgmes.extensions.CgmesSvMetadata;
@@ -62,7 +66,7 @@ public class CgmesExportService {
             this.mergingView = sweData.getMergingViewData().getMergingView();
             applyRemedialActions(direction, sweData, dichotomyResult);
             String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
-            applyLastShiftSecureToMergingView(networkWithPraUrl, mergingView);
+            applyNetworkWithPraResultToMergingView(networkWithPraUrl, mergingView);
             return exportMergingView(sweData, direction);
         } else {
             LOGGER.error("Not valid step, CGMES files wont be exported");
@@ -70,12 +74,22 @@ public class CgmesExportService {
         }
     }
 
-    void applyLastShiftSecureToMergingView(String networkWithPraUrl, MergingView mergingView) {
-        InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl);
-        Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
+    void applyNetworkWithPraResultToMergingView(String networkWithPraUrl, MergingView mergingView) {
+        try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
+            LOGGER.info("Applying last shift to the network");
+            Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
+            mergingView.getGenerators().forEach(generator -> generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP()));
+            mergingView.getLoads().forEach(load -> load.setP0(networkWithPra.getLoad(load.getId()).getP0()));
 
-        mergingView.getGenerators().forEach(generator ->  generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP()));
-        mergingView.getLoads().forEach(load -> load.setP0(networkWithPra.getLoad(load.getId()).getP0()));
+            LOGGER.info("Applying HVDC values to AC equivalent model");
+            // Applying the HVDC set point to the CGMES equivalent model if it was changed during the RAO computation
+            SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
+            Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
+            hvdcCreationParameters.forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
+
+        } catch (IOException e) {
+            throw new SweInternalException("Could not export CGMES files", e);
+        }
     }
 
     private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
@@ -116,7 +130,7 @@ public class CgmesExportService {
             mapCgmesFiles.putAll(createCommonFile(sweData.getMergingViewData().getNetworkFr(), sweData.getMergingViewData().getNetworkEs(), sweData.getMergingViewData().getNetworkPt(), sweData));
             return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, createFileType(direction));
         } catch (XMLStreamException | IOException e) {
-            throw new SweInternalException("Could not export CGMES files");
+            throw new SweInternalException("Could not export CGMES files", e);
         }
     }
 

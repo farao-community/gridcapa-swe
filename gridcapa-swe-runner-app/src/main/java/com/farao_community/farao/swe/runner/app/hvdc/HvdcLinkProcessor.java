@@ -120,7 +120,8 @@ public final class HvdcLinkProcessor {
     }
 
     private static void replaceHvdcByEquivalentModel(Network network, HvdcCreationParameters creationParameters) {
-        connectEquivalentGeneratorsAndLoads(network, creationParameters);
+        HvdcLine hvdcLine = network.getHvdcLine(creationParameters.getId());
+        connectEquivalentGeneratorsAndLoads(network, creationParameters, hvdcLine);
         connectEquivalentAcLine(network, creationParameters);
 
         network.getHvdcLine(creationParameters.getId()).remove();
@@ -139,8 +140,7 @@ public final class HvdcLinkProcessor {
         }
     }
 
-    private static void connectEquivalentGeneratorsAndLoads(Network network, HvdcCreationParameters creationParameters) {
-        HvdcLine hvdcLine = network.getHvdcLine(creationParameters.getId());
+    public static void connectEquivalentGeneratorsAndLoads(Network network, HvdcCreationParameters creationParameters,  HvdcLine hvdcLine) {
 
         Load load1 = network.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
         Generator gen1 = network.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));
