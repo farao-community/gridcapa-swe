@@ -203,7 +203,8 @@ public class FileExporter {
     }
 
     public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction, String filetype) throws IOException {
-        String cgmesFilename = cgmesFormatter.format(sweData.getTimestamp()).replace("[direction]", direction.getName().replace("-", ""));
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+        String cgmesFilename = cgmesFormatter.format(localTime).replace("[direction]", direction.getName().replace("-", ""));
         String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ZipOutputStream zipOs = new ZipOutputStream(baos)) {
