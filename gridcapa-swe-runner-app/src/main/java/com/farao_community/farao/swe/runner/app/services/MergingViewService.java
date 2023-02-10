@@ -45,6 +45,7 @@ public class MergingViewService {
         Network networkPt = networkService.importFromZip(buildZipFile(sweRequest, Country.PT));
 
         MergingView mergingView = MergingView.create("MergingViewService", "iidm");
+        mergingView.setCaseDate(networkFr.getCaseDate());
         mergingView.merge(networkFr, networkEs, networkPt);
         return new MergingViewData(networkFr, networkEs, networkPt, mergingView);
     }

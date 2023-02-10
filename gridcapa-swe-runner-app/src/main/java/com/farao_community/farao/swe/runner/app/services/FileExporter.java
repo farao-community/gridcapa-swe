@@ -57,7 +57,7 @@ public class FileExporter {
     private final MinioAdapter minioAdapter;
     private final VoltageResultMapper voltageResultMapper;
     private static final Map<String, String> UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS = Map.of(
-            " _0a3cbdb0-cd71-52b0-b93d-cb48c9fea3e2 + _6f6b15b3-9bcc-7864-7669-522e9f06e931", "_7824bc48-fc86-51db-8f9c-01b44933839e",
+            "_0a3cbdb0-cd71-52b0-b93d-cb48c9fea3e2 + _6f6b15b3-9bcc-7864-7669-522e9f06e931", "_7824bc48-fc86-51db-8f9c-01b44933839e",
             "_1d9c658e-1a01-c0ee-d127-a22e1270a242 + _2e81de07-4c22-5aa1-9683-5e51b054f7f8", "_e071a1d4-fef5-1bd9-5278-d195c5597b6e"
     );
     private static final Map<String, Integer> MAX_CURATIVE_RA_PER_TSO = Map.of("RTE", 5);
@@ -203,7 +203,7 @@ public class FileExporter {
     }
 
     public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction, String filetype) throws IOException {
-        String cgmesFilename = cgmesFormatter.format(sweData.getTimestamp()).replace("[direction]", direction.getName().replace("-", ""));
+        String cgmesFilename = getCgmZipFileName(sweData.getTimestamp(), direction);
         String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ZipOutputStream zipOs = new ZipOutputStream(baos)) {
@@ -228,6 +228,11 @@ public class FileExporter {
             }
         }
         return minioAdapter.generatePreSignedUrl(cgmesPath);
+    }
+
+    String getCgmZipFileName(OffsetDateTime offsetDateTime, DichotomyDirection direction) {
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(offsetDateTime.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+        return cgmesFormatter.format(localTime).replace("[direction]", direction.getName().replace("-", ""));
     }
 
     public String adaptTargetProcessName(ProcessType processType) {
