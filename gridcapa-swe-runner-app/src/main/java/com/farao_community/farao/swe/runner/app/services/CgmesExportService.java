@@ -78,14 +78,22 @@ public class CgmesExportService {
         try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
             LOGGER.info("Applying last shift to the network");
             Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
-            mergingView.getGenerators().forEach(generator -> generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP()));
-            mergingView.getLoads().forEach(load -> load.setP0(networkWithPra.getLoad(load.getId()).getP0()));
+            mergingView.getGenerators().forEach(generator -> {
+                if (networkWithPra.getGenerator(generator.getId()) != null) {
+                    generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
+                }
+            });
+            mergingView.getLoads().forEach(load -> {
+                if (networkWithPra.getLoad(load.getId()) != null) {
+                    load.setP0(networkWithPra.getLoad(load.getId()).getP0());
+                }
+            });
 
             LOGGER.info("Applying HVDC values to AC equivalent model");
             // Applying the HVDC set point to the CGMES equivalent model if it was changed during the RAO computation
             SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
             Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
-            hvdcCreationParameters.forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
+            hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
 
         } catch (IOException e) {
             throw new SweInternalException("Could not export CGMES files", e);
