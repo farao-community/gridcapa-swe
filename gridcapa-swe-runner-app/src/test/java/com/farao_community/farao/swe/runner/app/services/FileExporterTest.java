@@ -13,6 +13,7 @@ import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoring
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.search_tree_rao.castor.parameters.SearchTreeRaoParameters;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,5 +113,11 @@ class FileExporterTest {
         assertEquals("SWE_D2CC", fileExporter.adaptTargetProcessName(ProcessType.D2CC));
         assertEquals("SWE_IDCC", fileExporter.adaptTargetProcessName(ProcessType.IDCC));
 
+    }
+
+    @Test
+    void cgmFileNameTest() {
+        String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR);
+        assertEquals("20230101_0130_CGM_ESFR.zip", cgmFileName);
     }
 }

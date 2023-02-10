@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -203,8 +204,7 @@ public class FileExporter {
     }
 
     public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction, String filetype) throws IOException {
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-        String cgmesFilename = cgmesFormatter.format(localTime).replace("[direction]", direction.getName().replace("-", ""));
+        String cgmesFilename = getCgmZipFileName(sweData.getTimestamp(), direction);
         String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ZipOutputStream zipOs = new ZipOutputStream(baos)) {
@@ -229,6 +229,11 @@ public class FileExporter {
             }
         }
         return minioAdapter.generatePreSignedUrl(cgmesPath);
+    }
+
+    String getCgmZipFileName(OffsetDateTime offsetDateTime, DichotomyDirection direction) {
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(offsetDateTime.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+        return cgmesFormatter.format(localTime).replace("[direction]", direction.getName().replace("-", ""));
     }
 
     public String adaptTargetProcessName(ProcessType processType) {
