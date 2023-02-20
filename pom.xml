@@ -60,7 +60,7 @@
         <farao.dependencies.version>1.10.0</farao.dependencies.version>
         <farao.dichotomy.version>4.9.0</farao.dichotomy.version>
         <gridcapa.starter.minio.version>1.0.0</gridcapa.starter.minio.version>
-        <gridcapa.rao.runner.version>1.9.0</gridcapa.rao.runner.version>
+        <gridcapa.rao.runner.version>1.11.0</gridcapa.rao.runner.version>
         <gridcapa.task-manager.version>1.13.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
