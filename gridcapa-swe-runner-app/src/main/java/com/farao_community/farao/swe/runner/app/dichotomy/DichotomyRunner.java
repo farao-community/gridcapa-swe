@@ -8,8 +8,8 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.DichotomyEngine;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
+import com.farao_community.farao.dichotomy.api.index.HalfRangeDivisionIndexStrategy;
 import com.farao_community.farao.dichotomy.api.index.Index;
-import com.farao_community.farao.dichotomy.api.index.RangeDivisionIndexStrategy;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DichotomyRunner {
-    private static final RangeDivisionIndexStrategy INDEX_STRATEGY_CONFIGURATION = new RangeDivisionIndexStrategy(false);
+    private static final HalfRangeDivisionIndexStrategy HALF_INDEX_STRATEGY_CONFIGURATION = new HalfRangeDivisionIndexStrategy(false);
 
     private final DichotomyConfiguration dichotomyConfiguration;
     private final DichotomyLogging dichotomyLogging;
@@ -66,7 +66,7 @@ public class DichotomyRunner {
     DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, Parameters parameters) {
         return new DichotomyEngine<>(
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
-                INDEX_STRATEGY_CONFIGURATION,
+                HALF_INDEX_STRATEGY_CONFIGURATION,
                 networkShifterProvider.get(sweData, direction),
                 getNetworkValidator(sweData, direction));
     }
