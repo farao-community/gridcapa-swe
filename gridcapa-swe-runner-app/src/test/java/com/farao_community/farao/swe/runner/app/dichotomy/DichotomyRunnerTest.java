@@ -10,6 +10,7 @@ import com.farao_community.farao.dichotomy.api.DichotomyEngine;
 import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -22,6 +23,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -55,7 +58,7 @@ class DichotomyRunnerTest {
     @Test
     void testBuildDichotomyEngine() {
         when(networkShifterProvider.get(any(SweData.class), any(DichotomyDirection.class))).thenReturn(networkShifter);
-        when(fileExporter.saveRaoParameters(sweData)).thenReturn("raoParameters.json");
+        when(fileExporter.saveRaoParameters(OffsetDateTime.now(), ProcessType.D2CC, DichotomyDirection.ES_FR)).thenReturn("raoParameters.json");
         DichotomyEngine<SweDichotomyValidationData> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, parameters);
         assertNotNull(engine);
     }

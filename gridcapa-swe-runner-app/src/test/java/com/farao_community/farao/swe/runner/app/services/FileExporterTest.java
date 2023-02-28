@@ -14,7 +14,6 @@ import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.search_tree_rao.castor.parameters.SearchTreeRaoParameters;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,18 +92,25 @@ class FileExporterTest {
 
     @Test
     void saveRaoParametersTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, null, null, null, null, null, null, null, null, null, null);
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("raoParametersUrl");
-        String raoParametersUrl = fileExporter.saveRaoParameters(sweData);
+        String raoParametersUrl = fileExporter.saveRaoParameters(OffsetDateTime.now(), ProcessType.D2CC, DichotomyDirection.ES_FR);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
         assertEquals("raoParametersUrl", raoParametersUrl);
     }
 
     @Test
-    void sweRaoParametersTest() {
-        RaoParameters raoParameters = fileExporter.getSweRaoParameters();
+    void sweRaoParametersEsFrTest() {
+        RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_FR);
         SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
         assertEquals(2, searchTreeRaoParameters.getUnoptimizedCnecsInSeriesWithPstsIds().size());
+        assertEquals(5, searchTreeRaoParameters.getMaxCurativeRaPerTso().get("RTE"));
+    }
+
+    @Test
+    void sweRaoParametersEsPtTest() {
+        RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_PT);
+        SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
+        assertEquals(0, searchTreeRaoParameters.getUnoptimizedCnecsInSeriesWithPstsIds().size());
         assertEquals(5, searchTreeRaoParameters.getMaxCurativeRaPerTso().get("RTE"));
     }
 

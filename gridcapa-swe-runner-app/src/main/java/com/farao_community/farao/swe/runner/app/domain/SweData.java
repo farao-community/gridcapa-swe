@@ -30,8 +30,10 @@ public class SweData {
     private final String glskUrl;
     private final String jsonCracPathEsPt;
     private final String jsonCracPathFrEs;
+    private final String raoParametersEsFrUrl;
+    private final String raoParametersEsPtUrl;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
@@ -45,6 +47,8 @@ public class SweData {
         this.glskUrl = glskUrl;
         this.jsonCracPathEsPt = jsonCracPathEsPt;
         this.jsonCracPathFrEs = jsonCracPathFrEs;
+        this.raoParametersEsFrUrl = raoParametersEsFrUrl;
+        this.raoParametersEsPtUrl = raoParametersEsPtUrl;
     }
 
     public String getId() {
@@ -99,4 +103,11 @@ public class SweData {
         return jsonCracPathFrEs;
     }
 
+    public String getRaoParametersEsFrUrl() {
+        return raoParametersEsFrUrl;
+    }
+
+    public String getRaoParametersEsPtUrl() {
+        return raoParametersEsPtUrl;
+    }
 }

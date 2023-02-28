@@ -50,7 +50,7 @@ public class FileExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
-    private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
+    private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
 
     public static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
@@ -176,23 +176,27 @@ public class FileExporter {
         }
     }
 
-    public String saveRaoParameters(SweData sweData) {
-        RaoParameters raoParameters = getSweRaoParameters();
+    public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, DichotomyDirection direction) {
+        RaoParameters raoParameters = getSweRaoParameters(direction);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonRaoParameters.write(raoParameters, baos);
-        String raoParametersDestinationPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.ARTIFACTS) + RAO_PARAMETERS_FILE_NAME;
+        String raoParametersFileName = String.format(RAO_PARAMETERS_FILE_NAME, direction);
+        String raoParametersDestinationPath = makeDestinationMinioPath(timestamp, FileKind.ARTIFACTS) + raoParametersFileName;
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        minioAdapter.uploadArtifactForTimestamp(raoParametersDestinationPath, bais, sweData.getProcessType().toString(), "", sweData.getTimestamp());
+        minioAdapter.uploadArtifactForTimestamp(raoParametersDestinationPath, bais, processType.toString(), "", timestamp);
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    RaoParameters getSweRaoParameters() {
+    RaoParameters getSweRaoParameters(DichotomyDirection direction) {
         RaoParameters raoParameters = RaoParameters.load();
         // These additional parameters are specific to RAO Swe process
-        // We need to add them here because they are not read from .itools , todo remove this when correction is done in farao-core
+        // We need to add them here because they are not read from .itools ,
         SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
-        searchTreeRaoParameters.setUnoptimizedCnecsInSeriesWithPstsIds(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
         searchTreeRaoParameters.setMaxCurativeRaPerTso(MAX_CURATIVE_RA_PER_TSO);
+        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
+            // The cnec in series with pst concern only ES/FR border
+            searchTreeRaoParameters.setUnoptimizedCnecsInSeriesWithPstsIds(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
+        }
         return raoParameters;
     }
 
