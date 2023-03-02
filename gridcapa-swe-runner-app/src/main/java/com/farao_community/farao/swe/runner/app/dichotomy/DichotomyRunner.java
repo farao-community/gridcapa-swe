@@ -72,8 +72,7 @@ public class DichotomyRunner {
     }
 
     private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction) {
-        String raoParametersURL = fileExporter.saveRaoParameters(sweData);
-        return new RaoValidator(fileExporter, fileImporter, raoParametersURL, raoRunnerClient, sweData, direction, businessLogger);
+        return new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, direction, businessLogger);
     }
 
 }

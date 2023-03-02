@@ -37,7 +37,6 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
 
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
-    private final String raoParametersUrl;
     private final RaoRunnerClient raoRunnerClient;
     private final SweData sweData;
     private final DichotomyDirection direction;
@@ -45,10 +44,9 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, String raoParametersUrl, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, Logger businessLogger) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, Logger businessLogger) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
-        this.raoParametersUrl = raoParametersUrl;
         this.raoRunnerClient = raoRunnerClient;
         this.sweData = sweData;
         this.direction = direction;
@@ -80,6 +78,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
 
     private RaoRequest buildRaoRequest(String networkPresignedUrl, String scaledNetworkDirPath) {
         String resultsDestination = REGION + MINIO_SEPARATOR + sweData.getProcessType() + MINIO_SEPARATOR + scaledNetworkDirPath;
+        String raoParametersUrl = getMatchingRaoParametersUrl(direction);
         return new RaoRequest(sweData.getId(), networkPresignedUrl, getMatchingCracPath(direction, sweData), raoParametersUrl, resultsDestination, direction.getName());
     }
 
@@ -94,6 +93,15 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             return sweData.getJsonCracPathFrEs();
         } else if (direction.equals(DichotomyDirection.ES_PT) || direction.equals(DichotomyDirection.PT_ES)) {
             return sweData.getJsonCracPathEsPt();
+        }
+        throw new SweInvalidDataException("Unknown direction");
+    }
+
+    private String getMatchingRaoParametersUrl(DichotomyDirection direction) {
+        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
+            return sweData.getRaoParametersEsFrUrl();
+        } else if (direction.equals(DichotomyDirection.ES_PT) || direction.equals(DichotomyDirection.PT_ES)) {
+            return sweData.getRaoParametersEsPtUrl();
         }
         throw new SweInvalidDataException("Unknown direction");
     }
