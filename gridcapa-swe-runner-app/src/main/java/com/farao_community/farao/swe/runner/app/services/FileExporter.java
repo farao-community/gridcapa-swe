@@ -13,7 +13,6 @@ import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_api.json.JsonRaoParameters;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
-import com.farao_community.farao.search_tree_rao.castor.parameters.SearchTreeRaoParameters;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
@@ -189,13 +188,10 @@ public class FileExporter {
 
     RaoParameters getSweRaoParameters(DichotomyDirection direction) {
         RaoParameters raoParameters = RaoParameters.load();
-        // These additional parameters are specific to RAO Swe process
-        // We need to add them here because they are not read from .itools ,
-        SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
-        searchTreeRaoParameters.setMaxCurativeRaPerTso(MAX_CURATIVE_RA_PER_TSO);
+        raoParameters.getRaUsageLimitsPerContingencyParameters().setMaxCurativeRaPerTso(MAX_CURATIVE_RA_PER_TSO);
         if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
             // The cnec in series with pst concern only ES/FR border
-            searchTreeRaoParameters.setUnoptimizedCnecsInSeriesWithPstsIds(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
+            raoParameters.getNotOptimizedCnecsParameters().setDoNotOptimizeCnecsSecuredByTheirPst(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
         }
         return raoParameters;
     }
