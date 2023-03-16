@@ -59,7 +59,6 @@ public class FileExporter {
             "_0a3cbdb0-cd71-52b0-b93d-cb48c9fea3e2 + _6f6b15b3-9bcc-7864-7669-522e9f06e931", "_7824bc48-fc86-51db-8f9c-01b44933839e",
             "_1d9c658e-1a01-c0ee-d127-a22e1270a242 + _2e81de07-4c22-5aa1-9683-5e51b054f7f8", "_e071a1d4-fef5-1bd9-5278-d195c5597b6e"
     );
-    private static final Map<String, Integer> MAX_CURATIVE_RA_PER_TSO = Map.of("RTE", 5);
 
     private final ProcessConfiguration processConfiguration;
 
@@ -188,7 +187,6 @@ public class FileExporter {
 
     RaoParameters getSweRaoParameters(DichotomyDirection direction) {
         RaoParameters raoParameters = RaoParameters.load();
-        raoParameters.getRaUsageLimitsPerContingencyParameters().setMaxCurativeRaPerTso(MAX_CURATIVE_RA_PER_TSO);
         if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
             // The cnec in series with pst concern only ES/FR border
             raoParameters.getNotOptimizedCnecsParameters().setDoNotOptimizeCnecsSecuredByTheirPst(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);

@@ -101,14 +101,12 @@ class FileExporterTest {
     void sweRaoParametersEsFrTest() {
         RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_FR);
         assertEquals(2, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
-        assertEquals(5, raoParameters.getRaUsageLimitsPerContingencyParameters().getMaxCurativeRaPerTso().get("RTE"));
     }
 
     @Test
     void sweRaoParametersEsPtTest() {
         RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_PT);
         assertEquals(0, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
-        assertEquals(5, raoParameters.getRaUsageLimitsPerContingencyParameters().getMaxCurativeRaPerTso().get("RTE"));
     }
 
     @Test
