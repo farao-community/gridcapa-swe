@@ -11,7 +11,6 @@ import com.farao_community.farao.data.crac_impl.CracImpl;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
-import com.farao_community.farao.search_tree_rao.castor.parameters.SearchTreeRaoParameters;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
@@ -101,17 +100,13 @@ class FileExporterTest {
     @Test
     void sweRaoParametersEsFrTest() {
         RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_FR);
-        SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
-        assertEquals(2, searchTreeRaoParameters.getUnoptimizedCnecsInSeriesWithPstsIds().size());
-        assertEquals(5, searchTreeRaoParameters.getMaxCurativeRaPerTso().get("RTE"));
+        assertEquals(2, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
     }
 
     @Test
     void sweRaoParametersEsPtTest() {
         RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_PT);
-        SearchTreeRaoParameters searchTreeRaoParameters = raoParameters.getExtensionByName("SearchTreeRaoParameters");
-        assertEquals(0, searchTreeRaoParameters.getUnoptimizedCnecsInSeriesWithPstsIds().size());
-        assertEquals(5, searchTreeRaoParameters.getMaxCurativeRaPerTso().get("RTE"));
+        assertEquals(0, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
     }
 
     @Test
