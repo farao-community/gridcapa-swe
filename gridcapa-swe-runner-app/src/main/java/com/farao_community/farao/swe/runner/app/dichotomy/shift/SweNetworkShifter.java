@@ -144,7 +144,7 @@ public final class SweNetworkShifter implements NetworkShifter {
     }
 
     Map<String, Double> getTargetExchanges(double stepValue) {
-        return processType.equals(ProcessType.IDCC) ? getIdccTargetExchanges(stepValue, initialNetPositions) : getD2ccTargetExchanges(stepValue);
+        return processType.equals(ProcessType.D2CC) ? getD2ccTargetExchanges(stepValue) : getIdccTargetExchanges(stepValue, initialNetPositions);
     }
 
     private Map<String, Double> getIdccTargetExchanges(double stepValue, Map<String, Double> initialNetPositions) {

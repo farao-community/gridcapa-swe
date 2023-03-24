@@ -42,12 +42,12 @@ public class NetworkShifterProvider {
         Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
-                zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
-                getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-                dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
-                initialNetPositions,
-                processConfiguration);
+            zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
+            getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
+            dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
+            dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
+            initialNetPositions,
+            processConfiguration);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
@@ -55,6 +55,7 @@ public class NetworkShifterProvider {
             case D2CC:
                 return new SweD2ccShiftDispatcher(direction, initialNetPositions);
             case IDCC:
+            case IDCC_IDCF:
                 return new SweIdccShiftDispatcher(direction, initialNetPositions);
             default:
                 throw new SweInvalidDataException(String.format("Unknown target process for SWE: %s", processType));

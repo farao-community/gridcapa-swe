@@ -11,7 +11,8 @@ package com.farao_community.farao.swe.runner.api.resource;
  */
 public enum ProcessType {
     D2CC("2D"),
-    IDCC("ID");
+    IDCC("ID"),
+    IDCC_IDCF("IDCF");
 
     private final String code;
 
