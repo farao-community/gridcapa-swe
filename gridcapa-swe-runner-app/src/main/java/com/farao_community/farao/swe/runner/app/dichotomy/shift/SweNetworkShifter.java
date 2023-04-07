@@ -17,8 +17,7 @@ import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
-import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.*;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
@@ -26,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -35,6 +35,8 @@ public final class SweNetworkShifter implements NetworkShifter {
     private static final double DEFAULT_SHIFT_EPSILON = 1;
     public static final String ES_PT = "ES_PT";
     public static final String ES_FR = "ES_FR";
+    private static final double DEFAULT_PMAX = 9999.0;
+    private static final double DEFAULT_PMIN = -9999.0;
     private final Logger businessLogger;
 
     private final ProcessType processType;
@@ -60,87 +62,96 @@ public final class SweNetworkShifter implements NetworkShifter {
 
     @Override
     public void shiftNetwork(double stepValue, Network network) throws GlskLimitationException, ShiftingException {
+
         businessLogger.info("Starting shift on network {}", network.getVariantManager().getWorkingVariantId());
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
-        String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT")));
-        businessLogger.info(logTargetCountriesShift);
-        Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
-        int iterationCounter = 0;
-        boolean shiftSucceed = false;
+        // here set working variant generators pmin and pmax values to default values
+        // so that glsk generator pmin and pmax values are used
+        final Set<String> zoneIds = scalingValuesByCountry.keySet();
+        Map<String, InitGenerator> initGenerators = setPminPmaxToDefaultValue(network, zonalScalable, zoneIds);
 
-        String initialVariantId = network.getVariantManager().getWorkingVariantId();
-        String workingVariantCopyId = initialVariantId + " COPY";
-        network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId);
-        network.getVariantManager().setWorkingVariant(workingVariantCopyId);
+        try {
+            String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT")));
+            businessLogger.info(logTargetCountriesShift);
+            Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
+            int iterationCounter = 0;
+            boolean shiftSucceed = false;
 
-        List<String> limitingCountries = new ArrayList<>();
-        Map<String, Double> bordersExchanges;
+            String initialVariantId = network.getVariantManager().getWorkingVariantId();
+            String workingVariantCopyId = initialVariantId + " COPY";
+            network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId);
+            network.getVariantManager().setWorkingVariant(workingVariantCopyId);
+            List<String> limitingCountries = new ArrayList<>();
+            Map<String, Double> bordersExchanges;
 
-        int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
-        do {
-            // Step 1: Perform the scaling
-            LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
-            for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
-                String zoneId = entry.getKey();
-                double asked = entry.getValue();
-                String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
-                LOGGER.info(logApplyingVariationOnZone);
-                double done = zonalScalable.getData(zoneId).scale(network, asked);
-                if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
-                            direction, zoneId, asked, done);
-                    LOGGER.warn(logWarnIncompleteVariation);
-                    limitingCountries.add(zoneId);
+            int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
+            do {
+                // Step 1: Perform the scaling
+                LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
+                for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
+                    String zoneId = entry.getKey();
+                    double asked = entry.getValue();
+                    String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
+                    LOGGER.info(logApplyingVariationOnZone);
+                    double done = zonalScalable.getData(zoneId).scale(network, asked);
+                    if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
+                        String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
+                                direction, zoneId, asked, done);
+                        LOGGER.warn(logWarnIncompleteVariation);
+                        limitingCountries.add(zoneId);
+                    }
                 }
+                if (!limitingCountries.isEmpty()) {
+                    StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
+                    limitingCountries.forEach(sj::add);
+                    LOGGER.error("[{}] : {}", direction, sj);
+                    throw new GlskLimitationException(sj.toString());
+                }
+
+                // Step 2: Compute exchanges mismatch
+                LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), LoadFlowParameters.load());
+                if (!result.isOk()) {
+                    LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
+                    throw new ShiftingException("Loadflow computation diverged during balancing adjustment");
+                }
+                bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+                double mismatchEsPt = targetExchanges.get(ES_PT) - bordersExchanges.get(ES_PT);
+                double mismatchEsFr = targetExchanges.get(ES_FR) - bordersExchanges.get(ES_FR);
+
+                // Step 3: Checks balance adjustment results
+                if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
+                    String logShiftSucceded = String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter);
+                    LOGGER.info(logShiftSucceded);
+                    businessLogger.info("Shift succeed after {} iteration ", ++iterationCounter);
+                    String msg = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
+                    businessLogger.info(msg);
+                    network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
+                    shiftSucceed = true;
+                } else {
+                    // Reset current variant with initial state for each iteration
+                    network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId, true);
+                    scalingValuesByCountry.put(toEic("PT"), scalingValuesByCountry.get(toEic("PT")) - mismatchEsPt);
+                    scalingValuesByCountry.put(toEic("FR"), scalingValuesByCountry.get(toEic("FR")) - mismatchEsFr);
+                    scalingValuesByCountry.put(toEic("ES"), scalingValuesByCountry.get(toEic("ES")) + mismatchEsPt + mismatchEsFr);
+                    ++iterationCounter;
+                }
+
+            } while (iterationCounter < maxIterationNumber && !shiftSucceed);
+
+            // Step 4 : check after iteration max and out of tolerane
+            if (!shiftSucceed) {
+                String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
+                businessLogger.error(message);
+                throw new ShiftingException(message);
             }
-            if (!limitingCountries.isEmpty()) {
-                StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
-                limitingCountries.forEach(sj::add);
-                LOGGER.error("[{}] : {}", direction, sj);
-                throw new GlskLimitationException(sj.toString());
-            }
 
-            // Step 2: Compute exchanges mismatch
-            LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), LoadFlowParameters.load());
-            if (!result.isOk()) {
-                LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
-                throw new ShiftingException("Loadflow computation diverged during balancing adjustment");
-            }
-            bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
-            double mismatchEsPt = targetExchanges.get(ES_PT) - bordersExchanges.get(ES_PT);
-            double mismatchEsFr = targetExchanges.get(ES_FR) - bordersExchanges.get(ES_FR);
-
-            // Step 3: Checks balance adjustment results
-            if (Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr) {
-                String logShiftSucceded = String.format("[%s] : Shift succeed after %s iteration ", direction, ++iterationCounter);
-                LOGGER.info(logShiftSucceded);
-                businessLogger.info("Shift succeed after {} iteration ", ++iterationCounter);
-                String msg = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
-                businessLogger.info(msg);
-                network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
-                shiftSucceed = true;
-            } else {
-                // Reset current variant with initial state for each iteration
-                network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId, true);
-
-                scalingValuesByCountry.put(toEic("PT"), scalingValuesByCountry.get(toEic("PT")) - mismatchEsPt);
-                scalingValuesByCountry.put(toEic("FR"), scalingValuesByCountry.get(toEic("FR")) - mismatchEsFr);
-                scalingValuesByCountry.put(toEic("ES"), scalingValuesByCountry.get(toEic("ES")) + mismatchEsPt + mismatchEsFr);
-                ++iterationCounter;
-            }
-
-        } while (iterationCounter < maxIterationNumber && !shiftSucceed);
-
-        // Step 4 : check after iteration max and out of tolerane
-        if (!shiftSucceed) {
-            String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
-            businessLogger.error(message);
-            throw new ShiftingException(message);
+            // Step 5: Reset current variant with initial state
+            network.getVariantManager().setWorkingVariant(initialVariantId);
+            network.getVariantManager().removeVariant(workingVariantCopyId);
+        } finally {
+            // here set working variant generators pmin and pmax values to initial values
+            resetInitialPminPmax(network, zonalScalable, zoneIds, initGenerators);
         }
-
-        // Step 5: Reset current variant with initial state
-        network.getVariantManager().setWorkingVariant(initialVariantId);
-        network.getVariantManager().removeVariant(workingVariantCopyId);
     }
 
     Map<String, Double> getTargetExchanges(double stepValue) {
@@ -185,5 +196,64 @@ public final class SweNetworkShifter implements NetworkShifter {
 
     private static String toEic(String country) {
         return new EICode(Country.valueOf(country)).getAreaCode();
+    }
+
+    private Map<String, InitGenerator> setPminPmaxToDefaultValue(Network network, ZonalData<Scalable> scalableZonalData, Set<String> zonesIds) {
+        Map<String, InitGenerator> initGenerators = new HashMap<>();
+        zonesIds.stream().map(scalableZonalData::getData).filter(Objects::nonNull).map(scalable -> scalable.filterInjections(network).stream()
+                .filter(Generator.class::isInstance)
+                .map(Generator.class::cast)
+                .collect(Collectors.toList())).forEach(generators -> generators.forEach(generator -> {
+                    if (Double.isNaN(generator.getTargetP())) {
+                        generator.setTargetP(0.);
+                    }
+                    InitGenerator initGenerator = new InitGenerator();
+                    initGenerator.setpMin(generator.getMinP());
+                    initGenerator.setpMax(generator.getMaxP());
+                    initGenerators.put(generator.getId(), initGenerator);
+                    generator.setMinP(DEFAULT_PMIN);
+                    generator.setMaxP(DEFAULT_PMAX);
+                }));
+        LOGGER.info("Pmax and Pmin are set to default values for network {}", network.getNameOrId());
+        return initGenerators;
+    }
+
+    private void resetInitialPminPmax(Network network, ZonalData<Scalable> scalableZonalData, Set<String> zonesIds, Map<String, InitGenerator> initGenerators) {
+        zonesIds.forEach(zoneId -> {
+            Scalable scalable = scalableZonalData.getData(zoneId);
+            if (scalable != null) {
+                List<Generator> generators = scalable.filterInjections(network).stream()
+                        .filter(Generator.class::isInstance)
+                        .map(Generator.class::cast)
+                        .collect(Collectors.toList());
+
+                generators.forEach(generator -> {
+                    generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).getpMax()));
+                    generator.setMinP(Math.min(generator.getTargetP(), initGenerators.get(generator.getId()).getpMin()));
+                });
+            }
+        });
+        LOGGER.info("Pmax and Pmin are reset to initial values for network {}", network.getNameOrId());
+    }
+
+    private static class InitGenerator {
+        double pMin;
+        double pMax;
+
+        public double getpMin() {
+            return pMin;
+        }
+
+        public void setpMin(double pMin) {
+            this.pMin = pMin;
+        }
+
+        public double getpMax() {
+            return pMax;
+        }
+
+        public void setpMax(double pMax) {
+            this.pMax = pMax;
+        }
     }
 }
