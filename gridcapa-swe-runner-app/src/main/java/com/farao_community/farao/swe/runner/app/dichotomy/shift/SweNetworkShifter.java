@@ -200,10 +200,15 @@ public final class SweNetworkShifter implements NetworkShifter {
 
     private Map<String, InitGenerator> setPminPmaxToDefaultValue(Network network, ZonalData<Scalable> scalableZonalData, Set<String> zonesIds) {
         Map<String, InitGenerator> initGenerators = new HashMap<>();
-        zonesIds.stream().map(scalableZonalData::getData).filter(Objects::nonNull).map(scalable -> scalable.filterInjections(network).stream()
+        zonesIds.stream()
+                //filter out FRANCE because it is always in proportional and not absolute values
+                .filter(zoneId -> !zoneId.equals(toEic("FR")))
+                .map(scalableZonalData::getData)
+                .filter(Objects::nonNull)
+                .map(scalable -> scalable.filterInjections(network).stream()
                 .filter(Generator.class::isInstance)
                 .map(Generator.class::cast)
-                .collect(Collectors.toList())).forEach(generators -> generators.forEach(generator -> {
+                .collect(Collectors.toSet())).forEach(generators -> generators.forEach(generator -> {
                     if (Double.isNaN(generator.getTargetP())) {
                         generator.setTargetP(0.);
                     }
@@ -221,7 +226,8 @@ public final class SweNetworkShifter implements NetworkShifter {
     private void resetInitialPminPmax(Network network, ZonalData<Scalable> scalableZonalData, Set<String> zonesIds, Map<String, InitGenerator> initGenerators) {
         zonesIds.forEach(zoneId -> {
             Scalable scalable = scalableZonalData.getData(zoneId);
-            if (scalable != null) {
+            //filter out FRANCE because it is always in proportional and not absolute values
+            if (scalable != null && !zoneId.equals(toEic("FR"))) {
                 List<Generator> generators = scalable.filterInjections(network).stream()
                         .filter(Generator.class::isInstance)
                         .map(Generator.class::cast)
@@ -230,6 +236,10 @@ public final class SweNetworkShifter implements NetworkShifter {
                 generators.forEach(generator -> {
                     generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).getpMax()));
                     generator.setMinP(Math.min(generator.getTargetP(), initGenerators.get(generator.getId()).getpMin()));
+                    if (generator.getTargetP() > initGenerators.get(generator.getId()).getpMax()
+                            || generator.getTargetP() < initGenerators.get(generator.getId()).getpMin()) {
+                        LOGGER.debug("GENERATOR: id=[{}], has targetP: [{}] outside initial min max values", generator.getId(), generator.getTargetP());
+                    }
                 });
             }
         });
