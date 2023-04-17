@@ -208,14 +208,17 @@ public final class SweNetworkShifter implements NetworkShifter {
                 .map(scalable -> scalable.filterInjections(network).stream()
                 .filter(Generator.class::isInstance)
                 .map(Generator.class::cast)
-                .collect(Collectors.toSet())).forEach(generators -> generators.forEach(generator -> {
+                .collect(Collectors.toList())).forEach(generators -> generators.forEach(generator -> {
                     if (Double.isNaN(generator.getTargetP())) {
                         generator.setTargetP(0.);
                     }
                     InitGenerator initGenerator = new InitGenerator();
                     initGenerator.setpMin(generator.getMinP());
                     initGenerator.setpMax(generator.getMaxP());
-                    initGenerators.put(generator.getId(), initGenerator);
+                    String genId = generator.getId();
+                    if (!initGenerators.containsKey(genId)) {
+                        initGenerators.put(genId, initGenerator);
+                    }
                     generator.setMinP(DEFAULT_PMIN);
                     generator.setMaxP(DEFAULT_PMAX);
                 }));
