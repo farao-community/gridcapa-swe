@@ -17,6 +17,7 @@ import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
+import com.powsybl.iidm.modification.scalable.ScalingParameters;
 import com.powsybl.iidm.network.*;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -93,7 +94,9 @@ public final class SweNetworkShifter implements NetworkShifter {
                     double asked = entry.getValue();
                     String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
                     LOGGER.info(logApplyingVariationOnZone);
-                    double done = zonalScalable.getData(zoneId).scale(network, asked);
+                    ScalingParameters iterativeScalingParameters = new ScalingParameters();
+                    iterativeScalingParameters.setIterative(true);
+                    double done = zonalScalable.getData(zoneId).scale(network, asked, iterativeScalingParameters);
                     if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
                         String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
                                 direction, zoneId, asked, done);
