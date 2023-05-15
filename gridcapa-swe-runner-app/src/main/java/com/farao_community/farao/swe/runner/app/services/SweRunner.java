@@ -11,7 +11,6 @@ import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyParallelization;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
-import com.farao_community.farao.swe.runner.app.utils.Threadable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ public class SweRunner {
         this.filesService = filesService;
     }
 
-    @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         SweData sweData = filesService.importFiles(sweRequest);

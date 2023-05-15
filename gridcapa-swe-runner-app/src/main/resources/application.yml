@@ -11,11 +11,11 @@ spring:
   cloud:
     stream:
       function:
-        definition: request;interrupt
+        definition: request;softInterrupt
       default:
         binder: rabbit
       bindings:
-        interrupt-in-0:
+        softInterrupt-in-0:
           destination: swe-d2cc-stop-task
         request-in-0:
           destination: swe-d2cc-request

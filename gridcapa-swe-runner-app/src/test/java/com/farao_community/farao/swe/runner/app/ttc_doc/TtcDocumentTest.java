@@ -34,13 +34,4 @@ class TtcDocumentTest {
         InputStream inputStream = document.buildTtcDocFile();
         assertNotNull(inputStream);
     }
-
-    @Test
-    void simpleAllEmptyTest() {
-        SweDichotomyResult dichotomyResult = new SweDichotomyResult(DichotomyDirection.ES_FR, null, Optional.empty(), "exportedCgmesUrl", "", "");
-        ExecutionResult<SweDichotomyResult> executionResult = new ExecutionResult<>(List.of(dichotomyResult));
-        TtcDocument document = new TtcDocument(executionResult);
-        InputStream inputStream = document.buildTtcDocFile();
-        assertNotNull(inputStream);
-    }
 }

@@ -19,6 +19,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
+import com.farao_community.farao.swe.runner.app.services.InterruptionService;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class DichotomyRunner {
     private final FileImporter fileImporter;
     private final NetworkShifterProvider networkShifterProvider;
     private final RaoRunnerClient raoRunnerClient;
+    private final InterruptionService interruptionService;
 
     private final Logger businessLogger;
 
@@ -45,6 +47,7 @@ public class DichotomyRunner {
                            FileImporter fileImporter,
                            NetworkShifterProvider networkShifterProvider,
                            RaoRunnerClient raoRunnerClient,
+                           InterruptionService interruptionService,
                            Logger businessLogger) {
         this.dichotomyConfiguration = dichotomyConfiguration;
         this.dichotomyLogging = dichotomyLogging;
@@ -52,6 +55,7 @@ public class DichotomyRunner {
         this.fileImporter = fileImporter;
         this.networkShifterProvider = networkShifterProvider;
         this.raoRunnerClient = raoRunnerClient;
+        this.interruptionService = interruptionService;
         this.businessLogger = businessLogger;
     }
 
@@ -67,12 +71,13 @@ public class DichotomyRunner {
         return new DichotomyEngine<>(
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 HALF_INDEX_STRATEGY_CONFIGURATION,
+                interruptionService,
                 networkShifterProvider.get(sweData, direction),
-                getNetworkValidator(sweData, direction));
+                getNetworkValidator(sweData, direction),
+                sweData.getId());
     }
 
     private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction) {
         return new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, direction, businessLogger);
     }
-
 }
