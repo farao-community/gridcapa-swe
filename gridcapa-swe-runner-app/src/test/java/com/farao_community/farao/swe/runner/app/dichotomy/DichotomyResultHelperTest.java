@@ -71,7 +71,7 @@ class DichotomyResultHelperTest {
     @Test
     void getLimitingElementTest() {
         String limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
-        assertEquals("CNEC-2 - OPPOSITE - Co-1 - outage", limitingElement);
+        assertEquals("CNEC-1 - DIRECT - Co-2 - outage", limitingElement);
     }
 
     @Test
