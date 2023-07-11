@@ -65,7 +65,7 @@ public class ZonalScalableProvider {
             scalables.add(Scalable.onGenerator(generator.getId()));
         });
 
-        return Scalable.proportional(percentages, scalables);
+        return Scalable.proportional(percentages, scalables, true);
     }
 }
 

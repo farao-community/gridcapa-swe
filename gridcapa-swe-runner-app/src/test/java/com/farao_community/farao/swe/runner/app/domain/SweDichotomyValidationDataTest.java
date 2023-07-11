@@ -20,7 +20,7 @@ class SweDichotomyValidationDataTest {
 
     @Test
     void simpleTest() {
-        RaoResponse raoResponse = new RaoResponse("ID", null, null, null, null, null, null);
+        RaoResponse raoResponse = new RaoResponse("ID", null, null, null, null, null, null, false);
         AngleMonitoringResult angleMonitoringResult = new AngleMonitoringResult(null, null, AngleMonitoringResult.Status.DIVERGENT);
         SweDichotomyValidationData data = new SweDichotomyValidationData(raoResponse, angleMonitoringResult);
         assertEquals(raoResponse, data.getRaoResponse());
@@ -29,7 +29,7 @@ class SweDichotomyValidationDataTest {
 
     @Test
     void simpleWithoutAngleMonitoringResultTest() {
-        RaoResponse raoResponse = new RaoResponse("ID", null, null, null, null, null, null);
+        RaoResponse raoResponse = new RaoResponse("ID", null, null, null, null, null, null, false);
         SweDichotomyValidationData data = new SweDichotomyValidationData(raoResponse);
         assertEquals(raoResponse, data.getRaoResponse());
         assertNull(data.getAngleMonitoringResult());
