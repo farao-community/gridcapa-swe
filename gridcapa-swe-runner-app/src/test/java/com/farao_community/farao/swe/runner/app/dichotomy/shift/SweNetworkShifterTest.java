@@ -15,7 +15,6 @@ import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.powsybl.glsk.commons.ZonalDataImpl;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,9 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 class SweNetworkShifterTest {
 
-    private static final String EIC_FR = "10YFR-RTE------C";
-    private static final String EIC_ES = "10YES-REE------0";
-    private static final String EIC_PT = "10YPT-REN------W";
     @MockBean
     private ProcessConfiguration processConfiguration;
 
@@ -215,69 +211,5 @@ class SweNetworkShifterTest {
                 DichotomyDirection.ES_FR, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(11000., network));
-    }
-
-    @Test
-    void updateScalingValuesWithMismatchPtEsTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.PT_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
-        Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
-
-        networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
-
-        Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, 12.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1510.0);
-    }
-
-    @Test
-    void updateScalingValuesWithMismatchEsPtTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_PT, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
-        Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
-
-        networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
-
-        Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, 12.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1510.0);
-    }
-
-    @Test
-    void updateScalingValuesWithMismatchFrEsTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.FR_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
-        Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
-
-        networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
-
-        Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, -1.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1515.0);
-    }
-
-    @Test
-    void updateScalingValuesWithMismatchEsFrTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_FR, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
-        Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
-
-        networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
-
-        Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, -1.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1515.0);
     }
 }

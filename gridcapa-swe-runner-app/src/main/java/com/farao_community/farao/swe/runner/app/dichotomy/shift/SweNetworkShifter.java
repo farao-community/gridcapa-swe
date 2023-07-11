@@ -133,7 +133,9 @@ public final class SweNetworkShifter implements NetworkShifter {
                 } else {
                     // Reset current variant with initial state for each iteration
                     network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId, true);
-                    updateScalingValuesWithMismatch(scalingValuesByCountry, mismatchEsPt, mismatchEsFr);
+                    scalingValuesByCountry.put(toEic("PT"), scalingValuesByCountry.get(toEic("PT")) - mismatchEsPt);
+                    scalingValuesByCountry.put(toEic("FR"), scalingValuesByCountry.get(toEic("FR")) - mismatchEsFr);
+                    scalingValuesByCountry.put(toEic("ES"), scalingValuesByCountry.get(toEic("ES")) + mismatchEsPt + mismatchEsFr);
                     ++iterationCounter;
                 }
 
@@ -153,22 +155,6 @@ public final class SweNetworkShifter implements NetworkShifter {
             // here set working variant generators pmin and pmax values to initial values
             resetInitialPminPmax(network, zonalScalable, zoneIds, initGenerators);
         }
-    }
-
-    void updateScalingValuesWithMismatch(Map<String, Double> scalingValuesByCountry, double mismatchEsPt, double mismatchEsFr) {
-        switch (direction) {
-            case ES_FR:
-            case FR_ES:
-                scalingValuesByCountry.put(toEic("FR"), scalingValuesByCountry.get(toEic("FR")) - mismatchEsFr);
-                break;
-
-            case ES_PT:
-            case PT_ES:
-                scalingValuesByCountry.put(toEic("PT"), scalingValuesByCountry.get(toEic("PT")) - mismatchEsPt);
-                break;
-        }
-
-        scalingValuesByCountry.put(toEic("ES"), scalingValuesByCountry.get(toEic("ES")) + mismatchEsPt + mismatchEsFr);
     }
 
     Map<String, Double> getTargetExchanges(double stepValue) {
