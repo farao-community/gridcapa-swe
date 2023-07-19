@@ -94,9 +94,10 @@ public final class SweNetworkShifter implements NetworkShifter {
                     double asked = entry.getValue();
                     String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
                     LOGGER.info(logApplyingVariationOnZone);
-                    ScalingParameters iterativeScalingParameters = new ScalingParameters();
-                    iterativeScalingParameters.setIterative(true);
-                    double done = zonalScalable.getData(zoneId).scale(network, asked, iterativeScalingParameters);
+                    ScalingParameters scalingParameters = new ScalingParameters();
+                    scalingParameters.setIterative(true);
+                    scalingParameters.setReconnect(true);
+                    double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
                     if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
                         String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
                                 direction, zoneId, asked, done);
