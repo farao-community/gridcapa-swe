@@ -96,7 +96,7 @@ public final class SweNetworkShifter implements NetworkShifter {
                     LOGGER.info(logApplyingVariationOnZone);
                     ScalingParameters scalingParameters = new ScalingParameters();
                     scalingParameters.setIterative(true);
-                    scalingParameters.setReconnect(true);
+                    scalingParameters.setReconnect(true); //todo test with allowsGeneratorOutOfActivePowerLimits
                     double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
                     if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
                         String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
@@ -104,6 +104,7 @@ public final class SweNetworkShifter implements NetworkShifter {
                         LOGGER.warn(logWarnIncompleteVariation);
                         limitingCountries.add(zoneId);
                     }
+                    connectGeneratorsRegulatingTerminals(network, zonalScalable.getData(zoneId));
                 }
                 if (!limitingCountries.isEmpty()) {
                     StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
@@ -119,6 +120,8 @@ public final class SweNetworkShifter implements NetworkShifter {
                     throw new ShiftingException("Loadflow computation diverged during balancing adjustment");
                 }
                 bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+                String msg1 = String.format("[%s] : iteration %s - Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", iterationCounter, direction, bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
+                LOGGER.info(msg1);
                 double mismatchEsPt = targetExchanges.get(ES_PT) - bordersExchanges.get(ES_PT);
                 double mismatchEsFr = targetExchanges.get(ES_FR) - bordersExchanges.get(ES_FR);
 
@@ -128,6 +131,7 @@ public final class SweNetworkShifter implements NetworkShifter {
                     LOGGER.info(logShiftSucceded);
                     businessLogger.info("Shift succeed after {} iteration ", ++iterationCounter);
                     String msg = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
+                    LOGGER.info(msg);
                     businessLogger.info(msg);
                     network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                     shiftSucceed = true;
@@ -153,6 +157,39 @@ public final class SweNetworkShifter implements NetworkShifter {
         } finally {
             // here set working variant generators pmin and pmax values to initial values
             resetInitialPminPmax(network, zonalScalable, zoneIds, initGenerators);
+        }
+    }
+
+    private void connectGeneratorsRegulatingTerminals(Network network, Scalable scalable) {
+        scalable.filterInjections(network).stream()
+                .filter(injection -> injection.getType().equals(IdentifiableType.GENERATOR))
+                .map(injection -> (Generator) injection)
+                .filter(generator -> generator.getTerminal().isConnected() && !generator.getRegulatingTerminal().isConnected())
+                .collect(Collectors.toSet())
+                .forEach(this::connectRegulatingTerminalOfGenerator);
+    }
+
+    private void connectRegulatingTerminalOfGenerator(Generator generator) {
+        //if the generator is linked to the network with only one transformer, we need to connect this transformer also  (especially for Spain)
+        ConnectTopologyVisitor connectTopologyVisitor = new ConnectTopologyVisitor();
+        generator.getTerminal().getBusBreakerView().getConnectableBus().visitConnectedOrConnectableEquipments(connectTopologyVisitor);
+        if (!connectTopologyVisitor.getConnectables().isEmpty()) {
+            List<Connectable> otherConnectable = connectTopologyVisitor.getConnectables().stream().filter(connectable -> !connectable.getNameOrId().equals(generator.getNameOrId())).collect(Collectors.toList());
+            if (otherConnectable.size() == 1) {
+                Optional<TwoWindingsTransformer> twt = connectTopologyVisitor.getConnectables().stream().filter(connectable -> connectable.getType().equals(IdentifiableType.TWO_WINDINGS_TRANSFORMER)).map(c -> (TwoWindingsTransformer) c).findFirst();
+                if (twt.isPresent()) {
+                    if (!twt.get().getTerminal1().isConnected() || !twt.get().getTerminal2().isConnected()) {
+                        twt.get().getTerminals().forEach(Terminal::connect);
+                        LOGGER.info("Connecting twoWindingsTransformer {} linked to generator {}", twt.get().getNameOrId(), generator.getNameOrId());
+                    }
+                }
+            } else if (otherConnectable.size() > 1) { //todo confirm the behaviour expected
+                String message = String.format("Generator %s is connected to %s connectable : ", generator.getNameOrId(), otherConnectable.size());
+                for (Connectable c : otherConnectable) {
+                    message = message.concat(c.getNameOrId() + " of type " + c.getType() + " , ");
+                }
+                LOGGER.warn(message);
+            }
         }
     }
 
