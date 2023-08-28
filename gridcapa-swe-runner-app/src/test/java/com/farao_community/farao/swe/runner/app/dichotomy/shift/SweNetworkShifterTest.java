@@ -300,7 +300,7 @@ class SweNetworkShifterTest {
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
             DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
-        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(20);
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(800., network);
 
         assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
@@ -354,7 +354,7 @@ class SweNetworkShifterTest {
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.PT_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
             DichotomyDirection.PT_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
-        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(20);
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(800., network);
 
         assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
