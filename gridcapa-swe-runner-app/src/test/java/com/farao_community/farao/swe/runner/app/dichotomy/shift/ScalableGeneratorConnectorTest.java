@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
-public class ScalableGeneratorConnectorTest {
+class ScalableGeneratorConnectorTest {
     private Network network;
     private ScalableGeneratorConnector scalableGeneratorConnector;
 
