@@ -18,7 +18,9 @@ import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.modification.scalable.ScalingParameters;
-import com.powsybl.iidm.network.*;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Generator;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
@@ -70,6 +72,7 @@ public final class SweNetworkShifter implements NetworkShifter {
         // so that glsk generator pmin and pmax values are used
         final Set<String> zoneIds = scalingValuesByCountry.keySet();
         Map<String, InitGenerator> initGenerators = setPminPmaxToDefaultValue(network, zonalScalable, zoneIds);
+        ScalableGeneratorConnector scalableGeneratorConnector = new ScalableGeneratorConnector(zonalScalable);
 
         try {
             String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT")));
@@ -79,9 +82,9 @@ public final class SweNetworkShifter implements NetworkShifter {
             boolean shiftSucceed = false;
 
             String initialVariantId = network.getVariantManager().getWorkingVariantId();
-            String workingVariantCopyId = initialVariantId + " COPY";
-            network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId);
-            network.getVariantManager().setWorkingVariant(workingVariantCopyId);
+            String processedVariantId = initialVariantId + " PROCESSED COPY";
+            String workingVariantCopyId = initialVariantId + " WORKING COPY";
+            preProcessNetwork(network, scalableGeneratorConnector, initialVariantId, processedVariantId, workingVariantCopyId);
             List<String> limitingCountries = new ArrayList<>();
             Map<String, Double> bordersExchanges;
 
@@ -132,15 +135,15 @@ public final class SweNetworkShifter implements NetworkShifter {
                     network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                     shiftSucceed = true;
                 } else {
-                    // Reset current variant with initial state for each iteration
-                    network.getVariantManager().cloneVariant(initialVariantId, workingVariantCopyId, true);
+                    // Reset current variant with initial state for each iteration (keeping pre-processing)
+                    network.getVariantManager().cloneVariant(processedVariantId, workingVariantCopyId, true);
                     updateScalingValuesWithMismatch(scalingValuesByCountry, mismatchEsPt, mismatchEsFr);
                     ++iterationCounter;
                 }
 
             } while (iterationCounter < maxIterationNumber && !shiftSucceed);
 
-            // Step 4 : check after iteration max and out of tolerane
+            // Step 4 : check after iteration max and out of tolerance
             if (!shiftSucceed) {
                 String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
                 businessLogger.error(message);
@@ -149,11 +152,22 @@ public final class SweNetworkShifter implements NetworkShifter {
 
             // Step 5: Reset current variant with initial state
             network.getVariantManager().setWorkingVariant(initialVariantId);
+            network.getVariantManager().removeVariant(processedVariantId);
             network.getVariantManager().removeVariant(workingVariantCopyId);
         } finally {
+            // revert connections of TWT on generators that were not used by the scaling
+            scalableGeneratorConnector.revertUnnecessaryChanges(network);
             // here set working variant generators pmin and pmax values to initial values
             resetInitialPminPmax(network, zonalScalable, zoneIds, initGenerators);
         }
+    }
+
+    private void preProcessNetwork(Network network, ScalableGeneratorConnector scalableGeneratorConnector, String initialVariantId, String processedVariantId, String workingVariantCopyId) throws ShiftingException {
+        network.getVariantManager().cloneVariant(initialVariantId, processedVariantId, true);
+        network.getVariantManager().setWorkingVariant(processedVariantId);
+        scalableGeneratorConnector.prepareForScaling(network);
+        network.getVariantManager().cloneVariant(processedVariantId, workingVariantCopyId, true);
+        network.getVariantManager().setWorkingVariant(workingVariantCopyId);
     }
 
     void updateScalingValuesWithMismatch(Map<String, Double> scalingValuesByCountry, double mismatchEsPt, double mismatchEsFr) {

@@ -42,13 +42,13 @@ public class ZonalScalableProvider {
         String eicFR = new EICode(Country.FR).getAreaCode();
         if (zonalScalable.getData(eicFR) == null) {
             LOGGER.warn("Glsk file does not contains FR scalable for timestamp {}, a Country generators scalable is added", timestamp);
-            Scalable scalableFR = getCountryGeneratorsScalablefoFR(network);
+            Scalable scalableFR = getCountryGeneratorsScalableForFR(network);
             zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(eicFR, scalableFR)));
         }
         return zonalScalable;
     }
 
-    private Scalable getCountryGeneratorsScalablefoFR(Network network) {
+    private Scalable getCountryGeneratorsScalableForFR(Network network) {
         List<Scalable> scalables = new ArrayList<>();
         List<Float> percentages = new ArrayList<>();
         List<Generator> generators;
