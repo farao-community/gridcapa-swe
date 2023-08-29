@@ -40,6 +40,7 @@ public final class SweNetworkShifter implements NetworkShifter {
     public static final String ES_FR = "ES_FR";
     private static final double DEFAULT_PMAX = 9999.0;
     private static final double DEFAULT_PMIN = -9999.0;
+    private static final Set<Country> CONNECT_GENERATORS_IN_COUNTRIES = Set.of(Country.ES, Country.PT);
     private final Logger businessLogger;
 
     private final ProcessType processType;
@@ -165,7 +166,7 @@ public final class SweNetworkShifter implements NetworkShifter {
     private void preProcessNetwork(Network network, ScalableGeneratorConnector scalableGeneratorConnector, String initialVariantId, String processedVariantId, String workingVariantCopyId) throws ShiftingException {
         network.getVariantManager().cloneVariant(initialVariantId, processedVariantId, true);
         network.getVariantManager().setWorkingVariant(processedVariantId);
-        scalableGeneratorConnector.prepareForScaling(network);
+        scalableGeneratorConnector.prepareForScaling(network, CONNECT_GENERATORS_IN_COUNTRIES);
         network.getVariantManager().cloneVariant(processedVariantId, workingVariantCopyId, true);
         network.getVariantManager().setWorkingVariant(workingVariantCopyId);
     }

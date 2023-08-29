@@ -25,6 +25,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,7 +46,7 @@ class ScalableGeneratorConnectorTest {
         ZonalData<Scalable> zonalScalable = doc.getZonalScalable(network, instant);
         zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
         scalableGeneratorConnector = new ScalableGeneratorConnector(zonalScalable);
-        scalableGeneratorConnector.prepareForScaling(network);
+        scalableGeneratorConnector.prepareForScaling(network, Set.of(Country.ES, Country.PT));
     }
 
     private Scalable getCountryGeneratorsScalableForFR(Network network) {

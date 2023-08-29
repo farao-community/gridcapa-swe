@@ -24,17 +24,18 @@ import java.util.stream.Collectors;
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public class ScalableGeneratorConnector {
-    private Map<String, GeneratorState> changedGeneratorsInitialState = new HashMap<>();
+    private Map<String, GeneratorState> changedGeneratorsInitialState;
     private final ZonalData<Scalable> zonalScalable;
 
     ScalableGeneratorConnector(ZonalData<Scalable> zonalScalable) {
         this.zonalScalable = zonalScalable;
     }
 
-    void prepareForScaling(Network network) throws ShiftingException {
+    void prepareForScaling(Network network, Set<Country> countriesToProcess) throws ShiftingException {
         changedGeneratorsInitialState = new HashMap<>();
-        connectGeneratorsToMainComponent(network, Country.ES);
-        connectGeneratorsToMainComponent(network, Country.PT);
+        for (Country c : countriesToProcess) {
+            connectGeneratorsToMainComponent(network, c);
+        }
     }
 
     /**
