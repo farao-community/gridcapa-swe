@@ -69,12 +69,12 @@ public class ScalableGeneratorConnector {
         // for the generators that are not connected to main island
         GeneratorState generatorState = new GeneratorState(generator);
         changedGeneratorsInitialState.put(generator.getId(), generatorState);
-        if (generatorState.twoWindingsTransformerId != null) {
-            // If generator is connected to network through a transformer, connect it
-            TwoWindingsTransformer twt = network.getTwoWindingsTransformer(generatorState.twoWindingsTransformerId);
+        // If generator is connected to network through transformers, connect them
+        generatorState.twoWindingsTransformerConnection.keySet().forEach(twtId -> {
+            TwoWindingsTransformer twt = network.getTwoWindingsTransformer(twtId);
             twt.getTerminal1().connect();
             twt.getTerminal2().connect();
-        }
+        });
     }
 
     /**
@@ -106,8 +106,7 @@ public class ScalableGeneratorConnector {
         String generatorId;
         double targetP;
         boolean isTerminalConnected;
-        String twoWindingsTransformerId;
-        Pair<Boolean, Boolean> twtTerminalsConnected;
+        Map<String, Pair<Boolean, Boolean>> twoWindingsTransformerConnection;
 
         GeneratorState(Generator generator) throws ShiftingException {
             Bus genBus = getBus(generator.getTerminal());
@@ -117,23 +116,12 @@ public class ScalableGeneratorConnector {
             this.generatorId = generator.getId();
             this.targetP = generator.getTargetP();
             this.isTerminalConnected = generator.getTerminal().isConnected();
-
-            Set<TwoWindingsTransformer> transformers = new HashSet<>();
-            generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(transformers::add);
-
-            for (TwoWindingsTransformer twt : transformers) {
+            this.twoWindingsTransformerConnection = new HashMap<>();
+            generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> {
                 if (genBus.equals(getBus(twt.getTerminal1())) || genBus.equals(getBus(twt.getTerminal2()))) {
-                    if (this.twoWindingsTransformerId != null) {
-                        this.twoWindingsTransformerId = null;
-                        this.twtTerminalsConnected = null;
-                        // TODO : we are assuming here that generators linked to grid through multiple transformers
-                        //  should be excluded from scaling. Update this when expected behaviour is clear.
-                    } else {
-                        this.twoWindingsTransformerId = twt.getId();
-                        this.twtTerminalsConnected = Pair.of(twt.getTerminal1().isConnected(), twt.getTerminal2().isConnected());
-                    }
+                    twoWindingsTransformerConnection.put(twt.getId(), Pair.of(twt.getTerminal1().isConnected(), twt.getTerminal2().isConnected()));
                 }
-            }
+            });
         }
 
         void apply(Network network) {
@@ -144,13 +132,12 @@ public class ScalableGeneratorConnector {
             //  do we have to do the exact opposite when disconnecting?
             connectTerminal(generator.getTerminal(), this.isTerminalConnected);
 
-            // Some generators are simply connected to the network without a transformer
-            if (twoWindingsTransformerId != null) {
-                TwoWindingsTransformer twoWindingsTransformer = network.getTwoWindingsTransformer(twoWindingsTransformerId);
+            twoWindingsTransformerConnection.forEach((twtId, terminalConnection) -> {
+                TwoWindingsTransformer twoWindingsTransformer = network.getTwoWindingsTransformer(twtId);
                 Objects.requireNonNull(twoWindingsTransformer);
-                connectTerminal(twoWindingsTransformer.getTerminal1(), this.twtTerminalsConnected.getFirst());
-                connectTerminal(twoWindingsTransformer.getTerminal2(), this.twtTerminalsConnected.getSecond());
-            }
+                connectTerminal(twoWindingsTransformer.getTerminal1(), terminalConnection.getFirst());
+                connectTerminal(twoWindingsTransformer.getTerminal2(), terminalConnection.getSecond());
+            });
         }
 
         void connectTerminal(Terminal terminal, boolean connect) {

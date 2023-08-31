@@ -303,18 +303,18 @@ class SweNetworkShifterTest {
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
             DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
-        sweNetworkShifter.shiftNetwork(800., network);
+        sweNetworkShifter.shiftNetwork(1000., network);
 
         assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
         Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
-        assertEquals(800., shiftedExchanges.get("ES_FR"), 1.);
+        assertEquals(1000., shiftedExchanges.get("ES_FR"), 1.);
         assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
         // 1st generator in merit order is linked to grid through a line that is disconnected: it should remain that way and targetP remain at 0
         assertFalse(network.getGenerator("ESCDGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
         assertEquals(0., network.getGenerator("ESCDGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
-        // 2nd generator is connected to grid through 2 transformers that are disconnected: they should remain that way and targetP remain at 0
-        assertFalse(network.getGenerator("ESD2GU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
-        assertEquals(0., network.getGenerator("ESD2GU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 2nd generator is connected to grid through 2 transformers that are disconnected: it should be reconnected and targetP set to 200 (its max)
+        assertTrue(network.getGenerator("ESD2GU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(200., network.getGenerator("ESD2GU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
         // 3rd generator is directly connected to grid: it should remain that way and targetP set to 1200 (its max)
         assertTrue(network.getGenerator("ESDCGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
         assertEquals(1200., network.getGenerator("ESDCGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
@@ -327,8 +327,8 @@ class SweNetworkShifterTest {
         // 6th generator is connected to grid through a transformer but both are disconnected: they should be reconnected and
         // targetP set to 200 (to reach the 800MW) + some more to compensate for losses
         assertTrue(network.getGenerator("ESDTGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
-        assertEquals(227., network.getGenerator("ESDTGU1 _generator").getTargetP(), 2.);
-        // +800MW is already reached, the rest of the generators should not be changed nor scaled
+        assertEquals(233., network.getGenerator("ESDTGU1 _generator").getTargetP(), 2.);
+        // +1000MW is already reached, the rest of the generators should not be changed nor scaled
         assertFalse(network.getGenerator("ESCDGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
         assertEquals(0., network.getGenerator("ESCDGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
         assertFalse(network.getGenerator("ESD2GN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
@@ -357,18 +357,18 @@ class SweNetworkShifterTest {
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
             DichotomyDirection.PT_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
-        sweNetworkShifter.shiftNetwork(800., network);
+        sweNetworkShifter.shiftNetwork(1000., network);
 
         assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
         Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
-        assertEquals(-800., shiftedExchanges.get("ES_PT"), 1.);
+        assertEquals(-1000., shiftedExchanges.get("ES_PT"), 1.);
         assertEquals(0., shiftedExchanges.get("ES_FR"), 1.);
         // 1st generator in merit order is linked to grid through a line that is disconnected: it should remain that way and targetP remain at 0
         assertFalse(network.getGenerator("PTCDGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
         assertEquals(0., network.getGenerator("PTCDGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
-        // 2nd generator is connected to grid through 2 transformers that are disconnected: they should remain that way and targetP remain at 0
-        assertFalse(network.getGenerator("PTD2GU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
-        assertEquals(0., network.getGenerator("PTD2GU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 2nd generator is connected to grid through 2 transformers that are disconnected: it should be reconnected and targetP set to 200 (its max)
+        assertTrue(network.getGenerator("PTD2GU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(200., network.getGenerator("PTD2GU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
         // 3rd generator is directly connected to grid: it should remain that way and targetP set to 1200 (its max)
         assertTrue(network.getGenerator("PTDCGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
         assertEquals(1200., network.getGenerator("PTDCGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
@@ -381,8 +381,8 @@ class SweNetworkShifterTest {
         // 6th generator is connected to grid through a transformer but both are disconnected: they should be reconnected and
         // targetP set to 200 (to reach the 800MW) + some more to compensate for losses
         assertTrue(network.getGenerator("PTDTGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
-        assertEquals(227., network.getGenerator("PTDTGU1 _generator").getTargetP(), 2.);
-        // +800MW is already reached, the rest of the generators should not be changed nor scaled
+        assertEquals(233., network.getGenerator("PTDTGU1 _generator").getTargetP(), 2.);
+        // +1000MW is already reached, the rest of the generators should not be changed nor scaled
         assertFalse(network.getGenerator("PTCDGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
         assertEquals(0., network.getGenerator("PTCDGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
         assertFalse(network.getGenerator("PTD2GN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
