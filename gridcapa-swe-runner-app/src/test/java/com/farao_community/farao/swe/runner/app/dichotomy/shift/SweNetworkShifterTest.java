@@ -6,15 +6,21 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 
+import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.powsybl.glsk.cim.CimGlskDocument;
+import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.commons.ZonalDataImpl;
 import com.powsybl.iidm.modification.scalable.Scalable;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Substation;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,11 +29,13 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
@@ -38,6 +46,7 @@ class SweNetworkShifterTest {
     private static final String EIC_FR = "10YFR-RTE------C";
     private static final String EIC_ES = "10YES-REE------0";
     private static final String EIC_PT = "10YPT-REN------W";
+    private static final Double TARGET_P_TOLERANCE = 1e-3;
 
     @MockBean
     private ProcessConfiguration processConfiguration;
@@ -280,5 +289,130 @@ class SweNetworkShifterTest {
             .containsEntry(EIC_FR, -1.0)
             .containsEntry(EIC_ES, 45.0)
             .containsEntry(EIC_PT, 1515.0);
+    }
+
+    @Test
+    void testConnectGeneratorsEs() throws GlskLimitationException, ShiftingException {
+        Network network = Network.read("shift/TestCase_with_transformers.xiidm", getClass().getResourceAsStream("/shift/TestCase_with_transformers.xiidm"));
+        CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("/shift/TestCase_with_transformers_glsk.xml"));
+        Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
+        ZonalData<Scalable> zonalScalable = doc.getZonalScalable(network, instant);
+        zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
+        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+            DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
+        sweNetworkShifter.shiftNetwork(1000., network);
+
+        assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
+        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        assertEquals(1000., shiftedExchanges.get("ES_FR"), 1.);
+        assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
+        // 1st generator in merit order is linked to grid through a line that is disconnected: it should remain that way and targetP remain at 0
+        assertFalse(network.getGenerator("ESCDGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("ESCDGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 2nd generator is connected to grid through 2 transformers that are disconnected: it should be reconnected and targetP set to 200 (its max)
+        assertTrue(network.getGenerator("ESD2GU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(200., network.getGenerator("ESD2GU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 3rd generator is directly connected to grid: it should remain that way and targetP set to 1200 (its max)
+        assertTrue(network.getGenerator("ESDCGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1200., network.getGenerator("ESDCGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 4th generator is connected to grid through a transformer that is connected: it should remain that way and targetP set to 1200 (its max)
+        assertTrue(network.getGenerator("ESCTGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1200., network.getGenerator("ESCTGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 5th generator is directly connected to grid but its terminal is disconnected: it should be reconnected and targetP set to 200 (its max)
+        assertTrue(network.getGenerator("ESDDGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(200., network.getGenerator("ESDDGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 6th generator is connected to grid through a transformer but both are disconnected: they should be reconnected and
+        // targetP set to 200 (to reach the 800MW) + some more to compensate for losses
+        assertTrue(network.getGenerator("ESDTGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(233., network.getGenerator("ESDTGU1 _generator").getTargetP(), 2.);
+        // +1000MW is already reached, the rest of the generators should not be changed nor scaled
+        assertFalse(network.getGenerator("ESCDGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("ESCDGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertFalse(network.getGenerator("ESD2GN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("ESD2GN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertTrue(network.getGenerator("ESDCGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1000., network.getGenerator("ESDCGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertTrue(network.getGenerator("ESCTGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1000., network.getGenerator("ESCTGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertFalse(network.getGenerator("ESDDGN1 _generator").getTerminal().isConnected());
+        assertEquals(0., network.getGenerator("ESDDGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertFalse(network.getGenerator("ESDTGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("ESDTGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+    }
+
+    @Test
+    void testConnectGeneratorsPt() throws GlskLimitationException, ShiftingException {
+        // Same test as above but in the PR->ES direction
+        Network network = Network.read("shift/TestCase_with_transformers.xiidm", getClass().getResourceAsStream("/shift/TestCase_with_transformers.xiidm"));
+
+        CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("/shift/TestCase_with_transformers_glsk.xml"));
+        Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
+        ZonalData<Scalable> zonalScalable = doc.getZonalScalable(network, instant);
+        zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
+        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.PT_ES, initialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+            DichotomyDirection.PT_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
+        sweNetworkShifter.shiftNetwork(1000., network);
+
+        assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
+        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        assertEquals(-1000., shiftedExchanges.get("ES_PT"), 1.);
+        assertEquals(0., shiftedExchanges.get("ES_FR"), 1.);
+        // 1st generator in merit order is linked to grid through a line that is disconnected: it should remain that way and targetP remain at 0
+        assertFalse(network.getGenerator("PTCDGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("PTCDGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 2nd generator is connected to grid through 2 transformers that are disconnected: it should be reconnected and targetP set to 200 (its max)
+        assertTrue(network.getGenerator("PTD2GU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(200., network.getGenerator("PTD2GU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 3rd generator is directly connected to grid: it should remain that way and targetP set to 1200 (its max)
+        assertTrue(network.getGenerator("PTDCGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1200., network.getGenerator("PTDCGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 4th generator is connected to grid through a transformer that is connected: it should remain that way and targetP set to 1200 (its max)
+        assertTrue(network.getGenerator("PTCTGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1200., network.getGenerator("PTCTGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 5th generator is directly connected to grid but its terminal is disconnected: it should be reconnected and targetP set to 200 (its max)
+        assertTrue(network.getGenerator("PTDDGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(200., network.getGenerator("PTDDGU1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        // 6th generator is connected to grid through a transformer but both are disconnected: they should be reconnected and
+        // targetP set to 200 (to reach the 800MW) + some more to compensate for losses
+        assertTrue(network.getGenerator("PTDTGU1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(233., network.getGenerator("PTDTGU1 _generator").getTargetP(), 2.);
+        // +1000MW is already reached, the rest of the generators should not be changed nor scaled
+        assertFalse(network.getGenerator("PTCDGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("PTCDGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertFalse(network.getGenerator("PTD2GN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("PTD2GN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertTrue(network.getGenerator("PTDCGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1000., network.getGenerator("PTDCGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertTrue(network.getGenerator("PTCTGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(1000., network.getGenerator("PTCTGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertFalse(network.getGenerator("PTDDGN1 _generator").getTerminal().isConnected());
+        assertEquals(0., network.getGenerator("PTDDGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+        assertFalse(network.getGenerator("PTDTGN1 _generator").getTerminal().getBusBreakerView().getConnectableBus().isInMainSynchronousComponent());
+        assertEquals(0., network.getGenerator("PTDTGN1 _generator").getTargetP(), TARGET_P_TOLERANCE);
+    }
+
+    private Scalable getCountryGeneratorsScalableForFR(Network network) {
+        List<Scalable> scalables = new ArrayList<>();
+        List<Float> percentages = new ArrayList<>();
+        List<Generator> generators;
+        generators = network.getGeneratorStream()
+            .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
+            .filter(NetworkUtil::isCorrect)
+            .collect(Collectors.toList());
+        //calculate sum P of country's generators
+        double totalCountryP = generators.stream().mapToDouble(NetworkUtil::pseudoTargetP).sum();
+        //calculate factor of each generator
+        generators.forEach(generator -> {
+            float generatorPercentage = (float) (100 * NetworkUtil.pseudoTargetP(generator) / totalCountryP);
+            percentages.add(generatorPercentage);
+            scalables.add(Scalable.onGenerator(generator.getId()));
+        });
+        return Scalable.proportional(percentages, scalables);
     }
 }

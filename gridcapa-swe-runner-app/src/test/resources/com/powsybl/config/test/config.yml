@@ -1,0 +1,14 @@
+load-flow-default-parameters:
+  voltageInitMode: DC_VALUES
+  balanceType: PROPORTIONAL_TO_GENERATION_P
+  countriesToBalance: AL,AT,BA,BE,BG,CH,CZ,DE,ES,FR,GR,HR,HU,IT,ME,MK,NL,PL,PT,RO,RS,SI,SK,UA
+  phaseShifterRegulationOn: true
+
+open-loadflow-default-parameters:
+  minPlausibleTargetVoltage: 0.5
+  maxPlausibleTargetVoltage: 1.5
+  plausibleActivePowerLimit: 10000
+  maxIteration: 100
+  newtonRaphsonConvEpsPerEq: 1.0E-3
+  minRealisticVoltage : 0.5
+  maxRealisticVoltage : 1.5
