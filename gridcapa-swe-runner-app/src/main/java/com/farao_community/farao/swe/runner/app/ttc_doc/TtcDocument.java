@@ -70,7 +70,7 @@ public class TtcDocument {
         if (result != null && result.hasValidStep()) {
             mapWithValues.put(direction, String.valueOf((int) result.getHighestValidStepValue()));
         } else {
-            mapWithValues.put(direction, "");
+            mapWithValues.put(direction, "0");
         }
     }
 
