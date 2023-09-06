@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.*;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -172,8 +172,70 @@ public class CgmesExportService {
     private Map<String, ByteArrayOutputStream> createOneSsh(Network network, SweData sweData, String country) throws IOException, XMLStreamException {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
-            SteadyStateHypothesisExport.write(network, writer, new CgmesExportContext(network));
-            return Map.of(buildCgmesFilename(sweData, country, "SSH"), os);
+            CgmesExportContext cgmesExportContext = new CgmesExportContext(network);
+            SteadyStateHypothesisExport.write(network, writer, cgmesExportContext);
+            ByteArrayOutputStream newBaos = addInformationsToXmlFile(os);
+            return Map.of(buildCgmesFilename(sweData, country, "SSH"), newBaos);
+        }
+    }
+
+    private ByteArrayOutputStream addInformationsToXmlFile(ByteArrayOutputStream os) throws XMLStreamException, IOException {
+        // Read initial XML
+        XMLInputFactory inputFactory = XMLInputFactory.newFactory();
+        inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        inputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+        XMLStreamReader reader = inputFactory.createXMLStreamReader(new ByteArrayInputStream(os.toByteArray()));
+
+        // Create new writer to write modified XML
+        XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            XMLStreamWriter writerStream = outputFactory.createXMLStreamWriter(baos);
+
+            // Go through initial XML and copy each data in the new XML
+            while (reader.hasNext()) {
+                int eventType = reader.next();
+                switch (eventType) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        // Write start element in the new XML
+                        writerStream.writeStartElement(reader.getLocalName());
+
+                        // copy element's attributes
+                        for (int i = 0; i < reader.getAttributeCount(); i++) {
+                            writerStream.writeAttribute(
+                                    reader.getAttributeLocalName(i),
+                                    reader.getAttributeValue(i)
+                            );
+                        }
+
+                        // Add pTolerance
+                        addPTolerance(reader, writerStream);
+
+                        break;
+                    case XMLStreamConstants.CHARACTERS:
+                        // Write characters
+                        writerStream.writeCharacters(reader.getText());
+                        break;
+                    case XMLStreamConstants.END_ELEMENT:
+                        // Write end element in the new XML
+                        writerStream.writeEndElement();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            writerStream.close();
+            reader.close();
+            return baos;
+        }
+    }
+
+    private void addPTolerance(XMLStreamReader reader, XMLStreamWriter writerStream) throws XMLStreamException {
+        // I try to find what I need to modify it
+        if (reader.getLocalName().equals("ControlArea")) {
+            writerStream.writeStartElement("ControlArea.pTolerance");
+            writerStream.writeCharacters("10");
+            writerStream.writeEndElement();
         }
     }
 
