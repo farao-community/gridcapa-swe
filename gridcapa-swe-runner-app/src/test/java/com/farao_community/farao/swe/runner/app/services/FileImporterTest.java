@@ -84,7 +84,7 @@ class FileImporterTest {
         SweRequest req = createEmptySweRequest();
         CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
         Assertions.assertNotNull(cracFrEs);
-        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
+        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON);
         Assertions.assertNotNull(cracEsPt);
     }
 

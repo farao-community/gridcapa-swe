@@ -8,6 +8,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
+import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
@@ -23,8 +24,10 @@ import java.time.OffsetDateTime;
 @Service
 public class FilesService {
 
-    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON = "/crac/CimCracCreationParameters_PT-ES.json";
-    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON = "/crac/CimCracCreationParameters_FR-ES.json";
+    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON = "/crac/CimCracCreationParameters_PT-ES_IDCC.json";
+    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_D2CC_JSON = "/crac/CimCracCreationParameters_PT-ES_D2CC.json";
+    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_IDCC_JSON = "/crac/CimCracCreationParameters_FR-ES_IDCC.json";
+    public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON = "/crac/CimCracCreationParameters_FR-ES_D2CC.json";
 
     private final NetworkService networkService;
     private final MergingViewService mergingViewService;
@@ -39,15 +42,16 @@ public class FilesService {
     }
 
     public SweData importFiles(SweRequest sweRequest) {
-
         MergingViewData mergingViewData = mergingViewService.importMergingView(sweRequest);
         Network networkEsFr = networkService.importNetwork(sweRequest);
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network networkFrEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
         Network networkEsPt = networkService.loadNetworkFromMinio(targetProcessDateTime);
         Network networkPtEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
-        CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsFr, CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_JSON);
-        CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsPt, CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_JSON);
+        String cracCreationParamFrEs = sweRequest.getProcessType().equals(ProcessType.D2CC) ? CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON : CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_IDCC_JSON;
+        String cracCreationParamEsPt = sweRequest.getProcessType().equals(ProcessType.D2CC) ? CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_D2CC_JSON : CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON;
+        CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsFr, cracCreationParamFrEs);
+        CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsPt, cracCreationParamEsPt);
         Crac cracFrEs = cracCreationContextFrEs.getCrac();
         Crac cracEsPt = cracCreationContextEsPt.getCrac();
         String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());
