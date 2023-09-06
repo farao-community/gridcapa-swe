@@ -174,12 +174,12 @@ public class CgmesExportService {
             XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
             CgmesExportContext cgmesExportContext = new CgmesExportContext(network);
             SteadyStateHypothesisExport.write(network, writer, cgmesExportContext);
-            ByteArrayOutputStream newBaos = addInformationsToXmlFile(os);
+            ByteArrayOutputStream newBaos = addInformationToXmlFile(os);
             return Map.of(buildCgmesFilename(sweData, country, "SSH"), newBaos);
         }
     }
 
-    private ByteArrayOutputStream addInformationsToXmlFile(ByteArrayOutputStream os) throws XMLStreamException, IOException {
+    private ByteArrayOutputStream addInformationToXmlFile(ByteArrayOutputStream os) throws XMLStreamException, IOException {
         // Read initial XML
         XMLInputFactory inputFactory = XMLInputFactory.newFactory();
         inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
