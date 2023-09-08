@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.EnumMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,7 +36,7 @@ class SweDataTest {
 
     @Test
     void simpleD2ccTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl");
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         assertEquals(ProcessType.D2CC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetworkEsFr());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());
@@ -44,11 +46,12 @@ class SweDataTest {
         assertEquals("glskUrl", sweData.getGlskUrl());
         assertEquals("raoParametersEsFrUrl", sweData.getRaoParametersEsFrUrl());
         assertEquals("raoParametersEsPtUrl", sweData.getRaoParametersEsPtUrl());
+        assertEquals(Collections.emptyMap(), sweData.getMapCgmesInputFiles());
     }
 
     @Test
     void simpleIdccTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.IDCC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl");
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.IDCC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         assertEquals(ProcessType.IDCC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetworkEsFr());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());
@@ -58,5 +61,6 @@ class SweDataTest {
         assertEquals("glskUrl", sweData.getGlskUrl());
         assertEquals("raoParametersEsFrUrl", sweData.getRaoParametersEsFrUrl());
         assertEquals("raoParametersEsPtUrl", sweData.getRaoParametersEsPtUrl());
+        assertEquals(Collections.emptyMap(), sweData.getMapCgmesInputFiles());
     }
 }

@@ -13,6 +13,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.hvdc.HvdcLinkProcessor;
@@ -20,11 +21,14 @@ import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationPara
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
-import com.powsybl.cgmes.conversion.export.*;
+import com.powsybl.cgmes.conversion.export.CgmesExportContext;
+import com.powsybl.cgmes.conversion.export.StateVariablesExport;
+import com.powsybl.cgmes.conversion.export.SteadyStateHypothesisExport;
 import com.powsybl.cgmes.extensions.CgmesSvMetadata;
 import com.powsybl.commons.xml.XmlUtil;
 import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,11 +56,13 @@ public class CgmesExportService {
     public static final String PT = "REN";
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[country]_[type]_001.xml'");
     private final FileExporter fileExporter;
+    private final FileImporter fileImporter;
     private MergingView mergingView;
     private final UrlValidationService urlValidationService;
 
-    public CgmesExportService(FileExporter fileExporter, UrlValidationService urlValidationService) {
+    public CgmesExportService(FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService) {
         this.fileExporter = fileExporter;
+        this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
     }
 
@@ -133,9 +139,8 @@ public class CgmesExportService {
         try {
             Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
             mapCgmesFiles.putAll(createAllSshFiles(sweData));
-            mapCgmesFiles.putAll(createAllTpFiles(sweData));
-            mapCgmesFiles.putAll(createAllEqFiles(sweData));
             mapCgmesFiles.putAll(createCommonFile(sweData.getMergingViewData().getNetworkFr(), sweData.getMergingViewData().getNetworkEs(), sweData.getMergingViewData().getNetworkPt(), sweData));
+            mapCgmesFiles.putAll(retrieveFilesThatDidNotChange(sweData));
             return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, createFileType(direction));
         } catch (XMLStreamException | IOException e) {
             throw new SweInternalException("Could not export CGMES files", e);
@@ -151,22 +156,16 @@ public class CgmesExportService {
         return mapSshFiles;
     }
 
-    private Map<String, ByteArrayOutputStream> createAllTpFiles(SweData sweData) throws XMLStreamException, IOException {
-        LOGGER.info("Building TP files");
-        Map<String, ByteArrayOutputStream> mapTpFiles = new HashMap<>();
-        mapTpFiles.putAll(createOneTp(sweData.getMergingViewData().getNetworkFr(), sweData, FR));
-        mapTpFiles.putAll(createOneTp(sweData.getMergingViewData().getNetworkEs(), sweData, ES));
-        mapTpFiles.putAll(createOneTp(sweData.getMergingViewData().getNetworkPt(), sweData, PT));
-        return mapTpFiles;
-    }
-
-    private Map<String, ByteArrayOutputStream> createAllEqFiles(SweData sweData) throws XMLStreamException, IOException {
-        LOGGER.info("Building EQ files");
-        Map<String, ByteArrayOutputStream> mapEqFiles = new HashMap<>();
-        mapEqFiles.putAll(createOneEq(sweData.getMergingViewData().getNetworkFr(), sweData, FR));
-        mapEqFiles.putAll(createOneEq(sweData.getMergingViewData().getNetworkEs(), sweData, ES));
-        mapEqFiles.putAll(createOneEq(sweData.getMergingViewData().getNetworkPt(), sweData, PT));
-        return mapEqFiles;
+    private Map<String, ByteArrayOutputStream> retrieveFilesThatDidNotChange(SweData sweData) throws IOException {
+        LOGGER.info("Building all files that dit not changed");
+        Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
+        mapFiles.putAll(createOneFile(sweData, FR, "TP"));
+        mapFiles.putAll(createOneFile(sweData, ES, "TP"));
+        mapFiles.putAll(createOneFile(sweData, PT, "TP"));
+        mapFiles.putAll(createOneFile(sweData, FR, "EQ"));
+        mapFiles.putAll(createOneFile(sweData, ES, "EQ"));
+        mapFiles.putAll(createOneFile(sweData, PT, "EQ"));
+        return mapFiles;
     }
 
     private Map<String, ByteArrayOutputStream> createOneSsh(Network network, SweData sweData, String country) throws IOException, XMLStreamException {
@@ -239,19 +238,29 @@ public class CgmesExportService {
         }
     }
 
-    private Map<String, ByteArrayOutputStream> createOneTp(Network network, SweData sweData, String country) throws IOException, XMLStreamException {
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
-            TopologyExport.write(network, writer, new CgmesExportContext(network));
-            return Map.of(buildCgmesFilename(sweData, country, "TP"), os);
-        }
+    private Map<String, ByteArrayOutputStream> createOneFile(SweData sweData, String country, String type) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        IOUtils.copy(getInputStreamFromData(sweData, country, type), os);
+        os.close();
+        return Map.of(buildCgmesFilename(sweData, country, type), os);
+
     }
 
-    private Map<String, ByteArrayOutputStream> createOneEq(Network network, SweData sweData, String country) throws IOException, XMLStreamException {
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
-            EquipmentExport.write(network, writer, new CgmesExportContext(network));
-            return Map.of(buildCgmesFilename(sweData, country, "EQ"), os);
+    private InputStream getInputStreamFromData(SweData sweData, String country, String type) {
+        if (country.equals(FR) && type.equals("TP")) {
+            return fileImporter.importCgmesFiles(sweData.getMapCgmesInputFiles().get(CgmesFileType.RTE_TP).getUrl());
+        } else if (country.equals(FR) && type.equals("EQ")) {
+            return fileImporter.importCgmesFiles(sweData.getMapCgmesInputFiles().get(CgmesFileType.RTE_EQ).getUrl());
+        } else if (country.equals(ES) && type.equals("TP")) {
+            return fileImporter.importCgmesFiles(sweData.getMapCgmesInputFiles().get(CgmesFileType.REN_TP).getUrl());
+        } else if (country.equals(ES) && type.equals("EQ")) {
+            return fileImporter.importCgmesFiles(sweData.getMapCgmesInputFiles().get(CgmesFileType.REN_EQ).getUrl());
+        } else if (country.equals(PT) && type.equals("TP")) {
+            return fileImporter.importCgmesFiles(sweData.getMapCgmesInputFiles().get(CgmesFileType.REE_TP).getUrl());
+        } else if (country.equals(PT) && type.equals("EQ")) {
+            return fileImporter.importCgmesFiles(sweData.getMapCgmesInputFiles().get(CgmesFileType.REE_EQ).getUrl());
+        } else {
+            throw new SweInvalidDataException("Can not find file associated");
         }
     }
 
