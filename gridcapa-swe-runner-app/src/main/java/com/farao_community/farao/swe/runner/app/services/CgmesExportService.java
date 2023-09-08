@@ -70,36 +70,49 @@ public class CgmesExportService {
             LOGGER.info("Start export of the CGMES files");
             this.mergingView = sweData.getMergingViewData().getMergingView();
             applyRemedialActions(direction, sweData, dichotomyResult);
-            String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
-            applyNetworkWithPraResultToMergingView(networkWithPraUrl, mergingView);
-            return exportMergingView(sweData, direction);
+            Network networkWithPra  = getNetworkWithPra(dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl());
+            applyNetworkWithPraResultToMergingView(networkWithPra, mergingView);
+            return exportMergingView(sweData, direction, networkWithPra);
         } else {
             LOGGER.error("Not valid step, CGMES files wont be exported");
             return null;
         }
     }
 
-    void applyNetworkWithPraResultToMergingView(String networkWithPraUrl, MergingView mergingView) {
+
+    //TODO FIXME
+    // ----------------------------------------------------------
+    // SV changes maybe use network with PRA instead of merging view ! start (1) OK
+    // ----------------------------------------------------------
+    // SSH <- merging view ? remedial action / pays + shift ! next (2),
+    // my idea for SSH, use country network as context and network with PRA as input !
+    // ----------------------------------------------------------
+    // entry TP end EQ files could be used directly as outputs ! hold (3)
+    // ----------------------------------------------------------
+    void applyNetworkWithPraResultToMergingView(Network networkWithPra, MergingView mergingView) {
+        LOGGER.info("Applying last shift to the network");
+        mergingView.getGenerators().forEach(generator -> {
+            if (networkWithPra.getGenerator(generator.getId()) != null) {
+                generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
+            }
+        });
+        mergingView.getLoads().forEach(load -> {
+            if (networkWithPra.getLoad(load.getId()) != null) {
+                load.setP0(networkWithPra.getLoad(load.getId()).getP0());
+            }
+        });
+
+        LOGGER.info("Applying HVDC values to AC equivalent model");
+        // Applying the HVDC set point to the CGMES equivalent model if it was changed during the RAO computation
+        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
+        Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
+        hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
+
+    }
+
+    private Network getNetworkWithPra(String networkWithPraUrl) {
         try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
-            LOGGER.info("Applying last shift to the network");
-            Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
-            mergingView.getGenerators().forEach(generator -> {
-                if (networkWithPra.getGenerator(generator.getId()) != null) {
-                    generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
-                }
-            });
-            mergingView.getLoads().forEach(load -> {
-                if (networkWithPra.getLoad(load.getId()) != null) {
-                    load.setP0(networkWithPra.getLoad(load.getId()).getP0());
-                }
-            });
-
-            LOGGER.info("Applying HVDC values to AC equivalent model");
-            // Applying the HVDC set point to the CGMES equivalent model if it was changed during the RAO computation
-            SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
-            Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
-            hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
-
+            return Network.read("networkWithPra.xiidm", networkIs);
         } catch (IOException e) {
             throw new SweInternalException("Could not export CGMES files", e);
         }
@@ -134,11 +147,11 @@ public class CgmesExportService {
         }
     }
 
-    private String exportMergingView(SweData sweData, DichotomyDirection direction) {
+    private String exportMergingView(SweData sweData, DichotomyDirection direction, Network networkWithPra) {
         try {
             Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
             mapCgmesFiles.putAll(createAllSshFiles(sweData));
-            mapCgmesFiles.putAll(createCommonFile(sweData.getMergingViewData().getNetworkFr(), sweData.getMergingViewData().getNetworkEs(), sweData.getMergingViewData().getNetworkPt(), sweData));
+            mapCgmesFiles.putAll(createCommonFile(networkWithPra, sweData.getMergingViewData().getNetworkFr(), sweData.getMergingViewData().getNetworkEs(), sweData.getMergingViewData().getNetworkPt(), sweData));
             mapCgmesFiles.putAll(retrieveEqAndTpFiles(sweData));
             return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
         } catch (XMLStreamException | IOException e) {
@@ -254,11 +267,11 @@ public class CgmesExportService {
         }
     }
 
-    private Map<String, ByteArrayOutputStream> createCommonFile(Network n1, Network n2, Network n3, SweData sweData) throws XMLStreamException, IOException {
+    private Map<String, ByteArrayOutputStream> createCommonFile(Network networkWithPra, Network n1, Network n2, Network n3, SweData sweData) throws XMLStreamException, IOException {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
-            StateVariablesExport.write(mergingView, writer, createContext(mergingView, n1, n2, n3));
+            StateVariablesExport.write(networkWithPra, writer, createContext(mergingView, n1, n2, n3));
             return Map.of(buildCgmesFilename(sweData, "CGMSWE", "SV"), os);
         }
     }

@@ -6,9 +6,11 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.computation.local.LocalComputationManager;
@@ -21,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -41,6 +45,8 @@ class CgmesExportServiceTest {
 
     @Autowired
     private CgmesExportService cgmesExportService;
+    @Autowired
+    private UrlValidationService urlValidationService;
 
     @Test
     void buildCgmesFilenameTest() {
@@ -80,9 +86,14 @@ class CgmesExportServiceTest {
         mergingView.merge(inputNetwork);
         mergingView.setCaseDate(DateTime.parse("2030-01-25T19:00:00Z"));
         String networkWithPraUrl = getClass().getResource("/export_cgmes/microGrid.xiidm").toString();
-        cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPraUrl, mergingView);
-        assertEquals(200, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-        assertEquals(50., mergingView.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
+        try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
+            Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
+            cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPra, mergingView);
+            assertEquals(200, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
+            assertEquals(50., mergingView.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
+        } catch (IOException e) {
+            throw new SweInternalException("Could not export CGMES files", e);
+        }
     }
 
     private Network importFromZip(String zipPath) {
