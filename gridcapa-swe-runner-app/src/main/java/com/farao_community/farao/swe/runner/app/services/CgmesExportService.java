@@ -104,9 +104,7 @@ public class CgmesExportService {
             if (networkWithPra.getGenerator(generator.getId()).getTerminal().isConnected()
                     && !generator.getTerminal().isConnected()) {
                 generator.getTerminal().connect();
-                generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> {
-                    connectTwtIfNecessary(networkWithPra, twt);
-                });
+                generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> connectTwtIfNecessary(networkWithPra, twt));
             }
         }
     }
