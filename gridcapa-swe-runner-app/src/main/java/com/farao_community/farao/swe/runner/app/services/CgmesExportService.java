@@ -28,8 +28,10 @@ import com.powsybl.cgmes.conversion.export.SteadyStateHypothesisExport;
 import com.powsybl.cgmes.extensions.CgmesSvMetadata;
 import com.powsybl.commons.xml.XmlUtil;
 import com.powsybl.iidm.mergingview.MergingView;
+import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.IOUtils;
+import com.powsybl.iidm.network.TwoWindingsTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -81,23 +83,7 @@ public class CgmesExportService {
 
     void applyNetworkWithPraResultToMergingView(Network networkWithPra, MergingView mergingView) {
         LOGGER.info("Applying last shift to the network");
-        mergingView.getGenerators().forEach(generator -> {
-            if (networkWithPra.getGenerator(generator.getId()) != null) {
-                generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
-                if (networkWithPra.getGenerator(generator.getId()).getTerminal().isConnected()
-                        && !generator.getTerminal().isConnected()) {
-                    generator.getTerminal().connect();
-                    generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> {
-                        if (networkWithPra.getTwoWindingsTransformer(twt.getId()).getTerminal1().isConnected()) {
-                            twt.getTerminal1().connect();
-                        }
-                        if (networkWithPra.getTwoWindingsTransformer(twt.getId()).getTerminal2().isConnected()) {
-                            twt.getTerminal2().connect();
-                        }
-                    });
-                }
-            }
-        });
+        mergingView.getGenerators().forEach(generator -> updateGeneratorFromPraAndConnectIfNecessary(networkWithPra, generator));
         mergingView.getLoads().forEach(load -> {
             if (networkWithPra.getLoad(load.getId()) != null) {
                 load.setP0(networkWithPra.getLoad(load.getId()).getP0());
@@ -110,6 +96,28 @@ public class CgmesExportService {
         Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
         hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
 
+    }
+
+    private static void updateGeneratorFromPraAndConnectIfNecessary(Network networkWithPra, Generator generator) {
+        if (networkWithPra.getGenerator(generator.getId()) != null) {
+            generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
+            if (networkWithPra.getGenerator(generator.getId()).getTerminal().isConnected()
+                    && !generator.getTerminal().isConnected()) {
+                generator.getTerminal().connect();
+                generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> {
+                    connectTwtIfNecessary(networkWithPra, twt);
+                });
+            }
+        }
+    }
+
+    private static void connectTwtIfNecessary(Network networkWithPra, TwoWindingsTransformer twt) {
+        if (networkWithPra.getTwoWindingsTransformer(twt.getId()).getTerminal1().isConnected()) {
+            twt.getTerminal1().connect();
+        }
+        if (networkWithPra.getTwoWindingsTransformer(twt.getId()).getTerminal2().isConnected()) {
+            twt.getTerminal2().connect();
+        }
     }
 
     private Network getNetworkWithPra(String networkWithPraUrl) {
