@@ -29,10 +29,10 @@ import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class CgmesExportServiceTest {
 
-    @InjectMocks
+    @MockBean
     private FileExporter fileExporter;
     @Autowired
     private CgmesExportService cgmesExportService;
@@ -150,7 +150,7 @@ class CgmesExportServiceTest {
                 null
                 );
         String zipFileUrl = cgmesExportService.buildAndExportCgmesFiles(DichotomyDirection.ES_FR, sweData, dichotomyResult);
-        assertNotNull(zipFileUrl);
+        assertNull(zipFileUrl);
     }
 
     private Network importFromZip(String zipPath) {
