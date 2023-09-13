@@ -79,21 +79,23 @@ public class CgmesExportService {
         }
     }
 
-
-    //TODO FIXME
-    // ----------------------------------------------------------
-    // SV changes maybe use network with PRA instead of merging view ! start (1) OK
-    // ----------------------------------------------------------
-    // SSH <- merging view ? remedial action / pays + shift ! next (2),
-    // my idea for SSH, use country network as context and network with PRA as input !
-    // ----------------------------------------------------------
-    // entry TP end EQ files could be used directly as outputs ! hold (3)
-    // ----------------------------------------------------------
     void applyNetworkWithPraResultToMergingView(Network networkWithPra, MergingView mergingView) {
         LOGGER.info("Applying last shift to the network");
         mergingView.getGenerators().forEach(generator -> {
             if (networkWithPra.getGenerator(generator.getId()) != null) {
                 generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
+                if (networkWithPra.getGenerator(generator.getId()).getTerminal().isConnected()
+                        && !generator.getTerminal().isConnected()) {
+                    generator.getTerminal().connect();
+                    generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> {
+                        if (networkWithPra.getTwoWindingsTransformer(twt.getId()).getTerminal1().isConnected()) {
+                            twt.getTerminal1().connect();
+                        }
+                        if (networkWithPra.getTwoWindingsTransformer(twt.getId()).getTerminal2().isConnected()) {
+                            twt.getTerminal2().connect();
+                        }
+                    });
+                }
             }
         });
         mergingView.getLoads().forEach(load -> {
@@ -200,7 +202,7 @@ public class CgmesExportService {
         // Create new writer to write modified XML
         XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            XMLStreamWriter writerStream = outputFactory.createXMLStreamWriter(baos);
+            XMLStreamWriter writerStream = XmlUtil.initializeWriter(true, INDENT, baos);
 
             // Go through initial XML and copy each data in the new XML
             while (reader.hasNext()) {
