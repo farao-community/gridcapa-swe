@@ -101,6 +101,9 @@ public class CgmesExportService {
     private static void updateGeneratorFromPraAndConnectIfNecessary(Network networkWithPra, Generator generator) {
         if (networkWithPra.getGenerator(generator.getId()) != null) {
             generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
+            if (networkWithPra.getGenerator(generator.getId()).isVoltageRegulatorOn() || generator.isVoltageRegulatorOn()) {
+                generator.setVoltageRegulatorOn(networkWithPra.getGenerator(generator.getId()).isVoltageRegulatorOn());
+            }
             if (networkWithPra.getGenerator(generator.getId()).getTerminal().isConnected()
                     && !generator.getTerminal().isConnected()) {
                 generator.getTerminal().connect();

@@ -6,10 +6,19 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
+import com.farao_community.farao.data.crac_impl.CracImpl;
+import com.farao_community.farao.data.rao_result_impl.RaoResultImpl;
+import com.farao_community.farao.dichotomy.api.index.Index;
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
+import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
@@ -20,6 +29,8 @@ import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -33,7 +44,7 @@ import java.time.ZoneId;
 import java.util.Objects;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,6 +54,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class CgmesExportServiceTest {
 
+    @InjectMocks
+    private FileExporter fileExporter;
     @Autowired
     private CgmesExportService cgmesExportService;
     @Autowired
@@ -85,15 +98,59 @@ class CgmesExportServiceTest {
         MergingView mergingView = MergingView.create("imported_network", "iidm");
         mergingView.merge(inputNetwork);
         mergingView.setCaseDate(DateTime.parse("2030-01-25T19:00:00Z"));
-        String networkWithPraUrl = getClass().getResource("/export_cgmes/microGrid.xiidm").toString();
+        String networkWithPraUrl = getClass().getResource("/export_cgmes/microGridPra.xiidm").toString();
         try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
             Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
             cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPra, mergingView);
-            assertEquals(200, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
+            assertEquals(210, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
+            assertEquals(210, mergingView.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
             assertEquals(50., mergingView.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
         } catch (IOException e) {
             throw new SweInternalException("Could not export CGMES files", e);
         }
+    }
+
+    @Test
+    void testBuildAndExportCgmesFilesNoValidStep() {
+        Index<SweDichotomyValidationData> index = new Index<>(0d, 0d, 0d);
+        DichotomyResult<SweDichotomyValidationData> dichotomyResult = DichotomyResult.buildFromIndex(index);
+        assertNull(cgmesExportService.buildAndExportCgmesFiles(null, null, dichotomyResult));
+    }
+
+    @Test
+    void testBuildAndExportCgmesFiles() throws URISyntaxException {
+        Network inputNetwork = importFromZip(Paths.get(Objects.requireNonNull(getClass().getResource("/export_cgmes/MicroGrid.zip")).toURI()).toString());
+        assertEquals(140, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
+        assertEquals(90., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
+        MergingView mergingView = MergingView.create("imported_network", "iidm");
+        Index<SweDichotomyValidationData> index = new Index<>(0d, 2950d, 0d);
+        RaoResultImpl raoResult = Mockito.mock(RaoResultImpl.class);
+        RaoResponse raoResponse = Mockito.mock(RaoResponse.class);
+        when(raoResponse.getNetworkWithPraFileUrl()).thenReturn(getClass().getResource("/export_cgmes/microGridPra.xiidm").toString());
+        DichotomyStepResult<SweDichotomyValidationData> validStep = DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse), true);
+        index.addDichotomyStepResult(2950d, validStep);
+        DichotomyResult<SweDichotomyValidationData> dichotomyResult = DichotomyResult.buildFromIndex(index);
+        CimCracCreationContext cracEsFR = Mockito.mock(CimCracCreationContext.class);
+        when(cracEsFR.getCrac()).thenReturn(new CracImpl("test", "testName"));
+        SweData sweData = new SweData(
+                "test",
+                OffsetDateTime.now(),
+                ProcessType.D2CC,
+                null,
+                null,
+                null,
+                null,
+                new MergingViewData(inputNetwork, inputNetwork, inputNetwork, mergingView),
+                cracEsFR,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+                );
+        String zipFileUrl = cgmesExportService.buildAndExportCgmesFiles(DichotomyDirection.ES_FR, sweData, dichotomyResult);
+        assertNotNull(zipFileUrl);
     }
 
     private Network importFromZip(String zipPath) {
