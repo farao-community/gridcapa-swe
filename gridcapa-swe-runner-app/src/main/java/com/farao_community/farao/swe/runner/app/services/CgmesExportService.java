@@ -14,6 +14,7 @@ import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
@@ -27,8 +28,8 @@ import com.powsybl.cgmes.conversion.export.StateVariablesExport;
 import com.powsybl.cgmes.conversion.export.SteadyStateHypothesisExport;
 import com.powsybl.cgmes.extensions.CgmesSvMetadata;
 import com.powsybl.commons.xml.XmlUtil;
-import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Generator;
+import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.IOUtils;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
@@ -59,7 +60,6 @@ public class CgmesExportService {
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
-    private MergingView mergingView;
 
     public CgmesExportService(FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService) {
         this.fileExporter = fileExporter;
@@ -70,10 +70,9 @@ public class CgmesExportService {
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
         if (dichotomyResult.hasValidStep()) {
             LOGGER.info("Start export of the CGMES files");
-            this.mergingView = sweData.getMergingViewData().getMergingView();
             applyRemedialActions(direction, sweData, dichotomyResult);
             Network networkWithPra  = getNetworkWithPra(dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl());
-            applyNetworkWithPraResultToMergingView(networkWithPra, mergingView);
+            applyNetworkWithPraResultToMergingViewData(networkWithPra, sweData.getMergingViewData());
             return exportMergingView(sweData, direction, networkWithPra);
         } else {
             LOGGER.error("Not valid step, CGMES files wont be exported");
@@ -81,33 +80,39 @@ public class CgmesExportService {
         }
     }
 
-    void applyNetworkWithPraResultToMergingView(Network networkWithPra, MergingView mergingView) {
+    void applyNetworkWithPraResultToMergingViewData(Network networkWithPra, MergingViewData mergingViewData) {
         LOGGER.info("Applying last shift to the network");
-        mergingView.getGenerators().forEach(generator -> updateGeneratorFromPraAndConnectIfNecessary(networkWithPra, generator));
-        mergingView.getLoads().forEach(load -> {
-            if (networkWithPra.getLoad(load.getId()) != null) {
-                load.setP0(networkWithPra.getLoad(load.getId()).getP0());
-            }
-        });
+        mergingViewData.getNetworkEs().getGenerators().forEach(generator -> updateGeneratorFromPraAndConnectIfNecessary(networkWithPra, generator));
+        mergingViewData.getNetworkFr().getGenerators().forEach(generator -> updateGeneratorFromPraAndConnectIfNecessary(networkWithPra, generator));
+        mergingViewData.getNetworkPt().getGenerators().forEach(generator -> updateGeneratorFromPraAndConnectIfNecessary(networkWithPra, generator));
 
+        mergingViewData.getNetworkEs().getLoads().forEach(load -> updateLoadFromPra(networkWithPra, load));
+        mergingViewData.getNetworkFr().getLoads().forEach(load -> updateLoadFromPra(networkWithPra, load));
+        mergingViewData.getNetworkPt().getLoads().forEach(load -> updateLoadFromPra(networkWithPra, load));
         LOGGER.info("Applying HVDC values to AC equivalent model");
         // Applying the HVDC set point to the CGMES equivalent model if it was changed during the RAO computation
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
         Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
-        hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
-
+        hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingViewData.getNetworkEs(), mergingViewData.getNetworkFr(), parameter, networkWithPra.getHvdcLine(parameter.getId())));
     }
 
-    private static void updateGeneratorFromPraAndConnectIfNecessary(Network networkWithPra, Generator generator) {
-        if (networkWithPra.getGenerator(generator.getId()) != null) {
-            generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
-            if (networkWithPra.getGenerator(generator.getId()).isVoltageRegulatorOn() || generator.isVoltageRegulatorOn()) {
-                generator.setVoltageRegulatorOn(networkWithPra.getGenerator(generator.getId()).isVoltageRegulatorOn());
+    private static void updateLoadFromPra(Network networkWithPra, Load load) {
+        if (networkWithPra.getLoad(load.getId()) != null) {
+            load.setP0(networkWithPra.getLoad(load.getId()).getP0());
+        }
+    }
+
+    private static void updateGeneratorFromPraAndConnectIfNecessary(Network networkWithPra, Generator countryGenerator) {
+        Generator praGenerator = networkWithPra.getGenerator(countryGenerator.getId());
+        if (praGenerator != null) {
+            countryGenerator.setTargetP(praGenerator.getTargetP());
+            if (praGenerator.isVoltageRegulatorOn() || countryGenerator.isVoltageRegulatorOn()) {
+                countryGenerator.setVoltageRegulatorOn(praGenerator.isVoltageRegulatorOn());
             }
-            if (networkWithPra.getGenerator(generator.getId()).getTerminal().isConnected()
-                    && !generator.getTerminal().isConnected()) {
-                generator.getTerminal().connect();
-                generator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> connectTwtIfNecessary(networkWithPra, twt));
+            if (praGenerator.getTerminal().isConnected()
+                    && !countryGenerator.getTerminal().isConnected()) {
+                countryGenerator.getTerminal().connect();
+                countryGenerator.getTerminal().getVoltageLevel().getTwoWindingsTransformers().forEach(twt -> connectTwtIfNecessary(networkWithPra, twt));
             }
         }
     }
@@ -132,8 +137,8 @@ public class CgmesExportService {
     private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
         LOGGER.info("Applying remedial actions to the network");
         Crac matchingCrac = getMatchingCrac(direction, sweData);
-        applyNetworkActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedNetworkActionsDuringState(matchingCrac.getPreventiveState()));
-        applyRangeActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedRangeActionsDuringState(matchingCrac.getPreventiveState()),
+        applyNetworkActions(sweData, dichotomyResult.getHighestValidStep().getRaoResult().getActivatedNetworkActionsDuringState(matchingCrac.getPreventiveState()));
+        applyRangeActions(sweData, dichotomyResult.getHighestValidStep().getRaoResult().getActivatedRangeActionsDuringState(matchingCrac.getPreventiveState()),
                 dichotomyResult.getHighestValidStep().getRaoResult().getOptimizedSetPointsOnState(matchingCrac.getPreventiveState()));
     }
 
@@ -146,15 +151,37 @@ public class CgmesExportService {
         throw new SweInvalidDataException("Unknown direction");
     }
 
-    private void applyNetworkActions(Set<NetworkAction> activatedNetworkActionsDuringState) {
+    private void applyNetworkActions(SweData sweData, Set<NetworkAction> activatedNetworkActionsDuringState) {
+        Network networkEs = sweData.getMergingViewData().getNetworkEs();
+        Network networkFr = sweData.getMergingViewData().getNetworkFr();
+        Network networkPt = sweData.getMergingViewData().getNetworkPt();
         for (NetworkAction action : activatedNetworkActionsDuringState) {
-            action.apply(mergingView);
+            if (action.getNetworkElements().stream().allMatch(networkElement -> networkEs.getIdentifiable(networkElement.getId()) != null)) {
+                action.apply(networkEs);
+            }
+            if (action.getNetworkElements().stream().allMatch(networkElement -> networkFr.getIdentifiable(networkElement.getId()) != null)) {
+                action.apply(networkFr);
+            }
+            if (action.getNetworkElements().stream().allMatch(networkElement -> networkPt.getIdentifiable(networkElement.getId()) != null)) {
+                action.apply(networkPt);
+            }
         }
     }
 
-    private void applyRangeActions(Set<RangeAction<?>> activatedRangeActionsDuringState, Map<RangeAction<?>, Double> optimizedSetPointsOnState) {
+    private void applyRangeActions(SweData sweData, Set<RangeAction<?>> activatedRangeActionsDuringState, Map<RangeAction<?>, Double> optimizedSetPointsOnState) {
+        Network networkEs = sweData.getMergingViewData().getNetworkEs();
+        Network networkFr = sweData.getMergingViewData().getNetworkFr();
+        Network networkPt = sweData.getMergingViewData().getNetworkPt();
         for (RangeAction<?> action : activatedRangeActionsDuringState) {
-            action.apply(mergingView, optimizedSetPointsOnState.get(action));
+            if (action.getNetworkElements().stream().allMatch(networkElement -> networkEs.getIdentifiable(networkElement.getId()) != null)) {
+                action.apply(networkEs, optimizedSetPointsOnState.get(action));
+            }
+            if (action.getNetworkElements().stream().allMatch(networkElement -> networkFr.getIdentifiable(networkElement.getId()) != null)) {
+                action.apply(networkFr, optimizedSetPointsOnState.get(action));
+            }
+            if (action.getNetworkElements().stream().allMatch(networkElement -> networkPt.getIdentifiable(networkElement.getId()) != null)) {
+                action.apply(networkPt, optimizedSetPointsOnState.get(action));
+            }
         }
     }
 
@@ -209,7 +236,6 @@ public class CgmesExportService {
         XMLStreamReader reader = inputFactory.createXMLStreamReader(new ByteArrayInputStream(os.toByteArray()));
 
         // Create new writer to write modified XML
-        XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             XMLStreamWriter writerStream = XmlUtil.initializeWriter(true, INDENT, baos);
 
@@ -282,14 +308,14 @@ public class CgmesExportService {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
-            StateVariablesExport.write(networkWithPra, writer, createContext(mergingView, n1, n2, n3));
+            StateVariablesExport.write(networkWithPra, writer, createContext(n1, n2, n3));
             return Map.of(buildCgmesFilename(sweData, "CGMSWE", "SV"), os);
         }
     }
 
-    private static CgmesExportContext createContext(MergingView mergingView, Network n1, Network n2, Network n3) {
+    private static CgmesExportContext createContext(Network n1, Network n2, Network n3) {
         CgmesExportContext context = new CgmesExportContext();
-        context.setScenarioTime(mergingView.getCaseDate())
+        context.setScenarioTime(n1.getCaseDate())
                 .getSvModelDescription()
                 .addDependencies(n1.getExtension(CgmesSvMetadata.class).getDependencies())
                 .addDependencies(n2.getExtension(CgmesSvMetadata.class).getDependencies())

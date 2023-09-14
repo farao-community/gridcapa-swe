@@ -95,16 +95,15 @@ class CgmesExportServiceTest {
         Network inputNetwork = importFromZip(Paths.get(Objects.requireNonNull(getClass().getResource("/export_cgmes/MicroGrid.zip")).toURI()).toString());
         assertEquals(140, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
         assertEquals(90., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
-        MergingView mergingView = MergingView.create("imported_network", "iidm");
-        mergingView.merge(inputNetwork);
-        mergingView.setCaseDate(DateTime.parse("2030-01-25T19:00:00Z"));
+        MergingViewData mergingViewData = new MergingViewData(inputNetwork, inputNetwork, inputNetwork, null);
         String networkWithPraUrl = getClass().getResource("/export_cgmes/microGridPra.xiidm").toString();
         try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
             Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
-            cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPra, mergingView);
+            assertEquals(210, networkWithPra.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
+            assertEquals(50., networkWithPra.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
+            cgmesExportService.applyNetworkWithPraResultToMergingViewData(networkWithPra, mergingViewData);
             assertEquals(210, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-            assertEquals(210, mergingView.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-            assertEquals(50., mergingView.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
+            assertEquals(50., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
         } catch (IOException e) {
             throw new SweInternalException("Could not export CGMES files", e);
         }

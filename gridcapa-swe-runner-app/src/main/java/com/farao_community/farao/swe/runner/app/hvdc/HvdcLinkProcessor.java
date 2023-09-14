@@ -175,4 +175,49 @@ public final class HvdcLinkProcessor {
             }
         }
     }
+
+    public static void connectEquivalentGeneratorsAndLoads(Network network1, Network network2, HvdcCreationParameters creationParameters,  HvdcLine hvdcLine) {
+
+        Load load1 = network1.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
+        Generator gen1 = network1.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));
+        if (load1  == null && gen1 == null) {
+            load1 = network2.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
+            gen1 = network2.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));
+        }
+
+        Load load2 = network1.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.TWO));
+        Generator gen2 = network1.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.TWO));
+        if (load2  == null && gen2 == null) {
+            load2 = network2.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
+            gen2 = network2.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));
+        }
+
+        load1.getTerminal().connect();
+        gen1.getTerminal().connect();
+        load2.getTerminal().connect();
+        gen2.getTerminal().connect();
+
+        HvdcAngleDroopActivePowerControl angleDroopActivePowerControl = hvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class);
+        if (angleDroopActivePowerControl != null && angleDroopActivePowerControl.isEnabled()) {
+            load1.setP0(0);
+            gen1.setTargetP(0);
+            load2.setP0(0);
+            gen2.setTargetP(0);
+        } else {
+            double setpoint = hvdcLine.getActivePowerSetpoint();
+            if (hvdcLine.getConvertersMode().equals(HvdcLine.ConvertersMode.SIDE_1_RECTIFIER_SIDE_2_INVERTER)) {
+                // If power flow is from Side1 -> Side2 : set power on load1 & gen2
+                load1.setP0(setpoint);
+                gen2.setTargetP(setpoint);
+                load2.setP0(0);
+                gen1.setTargetP(0);
+            } else {
+                // If power flow is from Side2 -> Side1 : set power on load2 & gen1
+                load2.setP0(setpoint);
+                gen1.setTargetP(setpoint);
+                load1.setP0(0);
+                gen2.setTargetP(0);
+            }
+        }
+    }
 }
