@@ -12,7 +12,7 @@ import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.powsybl.iidm.network.Network;
 
 import java.time.OffsetDateTime;
-import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -34,9 +34,9 @@ public class SweData {
     private final String jsonCracPathFrEs;
     private final String raoParametersEsFrUrl;
     private final String raoParametersEsPtUrl;
-    private final EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles;
+    private final Map<CgmesFileType, SweFileResource> mapCgmesInputFiles;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
@@ -115,7 +115,7 @@ public class SweData {
         return raoParametersEsPtUrl;
     }
 
-    public EnumMap<CgmesFileType, SweFileResource> getMapCgmesInputFiles() {
+    public Map<CgmesFileType, SweFileResource> getMapCgmesInputFiles() {
         return mapCgmesInputFiles;
     }
 }

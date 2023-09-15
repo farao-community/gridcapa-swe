@@ -42,9 +42,6 @@ class CgmesExportServiceTest {
     @Autowired
     private CgmesExportService cgmesExportService;
 
-    // buildAndExportCgmesFiles
-    // applyNetworkWithPraResultToMergingView
-
     @Test
     void buildCgmesFilenameTest() {
         SoftAssertions assertions = new SoftAssertions();
