@@ -239,11 +239,11 @@ public class CgmesExportService {
     }
 
     private Map<String, ByteArrayOutputStream> createOneFile(SweData sweData, String country, String type) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        IOUtils.copy(getInputStreamFromData(sweData, country, type), os);
-        os.close();
-        return Map.of(buildCgmesFilename(sweData, country, type), os);
-
+        try (InputStream inputStream = getInputStreamFromData(sweData, country, type);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            IOUtils.copy(inputStream, outputStream);
+            return Map.of(buildCgmesFilename(sweData, country, type), outputStream);
+        }
     }
 
     private InputStream getInputStreamFromData(SweData sweData, String country, String type) {
@@ -260,7 +260,7 @@ public class CgmesExportService {
         } else if (country.equals(PT) && type.equals("EQ")) {
             return fileImporter.importCgmesFiles(sweData.getMapCgmesInputFiles().get(CgmesFileType.REE_EQ).getUrl());
         } else {
-            throw new SweInvalidDataException("Can not find file associated");
+            throw new SweInvalidDataException(String.format("Can not find file associated with type %s and country %s", type, country));
         }
     }
 
