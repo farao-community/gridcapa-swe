@@ -6,13 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
