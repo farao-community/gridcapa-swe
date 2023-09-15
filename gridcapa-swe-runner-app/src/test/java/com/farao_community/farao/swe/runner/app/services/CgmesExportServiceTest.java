@@ -15,6 +15,7 @@ import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
+import org.assertj.core.api.SoftAssertions;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,32 +42,36 @@ class CgmesExportServiceTest {
     @Autowired
     private CgmesExportService cgmesExportService;
 
+    // buildAndExportCgmesFiles
+    // applyNetworkWithPraResultToMergingView
+
     @Test
-    void testBuildCgmesFilename() {
+    void buildCgmesFilenameTest() {
+        SoftAssertions assertions = new SoftAssertions();
         SweData sweData = mock(SweData.class);
         when(sweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.of("UTC")));
+
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        String result = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
-        assertEquals("20221130T0000Z_2D_FR_ESFR_001.xml", result);
+        String d2ccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
+        assertions.assertThat(d2ccResult).isEqualTo("20221130T0000Z_2D_FR_ESFR_001.xml");
+
+        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC);
+        String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
+        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_ID_FR_ESFR_001.xml");
+
+        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
+        String idccIdcfResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
+        assertions.assertThat(idccIdcfResult).isEqualTo("20221130T0000Z_IDCF_FR_ESFR_001.xml");
+
+        assertions.assertAll();
     }
 
     @Test
-    void testCreateFileType() {
-        DichotomyDirection directionEsFr = DichotomyDirection.ES_FR;
-        String resultEsFr = cgmesExportService.createFileType(directionEsFr);
-        assertEquals("CGM_ESFR", resultEsFr);
-
-        DichotomyDirection directionFrEs = DichotomyDirection.FR_ES;
-        String resultFrEs = cgmesExportService.createFileType(directionFrEs);
-        assertEquals("CGM_FRES", resultFrEs);
-
-        DichotomyDirection directionEsPt = DichotomyDirection.ES_PT;
-        String resultEsPt = cgmesExportService.createFileType(directionEsPt);
-        assertEquals("CGM_ESPT", resultEsPt);
-
-        DichotomyDirection directionPtEs = DichotomyDirection.PT_ES;
-        String resultPtEs = cgmesExportService.createFileType(directionPtEs);
-        assertEquals("CGM_PTES", resultPtEs);
+    void buildFileTypeTest() {
+        assertEquals("CGM_ESFR", cgmesExportService.buildFileType(DichotomyDirection.ES_FR));
+        assertEquals("CGM_FRES", cgmesExportService.buildFileType(DichotomyDirection.FR_ES));
+        assertEquals("CGM_ESPT", cgmesExportService.buildFileType(DichotomyDirection.ES_PT));
+        assertEquals("CGM_PTES", cgmesExportService.buildFileType(DichotomyDirection.PT_ES));
     }
 
     @Test
@@ -88,5 +93,4 @@ class CgmesExportServiceTest {
         importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
         return Network.read(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
     }
-
 }

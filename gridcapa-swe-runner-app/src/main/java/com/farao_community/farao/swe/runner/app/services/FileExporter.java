@@ -230,7 +230,7 @@ public class FileExporter {
 
     String getCgmZipFileName(OffsetDateTime offsetDateTime, DichotomyDirection direction) {
         OffsetDateTime localTime = OffsetDateTime.ofInstant(offsetDateTime.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-        return cgmesFormatter.format(localTime).replace("[direction]", direction.getName().replace("-", ""));
+        return cgmesFormatter.format(localTime).replace("[direction]", direction.getDashName().replace("-", ""));
     }
 
     public String adaptTargetProcessName(ProcessType processType) {
