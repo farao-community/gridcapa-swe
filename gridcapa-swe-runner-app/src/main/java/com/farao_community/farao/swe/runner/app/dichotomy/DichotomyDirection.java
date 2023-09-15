@@ -10,18 +10,24 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public enum DichotomyDirection {
-    ES_FR("ES-FR"),
-    FR_ES("FR-ES"),
-    ES_PT("ES-PT"),
-    PT_ES("PT-ES");
+    ES_FR("ES-FR", "ESFR"),
+    FR_ES("FR-ES", "FRES"),
+    ES_PT("ES-PT", "ESPT"),
+    PT_ES("PT-ES", "PTES");
 
-    private final String name;
+    private final String dashName;
+    private final String shortName;
 
-    DichotomyDirection(String name) {
-        this.name = name;
+    DichotomyDirection(String dashName, String shortName) {
+        this.dashName = dashName;
+        this.shortName = shortName;
     }
 
-    public String getName() {
-        return name;
+    public String getDashName() {
+        return dashName;
+    }
+
+    public String getShortName() {
+        return shortName;
     }
 }

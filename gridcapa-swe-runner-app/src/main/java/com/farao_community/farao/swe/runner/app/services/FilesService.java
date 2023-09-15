@@ -9,14 +9,17 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.EnumMap;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -58,6 +61,22 @@ public class FilesService {
         String jsonCracPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, sweRequest.getProcessType());
         String raoParametersEsFrUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), DichotomyDirection.ES_FR);
         String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), DichotomyDirection.ES_PT);
-        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, mergingViewData, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl);
+        EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = fillMapCgmesInputFiles(sweRequest);
+        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, mergingViewData, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, mapCgmesInputFiles);
+    }
+
+    private EnumMap<CgmesFileType, SweFileResource> fillMapCgmesInputFiles(SweRequest sweRequest) {
+        EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = new EnumMap<>(CgmesFileType.class);
+        mapCgmesInputFiles.put(CgmesFileType.CORESO_SV, sweRequest.getCoresoSv());
+        mapCgmesInputFiles.put(CgmesFileType.RTE_SSH, sweRequest.getRteSsh());
+        mapCgmesInputFiles.put(CgmesFileType.RTE_EQ, sweRequest.getRteEq());
+        mapCgmesInputFiles.put(CgmesFileType.RTE_TP, sweRequest.getRteTp());
+        mapCgmesInputFiles.put(CgmesFileType.REE_SSH, sweRequest.getReeSsh());
+        mapCgmesInputFiles.put(CgmesFileType.REE_EQ, sweRequest.getReeEq());
+        mapCgmesInputFiles.put(CgmesFileType.REE_TP, sweRequest.getReeTp());
+        mapCgmesInputFiles.put(CgmesFileType.REN_SSH, sweRequest.getRenSsh());
+        mapCgmesInputFiles.put(CgmesFileType.REN_EQ, sweRequest.getRenEq());
+        mapCgmesInputFiles.put(CgmesFileType.REN_TP, sweRequest.getRenTp());
+        return mapCgmesInputFiles;
     }
 }

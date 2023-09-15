@@ -120,4 +120,12 @@ public class FileImporter {
             throw new SweInvalidDataException("Cannot import rao result from url", e);
         }
     }
+
+    public InputStream importCgmesFiles(String url) {
+        try {
+            return urlValidationService.openUrlStream(url);
+        } catch (Exception e) {
+            throw new SweInvalidDataException("Cannot import cgmes file from url", e);
+        }
+    }
 }

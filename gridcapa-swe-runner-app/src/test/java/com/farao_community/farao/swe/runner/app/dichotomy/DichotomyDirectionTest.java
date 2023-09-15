@@ -18,8 +18,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DichotomyDirectionTest {
 
     @Test
-    void simpleTest() {
-        DichotomyDirection directionEsFr = DichotomyDirection.ES_FR;
-        assertEquals("ES-FR", directionEsFr.getName());
+    void getShortNameTest() {
+        assertEquals("ESFR", DichotomyDirection.ES_FR.getShortName());
+        assertEquals("ESPT", DichotomyDirection.ES_PT.getShortName());
+        assertEquals("FRES", DichotomyDirection.FR_ES.getShortName());
+        assertEquals("PTES", DichotomyDirection.PT_ES.getShortName());
+    }
+
+    @Test
+    void getDashNameTest() {
+        assertEquals("ES-FR", DichotomyDirection.ES_FR.getDashName());
+        assertEquals("ES-PT", DichotomyDirection.ES_PT.getDashName());
+        assertEquals("FR-ES", DichotomyDirection.FR_ES.getDashName());
+        assertEquals("PT-ES", DichotomyDirection.PT_ES.getDashName());
     }
 }

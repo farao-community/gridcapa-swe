@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.io.InputStream;
 import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,7 +58,8 @@ class FilesServiceTest {
         when(fileImporter.importCimCrac(any(SweRequest.class))).thenReturn(mock(CimCrac.class));
         when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString())).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");
-        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(), null, null, null, null, null, null, null, null, null, null, null, null, null, new SweFileResource("name", "url"));
+        when(fileImporter.importCgmesFiles(anyString())).thenReturn(InputStream.nullInputStream());
+        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, null, new SweFileResource("name", "url"));
         SweData sweData = filesService.importFiles(sweRequest);
         assertNotNull(sweData);
     }
