@@ -15,7 +15,9 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
@@ -27,7 +29,6 @@ import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.EnumMap;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -146,7 +148,8 @@ class CgmesExportServiceTest {
                 null,
                 null,
                 null,
-                null
+                null,
+                fillMapCgmesInputFiles()
                 );
         String zipFileUrl = cgmesExportService.buildAndExportCgmesFiles(DichotomyDirection.ES_FR, sweData, dichotomyResult);
         assertNull(zipFileUrl);
@@ -156,5 +159,17 @@ class CgmesExportServiceTest {
         Properties importParams = new Properties();
         importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
         return Network.read(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
+    }
+
+    private EnumMap<CgmesFileType, SweFileResource> fillMapCgmesInputFiles() {
+        SweFileResource testRessource = new SweFileResource("test", getClass().getResource("/export_cgmes/emptyTestFile.txt").toString());
+        EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = new EnumMap<>(CgmesFileType.class);
+        mapCgmesInputFiles.put(CgmesFileType.RTE_EQ, testRessource);
+        mapCgmesInputFiles.put(CgmesFileType.RTE_TP, testRessource);
+        mapCgmesInputFiles.put(CgmesFileType.REE_EQ, testRessource);
+        mapCgmesInputFiles.put(CgmesFileType.REE_TP, testRessource);
+        mapCgmesInputFiles.put(CgmesFileType.REN_EQ, testRessource);
+        mapCgmesInputFiles.put(CgmesFileType.REN_TP, testRessource);
+        return mapCgmesInputFiles;
     }
 }
