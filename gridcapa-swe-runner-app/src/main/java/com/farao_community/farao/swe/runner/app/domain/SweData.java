@@ -44,7 +44,6 @@ public class SweData {
         this.networkFrEs = networkFrEs;
         this.networkEsPt = networkEsPt;
         this.networkPtEs = networkPtEs;
-        this.mergingViewData = mergingViewData;
         this.cracEsPt = cracEsPt;
         this.cracFrEs = cracFrEs;
         this.glskUrl = glskUrl;
@@ -53,6 +52,7 @@ public class SweData {
         this.raoParametersEsFrUrl = raoParametersEsFrUrl;
         this.raoParametersEsPtUrl = raoParametersEsPtUrl;
         this.mapCgmesInputFiles = mapCgmesInputFiles;
+        this.mergingViewData = mergingViewData;
     }
 
     public String getId() {

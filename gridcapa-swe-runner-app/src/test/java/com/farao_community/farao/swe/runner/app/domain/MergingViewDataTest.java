@@ -6,11 +6,13 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,23 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MergingViewDataTest {
 
     @Mock
-    private Network networkFr;
+    private Network network;
 
-    @Mock
-    private Network networkEs;
-
-    @Mock
-    private Network networkPt;
-
-    @Mock
-    private MergingView mergingView;
+    private Map<String, String> networkIdsByCountry = new HashMap<>();
 
     @Test
     void simpleTest() {
-        MergingViewData mergingViewData = new MergingViewData(networkFr, networkEs, networkPt, mergingView);
-        assertEquals(this.networkFr, mergingViewData.getNetworkFr());
-        assertEquals(this.networkEs, mergingViewData.getNetworkEs());
-        assertEquals(this.networkPt, mergingViewData.getNetworkPt());
-        assertEquals(this.mergingView, mergingViewData.getMergingView());
+        MergingViewData mergingViewData = new MergingViewData(network, networkIdsByCountry);
+        assertEquals(this.network, mergingViewData.getMergedNetwork());
+        assertEquals(this.networkIdsByCountry, mergingViewData.getSubnetworkIdByCountry());
     }
 }

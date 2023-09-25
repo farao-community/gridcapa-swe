@@ -12,11 +12,9 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.computation.local.LocalComputationManager;
-import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -76,13 +74,10 @@ class CgmesExportServiceTest {
         Network inputNetwork = importFromZip(Paths.get(Objects.requireNonNull(getClass().getResource("/export_cgmes/MicroGrid.zip")).toURI()).toString());
         assertEquals(140, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
         assertEquals(90., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
-        MergingView mergingView = MergingView.create("imported_network", "iidm");
-        mergingView.merge(inputNetwork);
-        mergingView.setCaseDate(DateTime.parse("2030-01-25T19:00:00Z"));
         String networkWithPraUrl = getClass().getResource("/export_cgmes/microGrid.xiidm").toString();
-        cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPraUrl, mergingView);
+        cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPraUrl, inputNetwork);
         assertEquals(200, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-        assertEquals(50., mergingView.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
+        assertEquals(50., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
     }
 
     private Network importFromZip(String zipPath) {

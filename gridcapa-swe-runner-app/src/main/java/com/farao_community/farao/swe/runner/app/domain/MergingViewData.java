@@ -6,39 +6,27 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
+
+import java.util.Map;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class MergingViewData {
+    private final Network mergedNetwork;
+    private final Map<String, String> subnetworkIdByCountry;
 
-    private final Network networkFr;
-    private final Network networkEs;
-    private final Network networkPt;
-    private final MergingView mergingView;
-
-    public MergingViewData(Network networkFr, Network networkEs, Network networkPt, MergingView mergingView) {
-        this.networkFr = networkFr;
-        this.networkEs = networkEs;
-        this.networkPt = networkPt;
-        this.mergingView = mergingView;
+    public MergingViewData(Network mergedNetwork, Map<String, String> subnetworkIdByCountry) {
+        this.mergedNetwork = mergedNetwork;
+        this.subnetworkIdByCountry = subnetworkIdByCountry;
     }
 
-    public Network getNetworkFr() {
-        return networkFr;
+    public Network getMergedNetwork() {
+        return mergedNetwork;
     }
 
-    public Network getNetworkEs() {
-        return networkEs;
-    }
-
-    public Network getNetworkPt() {
-        return networkPt;
-    }
-
-    public MergingView getMergingView() {
-        return mergingView;
+    public Map<String, String> getSubnetworkIdByCountry() {
+        return subnetworkIdByCountry;
     }
 }

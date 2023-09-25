@@ -27,7 +27,6 @@ import com.powsybl.cgmes.conversion.export.StateVariablesExport;
 import com.powsybl.cgmes.conversion.export.SteadyStateHypothesisExport;
 import com.powsybl.cgmes.extensions.CgmesSvMetadata;
 import com.powsybl.commons.xml.XmlUtil;
-import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -57,7 +56,6 @@ public class CgmesExportService {
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
-    private MergingView mergingView;
 
     public CgmesExportService(FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService) {
         this.fileExporter = fileExporter;
@@ -68,27 +66,27 @@ public class CgmesExportService {
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
         if (dichotomyResult.hasValidStep()) {
             LOGGER.info("Start export of the CGMES files");
-            this.mergingView = sweData.getMergingViewData().getMergingView();
-            applyRemedialActions(direction, sweData, dichotomyResult);
+            Network mergedNetwork = sweData.getMergingViewData().getMergedNetwork();
+            applyRemedialActions(direction, sweData, dichotomyResult, mergedNetwork);
             String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
-            applyNetworkWithPraResultToMergingView(networkWithPraUrl, mergingView);
-            return exportMergingView(sweData, direction);
+            applyNetworkWithPraResultToMergingView(networkWithPraUrl, mergedNetwork);
+            return exportMergedNetwork(sweData, direction, mergedNetwork);
         } else {
             LOGGER.error("Not valid step, CGMES files wont be exported");
             return null;
         }
     }
 
-    void applyNetworkWithPraResultToMergingView(String networkWithPraUrl, MergingView mergingView) {
+    void applyNetworkWithPraResultToMergingView(String networkWithPraUrl, Network mergedNetwork) {
         try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
             LOGGER.info("Applying last shift to the network");
             Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
-            mergingView.getGenerators().forEach(generator -> {
+            mergedNetwork.getGenerators().forEach(generator -> {
                 if (networkWithPra.getGenerator(generator.getId()) != null) {
                     generator.setTargetP(networkWithPra.getGenerator(generator.getId()).getTargetP());
                 }
             });
-            mergingView.getLoads().forEach(load -> {
+            mergedNetwork.getLoads().forEach(load -> {
                 if (networkWithPra.getLoad(load.getId()) != null) {
                     load.setP0(networkWithPra.getLoad(load.getId()).getP0());
                 }
@@ -98,19 +96,19 @@ public class CgmesExportService {
             // Applying the HVDC set point to the CGMES equivalent model if it was changed during the RAO computation
             SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
             Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
-            hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergingView, parameter, networkWithPra.getHvdcLine(parameter.getId())));
+            hvdcCreationParameters.stream().filter(param -> networkWithPra.getHvdcLine(param.getId()) != null).forEach(parameter -> HvdcLinkProcessor.connectEquivalentGeneratorsAndLoads(mergedNetwork, parameter, networkWithPra.getHvdcLine(parameter.getId())));
 
         } catch (IOException e) {
             throw new SweInternalException("Could not export CGMES files", e);
         }
     }
 
-    private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
+    private void applyRemedialActions(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, Network mergedNetwork) {
         LOGGER.info("Applying remedial actions to the network");
         Crac matchingCrac = getMatchingCrac(direction, sweData);
-        applyNetworkActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedNetworkActionsDuringState(matchingCrac.getPreventiveState()));
+        applyNetworkActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedNetworkActionsDuringState(matchingCrac.getPreventiveState()), mergedNetwork);
         applyRangeActions(dichotomyResult.getHighestValidStep().getRaoResult().getActivatedRangeActionsDuringState(matchingCrac.getPreventiveState()),
-                dichotomyResult.getHighestValidStep().getRaoResult().getOptimizedSetPointsOnState(matchingCrac.getPreventiveState()));
+                dichotomyResult.getHighestValidStep().getRaoResult().getOptimizedSetPointsOnState(matchingCrac.getPreventiveState()), mergedNetwork);
     }
 
     private Crac getMatchingCrac(DichotomyDirection direction, SweData sweData) {
@@ -122,23 +120,23 @@ public class CgmesExportService {
         throw new SweInvalidDataException("Unknown direction");
     }
 
-    private void applyNetworkActions(Set<NetworkAction> activatedNetworkActionsDuringState) {
+    private void applyNetworkActions(Set<NetworkAction> activatedNetworkActionsDuringState, Network network) {
         for (NetworkAction action : activatedNetworkActionsDuringState) {
-            action.apply(mergingView);
+            action.apply(network);
         }
     }
 
-    private void applyRangeActions(Set<RangeAction<?>> activatedRangeActionsDuringState, Map<RangeAction<?>, Double> optimizedSetPointsOnState) {
+    private void applyRangeActions(Set<RangeAction<?>> activatedRangeActionsDuringState, Map<RangeAction<?>, Double> optimizedSetPointsOnState, Network network) {
         for (RangeAction<?> action : activatedRangeActionsDuringState) {
-            action.apply(mergingView, optimizedSetPointsOnState.get(action));
+            action.apply(network, optimizedSetPointsOnState.get(action));
         }
     }
 
-    private String exportMergingView(SweData sweData, DichotomyDirection direction) {
+    private String exportMergedNetwork(SweData sweData, DichotomyDirection direction, Network mergedNetwork) {
         try {
             Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
-            mapCgmesFiles.putAll(createAllSshFiles(sweData));
-            mapCgmesFiles.putAll(createCommonFile(sweData.getMergingViewData().getNetworkFr(), sweData.getMergingViewData().getNetworkEs(), sweData.getMergingViewData().getNetworkPt(), sweData));
+            mapCgmesFiles.putAll(createAllSshFiles(mergedNetwork, sweData));
+            mapCgmesFiles.putAll(createCommonFile(mergedNetwork, sweData));
             mapCgmesFiles.putAll(retrieveEqAndTpFiles(sweData));
             return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
         } catch (XMLStreamException | IOException e) {
@@ -146,12 +144,13 @@ public class CgmesExportService {
         }
     }
 
-    private Map<String, ByteArrayOutputStream> createAllSshFiles(SweData sweData) throws XMLStreamException, IOException {
+    private Map<String, ByteArrayOutputStream> createAllSshFiles(Network mergedNetwork, SweData sweData) throws XMLStreamException, IOException {
         LOGGER.info("Building SSH files");
         Map<String, ByteArrayOutputStream> mapSshFiles = new HashMap<>();
-        mapSshFiles.putAll(createOneSsh(sweData.getMergingViewData().getNetworkFr(), sweData, CgmesFileType.RTE_SSH));
-        mapSshFiles.putAll(createOneSsh(sweData.getMergingViewData().getNetworkEs(), sweData, CgmesFileType.REE_SSH));
-        mapSshFiles.putAll(createOneSsh(sweData.getMergingViewData().getNetworkPt(), sweData, CgmesFileType.REN_SSH));
+        Map<String, String> networkIdsByCountry = sweData.getMergingViewData().getSubnetworkIdByCountry();
+        mapSshFiles.putAll(createOneSsh(mergedNetwork.getSubnetwork(networkIdsByCountry.get("FR")), sweData, CgmesFileType.RTE_SSH));
+        mapSshFiles.putAll(createOneSsh(mergedNetwork.getSubnetwork(networkIdsByCountry.get("ES")), sweData, CgmesFileType.REE_SSH));
+        mapSshFiles.putAll(createOneSsh(mergedNetwork.getSubnetwork(networkIdsByCountry.get("PT")), sweData, CgmesFileType.REN_SSH));
         return mapSshFiles;
     }
 
@@ -228,7 +227,7 @@ public class CgmesExportService {
         }
     }
 
-    private void addPTolerance(XMLStreamReader reader, XMLStreamWriter writerStream) throws XMLStreamException {
+    private void addPTolerance(XMLStreamReader reader, XMLStreamWriter writerStream) throws XMLStreamException { //todo refactor with Marc PR
         // I try to find what I need to modify it
         if (reader.getLocalName().equals("ControlArea")) {
             writerStream.writeStartElement("ControlArea.pTolerance");
@@ -254,25 +253,21 @@ public class CgmesExportService {
         }
     }
 
-    private Map<String, ByteArrayOutputStream> createCommonFile(Network n1, Network n2, Network n3, SweData sweData) throws XMLStreamException, IOException {
+    private Map<String, ByteArrayOutputStream> createCommonFile(Network mergedNetwork, SweData sweData) throws XMLStreamException, IOException {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             XMLStreamWriter writer = XmlUtil.initializeWriter(true, INDENT, os);
-            StateVariablesExport.write(mergingView, writer, createContext(mergingView, n1, n2, n3));
+            StateVariablesExport.write(mergedNetwork, writer, createContext(mergedNetwork));
             return Map.of(buildCgmesFilename(sweData, "CGMSWE", "SV"), os);
         }
     }
 
-    private static CgmesExportContext createContext(MergingView mergingView, Network n1, Network n2, Network n3) {
+    private static CgmesExportContext createContext(Network n1) {
         CgmesExportContext context = new CgmesExportContext();
-        context.setScenarioTime(mergingView.getCaseDate())
+        context.setScenarioTime(n1.getCaseDate())
                 .getSvModelDescription()
-                .addDependencies(n1.getExtension(CgmesSvMetadata.class).getDependencies())
-                .addDependencies(n2.getExtension(CgmesSvMetadata.class).getDependencies())
-                .addDependencies(n3.getExtension(CgmesSvMetadata.class).getDependencies());
+                .addDependencies(n1.getExtension(CgmesSvMetadata.class).getDependencies());
         context.addIidmMappings(n1);
-        context.addIidmMappings(n2);
-        context.addIidmMappings(n3);
         return context;
     }
 

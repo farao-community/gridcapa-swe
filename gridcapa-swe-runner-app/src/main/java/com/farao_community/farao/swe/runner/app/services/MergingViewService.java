@@ -10,7 +10,6 @@ import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataExceptio
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
-import com.powsybl.iidm.mergingview.MergingView;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -22,7 +21,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -35,19 +36,25 @@ public class MergingViewService {
 
     private final NetworkService networkService;
 
+    private Map<String, String> subnetworkIdByCountry = new HashMap<>();
+
     public MergingViewService(NetworkService networkService) {
         this.networkService = networkService;
     }
 
-    public MergingViewData importMergingView(SweRequest sweRequest) {
+    public MergingViewData importMergedNetwork(SweRequest sweRequest) {
+        subnetworkIdByCountry.clear();
         Network networkFr = networkService.importFromZip(buildZipFile(sweRequest, Country.FR));
+        String idFr = networkFr.getId();
+        subnetworkIdByCountry.put("FR", idFr);
         Network networkEs = networkService.importFromZip(buildZipFile(sweRequest, Country.ES));
+        String idEs = networkEs.getId();
+        subnetworkIdByCountry.put("ES", idEs);
         Network networkPt = networkService.importFromZip(buildZipFile(sweRequest, Country.PT));
-
-        MergingView mergingView = MergingView.create("MergingViewService", "iidm");
-        mergingView.setCaseDate(networkFr.getCaseDate());
-        mergingView.merge(networkFr, networkEs, networkPt);
-        return new MergingViewData(networkFr, networkEs, networkPt, mergingView);
+        String idPt = networkPt.getId();
+        subnetworkIdByCountry.put("PT", idPt);
+        Network mergedNetwork = Network.create("merged_network", networkEs, networkFr, networkPt);
+        return new MergingViewData(mergedNetwork, subnetworkIdByCountry);
     }
 
     private String buildZipFile(SweRequest sweRequest, Country country) {

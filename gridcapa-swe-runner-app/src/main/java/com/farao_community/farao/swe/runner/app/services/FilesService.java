@@ -45,7 +45,7 @@ public class FilesService {
     }
 
     public SweData importFiles(SweRequest sweRequest) {
-        MergingViewData mergingViewData = mergingViewService.importMergingView(sweRequest);
+        MergingViewData mergingViewData = mergingViewService.importMergedNetwork(sweRequest);
         Network networkEsFr = networkService.importNetwork(sweRequest);
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network networkFrEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
