@@ -20,7 +20,7 @@ import com.farao_community.farao.swe.runner.app.configurations.ProcessConfigurat
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
-import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
+import com.farao_community.farao.swe.runner.app.voltage.json.FailureVoltageCheckResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
@@ -47,6 +47,7 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
+    public static final String XIIDM = "XIIDM";
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
@@ -95,9 +96,9 @@ public class FileExporter {
                                                        String fileType) {
         MemDataSource memDataSource = new MemDataSource();
         try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
-            VoltageCheckResult voltageCheckResult = voltageResultMapper.mapVoltageResult(result);
+            Object resultToWrite = result != null ? voltageResultMapper.mapVoltageResult(result) : new FailureVoltageCheckResult();
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            zipSingleFile(os, objectWriter.writeValueAsBytes(voltageCheckResult), zipTargetNameChangeExtension(targetName, ".json"));
+            zipSingleFile(os, objectWriter.writeValueAsBytes(resultToWrite), zipTargetNameChangeExtension(targetName, ".json"));
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
         }
@@ -138,7 +139,7 @@ public class FileExporter {
     }
 
     public String saveNetworkInArtifact(Network network, String networkFilePath, String fileType, OffsetDateTime processTargetDateTime, ProcessType processType) {
-        exportAndUploadNetwork(network, "XIIDM", GridcapaFileGroup.ARTIFACT, networkFilePath, fileType, processTargetDateTime, processType);
+        exportAndUploadNetwork(network, XIIDM, GridcapaFileGroup.ARTIFACT, networkFilePath, fileType, processTargetDateTime, processType);
         return minioAdapter.generatePreSignedUrl(networkFilePath);
     }
 
@@ -166,8 +167,8 @@ public class FileExporter {
             case "UCTE":
                 network.write("UCTE", new Properties(), memDataSource);
                 return memDataSource.newInputStream("", "uct");
-            case "XIIDM":
-                network.write("XIIDM", new Properties(), memDataSource);
+            case XIIDM:
+                network.write(XIIDM, new Properties(), memDataSource);
                 return memDataSource.newInputStream("", "xiidm");
             default:
                 throw new UnsupportedOperationException(String.format("Network format %s not supported", format));
@@ -216,8 +217,6 @@ public class FileExporter {
                 }
                 is.close();
             }
-            zipOs.close();
-            baos.close();
 
             try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
                 minioAdapter.uploadOutputForTimestamp(cgmesPath, is, adaptTargetProcessName(sweData.getProcessType()), filetype, sweData.getTimestamp());

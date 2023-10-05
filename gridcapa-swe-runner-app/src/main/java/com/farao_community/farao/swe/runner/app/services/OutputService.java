@@ -50,13 +50,13 @@ public class OutputService {
     }
 
     public void buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
-        if (voltageMonitoringResult.isPresent()) {
+        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) { //voltageMonitoringResult.isPresent()
             OffsetDateTime timestamp = sweData.getTimestamp();
             String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
             OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
             DateTimeFormatter df = DateTimeFormatter.ofPattern(VOLTAGE_DOC_NAME_REGEX);
             String zipName = df.format(localTime).replace("[direction]", directionString);
-            VoltageMonitoringResult voltageRes = voltageMonitoringResult.get();
+            VoltageMonitoringResult voltageRes = voltageMonitoringResult.isPresent() ? voltageMonitoringResult.get() : null;
             fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, sweData.getProcessType(), "VOLTAGE_" + directionString);
         }
     }

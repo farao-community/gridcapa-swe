@@ -61,7 +61,7 @@ public class DichotomyLogging {
         String printableCrasIds = NONE;
         String currentTtc = String.valueOf(dichotomyResult.getHighestValidStepValue());
         String previousTtc = String.valueOf(dichotomyResult.getLowestInvalidStepValue());
-        String voltageCheckStatus =  voltageMonitoringResult.isPresent() ? String.valueOf(voltageMonitoringResult.get().getStatus()) : NONE;
+        String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult);
         String angleCheckStatus = NONE;
         String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
         Crac crac = (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) ? sweData.getCracFrEs().getCrac() : sweData.getCracEsPt().getCrac();
@@ -80,5 +80,16 @@ public class DichotomyLogging {
 
     private static String toString(Collection<String> c) {
         return c.stream().map(Object::toString).collect(Collectors.joining(", "));
+    }
+
+    private String getVoltageCheckResult(DichotomyDirection direction, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+        if (direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR)) {
+            if (voltageMonitoringResult.isPresent()) {
+                return String.valueOf(voltageMonitoringResult.get().getStatus());
+            } else {
+                return "FAILURE";
+            }
+        }
+        return NONE;
     }
 }
