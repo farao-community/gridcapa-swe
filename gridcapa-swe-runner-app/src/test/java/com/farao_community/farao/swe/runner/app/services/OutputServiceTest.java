@@ -49,7 +49,6 @@ class OutputServiceTest {
     static void init() {
         fileExporter = Mockito.mock(FileExporter.class);
         processConfiguration = Mockito.mock(ProcessConfiguration.class);
-        Mockito.when(fileExporter.exportTtcDocument(Mockito.any(SweData.class), Mockito.any(InputStream.class), Mockito.anyString())).thenReturn(TTC_DOCUMENT_URL_STRING);
         Mockito.when(fileExporter.saveVoltageMonitoringResultInJsonZip(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(VOLTAGE_DOCUMENT_URL_STRING);
         Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Paris");
@@ -64,6 +63,7 @@ class OutputServiceTest {
 
     @BeforeEach
     void beforeEach() {
+        Mockito.reset(fileExporter);
         sweData = Mockito.mock(SweData.class);
         Mockito.when(sweData.getTimestamp()).thenReturn(dateTime);
         Mockito.when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
@@ -71,6 +71,7 @@ class OutputServiceTest {
 
     @Test
     void buildAndExportTtcDocument() {
+        Mockito.when(fileExporter.exportTtcDocument(Mockito.any(SweData.class), Mockito.any(InputStream.class), Mockito.anyString())).thenReturn(TTC_DOCUMENT_URL_STRING);
         Assertions.assertEquals(TTC_DOCUMENT_URL_STRING, outputService.buildAndExportTtcDocument(sweData, executionResult));
     }
 
@@ -81,9 +82,15 @@ class OutputServiceTest {
     }
 
     @Test
-    void buildAndExportEsFrFailureVoltageDoc() {
-        outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, Optional.empty());
+    void buildAndExportFrEsFailureVoltageDoc() {
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, Optional.empty());
         Mockito.verify(fileExporter, Mockito.times(1)).saveVoltageMonitoringResultInJsonZip(Mockito.isNull(), Mockito.anyString(), Mockito.any(OffsetDateTime.class), Mockito.any(ProcessType.class), Mockito.anyString());
+    }
+
+    @Test
+    void noBuildAndExportPtEsVoltageDoc() {
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.PT_ES, sweData, Optional.empty());
+        Mockito.verify(fileExporter, Mockito.times(0)).saveVoltageMonitoringResultInJsonZip(Mockito.isNull(), Mockito.anyString(), Mockito.any(OffsetDateTime.class), Mockito.any(ProcessType.class), Mockito.anyString());
     }
 
     @NotNull

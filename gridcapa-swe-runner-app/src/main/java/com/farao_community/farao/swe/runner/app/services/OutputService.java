@@ -50,7 +50,7 @@ public class OutputService {
     }
 
     public void buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
-        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) { //voltageMonitoringResult.isPresent()
+        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
             OffsetDateTime timestamp = sweData.getTimestamp();
             String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
             OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));

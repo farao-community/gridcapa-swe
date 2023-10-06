@@ -45,4 +45,14 @@ class VoltageCheckServiceTest {
         result = service.runVoltageCheck(null, dicho, DichotomyDirection.FR_ES);
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void checkReturnsEmptyVoltageCheckIfNoValidStep() {
+        DichotomyResult<SweDichotomyValidationData> dicho = Mockito.mock(DichotomyResult.class);
+        Mockito.when(dicho.hasValidStep()).thenReturn(false);
+        Optional<VoltageMonitoringResult> result = service.runVoltageCheck(null, dicho, DichotomyDirection.FR_ES);
+        assertTrue(result.isEmpty());
+        result = service.runVoltageCheck(null, dicho, DichotomyDirection.FR_ES);
+        assertTrue(result.isEmpty());
+    }
 }
