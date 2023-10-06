@@ -216,6 +216,8 @@ public class FileExporter {
                 }
                 is.close();
             }
+            zipOs.close();
+            baos.close();
 
             try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
                 minioAdapter.uploadOutputForTimestamp(cgmesPath, is, adaptTargetProcessName(sweData.getProcessType()), filetype, sweData.getTimestamp());

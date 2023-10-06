@@ -56,7 +56,7 @@ public class OutputService {
             OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
             DateTimeFormatter df = DateTimeFormatter.ofPattern(VOLTAGE_DOC_NAME_REGEX);
             String zipName = df.format(localTime).replace("[direction]", directionString);
-            VoltageMonitoringResult voltageRes = voltageMonitoringResult.isPresent() ? voltageMonitoringResult.get() : null;
+            VoltageMonitoringResult voltageRes = voltageMonitoringResult.orElse(null);
             fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, sweData.getProcessType(), "VOLTAGE_" + directionString);
         }
     }
