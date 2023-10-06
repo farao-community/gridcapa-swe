@@ -6,15 +6,23 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.data.crac_api.Crac;
+import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
+import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
+import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @SpringBootTest
 class VoltageCheckServiceTest {
+
+    public static final String TEST_URL = "/network/network.xiidm";
 
     @Autowired
     private VoltageCheckService service;
@@ -50,9 +60,32 @@ class VoltageCheckServiceTest {
     void checkReturnsEmptyVoltageCheckIfNoValidStep() {
         DichotomyResult<SweDichotomyValidationData> dicho = Mockito.mock(DichotomyResult.class);
         Mockito.when(dicho.hasValidStep()).thenReturn(false);
-        Optional<VoltageMonitoringResult> result = service.runVoltageCheck(null, dicho, DichotomyDirection.FR_ES);
+        Optional<VoltageMonitoringResult> result = service.runVoltageCheck(null, dicho, DichotomyDirection.ES_FR);
         assertTrue(result.isEmpty());
         result = service.runVoltageCheck(null, dicho, DichotomyDirection.FR_ES);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void checkReturnsVoltageCheck() throws URISyntaxException {
+        DichotomyResult<SweDichotomyValidationData> dicho = Mockito.mock(DichotomyResult.class);
+        DichotomyStepResult<SweDichotomyValidationData> step = Mockito.mock(DichotomyStepResult.class);
+        SweDichotomyValidationData data = Mockito.mock(SweDichotomyValidationData.class);
+        RaoResponse raoResponse = Mockito.mock(RaoResponse.class);
+        InputStream inputStream = Mockito.mock(InputStream.class);
+        SweData sweData = Mockito.mock(SweData.class);
+        CimCracCreationContext cimCracCreationContext = Mockito.mock(CimCracCreationContext.class);
+        Crac crac = Mockito.mock(Crac.class);
+        RaoResult raoResult = Mockito.mock(RaoResult.class);
+        Mockito.when(sweData.getCracFrEs()).thenReturn(cimCracCreationContext);
+        Mockito.when(cimCracCreationContext.getCrac()).thenReturn(crac);
+        Mockito.when(dicho.hasValidStep()).thenReturn(true);
+        Mockito.when(dicho.getHighestValidStep()).thenReturn(step);
+        Mockito.when(step.getValidationData()).thenReturn(data);
+        Mockito.when(step.getRaoResult()).thenReturn(raoResult);
+        Mockito.when(data.getRaoResponse()).thenReturn(raoResponse);
+        Mockito.when(raoResponse.getNetworkWithPraFileUrl()).thenReturn(getClass().getResource(TEST_URL).toURI().toString());
+        Optional<VoltageMonitoringResult> result = service.runVoltageCheck(sweData, dicho, DichotomyDirection.ES_FR);
+        assertTrue(result.isPresent());
     }
 }
