@@ -47,7 +47,6 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
-    public static final String XIIDM = "XIIDM";
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
@@ -139,7 +138,7 @@ public class FileExporter {
     }
 
     public String saveNetworkInArtifact(Network network, String networkFilePath, String fileType, OffsetDateTime processTargetDateTime, ProcessType processType) {
-        exportAndUploadNetwork(network, XIIDM, GridcapaFileGroup.ARTIFACT, networkFilePath, fileType, processTargetDateTime, processType);
+        exportAndUploadNetwork(network, "XIIDM", GridcapaFileGroup.ARTIFACT, networkFilePath, fileType, processTargetDateTime, processType);
         return minioAdapter.generatePreSignedUrl(networkFilePath);
     }
 
@@ -167,8 +166,8 @@ public class FileExporter {
             case "UCTE":
                 network.write("UCTE", new Properties(), memDataSource);
                 return memDataSource.newInputStream("", "uct");
-            case XIIDM:
-                network.write(XIIDM, new Properties(), memDataSource);
+            case "XIIDM":
+                network.write("XIIDM", new Properties(), memDataSource);
                 return memDataSource.newInputStream("", "xiidm");
             default:
                 throw new UnsupportedOperationException(String.format("Network format %s not supported", format));

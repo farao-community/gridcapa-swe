@@ -88,4 +88,27 @@ class VoltageCheckServiceTest {
         Optional<VoltageMonitoringResult> result = service.runVoltageCheck(sweData, dicho, DichotomyDirection.ES_FR);
         assertTrue(result.isPresent());
     }
+
+    @Test
+    void checkReturnsEmptyVoltageCheckOnExceptionInGetFile() throws URISyntaxException {
+        DichotomyResult<SweDichotomyValidationData> dicho = Mockito.mock(DichotomyResult.class);
+        DichotomyStepResult<SweDichotomyValidationData> step = Mockito.mock(DichotomyStepResult.class);
+        SweDichotomyValidationData data = Mockito.mock(SweDichotomyValidationData.class);
+        RaoResponse raoResponse = Mockito.mock(RaoResponse.class);
+        InputStream inputStream = Mockito.mock(InputStream.class);
+        SweData sweData = Mockito.mock(SweData.class);
+        CimCracCreationContext cimCracCreationContext = Mockito.mock(CimCracCreationContext.class);
+        Crac crac = Mockito.mock(Crac.class);
+        RaoResult raoResult = Mockito.mock(RaoResult.class);
+        Mockito.when(sweData.getCracFrEs()).thenReturn(cimCracCreationContext);
+        Mockito.when(cimCracCreationContext.getCrac()).thenReturn(crac);
+        Mockito.when(dicho.hasValidStep()).thenReturn(true);
+        Mockito.when(dicho.getHighestValidStep()).thenReturn(step);
+        Mockito.when(step.getValidationData()).thenReturn(data);
+        Mockito.when(step.getRaoResult()).thenReturn(raoResult);
+        Mockito.when(data.getRaoResponse()).thenReturn(raoResponse);
+        Mockito.when(raoResponse.getNetworkWithPraFileUrl()).thenReturn("file:/returnEmpty");
+        Optional<VoltageMonitoringResult> result = service.runVoltageCheck(sweData, dicho, DichotomyDirection.ES_FR);
+        assertTrue(result.isEmpty());
+    }
 }
