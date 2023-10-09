@@ -14,13 +14,11 @@ import java.util.List;
  */
 public class FailureVoltageCheckResult {
 
-    private final List<VoltageCheckConstraintElement> constraintElements = Collections.emptyList();
-
     public String getIsSecure() {
         return "FAILURE";
     }
 
     public List<VoltageCheckConstraintElement> getConstraintElements() {
-        return constraintElements;
+        return Collections.emptyList();
     }
 }
