@@ -58,7 +58,7 @@
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
         <farao.dependencies.version>1.21.0</farao.dependencies.version>
-        <farao.dichotomy.version>4.13.1-SNAPSHOT</farao.dichotomy.version>
+        <farao.dichotomy.version>4.13.2</farao.dichotomy.version>
         <gridcapa.starter.minio.version>1.1.0</gridcapa.starter.minio.version>
         <gridcapa.rao.runner.version>1.17.1</gridcapa.rao.runner.version>
         <gridcapa.task-manager.version>1.21.0</gridcapa.task-manager.version>
@@ -106,11 +106,6 @@
                 <groupId>com.github.jasminb</groupId>
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-cgmes-extensions</artifactId>
-                <version>6.0.1</version>
             </dependency>
 
             <!-- Runtime dependencies -->
