@@ -140,7 +140,7 @@ public final class HvdcLinkProcessor {
         }
     }
 
-    public static void connectEquivalentGeneratorsAndLoads(Network network, HvdcCreationParameters creationParameters,  HvdcLine hvdcLine) {
+    private static void connectEquivalentGeneratorsAndLoads(Network network, HvdcCreationParameters creationParameters,  HvdcLine hvdcLine) {
 
         Load load1 = network.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
         Generator gen1 = network.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));

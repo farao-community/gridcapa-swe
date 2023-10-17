@@ -13,11 +13,11 @@ import java.util.Map;
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
-public class MergingViewData {
+public class MergedNetworkData {
     private final Network mergedNetwork;
     private final Map<String, String> subnetworkIdByCountry;
 
-    public MergingViewData(Network mergedNetwork, Map<String, String> subnetworkIdByCountry) {
+    public MergedNetworkData(Network mergedNetwork, Map<String, String> subnetworkIdByCountry) {
         this.mergedNetwork = mergedNetwork;
         this.subnetworkIdByCountry = subnetworkIdByCountry;
     }

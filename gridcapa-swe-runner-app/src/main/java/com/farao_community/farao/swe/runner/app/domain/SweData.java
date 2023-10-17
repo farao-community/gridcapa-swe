@@ -28,7 +28,7 @@ public class SweData {
     private final Network networkPtEs;
     private final CimCracCreationContext cracEsPt;
     private final CimCracCreationContext cracFrEs;
-    private final MergingViewData mergingViewData;
+    private final MergedNetworkData mergedNetworkData;
     private final String glskUrl;
     private final String jsonCracPathEsPt;
     private final String jsonCracPathFrEs;
@@ -36,7 +36,7 @@ public class SweData {
     private final String raoParametersEsPtUrl;
     private final Map<CgmesFileType, SweFileResource> mapCgmesInputFiles;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergingViewData mergingViewData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, MergedNetworkData mergedNetworkData, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
@@ -52,7 +52,7 @@ public class SweData {
         this.raoParametersEsFrUrl = raoParametersEsFrUrl;
         this.raoParametersEsPtUrl = raoParametersEsPtUrl;
         this.mapCgmesInputFiles = mapCgmesInputFiles;
-        this.mergingViewData = mergingViewData;
+        this.mergedNetworkData = mergedNetworkData;
     }
 
     public String getId() {
@@ -83,8 +83,8 @@ public class SweData {
         return networkPtEs;
     }
 
-    public MergingViewData getMergingViewData() {
-        return mergingViewData;
+    public MergedNetworkData getMergedNetworkData() {
+        return mergedNetworkData;
     }
 
     public CimCracCreationContext getCracEsPt() {

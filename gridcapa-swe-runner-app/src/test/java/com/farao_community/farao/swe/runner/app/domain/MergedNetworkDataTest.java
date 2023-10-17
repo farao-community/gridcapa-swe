@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @SpringBootTest
-class MergingViewDataTest {
+class MergedNetworkDataTest {
 
     @Mock
     private Network network;
@@ -29,8 +29,8 @@ class MergingViewDataTest {
 
     @Test
     void simpleTest() {
-        MergingViewData mergingViewData = new MergingViewData(network, networkIdsByCountry);
-        assertEquals(this.network, mergingViewData.getMergedNetwork());
-        assertEquals(this.networkIdsByCountry, mergingViewData.getSubnetworkIdByCountry());
+        MergedNetworkData mergdNetworkData = new MergedNetworkData(network, networkIdsByCountry);
+        assertEquals(this.network, mergdNetworkData.getMergedNetwork());
+        assertEquals(this.networkIdsByCountry, mergdNetworkData.getSubnetworkIdByCountry());
     }
 }

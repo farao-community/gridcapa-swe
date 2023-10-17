@@ -9,23 +9,14 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
-import com.google.common.base.Suppliers;
-import com.powsybl.cgmes.conversion.CgmesImport;
-import com.powsybl.computation.local.LocalComputationManager;
-import com.powsybl.iidm.network.ImportConfig;
-import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.Objects;
-import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -69,20 +60,4 @@ class CgmesExportServiceTest {
         assertEquals("CGM_PTES", cgmesExportService.buildFileType(DichotomyDirection.PT_ES));
     }
 
-    @Test
-    void testApplyingShiftToCgm() throws URISyntaxException {
-        Network inputNetwork = importFromZip(Paths.get(Objects.requireNonNull(getClass().getResource("/export_cgmes/MicroGrid.zip")).toURI()).toString());
-        assertEquals(140, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-        assertEquals(90., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
-        String networkWithPraUrl = getClass().getResource("/export_cgmes/microGrid.xiidm").toString();
-        cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPraUrl, inputNetwork);
-        assertEquals(200, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-        assertEquals(50., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
-    }
-
-    private Network importFromZip(String zipPath) {
-        Properties importParams = new Properties();
-        importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
-        return Network.read(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
-    }
 }

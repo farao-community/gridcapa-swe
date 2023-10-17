@@ -19,10 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -51,12 +49,6 @@ class NetworkServiceTest {
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
                 new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"),
                 new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
-    }
-
-    @Test
-    void getCgmListFromRequestTest() {
-        List<SweFileResource> cgmFilesFromRequest = networkImporter.getCgmAndBoundaryFilesFromRequest(sweRequest);
-        assertEquals(12, cgmFilesFromRequest.size());
     }
 
     @Test

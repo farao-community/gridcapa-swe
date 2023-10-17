@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.farao_community.farao.data.rao_result_api.OptimizationState;
+import com.farao_community.farao.data.crac_api.Instant;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
@@ -111,6 +111,6 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     }
 
     private boolean raoResultIsSecure(RaoResult raoResult) {
-        return raoResult.getFunctionalCost(OptimizationState.AFTER_CRA) <= 0.0;
+        return raoResult.getFunctionalCost(Instant.CURATIVE) <= 0.0;
     }
 }
