@@ -95,7 +95,7 @@ public class FileExporter {
                                                        String fileType) {
         MemDataSource memDataSource = new MemDataSource();
         try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
-            Object resultToWrite = result != null ? voltageResultMapper.mapVoltageResult(result) : new FailureVoltageCheckResult();
+            Object resultToWrite = getVoltageMonitoringResult(result);
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
             zipSingleFile(os, objectWriter.writeValueAsBytes(resultToWrite), zipTargetNameChangeExtension(targetName, ".json"));
         } catch (IOException e) {
@@ -108,6 +108,10 @@ public class FileExporter {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
         return minioAdapter.generatePreSignedUrl(voltageResultPath);
+    }
+
+    private Object getVoltageMonitoringResult(VoltageMonitoringResult result) {
+        return result != null ? voltageResultMapper.mapVoltageResult(result) : new FailureVoltageCheckResult();
     }
 
     public String zipTargetNameChangeExtension(String targetName, String extension) {

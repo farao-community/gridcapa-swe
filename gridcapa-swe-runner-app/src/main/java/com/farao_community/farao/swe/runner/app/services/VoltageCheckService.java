@@ -41,18 +41,19 @@ public class VoltageCheckService {
 
     public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, DichotomyDirection direction) {
 
-        if ((direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) && dichotomyResult.hasValidStep()) {
-            businessLogger.info("Running voltage check");
-            try {
-                Crac crac = sweData.getCracFrEs().getCrac();
-                Network network = getNetworkWithPra(dichotomyResult);
-                VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
-                return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));
-            } catch (Exception e) {
-                businessLogger.error("Exception during voltage check : {}", e.getMessage());
-            }
+        if ((direction != DichotomyDirection.ES_FR && direction != DichotomyDirection.FR_ES) || !dichotomyResult.hasValidStep()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        businessLogger.info("Running voltage check");
+        try {
+            Crac crac = sweData.getCracFrEs().getCrac();
+            Network network = getNetworkWithPra(dichotomyResult);
+            VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
+            return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));
+        } catch (Exception e) {
+            businessLogger.error("Exception during voltage check : {}", e.getMessage());
+            return Optional.empty();
+        }
     }
 
     private Network getNetworkWithPra(DichotomyResult<SweDichotomyValidationData> dichotomyResult) {

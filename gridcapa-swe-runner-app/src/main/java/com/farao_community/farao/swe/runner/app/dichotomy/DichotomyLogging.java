@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class DichotomyLogging {
 
     private static final String NONE = "NONE";
+    private static final String FAILURE = "FAILURE";
     private final Logger businessLogger;
     private static final String SUMMARY = "Summary :  " +
             "Limiting event : {},  \n" +
@@ -87,7 +88,7 @@ public class DichotomyLogging {
             if (voltageMonitoringResult.isPresent()) {
                 return String.valueOf(voltageMonitoringResult.get().getStatus());
             } else {
-                return "FAILURE";
+                return FAILURE;
             }
         }
         return NONE;
