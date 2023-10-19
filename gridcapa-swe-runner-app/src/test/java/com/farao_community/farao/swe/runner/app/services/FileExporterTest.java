@@ -76,6 +76,20 @@ class FileExporterTest {
     }
 
     @Test
+    void saveFailureVoltageMonitoringResultInJson() {
+        Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("voltageResult");
+        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJsonZip(null, "voltageResult.json", dateTime, ProcessType.D2CC, "Voltage_ESFR");
+        Mockito.verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(
+                Mockito.anyString(),
+                Mockito.any(InputStream.class),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.any(OffsetDateTime.class)
+        );
+        assertEquals("voltageResult", voltageUrl);
+    }
+
+    @Test
     void makeDestinationMinioPath() {
         assertEquals(
                 "2021/04/01/23_30/ARTIFACTS/",
