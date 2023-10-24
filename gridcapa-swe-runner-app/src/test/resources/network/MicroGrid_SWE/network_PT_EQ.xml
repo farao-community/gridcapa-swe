@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:entsoe="http://entsoe.eu/CIM/SchemaExtension/3/1#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cim="http://iec.ch/TC57/2013/CIM-schema-cim16#" xmlns:md="http://iec.ch/TC57/61970-552/ModelDescription/1#">
+    <md:FullModel rdf:about="urn:uuid:2b5d9fbb-239e-4c65-aea6-92b0e7a714c8">
+        <md:Model.scenarioTime>2023-07-31T00:30:00Z</md:Model.scenarioTime>
+        <md:Model.created>2023-10-24T09:22:12Z</md:Model.created>
+        <md:Model.description>EQ Model</md:Model.description>
+        <md:Model.version>1</md:Model.version>
+        <md:Model.profile>http://entsoe.eu/CIM/EquipmentCore/3/1</md:Model.profile>
+        <md:Model.modelingAuthoritySet>powsybl.org</md:Model.modelingAuthoritySet>
+    </md:FullModel>
+    <cim:Terminal rdf:ID="_afcdc2ef-bcdc-4642-b777-ddf495cd9122">
+        <cim:IdentifiedObject.mRID>afcdc2ef-bcdc-4642-b777-ddf495cd9122</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11_generator</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT1AA11_generator"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_20103ab6-652a-4fe3-823f-279d73f50b15">
+        <cim:IdentifiedObject.mRID>20103ab6-652a-4fe3-823f-279d73f50b15</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT4AA11_generator</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT4AA11_generator"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_286dffb2-28b0-4e1f-b240-74a9f6400df3">
+        <cim:IdentifiedObject.mRID>286dffb2-28b0-4e1f-b240-74a9f6400df3</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT4AA11_load</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT4AA11_load"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_d573ad8c-807a-4d5c-8b49-c970c4e12f19">
+        <cim:IdentifiedObject.mRID>d573ad8c-807a-4d5c-8b49-c970c4e12f19</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA11_generator</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT3AA11_generator"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_6a668380-6c0a-40eb-83e0-e221cf94ee2b">
+        <cim:IdentifiedObject.mRID>6a668380-6c0a-40eb-83e0-e221cf94ee2b</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA11_load</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT3AA11_load"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_1898c35a-e63b-4f18-b2c0-c482c3e82c95">
+        <cim:IdentifiedObject.mRID>1898c35a-e63b-4f18-b2c0-c482c3e82c95</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11 PPT4AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT1AA11+PPT4AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_420a0742-b86e-4ed9-ba83-5dfd2aa2d4c9">
+        <cim:IdentifiedObject.mRID>420a0742-b86e-4ed9-ba83-5dfd2aa2d4c9</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11 PPT4AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT1AA11+PPT4AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>2</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_eb552b45-8367-49dd-a73b-bc333875caef">
+        <cim:IdentifiedObject.mRID>eb552b45-8367-49dd-a73b-bc333875caef</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA11 PPT3AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT2AA11+PPT3AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_e3e129ec-a26b-4e72-9024-ca17f67a8e3c">
+        <cim:IdentifiedObject.mRID>e3e129ec-a26b-4e72-9024-ca17f67a8e3c</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA11 PPT3AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT2AA11+PPT3AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>2</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_a8c4afc3-c9aa-42c2-94c0-9720908f04d0">
+        <cim:IdentifiedObject.mRID>a8c4afc3-c9aa-42c2-94c0-9720908f04d0</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA11_load</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT2AA11_load"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_fbf466e0-5050-49a5-b004-835d6efeb7dc">
+        <cim:IdentifiedObject.mRID>fbf466e0-5050-49a5-b004-835d6efeb7dc</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11 PPT2AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT1AA11+PPT2AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_e1d5f707-33fb-4bfe-946b-5ad64f919645">
+        <cim:IdentifiedObject.mRID>e1d5f707-33fb-4bfe-946b-5ad64f919645</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11 PPT2AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT1AA11+PPT2AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>2</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_d21b6463-e6c0-4d75-b56b-db3a5ffa2d2a">
+        <cim:IdentifiedObject.mRID>d21b6463-e6c0-4d75-b56b-db3a5ffa2d2a</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA11_generator</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT2AA11_generator"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_9791d476-d259-43b4-9d57-6c35c032c82b">
+        <cim:IdentifiedObject.mRID>9791d476-d259-43b4-9d57-6c35c032c82b</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11_load</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT1AA11_load"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_952d8aad-df1f-49e2-8821-971ce78a21fd">
+        <cim:IdentifiedObject.mRID>952d8aad-df1f-49e2-8821-971ce78a21fd</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA11 PPT4AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT3AA11+PPT4AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>1</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Terminal rdf:ID="_557e7275-fe0b-416f-ad2e-0e21c9db96ea">
+        <cim:IdentifiedObject.mRID>557e7275-fe0b-416f-ad2e-0e21c9db96ea</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA11 PPT4AA11 1</cim:IdentifiedObject.name>
+        <cim:Terminal.ConductingEquipment rdf:resource="#_PPT3AA11+PPT4AA11+1"/>
+        <cim:ACDCTerminal.sequenceNumber>2</cim:ACDCTerminal.sequenceNumber>
+    </cim:Terminal>
+    <cim:Breaker rdf:ID="_PPT3AA11+PPT4AA11+1">
+        <cim:IdentifiedObject.mRID>PPT3AA11+PPT4AA11+1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA11 PPT4AA11 1</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT3AA1"/>
+        <cim:Switch.normalOpen>true</cim:Switch.normalOpen>
+        <cim:Switch.retained>true</cim:Switch.retained>
+    </cim:Breaker>
+    <cim:GeographicalRegion rdf:ID="_126af353-0363-4e3d-8ca1-f554863a06ff">
+        <cim:IdentifiedObject.mRID>126af353-0363-4e3d-8ca1-f554863a06ff</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PT</cim:IdentifiedObject.name>
+    </cim:GeographicalRegion>
+    <cim:SubGeographicalRegion rdf:ID="_4b3510a2-07af-4719-883f-e3813209382c">
+        <cim:IdentifiedObject.mRID>4b3510a2-07af-4719-883f-e3813209382c</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PT</cim:IdentifiedObject.name>
+        <cim:SubGeographicalRegion.Region rdf:resource="#_126af353-0363-4e3d-8ca1-f554863a06ff"/>
+    </cim:SubGeographicalRegion>
+    <cim:Substation rdf:ID="_PPT1AA">
+        <cim:IdentifiedObject.mRID>PPT1AA</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA</cim:IdentifiedObject.name>
+        <cim:Substation.Region rdf:resource="#_4b3510a2-07af-4719-883f-e3813209382c"/>
+    </cim:Substation>
+    <cim:Substation rdf:ID="_PPT2AA">
+        <cim:IdentifiedObject.mRID>PPT2AA</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA</cim:IdentifiedObject.name>
+        <cim:Substation.Region rdf:resource="#_4b3510a2-07af-4719-883f-e3813209382c"/>
+    </cim:Substation>
+    <cim:Substation rdf:ID="_PPT3AA">
+        <cim:IdentifiedObject.mRID>PPT3AA</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA</cim:IdentifiedObject.name>
+        <cim:Substation.Region rdf:resource="#_4b3510a2-07af-4719-883f-e3813209382c"/>
+    </cim:Substation>
+    <cim:BaseVoltage rdf:ID="_7c7937ca-558a-48a6-9936-1ae8e743b1d6">
+        <cim:IdentifiedObject.mRID>7c7937ca-558a-48a6-9936-1ae8e743b1d6</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>400</cim:IdentifiedObject.name>
+        <cim:BaseVoltage.nominalVoltage>400</cim:BaseVoltage.nominalVoltage>
+    </cim:BaseVoltage>
+    <cim:VoltageLevel rdf:ID="_PPT1AA1">
+        <cim:IdentifiedObject.mRID>PPT1AA1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA1</cim:IdentifiedObject.name>
+        <cim:VoltageLevel.Substation rdf:resource="#_PPT1AA"/>
+        <cim:VoltageLevel.BaseVoltage rdf:resource="#_7c7937ca-558a-48a6-9936-1ae8e743b1d6"/>
+    </cim:VoltageLevel>
+    <cim:VoltageLevel rdf:ID="_PPT2AA1">
+        <cim:IdentifiedObject.mRID>PPT2AA1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA1</cim:IdentifiedObject.name>
+        <cim:VoltageLevel.Substation rdf:resource="#_PPT2AA"/>
+        <cim:VoltageLevel.BaseVoltage rdf:resource="#_7c7937ca-558a-48a6-9936-1ae8e743b1d6"/>
+    </cim:VoltageLevel>
+    <cim:VoltageLevel rdf:ID="_PPT3AA1">
+        <cim:IdentifiedObject.mRID>PPT3AA1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA1</cim:IdentifiedObject.name>
+        <cim:VoltageLevel.Substation rdf:resource="#_PPT3AA"/>
+        <cim:VoltageLevel.BaseVoltage rdf:resource="#_7c7937ca-558a-48a6-9936-1ae8e743b1d6"/>
+    </cim:VoltageLevel>
+    <cim:EnergyConsumer rdf:ID="_PPT1AA11_load">
+        <cim:IdentifiedObject.mRID>PPT1AA11_load</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11_load</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT1AA1"/>
+    </cim:EnergyConsumer>
+    <cim:EnergyConsumer rdf:ID="_PPT2AA11_load">
+        <cim:IdentifiedObject.mRID>PPT2AA11_load</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA11_load</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT2AA1"/>
+    </cim:EnergyConsumer>
+    <cim:EnergyConsumer rdf:ID="_PPT3AA11_load">
+        <cim:IdentifiedObject.mRID>PPT3AA11_load</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA11_load</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT3AA1"/>
+    </cim:EnergyConsumer>
+    <cim:EnergyConsumer rdf:ID="_PPT4AA11_load">
+        <cim:IdentifiedObject.mRID>PPT4AA11_load</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT4AA11_load</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT3AA1"/>
+    </cim:EnergyConsumer>
+    <cim:LoadArea rdf:ID="_62973d32-5ab2-4a6a-8dae-89b274e19d98">
+        <cim:IdentifiedObject.mRID>62973d32-5ab2-4a6a-8dae-89b274e19d98</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>urn:uuid:26ac088c-2e06-11ee-816e</cim:IdentifiedObject.name>
+    </cim:LoadArea>
+    <cim:SubLoadArea rdf:ID="_6eb1ec85-874e-4700-81a7-f1b9dcda9973">
+        <cim:IdentifiedObject.mRID>6eb1ec85-874e-4700-81a7-f1b9dcda9973</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>urn:uuid:26ac088c-2e06-11ee-816e</cim:IdentifiedObject.name>
+        <cim:SubLoadArea.LoadArea rdf:resource="#_62973d32-5ab2-4a6a-8dae-89b274e19d98"/>
+    </cim:SubLoadArea>
+    <cim:RegulatingControl rdf:ID="_a7b14478-ef15-443a-be09-17982b858e5e">
+        <cim:IdentifiedObject.mRID>a7b14478-ef15-443a-be09-17982b858e5e</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>RC_PPT1AA11_generator</cim:IdentifiedObject.name>
+        <cim:RegulatingControl.Terminal rdf:resource="#_afcdc2ef-bcdc-4642-b777-ddf495cd9122"/>
+        <cim:RegulatingControl.mode rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#RegulatingControlModeKind.voltage"/>
+    </cim:RegulatingControl>
+    <cim:SynchronousMachine rdf:ID="_PPT1AA11_generator">
+        <cim:IdentifiedObject.mRID>PPT1AA11_generator</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11_generator</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT1AA1"/>
+        <cim:RotatingMachine.GeneratingUnit rdf:resource="#_2f8ca6e4-64d5-4749-b78c-07cb06f7c830"/>
+        <cim:RegulatingCondEq.RegulatingControl rdf:resource="#_a7b14478-ef15-443a-be09-17982b858e5e"/>
+        <cim:SynchronousMachine.minQ>-9000</cim:SynchronousMachine.minQ>
+        <cim:SynchronousMachine.maxQ>9000</cim:SynchronousMachine.maxQ>
+        <cim:RotatingMachine.ratedS>9000</cim:RotatingMachine.ratedS>
+        <cim:SynchronousMachine.type rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#SynchronousMachineKind.generatorOrMotor"/>
+    </cim:SynchronousMachine>
+    <cim:GeneratingUnit rdf:ID="_2f8ca6e4-64d5-4749-b78c-07cb06f7c830">
+        <cim:IdentifiedObject.mRID>2f8ca6e4-64d5-4749-b78c-07cb06f7c830</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>GU_PPT1AA11_generator</cim:IdentifiedObject.name>
+        <cim:GeneratingUnit.minOperatingP>-9000</cim:GeneratingUnit.minOperatingP>
+        <cim:GeneratingUnit.maxOperatingP>9000</cim:GeneratingUnit.maxOperatingP>
+        <cim:GeneratingUnit.initialP>2500</cim:GeneratingUnit.initialP>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT1AA"/>
+    </cim:GeneratingUnit>
+    <cim:RegulatingControl rdf:ID="_fbd26cfc-30a1-4e84-b151-f118cd10d2ad">
+        <cim:IdentifiedObject.mRID>fbd26cfc-30a1-4e84-b151-f118cd10d2ad</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>RC_PPT2AA11_generator</cim:IdentifiedObject.name>
+        <cim:RegulatingControl.Terminal rdf:resource="#_d21b6463-e6c0-4d75-b56b-db3a5ffa2d2a"/>
+        <cim:RegulatingControl.mode rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#RegulatingControlModeKind.voltage"/>
+    </cim:RegulatingControl>
+    <cim:SynchronousMachine rdf:ID="_PPT2AA11_generator">
+        <cim:IdentifiedObject.mRID>PPT2AA11_generator</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA11_generator</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT2AA1"/>
+        <cim:RotatingMachine.GeneratingUnit rdf:resource="#_ffac19f2-67b2-4445-89fb-16e7b604010e"/>
+        <cim:RegulatingCondEq.RegulatingControl rdf:resource="#_fbd26cfc-30a1-4e84-b151-f118cd10d2ad"/>
+        <cim:SynchronousMachine.minQ>-9000</cim:SynchronousMachine.minQ>
+        <cim:SynchronousMachine.maxQ>9000</cim:SynchronousMachine.maxQ>
+        <cim:RotatingMachine.ratedS>9000</cim:RotatingMachine.ratedS>
+        <cim:SynchronousMachine.type rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#SynchronousMachineKind.generatorOrMotor"/>
+    </cim:SynchronousMachine>
+    <cim:GeneratingUnit rdf:ID="_ffac19f2-67b2-4445-89fb-16e7b604010e">
+        <cim:IdentifiedObject.mRID>ffac19f2-67b2-4445-89fb-16e7b604010e</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>GU_PPT2AA11_generator</cim:IdentifiedObject.name>
+        <cim:GeneratingUnit.minOperatingP>-9000</cim:GeneratingUnit.minOperatingP>
+        <cim:GeneratingUnit.maxOperatingP>9000</cim:GeneratingUnit.maxOperatingP>
+        <cim:GeneratingUnit.initialP>2000</cim:GeneratingUnit.initialP>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT2AA"/>
+    </cim:GeneratingUnit>
+    <cim:RegulatingControl rdf:ID="_2503eff6-63a1-44de-9dac-2f32571ceb4a">
+        <cim:IdentifiedObject.mRID>2503eff6-63a1-44de-9dac-2f32571ceb4a</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>RC_PPT3AA11_generator</cim:IdentifiedObject.name>
+        <cim:RegulatingControl.Terminal rdf:resource="#_d573ad8c-807a-4d5c-8b49-c970c4e12f19"/>
+        <cim:RegulatingControl.mode rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#RegulatingControlModeKind.voltage"/>
+    </cim:RegulatingControl>
+    <cim:SynchronousMachine rdf:ID="_PPT3AA11_generator">
+        <cim:IdentifiedObject.mRID>PPT3AA11_generator</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT3AA11_generator</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT3AA1"/>
+        <cim:RotatingMachine.GeneratingUnit rdf:resource="#_10a4cf44-401d-4bc3-9500-e2aacc7350c2"/>
+        <cim:RegulatingCondEq.RegulatingControl rdf:resource="#_2503eff6-63a1-44de-9dac-2f32571ceb4a"/>
+        <cim:SynchronousMachine.minQ>-9000</cim:SynchronousMachine.minQ>
+        <cim:SynchronousMachine.maxQ>9000</cim:SynchronousMachine.maxQ>
+        <cim:RotatingMachine.ratedS>9000</cim:RotatingMachine.ratedS>
+        <cim:SynchronousMachine.type rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#SynchronousMachineKind.generatorOrMotor"/>
+    </cim:SynchronousMachine>
+    <cim:GeneratingUnit rdf:ID="_10a4cf44-401d-4bc3-9500-e2aacc7350c2">
+        <cim:IdentifiedObject.mRID>10a4cf44-401d-4bc3-9500-e2aacc7350c2</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>GU_PPT3AA11_generator</cim:IdentifiedObject.name>
+        <cim:GeneratingUnit.minOperatingP>-9000</cim:GeneratingUnit.minOperatingP>
+        <cim:GeneratingUnit.maxOperatingP>9000</cim:GeneratingUnit.maxOperatingP>
+        <cim:GeneratingUnit.initialP>1500</cim:GeneratingUnit.initialP>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT3AA"/>
+    </cim:GeneratingUnit>
+    <cim:RegulatingControl rdf:ID="_188a1877-8a32-4ab6-8feb-56ace8b9a036">
+        <cim:IdentifiedObject.mRID>188a1877-8a32-4ab6-8feb-56ace8b9a036</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>RC_PPT4AA11_generator</cim:IdentifiedObject.name>
+        <cim:RegulatingControl.Terminal rdf:resource="#_20103ab6-652a-4fe3-823f-279d73f50b15"/>
+        <cim:RegulatingControl.mode rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#RegulatingControlModeKind.voltage"/>
+    </cim:RegulatingControl>
+    <cim:SynchronousMachine rdf:ID="_PPT4AA11_generator">
+        <cim:IdentifiedObject.mRID>PPT4AA11_generator</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT4AA11_generator</cim:IdentifiedObject.name>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT3AA1"/>
+        <cim:RotatingMachine.GeneratingUnit rdf:resource="#_a024cf7a-f7d4-4c64-9ae9-3664b4c46c98"/>
+        <cim:RegulatingCondEq.RegulatingControl rdf:resource="#_188a1877-8a32-4ab6-8feb-56ace8b9a036"/>
+        <cim:SynchronousMachine.minQ>-9000</cim:SynchronousMachine.minQ>
+        <cim:SynchronousMachine.maxQ>9000</cim:SynchronousMachine.maxQ>
+        <cim:RotatingMachine.ratedS>9000</cim:RotatingMachine.ratedS>
+        <cim:SynchronousMachine.type rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#SynchronousMachineKind.generatorOrMotor"/>
+    </cim:SynchronousMachine>
+    <cim:GeneratingUnit rdf:ID="_a024cf7a-f7d4-4c64-9ae9-3664b4c46c98">
+        <cim:IdentifiedObject.mRID>a024cf7a-f7d4-4c64-9ae9-3664b4c46c98</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>GU_PPT4AA11_generator</cim:IdentifiedObject.name>
+        <cim:GeneratingUnit.minOperatingP>-9000</cim:GeneratingUnit.minOperatingP>
+        <cim:GeneratingUnit.maxOperatingP>9000</cim:GeneratingUnit.maxOperatingP>
+        <cim:GeneratingUnit.initialP>1500</cim:GeneratingUnit.initialP>
+        <cim:Equipment.EquipmentContainer rdf:resource="#_PPT3AA"/>
+    </cim:GeneratingUnit>
+    <cim:ACLineSegment rdf:ID="_PPT1AA11+PPT2AA11+1">
+        <cim:IdentifiedObject.mRID>PPT1AA11+PPT2AA11+1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11 PPT2AA11 1</cim:IdentifiedObject.name>
+        <cim:ACLineSegment.r>0</cim:ACLineSegment.r>
+        <cim:ACLineSegment.x>10</cim:ACLineSegment.x>
+        <cim:ACLineSegment.bch>0</cim:ACLineSegment.bch>
+        <cim:ConductingEquipment.BaseVoltage rdf:resource="#_7c7937ca-558a-48a6-9936-1ae8e743b1d6"/>
+    </cim:ACLineSegment>
+    <cim:OperationalLimitType rdf:ID="_62ca3dfc-efd0-4fb0-adb7-0ae8794e5e69">
+        <cim:IdentifiedObject.mRID>62ca3dfc-efd0-4fb0-adb7-0ae8794e5e69</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PATL</cim:IdentifiedObject.name>
+        <cim:OperationalLimitType.direction rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#OperationalLimitDirectionKind.absoluteValue"/>
+        <entsoe:OperationalLimitType.limitType rdf:resource="http://entsoe.eu/CIM/SchemaExtension/3/1#LimitTypeKind.patl"/>
+    </cim:OperationalLimitType>
+    <cim:OperationalLimitSet rdf:ID="_8c6e7ee0-f438-4119-8ed2-8ca8af666785">
+        <cim:IdentifiedObject.mRID>8c6e7ee0-f438-4119-8ed2-8ca8af666785</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>operational limit patl</cim:IdentifiedObject.name>
+        <cim:OperationalLimitSet.Terminal rdf:resource="#_fbf466e0-5050-49a5-b004-835d6efeb7dc"/>
+    </cim:OperationalLimitSet>
+    <cim:CurrentLimit rdf:ID="_0f062b27-dbd3-48e9-bca0-8da03dbd72a8">
+        <cim:IdentifiedObject.mRID>0f062b27-dbd3-48e9-bca0-8da03dbd72a8</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>CurrentLimit PATL</cim:IdentifiedObject.name>
+        <cim:CurrentLimit.value>2000</cim:CurrentLimit.value>
+        <cim:OperationalLimit.OperationalLimitSet rdf:resource="#_8c6e7ee0-f438-4119-8ed2-8ca8af666785"/>
+        <cim:OperationalLimit.OperationalLimitType rdf:resource="#_62ca3dfc-efd0-4fb0-adb7-0ae8794e5e69"/>
+    </cim:CurrentLimit>
+    <cim:OperationalLimitType rdf:ID="_01b98d59-e9a0-464c-9795-6c21c9fef593">
+        <cim:IdentifiedObject.mRID>01b98d59-e9a0-464c-9795-6c21c9fef593</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PATL</cim:IdentifiedObject.name>
+        <cim:OperationalLimitType.direction rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#OperationalLimitDirectionKind.absoluteValue"/>
+        <entsoe:OperationalLimitType.limitType rdf:resource="http://entsoe.eu/CIM/SchemaExtension/3/1#LimitTypeKind.patl"/>
+    </cim:OperationalLimitType>
+    <cim:OperationalLimitSet rdf:ID="_bd5f7f02-3250-40c8-b1d1-05d61e4f81f6">
+        <cim:IdentifiedObject.mRID>bd5f7f02-3250-40c8-b1d1-05d61e4f81f6</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>operational limit patl</cim:IdentifiedObject.name>
+        <cim:OperationalLimitSet.Terminal rdf:resource="#_e1d5f707-33fb-4bfe-946b-5ad64f919645"/>
+    </cim:OperationalLimitSet>
+    <cim:CurrentLimit rdf:ID="_0d6c8caf-b38a-4e00-a8a4-11c3cd6d06c4">
+        <cim:IdentifiedObject.mRID>0d6c8caf-b38a-4e00-a8a4-11c3cd6d06c4</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>CurrentLimit PATL</cim:IdentifiedObject.name>
+        <cim:CurrentLimit.value>2000</cim:CurrentLimit.value>
+        <cim:OperationalLimit.OperationalLimitSet rdf:resource="#_bd5f7f02-3250-40c8-b1d1-05d61e4f81f6"/>
+        <cim:OperationalLimit.OperationalLimitType rdf:resource="#_01b98d59-e9a0-464c-9795-6c21c9fef593"/>
+    </cim:CurrentLimit>
+    <cim:ACLineSegment rdf:ID="_PPT1AA11+PPT4AA11+1">
+        <cim:IdentifiedObject.mRID>PPT1AA11+PPT4AA11+1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT1AA11 PPT4AA11 1</cim:IdentifiedObject.name>
+        <cim:ACLineSegment.r>0</cim:ACLineSegment.r>
+        <cim:ACLineSegment.x>10</cim:ACLineSegment.x>
+        <cim:ACLineSegment.bch>0</cim:ACLineSegment.bch>
+        <cim:ConductingEquipment.BaseVoltage rdf:resource="#_7c7937ca-558a-48a6-9936-1ae8e743b1d6"/>
+    </cim:ACLineSegment>
+    <cim:OperationalLimitType rdf:ID="_23f619ee-9f74-4254-8be6-987d29c3b17a">
+        <cim:IdentifiedObject.mRID>23f619ee-9f74-4254-8be6-987d29c3b17a</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PATL</cim:IdentifiedObject.name>
+        <cim:OperationalLimitType.direction rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#OperationalLimitDirectionKind.absoluteValue"/>
+        <entsoe:OperationalLimitType.limitType rdf:resource="http://entsoe.eu/CIM/SchemaExtension/3/1#LimitTypeKind.patl"/>
+    </cim:OperationalLimitType>
+    <cim:OperationalLimitSet rdf:ID="_f0d6a210-b611-40d1-b05a-4f5f8a0ce209">
+        <cim:IdentifiedObject.mRID>f0d6a210-b611-40d1-b05a-4f5f8a0ce209</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>operational limit patl</cim:IdentifiedObject.name>
+        <cim:OperationalLimitSet.Terminal rdf:resource="#_1898c35a-e63b-4f18-b2c0-c482c3e82c95"/>
+    </cim:OperationalLimitSet>
+    <cim:CurrentLimit rdf:ID="_86a82c90-c506-446d-a7c3-bf03a2a208a3">
+        <cim:IdentifiedObject.mRID>86a82c90-c506-446d-a7c3-bf03a2a208a3</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>CurrentLimit PATL</cim:IdentifiedObject.name>
+        <cim:CurrentLimit.value>2000</cim:CurrentLimit.value>
+        <cim:OperationalLimit.OperationalLimitSet rdf:resource="#_f0d6a210-b611-40d1-b05a-4f5f8a0ce209"/>
+        <cim:OperationalLimit.OperationalLimitType rdf:resource="#_23f619ee-9f74-4254-8be6-987d29c3b17a"/>
+    </cim:CurrentLimit>
+    <cim:OperationalLimitType rdf:ID="_adc6f66a-d3d4-4e22-a0ae-1a95040cbe98">
+        <cim:IdentifiedObject.mRID>adc6f66a-d3d4-4e22-a0ae-1a95040cbe98</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PATL</cim:IdentifiedObject.name>
+        <cim:OperationalLimitType.direction rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#OperationalLimitDirectionKind.absoluteValue"/>
+        <entsoe:OperationalLimitType.limitType rdf:resource="http://entsoe.eu/CIM/SchemaExtension/3/1#LimitTypeKind.patl"/>
+    </cim:OperationalLimitType>
+    <cim:OperationalLimitSet rdf:ID="_3ae250c5-fb97-4ee1-9c0f-500cb3e63af1">
+        <cim:IdentifiedObject.mRID>3ae250c5-fb97-4ee1-9c0f-500cb3e63af1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>operational limit patl</cim:IdentifiedObject.name>
+        <cim:OperationalLimitSet.Terminal rdf:resource="#_420a0742-b86e-4ed9-ba83-5dfd2aa2d4c9"/>
+    </cim:OperationalLimitSet>
+    <cim:CurrentLimit rdf:ID="_e7f9e437-f1e9-46bd-a4b7-f50c937af600">
+        <cim:IdentifiedObject.mRID>e7f9e437-f1e9-46bd-a4b7-f50c937af600</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>CurrentLimit PATL</cim:IdentifiedObject.name>
+        <cim:CurrentLimit.value>2000</cim:CurrentLimit.value>
+        <cim:OperationalLimit.OperationalLimitSet rdf:resource="#_3ae250c5-fb97-4ee1-9c0f-500cb3e63af1"/>
+        <cim:OperationalLimit.OperationalLimitType rdf:resource="#_adc6f66a-d3d4-4e22-a0ae-1a95040cbe98"/>
+    </cim:CurrentLimit>
+    <cim:ACLineSegment rdf:ID="_PPT2AA11+PPT3AA11+1">
+        <cim:IdentifiedObject.mRID>PPT2AA11+PPT3AA11+1</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PPT2AA11 PPT3AA11 1</cim:IdentifiedObject.name>
+        <cim:ACLineSegment.r>0</cim:ACLineSegment.r>
+        <cim:ACLineSegment.x>10</cim:ACLineSegment.x>
+        <cim:ACLineSegment.bch>0</cim:ACLineSegment.bch>
+        <cim:ConductingEquipment.BaseVoltage rdf:resource="#_7c7937ca-558a-48a6-9936-1ae8e743b1d6"/>
+    </cim:ACLineSegment>
+    <cim:OperationalLimitType rdf:ID="_f87d493f-9909-4bf7-95c8-5d67a3211d44">
+        <cim:IdentifiedObject.mRID>f87d493f-9909-4bf7-95c8-5d67a3211d44</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PATL</cim:IdentifiedObject.name>
+        <cim:OperationalLimitType.direction rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#OperationalLimitDirectionKind.absoluteValue"/>
+        <entsoe:OperationalLimitType.limitType rdf:resource="http://entsoe.eu/CIM/SchemaExtension/3/1#LimitTypeKind.patl"/>
+    </cim:OperationalLimitType>
+    <cim:OperationalLimitSet rdf:ID="_e3daa8a2-e5db-45ee-b993-15b2e0bb2096">
+        <cim:IdentifiedObject.mRID>e3daa8a2-e5db-45ee-b993-15b2e0bb2096</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>operational limit patl</cim:IdentifiedObject.name>
+        <cim:OperationalLimitSet.Terminal rdf:resource="#_eb552b45-8367-49dd-a73b-bc333875caef"/>
+    </cim:OperationalLimitSet>
+    <cim:CurrentLimit rdf:ID="_fae0e4ea-5c9f-4917-bfec-d8fa7cd837ab">
+        <cim:IdentifiedObject.mRID>fae0e4ea-5c9f-4917-bfec-d8fa7cd837ab</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>CurrentLimit PATL</cim:IdentifiedObject.name>
+        <cim:CurrentLimit.value>2000</cim:CurrentLimit.value>
+        <cim:OperationalLimit.OperationalLimitSet rdf:resource="#_e3daa8a2-e5db-45ee-b993-15b2e0bb2096"/>
+        <cim:OperationalLimit.OperationalLimitType rdf:resource="#_f87d493f-9909-4bf7-95c8-5d67a3211d44"/>
+    </cim:CurrentLimit>
+    <cim:OperationalLimitType rdf:ID="_9ef9ccc1-1a3e-4410-815c-399f0f07ee99">
+        <cim:IdentifiedObject.mRID>9ef9ccc1-1a3e-4410-815c-399f0f07ee99</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>PATL</cim:IdentifiedObject.name>
+        <cim:OperationalLimitType.direction rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#OperationalLimitDirectionKind.absoluteValue"/>
+        <entsoe:OperationalLimitType.limitType rdf:resource="http://entsoe.eu/CIM/SchemaExtension/3/1#LimitTypeKind.patl"/>
+    </cim:OperationalLimitType>
+    <cim:OperationalLimitSet rdf:ID="_a1d038bc-9358-48e1-a3d2-2c5223f2a025">
+        <cim:IdentifiedObject.mRID>a1d038bc-9358-48e1-a3d2-2c5223f2a025</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>operational limit patl</cim:IdentifiedObject.name>
+        <cim:OperationalLimitSet.Terminal rdf:resource="#_e3e129ec-a26b-4e72-9024-ca17f67a8e3c"/>
+    </cim:OperationalLimitSet>
+    <cim:CurrentLimit rdf:ID="_9801c11f-fa17-45fb-bdd5-97fc94cb3305">
+        <cim:IdentifiedObject.mRID>9801c11f-fa17-45fb-bdd5-97fc94cb3305</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>CurrentLimit PATL</cim:IdentifiedObject.name>
+        <cim:CurrentLimit.value>2000</cim:CurrentLimit.value>
+        <cim:OperationalLimit.OperationalLimitSet rdf:resource="#_a1d038bc-9358-48e1-a3d2-2c5223f2a025"/>
+        <cim:OperationalLimit.OperationalLimitType rdf:resource="#_9ef9ccc1-1a3e-4410-815c-399f0f07ee99"/>
+    </cim:CurrentLimit>
+    <cim:ControlArea rdf:ID="_614ffadb-f7a5-4417-b8ac-15fdf89e09c5">
+        <cim:IdentifiedObject.mRID>614ffadb-f7a5-4417-b8ac-15fdf89e09c5</cim:IdentifiedObject.mRID>
+        <cim:IdentifiedObject.name>Network</cim:IdentifiedObject.name>
+        <entsoe:IdentifiedObject.energyIdentCodeEic>Network--1</entsoe:IdentifiedObject.energyIdentCodeEic>
+        <cim:ControlArea.type rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#ControlAreaTypeKind.Interchange"/>
+        <cim:ControlArea.EnergyArea rdf:resource="#_62973d32-5ab2-4a6a-8dae-89b274e19d98"/>
+    </cim:ControlArea>
+</rdf:RDF>

@@ -78,7 +78,7 @@ public class CgmesExportService {
         HvdcLinkProcessor.replaceHvdcByEquivalentModel(networkWithPra, hvdcCreationParameters);
     }
 
-    private Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws XMLStreamException, IOException {
+    Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws XMLStreamException, IOException {
         Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
         mapCgmesFiles.putAll(createAllSshFiles(mergedNetwork, sweData));
         mapCgmesFiles.putAll(createCommonFile(mergedNetwork, sweData));
@@ -86,7 +86,7 @@ public class CgmesExportService {
         return mapCgmesFiles;
     }
 
-    private Map<String, ByteArrayOutputStream> createAllSshFiles(Network mergedNetwork, SweData sweData) throws IOException {
+    Map<String, ByteArrayOutputStream> createAllSshFiles(Network mergedNetwork, SweData sweData) throws IOException {
         LOGGER.info("Building SSH files");
         Map<String, ByteArrayOutputStream> mapSshFiles = new HashMap<>();
         Map<String, String> networkIdsByCountry = sweData.getMergedNetworkData().getSubnetworkIdByCountry();
@@ -138,7 +138,7 @@ public class CgmesExportService {
         }
     }
 
-    private Map<String, ByteArrayOutputStream> createCommonFile(Network network, SweData sweData) throws IOException {
+    Map<String, ByteArrayOutputStream> createCommonFile(Network network, SweData sweData) throws IOException {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             Properties exportParams = new Properties();

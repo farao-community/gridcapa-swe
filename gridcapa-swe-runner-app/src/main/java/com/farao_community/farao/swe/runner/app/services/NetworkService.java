@@ -23,6 +23,7 @@ import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -72,17 +73,19 @@ public class NetworkService {
 
     public MergedNetworkData importMergedNetwork(SweRequest sweRequest) {
         subNetworkIdByCountry.clear();
-        Network networkFr = importFromZip(buildZipFile(sweRequest, Country.FR));
-        String idFr = networkFr.getId();
-        subNetworkIdByCountry.put("FR", idFr);
-        Network networkEs = importFromZip(buildZipFile(sweRequest, Country.ES));
-        String idEs = networkEs.getId();
-        subNetworkIdByCountry.put("ES", idEs);
-        Network networkPt = importFromZip(buildZipFile(sweRequest, Country.PT));
-        String idPt = networkPt.getId();
-        subNetworkIdByCountry.put("PT", idPt);
+        Network networkFr = getNetworkForCountry(sweRequest, Country.FR);
+        Network networkEs = getNetworkForCountry(sweRequest, Country.ES);
+        Network networkPt = getNetworkForCountry(sweRequest, Country.PT);
         Network mergedNetwork = Network.merge("network_merged", networkEs, networkFr, networkPt);
         return new MergedNetworkData(mergedNetwork, subNetworkIdByCountry);
+    }
+
+    @NotNull
+    private Network getNetworkForCountry(SweRequest sweRequest, Country country) {
+        Network network = importFromZip(buildZipFile(sweRequest, country));
+        String id = network.getId();
+        subNetworkIdByCountry.put(country.toString(), id);
+        return network;
     }
 
     public void addHvdcAndPstToNetwork(Network network) {
