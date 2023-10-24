@@ -39,11 +39,19 @@
         <deliveryMode>PERSISTENT</deliveryMode>
     </appender>
 
+    <!-- appender to display all execution logs on console except those bound to "amqp-business-events" appender -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- This logger name must match Logger's names in java code
     Do not bind any logger with the appender "amqp-business-events"!
     You should bind with "amqp-business-events" appender only Loggers you want to see in gridcapa processes as a final user-->
     <logger name="SWE_BUSINESS_LOGGER" additivity="false" level="INFO">
         <appender-ref ref="amqp-business-events"/>
+        <appender-ref ref="STDOUT" />
     </logger>
     <logger name="com.farao_community.farao.dichotomy.api.logging.DichotomyBusinessLogs" level="INFO">
         <appender-ref ref="amqp-business-events"/>
@@ -55,13 +63,6 @@
         <appender-ref ref="amqp-business-events"/>
     </logger>
 
-
-    <!-- appender to display all execution logs on console except those bound to "amqp-business-events" appender -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

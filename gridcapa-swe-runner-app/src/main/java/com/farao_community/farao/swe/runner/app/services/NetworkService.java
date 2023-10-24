@@ -23,7 +23,6 @@ import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -72,15 +75,19 @@ public class NetworkService {
     }
 
     public MergedNetworkData importMergedNetwork(SweRequest sweRequest) {
-        subNetworkIdByCountry.clear();
-        Network networkFr = getNetworkForCountry(sweRequest, Country.FR);
-        Network networkEs = getNetworkForCountry(sweRequest, Country.ES);
-        Network networkPt = getNetworkForCountry(sweRequest, Country.PT);
-        Network mergedNetwork = Network.merge("network_merged", networkEs, networkFr, networkPt);
-        return new MergedNetworkData(mergedNetwork, subNetworkIdByCountry);
+        try {
+            businessLogger.info("Start import of input CGMES files");
+            subNetworkIdByCountry.clear();
+            Network networkFr = getNetworkForCountry(sweRequest, Country.FR);
+            Network networkEs = getNetworkForCountry(sweRequest, Country.ES);
+            Network networkPt = getNetworkForCountry(sweRequest, Country.PT);
+            Network mergedNetwork = Network.merge("network_merged", networkEs, networkFr, networkPt);
+            return new MergedNetworkData(mergedNetwork, subNetworkIdByCountry);
+        } catch (Exception e) {
+            throw new SweInternalException("Exception occurred during input CGM import", e);
+        }
     }
 
-    @NotNull
     private Network getNetworkForCountry(SweRequest sweRequest, Country country) {
         Network network = importFromZip(buildZipFile(sweRequest, country));
         String id = network.getId();

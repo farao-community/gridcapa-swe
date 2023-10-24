@@ -43,12 +43,14 @@ import java.util.Set;
 @Service
 public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
+    private final Logger businessLogger;
     private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_001.xml'");
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
 
-    public CgmesExportService(FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService) {
+    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService) {
+        this.businessLogger = businessLogger;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
@@ -56,7 +58,7 @@ public class CgmesExportService {
 
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
         if (dichotomyResult.hasValidStep()) {
-            LOGGER.info("Start export of the CGMES files");
+            businessLogger.info("Start export of the CGMES files");
             String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
             try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
                 Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
@@ -67,7 +69,7 @@ public class CgmesExportService {
                 throw new RuntimeException(e);
             }
         } else {
-            LOGGER.error("Not valid step, CGMES files wont be exported");
+            businessLogger.error("Not valid step, CGMES files wont be exported");
             return null;
         }
     }
