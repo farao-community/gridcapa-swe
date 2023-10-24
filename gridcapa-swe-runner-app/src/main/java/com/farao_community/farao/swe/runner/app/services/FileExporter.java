@@ -20,7 +20,7 @@ import com.farao_community.farao.swe.runner.app.configurations.ProcessConfigurat
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
-import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
+import com.farao_community.farao.swe.runner.app.voltage.json.FailureVoltageCheckResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
@@ -107,9 +107,9 @@ public class FileExporter {
                                                        String fileType) {
         MemDataSource memDataSource = new MemDataSource();
         try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
-            VoltageCheckResult voltageCheckResult = voltageResultMapper.mapVoltageResult(result);
+            Object resultToWrite = getVoltageMonitoringResult(result);
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            zipSingleFile(os, objectWriter.writeValueAsBytes(voltageCheckResult), zipTargetNameChangeExtension(targetName, ".json"));
+            zipSingleFile(os, objectWriter.writeValueAsBytes(resultToWrite), zipTargetNameChangeExtension(targetName, ".json"));
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
         }
@@ -120,6 +120,10 @@ public class FileExporter {
             throw new SweInvalidDataException("Error while trying to upload converted CRAC file.", e);
         }
         return minioAdapter.generatePreSignedUrl(voltageResultPath);
+    }
+
+    private Object getVoltageMonitoringResult(VoltageMonitoringResult result) {
+        return result != null ? voltageResultMapper.mapVoltageResult(result) : new FailureVoltageCheckResult();
     }
 
     public String zipTargetNameChangeExtension(String targetName, String extension) {
