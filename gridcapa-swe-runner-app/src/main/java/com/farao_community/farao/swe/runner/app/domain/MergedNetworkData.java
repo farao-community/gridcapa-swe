@@ -11,7 +11,7 @@ import com.powsybl.iidm.network.Network;
 import java.util.Map;
 
 /**
- * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
+ * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public class MergedNetworkData {
     private final Network mergedNetwork;

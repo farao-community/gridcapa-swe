@@ -55,8 +55,6 @@ public class NetworkService {
 
     private final MinioAdapter minioAdapter;
 
-    private final Map<String, String> subNetworkIdByCountry = new HashMap<>();
-
     private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     private final Logger businessLogger;
 
@@ -77,10 +75,10 @@ public class NetworkService {
     public MergedNetworkData importMergedNetwork(SweRequest sweRequest) {
         try {
             businessLogger.info("Start import of input CGMES files");
-            subNetworkIdByCountry.clear();
-            Network networkFr = getNetworkForCountry(sweRequest, Country.FR);
-            Network networkEs = getNetworkForCountry(sweRequest, Country.ES);
-            Network networkPt = getNetworkForCountry(sweRequest, Country.PT);
+            Map<String, String> subNetworkIdByCountry = new HashMap<>();
+            Network networkFr = getNetworkForCountry(sweRequest, Country.FR, subNetworkIdByCountry);
+            Network networkEs = getNetworkForCountry(sweRequest, Country.ES, subNetworkIdByCountry);
+            Network networkPt = getNetworkForCountry(sweRequest, Country.PT, subNetworkIdByCountry);
             Network mergedNetwork = Network.merge("network_merged", networkEs, networkFr, networkPt);
             return new MergedNetworkData(mergedNetwork, subNetworkIdByCountry);
         } catch (Exception e) {
@@ -88,7 +86,7 @@ public class NetworkService {
         }
     }
 
-    private Network getNetworkForCountry(SweRequest sweRequest, Country country) {
+    private Network getNetworkForCountry(SweRequest sweRequest, Country country, Map<String, String> subNetworkIdByCountry) {
         Network network = importFromZip(buildZipFile(sweRequest, country));
         String id = network.getId();
         subNetworkIdByCountry.put(country.toString(), id);
