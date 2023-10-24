@@ -13,7 +13,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref_name, 'hotfix')
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -80,12 +80,12 @@ jobs:
           skip_fetch: true
           skip_checkout: true
 
-      - name: Merge automatically into main
+      - name: Merge automatically into source branch
         uses: devmasx/merge-branch@master
         with:
           type: now
           from_branch: next-release-v${{ github.event.inputs.nextVersion }}
-          target_branch: main
+          target_branch: ${{ github.ref_name }}
           message: Automatic merge after release ${{ github.event.inputs.releaseVersion }}
           github_token: ${{ secrets.REPO_ACCESS_TOKEN }}
 
