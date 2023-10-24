@@ -25,6 +25,6 @@ class DichotomyLoggingTest {
         DichotomyLogging businessLogger = new DichotomyLogging(logger);
         assertEquals("FAILURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.ES_FR, Optional.empty()));
         assertEquals("NONE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.PT_ES, Optional.empty()));
-        assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(new VoltageMonitoringResult(Collections.emptyMap()))));
+        assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(new VoltageMonitoringResult(Collections.emptyMap(), Collections.emptyMap(), VoltageMonitoringResult.Status.SECURE))));
     }
 }
