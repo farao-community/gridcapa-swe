@@ -31,10 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -48,6 +45,8 @@ public class CgmesExportService {
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
+
+    private static final Map<String, String> TSO_BY_COUNTRY = Map.of("FR", "RTE", "ES", "REE", "PT", "REN");
 
     public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService) {
         this.businessLogger = businessLogger;
@@ -91,10 +90,23 @@ public class CgmesExportService {
     Map<String, ByteArrayOutputStream> createAllSshFiles(Network mergedNetwork, SweData sweData) throws IOException {
         LOGGER.info("Building SSH files");
         Map<String, ByteArrayOutputStream> mapSshFiles = new HashMap<>();
-        Map<String, String> networkIdsByCountry = sweData.getMergedNetworkData().getSubnetworkIdByCountry();
-        mapSshFiles.putAll(createOneSsh(mergedNetwork.getSubnetwork(networkIdsByCountry.get("FR")), sweData, CgmesFileType.RTE_SSH));
-        mapSshFiles.putAll(createOneSsh(mergedNetwork.getSubnetwork(networkIdsByCountry.get("ES")), sweData, CgmesFileType.REE_SSH));
-        mapSshFiles.putAll(createOneSsh(mergedNetwork.getSubnetwork(networkIdsByCountry.get("PT")), sweData, CgmesFileType.REN_SSH));
+        Map<String, Network> subnetworksByCountry = new HashMap<>();
+        mergedNetwork.getSubnetworks().forEach(network -> {
+            if (network.getCountries().size() != 1) {
+                LOGGER.error("Subnetwork with id {} contains countries : {}, it will not be exported to SSH file", network.getNameOrId(), network.getCountries().toString());
+            } else {
+                String country = network.getCountries().stream().toList().get(0).name();
+                subnetworksByCountry.put(country, network);
+            }
+        });
+
+        for (Map.Entry<String, String> entry : TSO_BY_COUNTRY.entrySet()) {
+            String country = entry.getKey();
+            String tso = entry.getValue();
+            if (subnetworksByCountry.containsKey(country)) {
+                mapSshFiles.putAll(createOneSsh(subnetworksByCountry.get(country), sweData, tso));
+            }
+        }
         return mapSshFiles;
     }
 
@@ -110,7 +122,7 @@ public class CgmesExportService {
         return mapFiles;
     }
 
-    private Map<String, ByteArrayOutputStream> createOneSsh(Network network, SweData sweData, CgmesFileType cgmesFileType) throws IOException {
+    private Map<String, ByteArrayOutputStream> createOneSsh(Network network, SweData sweData, String tso) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Properties exportParams = new Properties();
             exportParams.put(CgmesExport.PROFILES, "SSH");
@@ -118,7 +130,7 @@ public class CgmesExportService {
             network.write("CGMES", exportParams, memDataSource);
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
-            String newFileName = buildCgmesFilename(sweData, cgmesFileType.getTso(), "SSH");
+            String newFileName = buildCgmesFilename(sweData, tso, "SSH");
             return Map.of(newFileName, baos);
         }
     }
