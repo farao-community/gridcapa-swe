@@ -179,7 +179,7 @@ public final class HvdcLinkProcessor {
     private static Generator getGeneratorOrThrow(Network network, String id) {
         Generator generator = network.getGenerator(id);
         if (generator == null) {
-            throw new SweInvalidDataException(String.format("Generator with id: %s does not exist in network ", id));
+            throw new SweInvalidDataException(String.format("Generator with id: %s needed for HVDC link modelling does not exist in network ", id));
         }
         return generator;
     }
@@ -187,7 +187,7 @@ public final class HvdcLinkProcessor {
     private static Load getLoadOrThrow(Network network, String id) {
         Load load = network.getLoad(id);
         if (load == null) {
-            throw new SweInvalidDataException(String.format("Load with id: %s does not exist in network ", id));
+            throw new SweInvalidDataException(String.format("Load with id: %s needed for HVDC link modelling does not exist in network ", id));
         }
         return load;
     }
@@ -195,7 +195,7 @@ public final class HvdcLinkProcessor {
     private static Line getLineOrThrow(Network network, String id) {
         Line line = network.getLine(id);
         if (line == null) {
-            throw new SweInvalidDataException(String.format("Line with id: %s does not exist in network ", id));
+            throw new SweInvalidDataException(String.format("Line with id: %s needed for HVDC link modelling does not exist in network ", id));
         }
         return line;
     }
