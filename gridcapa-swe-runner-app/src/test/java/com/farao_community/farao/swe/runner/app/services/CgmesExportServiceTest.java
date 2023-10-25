@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
-import com.farao_community.farao.swe.runner.app.domain.MergedNetworkData;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
@@ -23,7 +22,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,29 +69,21 @@ class CgmesExportServiceTest {
 
     @Test
     void exportCgmesSshTest() throws IOException {
-        MergedNetworkData mergedNetworkData = createMergedNetworkData();
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, mergedNetworkData, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(mergedNetworkData.getMergedNetwork(), sweData);
+        String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData);
         assertEquals(3, sshFiles.size());
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
     }
 
     @Test
     void exportCgmesSvTest() throws IOException {
-        MergedNetworkData mergedNetworkData = createMergedNetworkData();
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, mergedNetworkData, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> file = cgmesExportService.createCommonFile(mergedNetworkData.getMergedNetwork(), sweData);
-        assertEquals(1, file.size());
-        assertTrue(file.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
-    }
-
-    private MergedNetworkData createMergedNetworkData() {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, String> subNetworkIds = new HashMap<>();
-        subNetworkIds.put("ES", "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103");
-        subNetworkIds.put("FR", "urn:uuid:6cde6aab-942e-4af6-b087-c559bf0c67b4");
-        subNetworkIds.put("PT", "urn:uuid:26ac088c-2e06-11ee-816e-00155d38aa10");
-        return new MergedNetworkData(network, subNetworkIds);
+        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> file = cgmesExportService.createCommonFile(network, sweData);
+        assertEquals(1, file.size());
+        assertTrue(file.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
     }
 }

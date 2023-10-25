@@ -11,7 +11,6 @@ import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
-import com.farao_community.farao.swe.runner.app.domain.MergedNetworkData;
 import com.farao_community.farao.swe.runner.app.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
@@ -72,15 +71,14 @@ public class NetworkService {
         }
     }
 
-    public MergedNetworkData importMergedNetwork(SweRequest sweRequest) {
+    public Network importMergedNetwork(SweRequest sweRequest) {
         try {
             businessLogger.info("Start import of input CGMES files");
             Map<String, String> subNetworkIdByCountry = new HashMap<>();
             Network networkFr = getNetworkForCountry(sweRequest, Country.FR, subNetworkIdByCountry);
             Network networkEs = getNetworkForCountry(sweRequest, Country.ES, subNetworkIdByCountry);
             Network networkPt = getNetworkForCountry(sweRequest, Country.PT, subNetworkIdByCountry);
-            Network mergedNetwork = Network.merge("network_merged", networkEs, networkFr, networkPt);
-            return new MergedNetworkData(mergedNetwork, subNetworkIdByCountry);
+            return Network.merge("network_merged", networkEs, networkFr, networkPt);
         } catch (Exception e) {
             throw new SweInternalException("Exception occurred during input CGM import", e);
         }

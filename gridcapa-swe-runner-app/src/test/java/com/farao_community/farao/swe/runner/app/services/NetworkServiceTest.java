@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
-import com.farao_community.farao.swe.runner.app.domain.MergedNetworkData;
 import com.farao_community.farao.swe.runner.app.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.swe.runner.app.hvdc.TestUtils;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
@@ -68,9 +67,9 @@ class NetworkServiceTest {
 
     @Test
     void importMergedNetwork() {
-        MergedNetworkData mergedNetworkData = networkImporter.importMergedNetwork(sweRequest);
-        assertNotNull(mergedNetworkData.getMergedNetwork());
-        assertEquals(3, mergedNetworkData.getSubnetworkIdByCountry().size());
+        Network mergedNetwork = networkImporter.importMergedNetwork(sweRequest);
+        assertNotNull(mergedNetwork);
+        assertEquals(3, mergedNetwork.getSubnetworks().size());
     }
 
     @Test
