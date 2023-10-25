@@ -7,14 +7,21 @@
 
 package com.farao_community.farao.swe.runner.app.hvdc;
 
+import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
+import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -98,5 +105,13 @@ class HvdcLinkProcessorTest {
         HvdcLinkProcessor.replaceHvdcByEquivalentModel(network, params.getHvdcCreationParametersSet());
         assertTrue(network.getLine("FFR4AA1  DDE1AA1  1").getTerminal1().isConnected());
         assertFalse(network.getLine("FFR4AA1  DDE1AA1  1").getTerminal2().isConnected());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/hvdc/TestCase16Nodes_noload.xiidm", "/hvdc/TestCase16Nodes_nogenerator.xiidm", "/hvdc/TestCase16Nodes_noline.xiidm"})
+    void testNoinputFails(String xiidm) {
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream(xiidm));
+        Set<HvdcCreationParameters> params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json")).getHvdcCreationParametersSet();
+        assertThrows(SweInvalidDataException.class, () -> HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params));
     }
 }

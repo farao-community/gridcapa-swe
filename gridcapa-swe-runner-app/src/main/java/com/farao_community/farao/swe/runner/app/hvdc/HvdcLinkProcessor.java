@@ -7,6 +7,7 @@
 
 package com.farao_community.farao.swe.runner.app.hvdc;
 
+import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.VscStationCreationParameters;
 import com.powsybl.iidm.network.*;
@@ -16,7 +17,6 @@ import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Replaces an HVDC line's equivalent AC model with an actual HVDC line, and vice-versa
@@ -35,7 +35,7 @@ public final class HvdcLinkProcessor {
     public static void replaceEquivalentModelByHvdc(Network network, Set<HvdcCreationParameters> creationParametersSet) {
         // Sort HvdcCreationParameters to ensure repeatability
         List<HvdcCreationParameters> sortedHvdcCreationParameters = creationParametersSet.stream()
-                .sorted(Comparator.comparing(HvdcCreationParameters::getId)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(HvdcCreationParameters::getId)).toList();
         for (HvdcCreationParameters parameter : sortedHvdcCreationParameters) {
             replaceEquivalentModelByHvdc(network, parameter);
         }
@@ -55,12 +55,12 @@ public final class HvdcLinkProcessor {
     }
 
     private static void disconnectGeneratorAndLoad(Network network, HvdcCreationParameters creationParameters, HvdcLine.Side side) {
-        network.getGenerator(creationParameters.getEquivalentGeneratorId(side)).getTerminal().disconnect();
-        network.getLoad(creationParameters.getEquivalentLoadId(side)).getTerminal().disconnect();
+        getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(side)).getTerminal().disconnect();
+        getLoadOrThrow(network, creationParameters.getEquivalentLoadId(side)).getTerminal().disconnect();
     }
 
     private static void createVscStation(Network network, HvdcCreationParameters creationParameters, HvdcLine.Side side) {
-        Generator equivalentGenerator = network.getGenerator(creationParameters.getEquivalentGeneratorId(side));
+        Generator equivalentGenerator = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(side));
         Terminal terminal = equivalentGenerator.getTerminal();
         // WARNING : in CVG, this is done for the equivalent generator of HVDC line 1 for both HVDC lines. Here it is more generic => check if OK
         VscStationCreationParameters vscStationCreationParameters = creationParameters.getVscCreationParameters(side);
@@ -91,7 +91,7 @@ public final class HvdcLinkProcessor {
                 .setActivePowerSetpoint(0)
                 .add();
         // Check if equivalent line is connected before connecting the new HVDC line
-        Line equivalentAcLine = network.getLine(creationParameters.getEquivalentAcLineId());
+        Line equivalentAcLine = getLineOrThrow(network, creationParameters.getEquivalentAcLineId());
         if (equivalentAcLine.getTerminal1().isConnected()) {
             hvdcLine.getConverterStation1().getTerminal().connect();
             equivalentAcLine.getTerminal1().disconnect();
@@ -131,7 +131,7 @@ public final class HvdcLinkProcessor {
 
     private static void connectEquivalentAcLine(Network network, HvdcCreationParameters creationParameters) {
         HvdcLine hvdcLine = network.getHvdcLine(creationParameters.getId());
-        Line equivalentAcLine = network.getLine(creationParameters.getEquivalentAcLineId());
+        Line equivalentAcLine = getLineOrThrow(network, creationParameters.getEquivalentAcLineId());
         if (hvdcLine.getConverterStation1().getTerminal().isConnected()) {
             equivalentAcLine.getTerminal1().connect();
         }
@@ -142,10 +142,10 @@ public final class HvdcLinkProcessor {
 
     public static void connectEquivalentGeneratorsAndLoads(Network network, HvdcCreationParameters creationParameters,  HvdcLine hvdcLine) {
 
-        Load load1 = network.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
-        Generator gen1 = network.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));
-        Load load2 = network.getLoad(creationParameters.getEquivalentLoadId(HvdcLine.Side.TWO));
-        Generator gen2 = network.getGenerator(creationParameters.getEquivalentGeneratorId(HvdcLine.Side.TWO));
+        Load load1 = getLoadOrThrow(network, creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
+        Generator gen1 = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));
+        Load load2 = getLoadOrThrow(network, creationParameters.getEquivalentLoadId(HvdcLine.Side.TWO));
+        Generator gen2 = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(HvdcLine.Side.TWO));
 
         load1.getTerminal().connect();
         gen1.getTerminal().connect();
@@ -174,5 +174,29 @@ public final class HvdcLinkProcessor {
                 gen2.setTargetP(0);
             }
         }
+    }
+
+    private static Generator getGeneratorOrThrow(Network network, String id) {
+        Generator generator = network.getGenerator(id);
+        if (generator == null) {
+            throw new SweInvalidDataException(String.format("Generator with id: %s does not exist in network ", id));
+        }
+        return generator;
+    }
+
+    private static Load getLoadOrThrow(Network network, String id) {
+        Load load = network.getLoad(id);
+        if (load == null) {
+            throw new SweInvalidDataException(String.format("Load with id: %s does not exist in network ", id));
+        }
+        return load;
+    }
+
+    private static Line getLineOrThrow(Network network, String id) {
+        Line line = network.getLine(id);
+        if (line == null) {
+            throw new SweInvalidDataException(String.format("Line with id: %s does not exist in network ", id));
+        }
+        return line;
     }
 }
