@@ -51,7 +51,7 @@ class ScalableGeneratorConnectorTest {
 
     private Scalable getCountryGeneratorsScalableForFR(Network network) {
         List<Scalable> scalables = new ArrayList<>();
-        List<Float> percentages = new ArrayList<>();
+        List<Double> percentages = new ArrayList<>();
         List<Generator> generators;
         generators = network.getGeneratorStream()
             .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
@@ -61,7 +61,7 @@ class ScalableGeneratorConnectorTest {
         double totalCountryP = generators.stream().mapToDouble(NetworkUtil::pseudoTargetP).sum();
         //calculate factor of each generator
         generators.forEach(generator -> {
-            float generatorPercentage = (float) (100 * NetworkUtil.pseudoTargetP(generator) / totalCountryP);
+            double generatorPercentage = 100 * NetworkUtil.pseudoTargetP(generator) / totalCountryP;
             percentages.add(generatorPercentage);
             scalables.add(Scalable.onGenerator(generator.getId()));
         });

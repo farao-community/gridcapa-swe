@@ -32,10 +32,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
@@ -399,7 +407,7 @@ class SweNetworkShifterTest {
 
     private Scalable getCountryGeneratorsScalableForFR(Network network) {
         List<Scalable> scalables = new ArrayList<>();
-        List<Float> percentages = new ArrayList<>();
+        List<Double> percentages = new ArrayList<>();
         List<Generator> generators;
         generators = network.getGeneratorStream()
             .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
@@ -409,7 +417,7 @@ class SweNetworkShifterTest {
         double totalCountryP = generators.stream().mapToDouble(NetworkUtil::pseudoTargetP).sum();
         //calculate factor of each generator
         generators.forEach(generator -> {
-            float generatorPercentage = (float) (100 * NetworkUtil.pseudoTargetP(generator) / totalCountryP);
+            double generatorPercentage =  100 * NetworkUtil.pseudoTargetP(generator) / totalCountryP;
             percentages.add(generatorPercentage);
             scalables.add(Scalable.onGenerator(generator.getId()));
         });

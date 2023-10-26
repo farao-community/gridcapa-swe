@@ -7,8 +7,8 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.data.crac_api.Crac;
+import com.farao_community.farao.data.crac_api.Instant;
 import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
-import com.farao_community.farao.data.rao_result_api.OptimizationState;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
@@ -79,7 +79,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(OptimizationState.AFTER_CRA)).thenReturn(-1.0);
+        when(raoResult.getFunctionalCost(Instant.CURATIVE)).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
@@ -106,7 +106,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(OptimizationState.AFTER_CRA)).thenReturn(22.0);
+        when(raoResult.getFunctionalCost(Instant.CURATIVE)).thenReturn(22.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
@@ -134,7 +134,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(OptimizationState.AFTER_CRA)).thenReturn(-1.0);
+        when(raoResult.getFunctionalCost(Instant.CURATIVE)).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);

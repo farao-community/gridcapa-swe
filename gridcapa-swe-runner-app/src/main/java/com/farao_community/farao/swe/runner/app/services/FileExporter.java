@@ -51,7 +51,7 @@ public class FileExporter {
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
-
+    private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     public static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
     private final MinioAdapter minioAdapter;
     private final VoltageResultMapper voltageResultMapper;
@@ -66,6 +66,18 @@ public class FileExporter {
         this.minioAdapter = minioAdapter;
         this.voltageResultMapper = voltageResultMapper;
         this.processConfiguration = processConfiguration;
+    }
+
+    public void saveMergedNetworkWithHvdc(Network network, OffsetDateTime targetDateTime) {
+        MemDataSource memDataSource = new MemDataSource();
+        network.write("XIIDM", new Properties(), memDataSource);
+        InputStream xiidm;
+        try {
+            xiidm = memDataSource.newInputStream("", "xiidm");
+        } catch (IOException e) {
+            throw new SweInternalException("Could not export XIIDM file");
+        }
+        minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", targetDateTime);
     }
 
     /**

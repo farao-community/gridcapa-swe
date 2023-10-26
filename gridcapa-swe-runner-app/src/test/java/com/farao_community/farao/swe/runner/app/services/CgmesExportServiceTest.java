@@ -8,28 +8,23 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
-import com.google.common.base.Suppliers;
-import com.powsybl.cgmes.conversion.CgmesImport;
-import com.powsybl.computation.local.LocalComputationManager;
-import com.powsybl.iidm.mergingview.MergingView;
-import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.EnumMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -72,22 +67,34 @@ class CgmesExportServiceTest {
     }
 
     @Test
-    void testApplyingShiftToCgm() throws URISyntaxException {
-        Network inputNetwork = importFromZip(Paths.get(Objects.requireNonNull(getClass().getResource("/export_cgmes/MicroGrid.zip")).toURI()).toString());
-        assertEquals(140, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-        assertEquals(90., inputNetwork.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
-        MergingView mergingView = MergingView.create("imported_network", "iidm");
-        mergingView.merge(inputNetwork);
-        mergingView.setCaseDate(DateTime.parse("2030-01-25T19:00:00Z"));
-        String networkWithPraUrl = getClass().getResource("/export_cgmes/microGrid.xiidm").toString();
-        cgmesExportService.applyNetworkWithPraResultToMergingView(networkWithPraUrl, mergingView);
-        assertEquals(200, inputNetwork.getGenerator("_2844585c-0d35-488d-a449-685bcd57afbf").getTargetP());
-        assertEquals(50., mergingView.getLoad("_69add5b4-70bd-4360-8a93-286256c0d38b").getP0());
+    void exportCgmesSshTest() throws IOException {
+        String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData);
+        assertEquals(3, sshFiles.size());
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
     }
 
-    private Network importFromZip(String zipPath) {
-        Properties importParams = new Properties();
-        importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
-        return Network.read(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
+    @Test
+    void exportCgmesSshWithErrorTest() throws IOException {
+        //In cas of subnetwork contains many countries it will not be exported
+        String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData);
+        assertEquals(2, sshFiles.size());
+        assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTE_SSH_001.xml"));
+    }
+
+    @Test
+    void exportCgmesSvTest() throws IOException {
+        String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> file = cgmesExportService.createCommonFile(network, sweData);
+        assertEquals(1, file.size());
+        assertTrue(file.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
     }
 }

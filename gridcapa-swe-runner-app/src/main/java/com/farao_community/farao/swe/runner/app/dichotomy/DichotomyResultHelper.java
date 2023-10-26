@@ -12,11 +12,14 @@ import com.farao_community.farao.data.crac_api.Instant;
 import com.farao_community.farao.data.crac_api.cnec.FlowCnec;
 import com.farao_community.farao.data.crac_api.network_action.NetworkAction;
 import com.farao_community.farao.data.crac_api.range_action.RangeAction;
-import com.farao_community.farao.data.rao_result_api.OptimizationState;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -58,13 +61,7 @@ public final class DichotomyResultHelper {
     }
 
     private static double computeFlowMargin(RaoResult raoResult, FlowCnec flowCnec) {
-        if (flowCnec.getState().getInstant() == Instant.CURATIVE) {
-            return raoResult.getMargin(OptimizationState.AFTER_CRA, flowCnec, Unit.AMPERE);
-        } else if (flowCnec.getState().getInstant() == Instant.AUTO) {
-            return raoResult.getMargin(OptimizationState.AFTER_ARA, flowCnec, Unit.AMPERE);
-        } else {
-            return raoResult.getMargin(OptimizationState.AFTER_PRA, flowCnec, Unit.AMPERE);
-        }
+        return raoResult.getMargin(flowCnec.getState().getInstant(), flowCnec, Unit.AMPERE);
     }
 
     public static List<String> getActivatedActionInPreventive(Crac crac, RaoResult raoResult) {

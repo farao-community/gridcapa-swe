@@ -36,7 +36,7 @@ class SweDataTest {
 
     @Test
     void simpleD2ccTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.D2CC, network, network, network, network, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         assertEquals(ProcessType.D2CC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetworkEsFr());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());
@@ -51,7 +51,7 @@ class SweDataTest {
 
     @Test
     void simpleIdccTest() {
-        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.IDCC, network, network, network, network, null, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        SweData sweData = new SweData("id", OffsetDateTime.now(), ProcessType.IDCC, network, network, network, network, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         assertEquals(ProcessType.IDCC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetworkEsFr());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());

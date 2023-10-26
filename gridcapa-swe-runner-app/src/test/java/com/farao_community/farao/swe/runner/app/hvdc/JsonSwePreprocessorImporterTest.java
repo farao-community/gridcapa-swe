@@ -37,7 +37,7 @@ class JsonSwePreprocessorImporterTest {
 
     @Test
     void testImport() {
-        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
+        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_correct.json"));
         assertNotNull(params);
         assertNotNull(params.getHvdcCreationParametersSet());
         assertEquals(2, params.getHvdcCreationParametersSet().size());

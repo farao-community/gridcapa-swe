@@ -119,6 +119,10 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-cgmes-extensions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
             <artifactId>powsybl-cgmes-model</artifactId>
         </dependency>
         <dependency>
@@ -132,10 +136,6 @@
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-glsk-document-cim</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-iidm-mergingview</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>

@@ -13,7 +13,6 @@ import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
-import com.farao_community.farao.swe.runner.app.domain.MergingViewData;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
@@ -33,21 +32,23 @@ public class FilesService {
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON = "/crac/CimCracCreationParameters_FR-ES_D2CC.json";
 
     private final NetworkService networkService;
-    private final MergingViewService mergingViewService;
+
     private final FileImporter fileImporter;
     private final FileExporter fileExporter;
 
-    public FilesService(NetworkService networkImporter, MergingViewService mergingViewService, FileImporter fileImporter, FileExporter fileExporter) {
+    public FilesService(NetworkService networkImporter, FileImporter fileImporter, FileExporter fileExporter) {
         this.networkService = networkImporter;
-        this.mergingViewService = mergingViewService;
         this.fileImporter = fileImporter;
         this.fileExporter = fileExporter;
     }
 
     public SweData importFiles(SweRequest sweRequest) {
-        MergingViewData mergingViewData = mergingViewService.importMergingView(sweRequest);
-        Network networkEsFr = networkService.importNetwork(sweRequest);
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
+        Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
+        networkService.addHvdcAndPstToNetwork(mergedNetwork);
+        fileExporter.saveMergedNetworkWithHvdc(mergedNetwork, targetProcessDateTime);
+
+        Network networkEsFr = networkService.loadNetworkFromMinio(targetProcessDateTime);
         Network networkFrEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
         Network networkEsPt = networkService.loadNetworkFromMinio(targetProcessDateTime);
         Network networkPtEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
@@ -62,7 +63,7 @@ public class FilesService {
         String raoParametersEsFrUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), DichotomyDirection.ES_FR);
         String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), DichotomyDirection.ES_PT);
         EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = fillMapCgmesInputFiles(sweRequest);
-        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, mergingViewData, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, mapCgmesInputFiles);
+        return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, mapCgmesInputFiles);
     }
 
     private EnumMap<CgmesFileType, SweFileResource> fillMapCgmesInputFiles(SweRequest sweRequest) {
