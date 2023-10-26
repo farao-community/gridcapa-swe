@@ -18,6 +18,7 @@ import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePrep
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.computation.local.LocalComputationManager;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
@@ -33,11 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -57,6 +54,8 @@ public class NetworkService {
     private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     private final Logger businessLogger;
 
+    static final Map<Country, String> TSO_BY_COUNTRY = Map.of(Country.FR, "RTE", Country.ES, "REE", Country.PT, "REN");
+
     public NetworkService(MinioAdapter minioAdapter, Logger businessLogger) {
         this.minioAdapter = minioAdapter;
         this.businessLogger = businessLogger;
@@ -74,21 +73,15 @@ public class NetworkService {
     public Network importMergedNetwork(SweRequest sweRequest) {
         try {
             businessLogger.info("Start import of input CGMES files");
-            Map<String, String> subNetworkIdByCountry = new HashMap<>();
-            Network networkFr = getNetworkForCountry(sweRequest, Country.FR, subNetworkIdByCountry);
-            Network networkEs = getNetworkForCountry(sweRequest, Country.ES, subNetworkIdByCountry);
-            Network networkPt = getNetworkForCountry(sweRequest, Country.PT, subNetworkIdByCountry);
-            return Network.merge("network_merged", networkEs, networkFr, networkPt);
+            List<Network> networks = TSO_BY_COUNTRY.keySet().stream().map(country -> getNetworkForCountry(sweRequest, country)).toList();
+            return Network.merge("network_merged", networks.toArray(new Network[0]));
         } catch (Exception e) {
             throw new SweInternalException("Exception occurred during input CGM import", e);
         }
     }
 
-    private Network getNetworkForCountry(SweRequest sweRequest, Country country, Map<String, String> subNetworkIdByCountry) {
-        Network network = importFromZip(buildZipFile(sweRequest, country));
-        String id = network.getId();
-        subNetworkIdByCountry.put(country.toString(), id);
-        return network;
+    private Network getNetworkForCountry(SweRequest sweRequest, Country country) {
+        return importFromZip(buildZipFile(sweRequest, country));
     }
 
     public void addHvdcAndPstToNetwork(Network network) {
@@ -183,11 +176,5 @@ public class NetworkService {
         } catch (IOException ioe) {
             throw new SweInvalidDataException("Error creating netowrk zip file: " + ioe);
         }
-    }
-
-    enum Country {
-        FR,
-        ES,
-        PT
     }
 }

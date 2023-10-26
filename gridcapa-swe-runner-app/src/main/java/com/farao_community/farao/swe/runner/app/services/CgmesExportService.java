@@ -20,6 +20,7 @@ import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePrep
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
 import com.powsybl.commons.datasource.MemDataSource;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -33,6 +34,8 @@ import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.farao_community.farao.swe.runner.app.services.NetworkService.TSO_BY_COUNTRY;
+
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -45,8 +48,6 @@ public class CgmesExportService {
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
-
-    private static final Map<String, String> TSO_BY_COUNTRY = Map.of("FR", "RTE", "ES", "REE", "PT", "REN");
 
     public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService) {
         this.businessLogger = businessLogger;
@@ -90,18 +91,18 @@ public class CgmesExportService {
     Map<String, ByteArrayOutputStream> createAllSshFiles(Network mergedNetwork, SweData sweData) throws IOException {
         LOGGER.info("Building SSH files");
         Map<String, ByteArrayOutputStream> mapSshFiles = new HashMap<>();
-        Map<String, Network> subnetworksByCountry = new HashMap<>();
+        Map<Country, Network> subnetworksByCountry = new HashMap<>();
         mergedNetwork.getSubnetworks().forEach(network -> {
             if (network.getCountries().size() != 1) {
-                LOGGER.error("Subnetwork with id {} contains countries : {}, it will not be exported to SSH file", network.getNameOrId(), network.getCountries().toString());
+                LOGGER.error("Subnetwork with id {} contains countries : {}, it will not be exported to SSH file", network.getNameOrId(), network.getCountries());
             } else {
-                String country = network.getCountries().stream().toList().get(0).name();
+                Country country = network.getCountries().stream().toList().get(0);
                 subnetworksByCountry.put(country, network);
             }
         });
 
-        for (Map.Entry<String, String> entry : TSO_BY_COUNTRY.entrySet()) {
-            String country = entry.getKey();
+        for (Map.Entry<Country, String> entry : TSO_BY_COUNTRY.entrySet()) {
+            Country country = entry.getKey();
             String tso = entry.getValue();
             if (subnetworksByCountry.containsKey(country)) {
                 mapSshFiles.putAll(createOneSsh(subnetworksByCountry.get(country), sweData, tso));
