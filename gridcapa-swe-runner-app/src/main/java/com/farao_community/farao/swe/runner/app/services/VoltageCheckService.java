@@ -42,6 +42,10 @@ public class VoltageCheckService {
     public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, DichotomyDirection direction) {
 
         if ((direction != DichotomyDirection.ES_FR && direction != DichotomyDirection.FR_ES) || !dichotomyResult.hasValidStep()) {
+
+            if (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) {
+                businessLogger.warn("Voltage check is in failure because no valid step is available to run it.");
+            }
             return Optional.empty();
         }
         businessLogger.info("Running voltage check");

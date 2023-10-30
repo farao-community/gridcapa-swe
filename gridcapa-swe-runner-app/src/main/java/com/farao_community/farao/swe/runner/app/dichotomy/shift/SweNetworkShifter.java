@@ -126,6 +126,7 @@ public final class SweNetworkShifter implements NetworkShifter {
                 LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), LoadFlowParameters.load());
                 if (!result.isOk()) {
                     LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
+                    businessLogger.error("Loadflow computation diverged on network '{}'", network.getId());
                     throw new ShiftingException("Loadflow computation diverged during balancing adjustment");
                 }
                 bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
