@@ -79,7 +79,14 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private RaoRequest buildRaoRequest(String networkPresignedUrl, String scaledNetworkDirPath) {
         String resultsDestination = REGION + MINIO_SEPARATOR + sweData.getProcessType() + MINIO_SEPARATOR + scaledNetworkDirPath;
         String raoParametersUrl = getMatchingRaoParametersUrl(direction);
-        return new RaoRequest(sweData.getId(), networkPresignedUrl, getMatchingCracPath(direction, sweData), raoParametersUrl, resultsDestination, direction.getDashName());
+        return new RaoRequest.RaoRequestBuilder()
+                .withId(sweData.getId())
+                .withNetworkFileUrl(networkPresignedUrl)
+                .withCracFileUrl(getMatchingCracPath(direction, sweData))
+                .withRaoParametersFileUrl(raoParametersUrl)
+                .withResultsDestination(resultsDestination)
+                .withEventPrefix(direction.getDashName())
+                .build();
     }
 
     private String generateScaledNetworkDirPath(Network network) {
