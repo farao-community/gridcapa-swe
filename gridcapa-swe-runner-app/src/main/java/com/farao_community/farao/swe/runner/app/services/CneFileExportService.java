@@ -106,7 +106,7 @@ public class CneFileExportService {
                 angleMonitoringResult = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult();
             }
         } else {
-            if ((!Double.isNaN(dichotomyResult.getLowestInvalidStepValue())) && dichotomyResult.getLowestInvalidStep().getValidationData() != null) {
+            if (!Double.isNaN(dichotomyResult.getLowestInvalidStepValue()) && dichotomyResult.getLowestInvalidStep().getValidationData() != null) {
                 angleMonitoringResult = dichotomyResult.getLowestInvalidStep().getValidationData().getAngleMonitoringResult();
             }
         }
