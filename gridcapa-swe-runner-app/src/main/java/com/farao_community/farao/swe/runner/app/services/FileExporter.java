@@ -75,7 +75,7 @@ public class FileExporter {
         try {
             xiidm = memDataSource.newInputStream("", "xiidm");
         } catch (IOException e) {
-            throw new SweInternalException("Could not export XIIDM file");
+            throw new SweInternalException("Could not export XIIDM file", e);
         }
         minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", targetDateTime);
     }

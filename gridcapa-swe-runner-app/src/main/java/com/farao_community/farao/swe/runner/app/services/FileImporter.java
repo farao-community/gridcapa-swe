@@ -74,7 +74,7 @@ public class FileImporter {
         try (InputStream cracResultStream = urlValidationService.openUrlStream(cracUrl)) {
             return CracImporters.importCrac(FilenameUtils.getName(new URL(cracUrl).getPath()), cracResultStream);
         } catch (IOException e) {
-            throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl));
+            throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl), e);
         }
     }
 
