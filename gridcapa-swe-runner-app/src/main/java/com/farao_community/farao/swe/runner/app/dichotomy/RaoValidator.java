@@ -72,7 +72,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse));
         } catch (RuntimeException e) {
-            throw new ValidationException("RAO run failed. Nested exception: " + e.getMessage());
+            throw new ValidationException("RAO run failed", e);
         }
     }
 

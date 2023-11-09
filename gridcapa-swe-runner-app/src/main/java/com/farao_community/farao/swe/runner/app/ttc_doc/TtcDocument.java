@@ -79,7 +79,7 @@ public class TtcDocument {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             this.doc = dBuilder.newDocument();
         } catch (ParserConfigurationException e) {
-            LOGGER.error("Could not instantiate ttc document");
+            LOGGER.error("Could not instantiate ttc document", e);
         }
     }
 
@@ -142,7 +142,7 @@ public class TtcDocument {
             transformer.transform(xmlSource, outputTarget);
             return new ByteArrayInputStream(outputStream.toByteArray());
         } catch (TransformerException e) {
-            throw new SweInternalException("Could not export ttc document");
+            throw new SweInternalException("Could not export ttc document", e);
         }
     }
 }
