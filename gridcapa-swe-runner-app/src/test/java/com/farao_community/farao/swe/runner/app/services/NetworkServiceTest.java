@@ -9,10 +9,6 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
-import com.farao_community.farao.swe.runner.app.hvdc.HvdcLinkProcessor;
-import com.farao_community.farao.swe.runner.app.hvdc.TestUtils;
-import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
-import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -77,16 +73,5 @@ class NetworkServiceTest {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         networkImporter.addHvdcAndPstToNetwork(network);
         assertEquals(2, network.getHvdcLineCount());
-
     }
-
-    @Test
-    void testHvdcCreation() {
-        // Inspect the contents of the created HVDC lines
-        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
-        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
-        HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
-        TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs.xiidm", getClass());
-    }
-
 }

@@ -74,6 +74,11 @@
             <!-- Compile dependencies -->
             <dependency>
                 <groupId>com.farao-community.farao</groupId>
+                <artifactId>gridcapa-swe-commons</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.farao-community.farao</groupId>
                 <artifactId>farao-dichotomy-api</artifactId>
                 <version>${farao.dichotomy.version}</version>
             </dependency>

@@ -43,6 +43,10 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-swe-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
             <artifactId>farao-crac-creation-util</artifactId>
         </dependency>
         <dependency>
