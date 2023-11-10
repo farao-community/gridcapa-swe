@@ -44,10 +44,12 @@ import static com.farao_community.farao.swe.runner.app.services.NetworkService.T
 @Service
 public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
+    public static final List<String> CGMES_PROFILES = List.of("EQ", "TP", "SSH");
     private final Logger businessLogger;
     private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_001.xml'");
     private final FileExporter fileExporter;
     private final UrlValidationService urlValidationService;
+    private final Properties exportParams = new Properties();
 
     public CgmesExportService(Logger businessLogger, FileExporter fileExporter, UrlValidationService urlValidationService) {
         this.businessLogger = businessLogger;
@@ -68,7 +70,7 @@ public class CgmesExportService {
                 throw new RuntimeException(e);
             }
         } else {
-            businessLogger.error("Not valid step, CGMES files wont be exported");
+            businessLogger.error("Dichotomy has no valid step, CGMES files wont be exported");
             return null;
         }
     }
@@ -111,14 +113,13 @@ public class CgmesExportService {
 
     private Map<String, ByteArrayOutputStream> createTsoFiles(Network network, SweData sweData, String tso) throws IOException {
         Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
-        Properties exportParams = new Properties();
-        exportParams.put(CgmesExport.PROFILES, List.of("EQ", "TP", "SSH"));
+        exportParams.put(CgmesExport.PROFILES, CGMES_PROFILES);
         exportParams.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
         MemDataSource memDataSource = new MemDataSource();
         network.write("CGMES", exportParams, memDataSource);
-        putAndRenameFile(network.getNameOrId(), sweData, tso, memDataSource, mapFiles, "EQ");
-        putAndRenameFile(network.getNameOrId(), sweData, tso, memDataSource, mapFiles, "SSH");
-        putAndRenameFile(network.getNameOrId(), sweData, tso, memDataSource, mapFiles, "TP");
+        for (String profile : CGMES_PROFILES) {
+            putAndRenameFile(network.getNameOrId(), sweData, tso, memDataSource, mapFiles, profile);
+        }
         return mapFiles;
     }
 
@@ -134,7 +135,6 @@ public class CgmesExportService {
     Map<String, ByteArrayOutputStream> createCommonFile(Network network, SweData sweData) throws IOException {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            Properties exportParams = new Properties();
             exportParams.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
             exportParams.put(CgmesExport.PROFILES, "SV");
             MemDataSource memDataSource = new MemDataSource();
