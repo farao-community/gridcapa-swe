@@ -16,9 +16,14 @@ import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorP
 import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
+import com.powsybl.cgmes.extensions.CgmesControlArea;
+import com.powsybl.cgmes.extensions.CgmesControlAreas;
 import com.powsybl.commons.datasource.MemDataSource;
+import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,6 +37,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -45,6 +51,7 @@ import static com.farao_community.farao.swe.runner.app.services.NetworkService.T
 public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
     public static final List<String> CGMES_PROFILES = List.of("EQ", "TP", "SSH");
+    public static final double DEFAULT_P_TOLERANCE = 10;
     private final Logger businessLogger;
     private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_001.xml'");
     private final FileExporter fileExporter;
@@ -64,6 +71,7 @@ public class CgmesExportService {
             try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
                 Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
                 applyHvdcSetPointToAcEquivalentModel(networkWithPra);
+                LoadFlow.run(networkWithPra,  networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), LoadFlowParameters.load());
                 Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
                 return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
             } catch (IOException | XMLStreamException e) {
@@ -112,6 +120,7 @@ public class CgmesExportService {
     }
 
     private Map<String, ByteArrayOutputStream> createTsoFiles(Network network, SweData sweData, String tso) throws IOException {
+        updateControlAreasExtension(network);
         Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
         exportParams.put(CgmesExport.PROFILES, CGMES_PROFILES);
         exportParams.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
@@ -121,6 +130,22 @@ public class CgmesExportService {
             putAndRenameFile(network.getNameOrId(), sweData, tso, memDataSource, mapFiles, profile);
         }
         return mapFiles;
+    }
+
+    private void updateControlAreasExtension(Network network) {
+        CgmesControlAreas controlAreas = network.getExtension(CgmesControlAreas.class);
+        if (controlAreas != null && controlAreas.getCgmesControlAreas().size() == 1) {
+            // We use this method for each subnetwork, we should have only one ControlArea by subnetwork
+            Optional<CgmesControlArea> controlAreaOpt = controlAreas.getCgmesControlAreas().stream().findFirst();
+            controlAreaOpt.ifPresent(controlArea -> {
+                controlArea.setNetInterchange(computeNetInterchange(network));
+                controlArea.setPTolerance(DEFAULT_P_TOLERANCE);
+            });
+        }
+    }
+
+    private double computeNetInterchange(Network network) {
+        return network.getDanglingLineStream().filter(dl -> !Double.isNaN(dl.getBoundary().getP())).mapToDouble(dl -> dl.getBoundary().getP()).sum();
     }
 
     private void putAndRenameFile(String baseName, SweData sweData, String tso, MemDataSource memDataSource, Map<String, ByteArrayOutputStream> mapFiles, String type) throws IOException {
