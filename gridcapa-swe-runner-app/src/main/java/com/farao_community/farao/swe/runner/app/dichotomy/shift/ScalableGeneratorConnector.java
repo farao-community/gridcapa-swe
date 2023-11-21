@@ -95,7 +95,7 @@ public class ScalableGeneratorConnector {
         changedGeneratorsInitialState.forEach((genId, initialState) -> {
             Generator gen = network.getGenerator(genId);
             if (!getBus(gen.getTerminal()).isInMainConnectedComponent()
-                || (Math.abs(gen.getTargetP()) < 1e-6 && Math.abs(initialState.targetP) < 1e-6)) {
+                || Math.abs(gen.getTargetP()) < 1e-6 && Math.abs(initialState.targetP) < 1e-6) {
                 // Generator is not connected to the main island, even after connecting it and its TWT
                 // Or it has 0 production and has not moved
                 // Reset it to its state before scaling
