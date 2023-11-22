@@ -15,20 +15,24 @@ import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.data.swe_cne_exporter.SweCneClassCreator;
 import com.farao_community.farao.data.swe_cne_exporter.SweCneExporter;
 import com.farao_community.farao.data.swe_cne_exporter.SweCneUtil;
-import com.farao_community.farao.data.swe_cne_exporter.xsd.*;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.CriticalNetworkElementMarketDocument;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.Point;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.Reason;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.SeriesPeriod;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
-import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBContext;
@@ -54,6 +58,7 @@ import java.util.zip.ZipOutputStream;
  */
 
 @Service
+@Import(ProcessConfiguration.class)
 public class CneFileExportService {
 
     public static final String FILENAME_TIMESTAMP_REGEX = "yyyyMMdd'_'HHmm'_CNE_[direction]_[secureType].zip'";

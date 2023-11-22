@@ -6,13 +6,14 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
-import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.ttc_doc.TtcDocument;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import java.util.Optional;
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service
+@Import(ProcessConfiguration.class)
 public class OutputService {
 
     public static final String TTC_DOC_NAME_REGEX = "'SWE_'yyyyMMdd'_'HHmm'_TTCdoc.xml'";

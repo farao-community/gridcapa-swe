@@ -4,6 +4,16 @@
       "name": "swe-runner.bindings.request.destination",
       "type": "java.lang.String",
       "description": "Description for swe-runner.bindings.request.destination."
+    },
+    {
+      "name": "swe-commons.shift-max-iteration-number",
+      "type": "java.lang.String",
+      "description": "Description for swe-commons.shift-max-iteration-number."
+    },
+    {
+      "name": "swe-commons.zone-id",
+      "type": "java.lang.String",
+      "description": "Description for swe-commons.zone-id."
     }
   ]
 }

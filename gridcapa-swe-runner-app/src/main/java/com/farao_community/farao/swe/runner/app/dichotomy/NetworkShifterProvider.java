@@ -8,14 +8,15 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
-import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.*;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.Map;
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 @Service
+@Import(ProcessConfiguration.class)
 public class NetworkShifterProvider {
 
     private final DichotomyConfiguration dichotomyConfiguration;
@@ -41,6 +43,7 @@ public class NetworkShifterProvider {
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
         Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
             zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
             getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
