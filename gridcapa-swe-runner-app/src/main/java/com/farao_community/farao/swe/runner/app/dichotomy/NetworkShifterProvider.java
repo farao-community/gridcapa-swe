@@ -12,9 +12,10 @@ import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfi
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.shift.*;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.*;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Import;
@@ -30,28 +31,27 @@ import java.util.Map;
 public class NetworkShifterProvider {
 
     private final DichotomyConfiguration dichotomyConfiguration;
-    private final ZonalScalableProvider zonalScalableProvider;
     private final Logger businessLogger;
     private final ProcessConfiguration processConfiguration;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider, Logger businessLogger, ProcessConfiguration processConfiguration) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, Logger businessLogger, ProcessConfiguration processConfiguration) {
         this.dichotomyConfiguration = dichotomyConfiguration;
-        this.zonalScalableProvider = zonalScalableProvider;
         this.businessLogger = businessLogger;
         this.processConfiguration = processConfiguration;
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
-        Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
+        ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
+        Network network = NetworkService.getNetworkByDirection(sweData, direction);
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
 
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
-            zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
-            getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-            dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-            dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
-            initialNetPositions,
-            processConfiguration);
+                zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
+                getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
+                initialNetPositions,
+                processConfiguration);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {

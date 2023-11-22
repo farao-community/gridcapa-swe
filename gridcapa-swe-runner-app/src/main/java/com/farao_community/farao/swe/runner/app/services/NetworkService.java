@@ -6,12 +6,14 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.gridcapa_swe_commons.preprocessor.hvdc.SweHvdcPreprocessor;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.computation.local.LocalComputationManager;
@@ -172,5 +174,24 @@ public class NetworkService {
         } catch (IOException ioe) {
             throw new SweInvalidDataException("Error creating netowrk zip file", ioe);
         }
+    }
+
+    public static Network getNetworkByDirection(SweData sweData, DichotomyDirection direction) {
+        Network network = null;
+        switch (direction) {
+            case ES_FR:
+                network = sweData.getNetworkEsFr();
+                break;
+            case ES_PT:
+                network =  sweData.getNetworkEsPt();
+                break;
+            case FR_ES:
+                network =  sweData.getNetworkFrEs();
+                break;
+            case PT_ES:
+                network =  sweData.getNetworkPtEs();
+                break;
+        }
+        return network;
     }
 }

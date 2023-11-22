@@ -13,10 +13,10 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
+import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -68,7 +68,7 @@ class DichotomyRunnerTest {
     void runDichotomyTest() {
         Network network = Mockito.mock(Network.class);
         DichotomyResult<RaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
-        Mockito.when(NetworkUtil.getNetworkByDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(network);
+        Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(network);
         DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
         Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), Mockito.any(Parameters.class));
