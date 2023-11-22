@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.api;
 
-import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import org.junit.jupiter.api.Test;

@@ -9,7 +9,7 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweD2ccShiftDispatcher;
 import com.farao_community.farao.swe.runner.app.dichotomy.shift.SweIdccShiftDispatcher;
 import org.junit.jupiter.api.Test;

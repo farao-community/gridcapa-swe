@@ -9,7 +9,7 @@ package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.powsybl.iidm.network.Country;
 
 import java.util.Map;

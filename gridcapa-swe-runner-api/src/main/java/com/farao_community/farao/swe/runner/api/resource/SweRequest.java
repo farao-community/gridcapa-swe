@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.api.resource;
 
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.jasminb.jsonapi.annotations.Id;

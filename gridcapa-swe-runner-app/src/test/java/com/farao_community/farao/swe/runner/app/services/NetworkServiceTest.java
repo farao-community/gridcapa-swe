@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.powsybl.iidm.network.Network;

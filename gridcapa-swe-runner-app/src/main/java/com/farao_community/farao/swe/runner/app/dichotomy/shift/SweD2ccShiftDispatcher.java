@@ -9,7 +9,7 @@ package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.powsybl.iidm.network.Country;
 
 import java.util.Map;
@@ -32,27 +32,27 @@ public class SweD2ccShiftDispatcher implements ShiftDispatcher {
     public Map<String, Double> dispatch(double value) {
         Map<String, Double> factors = new TreeMap<>();
         switch (direction) {
-            case ES_FR :
+            case ES_FR:
                 factors.put(toEic("PT"), 0.);
-                factors.put(toEic("ES"),  1.);
+                factors.put(toEic("ES"), 1.);
                 factors.put(toEic("FR"), -1.);
                 break;
-            case FR_ES :
+            case FR_ES:
                 factors.put(toEic("PT"), 0.);
-                factors.put(toEic("ES"),  -1.);
+                factors.put(toEic("ES"), -1.);
                 factors.put(toEic("FR"), 1.);
                 break;
-            case ES_PT :
+            case ES_PT:
                 factors.put(toEic("PT"), -1.);
-                factors.put(toEic("ES"),  1.);
+                factors.put(toEic("ES"), 1.);
                 factors.put(toEic("FR"), 0.);
                 break;
-            case PT_ES :
+            case PT_ES:
                 factors.put(toEic("PT"), 1.);
-                factors.put(toEic("ES"),  -1.);
+                factors.put(toEic("ES"), -1.);
                 factors.put(toEic("FR"), 0.);
                 break;
-            default :
+            default:
                 throw new SweInvalidDataException(String.format("Unknown dichotomy direction for SWE: %s", direction));
         }
         return factors.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() * value - initialNetPositions.get(e.getKey())));
