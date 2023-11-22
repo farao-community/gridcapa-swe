@@ -36,14 +36,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build and publish Docker image
-        uses: elgohr/Publish-Docker-Github-Action@main
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: farao/gridcapa-swe-runner
           username: farao
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Broadcast update event
-        uses: farao-community/broadcast-event@master
-        with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          event-type: gridcapa_swe_updated

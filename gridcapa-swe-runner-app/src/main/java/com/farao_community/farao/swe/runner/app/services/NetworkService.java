@@ -69,7 +69,7 @@ public class NetworkService {
         try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + fileName)) {
             return Network.read(fileName, xiidm);
         } catch (IOException e) {
-            throw new SweInternalException("Could not load network from XIIDM file");
+            throw new SweInternalException("Could not load network from XIIDM file", e);
         }
     }
 
@@ -177,7 +177,7 @@ public class NetworkService {
             zos.close();
             return zipPath;
         } catch (IOException ioe) {
-            throw new SweInvalidDataException("Error creating netowrk zip file: " + ioe);
+            throw new SweInvalidDataException("Error creating netowrk zip file", ioe);
         }
     }
 }

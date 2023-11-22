@@ -55,9 +55,11 @@
     </logger>
     <logger name="com.farao_community.farao.dichotomy.api.logging.DichotomyBusinessLogs" level="INFO">
         <appender-ref ref="amqp-business-events"/>
+        <appender-ref ref="STDOUT" />
     </logger>
     <logger name="com.farao_community.farao.dichotomy.api.logging.DichotomyBusinessWarns" level="WARN">
         <appender-ref ref="amqp-business-events"/>
+        <appender-ref ref="STDOUT" />
     </logger>
     <logger name="com.farao_community.farao.dichotomy.api.logging.TechnicalLogs" level="OFF">
         <appender-ref ref="amqp-business-events"/>
