@@ -95,7 +95,14 @@ class CgmesExportServiceTest {
         Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllFiles(network, sweData);
         assertEquals(6, sshFiles.size());
         assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
+        assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_EQ_001.xml"));
+        assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_TP_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_EQ_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_TP_001.xml"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTE_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTE_EQ_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTE_TP_001.xml"));
     }
 
     @Test

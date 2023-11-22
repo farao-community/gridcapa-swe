@@ -89,7 +89,7 @@ public class CgmesExportService {
                 throw new RuntimeException(e);
             }
         } else {
-            businessLogger.error("Dichotomy does not have a valid step, CGMES files wont be exported");
+            businessLogger.error("Dichotomy does not have a valid step, CGMES files won't be exported");
             return null;
         }
     }
