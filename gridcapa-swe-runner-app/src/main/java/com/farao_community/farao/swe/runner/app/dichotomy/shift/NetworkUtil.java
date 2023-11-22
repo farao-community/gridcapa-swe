@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy.shift;
 
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Injection;

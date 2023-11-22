@@ -11,6 +11,7 @@ import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.index.HalfRangeDivisionIndexStrategy;
 import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;

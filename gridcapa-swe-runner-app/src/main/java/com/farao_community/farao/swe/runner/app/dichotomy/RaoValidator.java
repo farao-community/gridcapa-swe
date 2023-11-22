@@ -11,6 +11,7 @@ import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoring;
 import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
