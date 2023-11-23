@@ -107,7 +107,7 @@ public class CgmesExportService {
         return mapCgmesFiles;
     }
 
-    Map<String, ByteArrayOutputStream> createAllFiles(Network mergedNetwork, SweData sweData) throws IOException {
+    private Map<String, ByteArrayOutputStream> createAllFiles(Network mergedNetwork, SweData sweData) throws IOException {
         Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
         Map<Country, Network> subnetworksByCountry = new EnumMap<>(Country.class);
         mergedNetwork.getSubnetworks().forEach(network -> {
@@ -166,7 +166,7 @@ public class CgmesExportService {
         }
     }
 
-    Map<String, ByteArrayOutputStream> createCommonFile(Network network, SweData sweData) throws IOException {
+    private Map<String, ByteArrayOutputStream> createCommonFile(Network network, SweData sweData) throws IOException {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             MemDataSource memDataSource = new MemDataSource();

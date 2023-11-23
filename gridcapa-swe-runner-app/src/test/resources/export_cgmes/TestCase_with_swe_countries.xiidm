@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iidm:network xmlns:iidm="http://www.powsybl.org/schema/iidm/1_11"
     xmlns:hapc="http://www.itesla_project.eu/schema/iidm/ext/hvdc_angle_droop_active_power_control/1_0"
+    xmlns:cca="http://www.powsybl.org/schema/iidm/ext/cgmes_control_areas/1_0"
     id="TestCase16Nodes" caseDate="2021-08-27T17:22:10.856+02:00" forecastDistance="0"
-    sourceFormat="UCTE" minimumValidationLevel="STEADY_STATE_HYPOTHESIS">
+    sourceFormat="CGMES" minimumValidationLevel="STEADY_STATE_HYPOTHESIS">
     <!-- subnetwork ES -->
     <iidm:network id="urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"
         caseDate="2023-07-31T00:30:00.000Z" forecastDistance="0" sourceFormat="CGMES"
@@ -145,6 +146,12 @@
             <iidm:currentLimits1 permanentLimit="2000.0" />
             <iidm:currentLimits2 permanentLimit="2000.0" />
         </iidm:line>
+        <iidm:extension id="urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103">
+                    <cca:cgmesControlAreas>
+                        <cca:controlArea id="_cb354e3c-97fe-4fde-f9a6-b3fe750d4a34" name="_CA_ES" energyIdentificationCodeEic="10YES-REE------0" netInterchange="77.042" pTolerance="10.0">
+                        </cca:controlArea>
+                    </cca:cgmesControlAreas>
+                </iidm:extension>
     </iidm:network>
     <!-- subnetwork PT -->
     <iidm:network id="urn:uuid:26ac088c-2e06-11ee-816e-00155d38aa10"
