@@ -58,7 +58,7 @@
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
         <farao.dependencies.version>1.21.1</farao.dependencies.version>
-        <farao.dichotomy.version>4.13.4</farao.dichotomy.version>
+        <farao.dichotomy.version>4.14.0</farao.dichotomy.version>
         <gridcapa.starter.minio.version>1.1.1</gridcapa.starter.minio.version>
         <gridcapa.rao.runner.version>1.18.3</gridcapa.rao.runner.version>
         <gridcapa.task-manager.version>1.22.1</gridcapa.task-manager.version>
