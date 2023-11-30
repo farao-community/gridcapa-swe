@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: swe-commons
-
-swe-commons:
-  zone-id: "Europe/Paris"
-  shift-max-iteration-number: 20
