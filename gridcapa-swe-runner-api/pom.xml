@@ -18,8 +18,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>gridcapa-swe-commons</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

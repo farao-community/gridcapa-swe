@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GLSK_MarketDocument xmlns="urn:iec62325.351:tc57wg16:451-n:glskdocument:2:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iec62325.351:tc57wg16:451-n:glskdocument:2:1 iec62325-451-n-glsk_v2_1.xsd">
+  <mRID>CORESO-20230731-SWECCD2-F008</mRID>
+  <revisionNumber>1</revisionNumber>
+  <type>B22</type>
+  <process.processType>A48</process.processType>
+  <sender_MarketParticipant.mRID codingScheme="A01">22XCORESO------S</sender_MarketParticipant.mRID>
+  <sender_MarketParticipant.marketRole.type>A36</sender_MarketParticipant.marketRole.type>
+  <receiver_MarketParticipant.mRID codingScheme="A01">10XPT-REN------9</receiver_MarketParticipant.mRID>
+  <receiver_MarketParticipant.marketRole.type>A04</receiver_MarketParticipant.marketRole.type>
+  <createdDateTime>2023-07-29T15:05:00Z</createdDateTime>
+  <status>
+    <value>A42</value>
+  </status>
+  <time_Period.timeInterval>
+    <start>2023-07-30T22:00Z</start>
+    <end>2023-07-31T22:00Z</end>
+  </time_Period.timeInterval>
+  <domain.mRID codingScheme="A01">10YCB-FR-ES-PT-S</domain.mRID>
+  <TimeSeries>
+    <mRID>ES-TimeSeries</mRID>
+    <subject_Domain.mRID codingScheme="A01">10YES-REE------0</subject_Domain.mRID>
+    <curveType>A01</curveType>
+    <Period>
+      <timeInterval>
+        <start>2023-07-30T22:00Z</start>
+        <end>2023-07-31T22:00Z</end>
+      </timeInterval>
+      <resolution>PT60M</resolution>
+      <Point>
+        <position>10</position>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCDGU1 _generator</mRID>
+            <name>ES completely disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESD2GU1 _generator</mRID>
+            <name>ES disconnected generator through 2 transformers - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDCGU1 _generator</mRID>
+            <name>ES directly connected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCTGU1 _generator</mRID>
+            <name>ES connected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDDGU1 _generator</mRID>
+            <name>ES directly disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDTGU1 _generator</mRID>
+            <name>ES disconnected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>250.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCDGN1 _generator</mRID>
+            <name>ES completely disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESD2GN1 _generator</mRID>
+            <name>ES disconnected generator through 2 transformers - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDCGN1 _generator</mRID>
+            <name>ES directly connected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCTGN1 _generator</mRID>
+            <name>ES connected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDDGN1 _generator</mRID>
+            <name>ES directly disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDTGN1 _generator</mRID>
+            <name>ES disconnected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCDGU1 _generator</mRID>
+            <name>ES completely disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESD2GU1 _generator</mRID>
+            <name>ES disconnected generator through 2 transformers - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDCGU1 _generator</mRID>
+            <name>ES directly connected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCTGU1 _generator</mRID>
+            <name>ES connected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDDGU1 _generator</mRID>
+            <name>ES directly disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDTGU1 _generator</mRID>
+            <name>ES disconnected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCDGN1 _generator</mRID>
+            <name>ES completely disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESD2GN1 _generator</mRID>
+            <name>ES disconnected generator through 2 transformers - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDCGN1 _generator</mRID>
+            <name>ES directly connected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESCTGN1 _generator</mRID>
+            <name>ES connected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDDGN1 _generator</mRID>
+            <name>ES directly disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">ESDTGN1 _generator</mRID>
+            <name>ES disconnected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+      </Point>
+    </Period>
+  </TimeSeries>
+  <TimeSeries>
+    <mRID>PT-TimeSeries</mRID>
+    <subject_Domain.mRID codingScheme="A01">10YPT-REN------W</subject_Domain.mRID>
+    <curveType>A01</curveType>
+    <Period>
+      <timeInterval>
+        <start>2023-07-30T22:00Z</start>
+        <end>2023-07-31T22:00Z</end>
+      </timeInterval>
+      <resolution>PT60M</resolution>
+      <Point>
+        <position>10</position>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCDGU1 _generator</mRID>
+            <name>PT completely disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTD2GU1 _generator</mRID>
+            <name>PT disconnected generator through 2 transformers - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDCGU1 _generator</mRID>
+            <name>PT directly connected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCTGU1 _generator</mRID>
+            <name>PT connected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDDGU1 _generator</mRID>
+            <name>PT directly disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDTGU1 _generator</mRID>
+            <name>PT disconnected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>250.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCDGN1 _generator</mRID>
+            <name>PT completely disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTD2GN1 _generator</mRID>
+            <name>PT disconnected generator through 2 transformers - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDCGN1 _generator</mRID>
+            <name>PT directly connected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCTGN1 _generator</mRID>
+            <name>PT connected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDDGN1 _generator</mRID>
+            <name>PT directly disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDTGN1 _generator</mRID>
+            <name>PT disconnected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries><SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCDGU1 _generator</mRID>
+            <name>PT completely disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTD2GU1 _generator</mRID>
+            <name>PT disconnected generator through 2 transformers - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDCGU1 _generator</mRID>
+            <name>PT directly connected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCTGU1 _generator</mRID>
+            <name>PT connected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDDGU1 _generator</mRID>
+            <name>PT directly disconnected generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDTGU1 _generator</mRID>
+            <name>PT disconnected through transformer generator - will be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCDGN1 _generator</mRID>
+            <name>PT completely disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A02</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTD2GN1 _generator</mRID>
+            <name>PT disconnected generator through 2 transformers - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDCGN1 _generator</mRID>
+            <name>PT directly connected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTCTGN1 _generator</mRID>
+            <name>PT connected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>1200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDDGN1 _generator</mRID>
+            <name>PT directly disconnected generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+        <SKBlock_TimeSeries>
+          <businessType>B45</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <flowDirection.direction>A01</flowDirection.direction>
+          <measurement_Unit.name>MAW</measurement_Unit.name>
+          <attributeInstanceComponent.position>1</attributeInstanceComponent.position>
+          <RegisteredResource>
+            <mRID codingScheme="A02">PTDTGN1 _generator</mRID>
+            <name>PT disconnected through transformer generator - will not be used in scaling</name>
+            <resourceCapacity.maximumCapacity>200.00</resourceCapacity.maximumCapacity>
+            <resourceCapacity.minimumCapacity>0.0</resourceCapacity.minimumCapacity>
+          </RegisteredResource>
+        </SKBlock_TimeSeries>
+      </Point>
+    </Period>
+  </TimeSeries>
+  <TimeSeries>
+    <mRID>FR-TimeSeries</mRID>
+    <subject_Domain.mRID codingScheme="A01">10YFR-RTE------C</subject_Domain.mRID>
+    <curveType>A03</curveType>
+    <Period>
+      <timeInterval>
+        <start>2018-03-27T22:00Z</start>
+        <end>2018-03-28T22:00Z</end>
+      </timeInterval>
+      <resolution>PT60M</resolution>
+      <Point>
+        <position>1</position>
+        <SKBlock_TimeSeries>
+          <businessType>B42</businessType>
+          <mktPSRType.psrType>A04</mktPSRType.psrType>
+          <measurement_Unit.name>C62</measurement_Unit.name>
+        </SKBlock_TimeSeries>
+      </Point>
+    </Period>
+  </TimeSeries>
+</GLSK_MarketDocument>
