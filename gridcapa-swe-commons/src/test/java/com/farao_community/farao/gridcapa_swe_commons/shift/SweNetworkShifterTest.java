@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -56,6 +57,8 @@ class SweNetworkShifterTest {
     private static final String EIC_PT = "10YPT-REN------W";
     private static final Double TARGET_P_TOLERANCE = 1e-3;
 
+    @Autowired
+    CountryBalanceComputation countryBalanceComputation;
     @MockBean
     ProcessConfiguration processConfiguration;
 
@@ -168,7 +171,7 @@ class SweNetworkShifterTest {
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         sweNetworkShifter.shiftNetwork(1000., network);
 
-        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        Map<String, Double> shiftedExchanges = countryBalanceComputation.computeSweBordersExchanges(network);
         assertEquals(1000, shiftedExchanges.get("ES_FR"), 1.);
         assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
 
@@ -219,7 +222,7 @@ class SweNetworkShifterTest {
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         sweNetworkShifter.shiftNetwork(9050., network);
 
-        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        Map<String, Double> shiftedExchanges = countryBalanceComputation.computeSweBordersExchanges(network);
         assertEquals(9050., shiftedExchanges.get("ES_FR"), 1.);
         assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
     }
@@ -306,7 +309,7 @@ class SweNetworkShifterTest {
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
         ZonalData<Scalable> zonalScalable = doc.getZonalScalable(network, instant);
         zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
-        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        Map<String, Double> initialNetPositions = countryBalanceComputation.computeSweCountriesBalances(network);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
@@ -314,7 +317,7 @@ class SweNetworkShifterTest {
         sweNetworkShifter.shiftNetwork(1000., network);
 
         assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
-        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        Map<String, Double> shiftedExchanges = countryBalanceComputation.computeSweBordersExchanges(network);
         assertEquals(1000., shiftedExchanges.get("ES_FR"), 1.);
         assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
         // 1st generator in merit order is linked to grid through a line that is disconnected: it should remain that way and targetP remain at 0
@@ -360,7 +363,7 @@ class SweNetworkShifterTest {
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
         ZonalData<Scalable> zonalScalable = doc.getZonalScalable(network, instant);
         zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
-        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        Map<String, Double> initialNetPositions = countryBalanceComputation.computeSweCountriesBalances(network);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.PT_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.PT_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
@@ -368,7 +371,7 @@ class SweNetworkShifterTest {
         sweNetworkShifter.shiftNetwork(1000., network);
 
         assertEquals(Set.of("InitialState"), network.getVariantManager().getVariantIds());
-        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        Map<String, Double> shiftedExchanges = countryBalanceComputation.computeSweBordersExchanges(network);
         assertEquals(-1000., shiftedExchanges.get("ES_PT"), 1.);
         assertEquals(0., shiftedExchanges.get("ES_FR"), 1.);
         // 1st generator in merit order is linked to grid through a line that is disconnected: it should remain that way and targetP remain at 0

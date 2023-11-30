@@ -32,11 +32,13 @@ import java.util.Map;
 public class NetworkShifterProvider {
 
     private final DichotomyConfiguration dichotomyConfiguration;
+    private final CountryBalanceComputation countryBalanceComputation;
     private final Logger businessLogger;
     private final ProcessConfiguration processConfiguration;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, Logger businessLogger, ProcessConfiguration processConfiguration) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, CountryBalanceComputation countryBalanceComputation, Logger businessLogger, ProcessConfiguration processConfiguration) {
         this.dichotomyConfiguration = dichotomyConfiguration;
+        this.countryBalanceComputation = countryBalanceComputation;
         this.businessLogger = businessLogger;
         this.processConfiguration = processConfiguration;
     }
@@ -44,8 +46,7 @@ public class NetworkShifterProvider {
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
         ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
         Network network = NetworkService.getNetworkByDirection(sweData, direction);
-        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
-
+        Map<String, Double> initialNetPositions = countryBalanceComputation.computeSweCountriesBalances(network);
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                 getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
