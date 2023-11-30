@@ -26,7 +26,6 @@ public class ProcessConfiguration {
     }
 
     public Integer getShiftMaxIterationNumber() {
-        System.out.println("MAX ITERATION " + shiftMaxIterationNumber);
         return shiftMaxIterationNumber;
     }
 }
