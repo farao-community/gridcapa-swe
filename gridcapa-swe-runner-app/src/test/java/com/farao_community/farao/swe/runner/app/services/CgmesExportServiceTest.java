@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;

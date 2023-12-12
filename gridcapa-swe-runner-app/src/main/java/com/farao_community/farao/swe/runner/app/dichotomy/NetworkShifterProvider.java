@@ -8,12 +8,17 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter;
+import com.farao_community.farao.gridcapa_swe_commons.shift.ZonalScalableProvider;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
-import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.*;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -27,39 +32,34 @@ import java.util.Map;
 public class NetworkShifterProvider {
 
     private final DichotomyConfiguration dichotomyConfiguration;
-    private final ZonalScalableProvider zonalScalableProvider;
     private final Logger businessLogger;
     private final ProcessConfiguration processConfiguration;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, ZonalScalableProvider zonalScalableProvider, Logger businessLogger, ProcessConfiguration processConfiguration) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, Logger businessLogger, ProcessConfiguration processConfiguration) {
         this.dichotomyConfiguration = dichotomyConfiguration;
-        this.zonalScalableProvider = zonalScalableProvider;
         this.businessLogger = businessLogger;
         this.processConfiguration = processConfiguration;
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
-        Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
+        ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
+        Network network = NetworkService.getNetworkByDirection(sweData, direction);
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
-            zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
-            getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-            dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-            dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
-            initialNetPositions,
-            processConfiguration);
+                zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
+                getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
+                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
+                initialNetPositions,
+                processConfiguration);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
-        switch (processType) {
-            case D2CC:
-                return new SweD2ccShiftDispatcher(direction, initialNetPositions);
-            case IDCC:
-            case IDCC_IDCF:
-                return new SweIdccShiftDispatcher(direction, initialNetPositions);
-            default:
-                throw new SweInvalidDataException(String.format("Unknown target process for SWE: %s", processType));
-        }
+        return switch (processType) {
+            case D2CC -> new SweD2ccShiftDispatcher(direction, initialNetPositions);
+            case IDCC, IDCC_IDCF -> new SweIdccShiftDispatcher(direction, initialNetPositions);
+        };
     }
 }
 

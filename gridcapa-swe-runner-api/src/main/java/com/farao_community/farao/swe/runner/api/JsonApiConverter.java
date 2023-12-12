@@ -7,9 +7,9 @@
 
 package com.farao_community.farao.swe.runner.api;
 
-import com.farao_community.farao.swe.runner.api.exception.AbstractSweException;
-import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.AbstractSweException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

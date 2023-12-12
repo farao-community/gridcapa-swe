@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

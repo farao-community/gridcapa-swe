@@ -8,8 +8,8 @@
 package com.farao_community.farao.swe.runner.app.parallelization;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyLogging;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner;
 import com.farao_community.farao.swe.runner.app.domain.SweData;

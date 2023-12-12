@@ -11,14 +11,15 @@ import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.index.HalfRangeDivisionIndexStrategy;
 import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
+import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,7 @@ public class DichotomyRunner {
         Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
         dichotomyLogging.logStartDichotomy(parameters);
         DichotomyEngine<SweDichotomyValidationData> engine = buildDichotomyEngine(sweData, direction, parameters);
-        Network network = NetworkUtil.getNetworkByDirection(sweData, direction);
+        Network network = NetworkService.getNetworkByDirection(sweData, direction);
         return engine.run(network);
     }
 

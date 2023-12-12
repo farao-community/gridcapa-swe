@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.configurations;
 
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 

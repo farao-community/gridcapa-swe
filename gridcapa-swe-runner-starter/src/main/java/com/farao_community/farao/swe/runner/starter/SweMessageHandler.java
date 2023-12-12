@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.starter;
 
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.JsonApiConverter;
-import com.farao_community.farao.swe.runner.api.exception.SweInternalException;
 import org.springframework.amqp.core.*;
 
 /**

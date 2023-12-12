@@ -7,13 +7,10 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
-import com.farao_community.farao.swe.runner.app.hvdc.HvdcLinkProcessor;
-import com.farao_community.farao.swe.runner.app.hvdc.parameters.HvdcCreationParameters;
-import com.farao_community.farao.swe.runner.app.hvdc.parameters.SwePreprocessorParameters;
-import com.farao_community.farao.swe.runner.app.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
 import com.powsybl.cgmes.extensions.CgmesControlArea;
@@ -39,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 
 import static com.farao_community.farao.swe.runner.app.services.NetworkService.TSO_BY_COUNTRY;
 
@@ -82,7 +78,7 @@ public class CgmesExportService {
             try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
                 Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
                 applyHvdcSetPointToAcEquivalentModel(networkWithPra);
-                LoadFlow.run(networkWithPra,  networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), LoadFlowParameters.load());
+                LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), LoadFlowParameters.load());
                 Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
                 return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
             } catch (IOException | XMLStreamException e) {
@@ -95,9 +91,8 @@ public class CgmesExportService {
     }
 
     private void applyHvdcSetPointToAcEquivalentModel(Network networkWithPra) {
-        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
-        Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
-        HvdcLinkProcessor.replaceHvdcByEquivalentModel(networkWithPra, hvdcCreationParameters);
+        SweHvdcPreprocessor sweHvdcPreprocessor = new SweHvdcPreprocessor();
+        sweHvdcPreprocessor.applyParametersToNetwork(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"), networkWithPra);
     }
 
     Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws XMLStreamException, IOException {

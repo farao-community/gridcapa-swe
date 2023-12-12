@@ -32,9 +32,11 @@ logback:
     exchange: swe-d2cc-task-manager-logs-exchange
     routing-key: "#"
 
-swe-runner:
+swe-commons:
   zone-id: "Europe/Paris"
   shift-max-iteration-number: 20
+
+swe-runner:
   dichotomy:
     parameters:
       ES_FR:

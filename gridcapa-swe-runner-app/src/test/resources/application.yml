@@ -6,8 +6,11 @@ spring:
   application:
     name: swe-d2cc-runner
 
-swe-runner:
+swe-commons:
   shift-max-iteration-number: 20
+  zone-id: "Europe/Paris"
+
+swe-runner:
   dichotomy:
     parameters:
       ES_FR:
@@ -37,7 +40,6 @@ swe-runner:
   whitelist:
     - http://localhost:9000/
     - file:/
-  zone-id: "Europe/Paris"
 
 minio-adapter:
   bucket: gridcapa

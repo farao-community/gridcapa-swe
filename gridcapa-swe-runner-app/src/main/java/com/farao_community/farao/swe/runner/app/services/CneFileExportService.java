@@ -15,17 +15,19 @@ import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.data.swe_cne_exporter.SweCneClassCreator;
 import com.farao_community.farao.data.swe_cne_exporter.SweCneExporter;
 import com.farao_community.farao.data.swe_cne_exporter.SweCneUtil;
-import com.farao_community.farao.data.swe_cne_exporter.xsd.*;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.CriticalNetworkElementMarketDocument;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.Point;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.Reason;
+import com.farao_community.farao.data.swe_cne_exporter.xsd.SeriesPeriod;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
+import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
-import com.farao_community.farao.swe.runner.api.resource.ProcessType;
-import com.farao_community.farao.swe.runner.app.configurations.ProcessConfiguration;
-import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.app.dichotomy.shift.NetworkUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
@@ -80,7 +82,7 @@ public class CneFileExportService {
         MemDataSource memDataSource = new MemDataSource();
         String targetZipFileName = generateCneZipFileName(timestamp, isHighestValid, direction);
         exportAndZipCneFile(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext, memDataSource, targetZipFileName, isHighestValid);
-        String cneResultPath =  fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
+        String cneResultPath = fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
         uploadFileToMinio(isHighestValid, sweData.getProcessType(), direction, timestamp, memDataSource, targetZipFileName, cneResultPath);
         return minioAdapter.generatePreSignedUrl(cneResultPath);
     }
@@ -130,7 +132,7 @@ public class CneFileExportService {
                 marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
             } else {
                 SweCneExporter sweCneExporter = new SweCneExporter();
-                sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkUtil.getNetworkByDirection(sweData, direction), cracCreationContext,
+                sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkService.getNetworkByDirection(sweData, direction), cracCreationContext,
                         raoResult, angleMonitoringResult, RaoParameters.load(), cneExporterParameters, zipOs);
             }
             zipOs.closeEntry();
@@ -139,7 +141,7 @@ public class CneFileExportService {
         }
     }
 
-    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction,  DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
+    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
         CriticalNetworkElementMarketDocument marketDocument = createErrorMarketDocumentAndInitializeHeader(sweData, direction, cneExporterParameters);
         OffsetDateTime offsetDateTime = cracCreationContext.getTimeStamp().withMinute(0);
         Point point = SweCneClassCreator.newPoint(1);
@@ -162,7 +164,7 @@ public class CneFileExportService {
         marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterParameters.getReceiverRole().getCode());
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterParameters.getTimeInterval()));
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkUtil.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkService.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
 
@@ -208,7 +210,7 @@ public class CneFileExportService {
 
     private CneExporterParameters getCneExporterParameters(OffsetDateTime timestamp) {
         // limit size to 35 characters, a UUID is 36 characters long
-        String mRid =  UUID.randomUUID().toString().substring(1);
+        String mRid = UUID.randomUUID().toString().substring(1);
         return new CneExporterParameters(
                 mRid, 1, "", CneExporterParameters.ProcessType.Z01,
                 RTE_SYSTEM_OPERATOR_SENDER_ID, CneExporterParameters.RoleType.SYSTEM_OPERATOR,

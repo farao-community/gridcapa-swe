@@ -16,7 +16,7 @@ import com.farao_community.farao.data.crac_creation.creator.cim.importer.CimCrac
 import com.farao_community.farao.data.crac_io_api.CracImporters;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.data.rao_result_json.RaoResultImporter;
-import com.farao_community.farao.swe.runner.api.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
