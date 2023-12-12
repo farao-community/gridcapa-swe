@@ -8,7 +8,6 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Map;
 
