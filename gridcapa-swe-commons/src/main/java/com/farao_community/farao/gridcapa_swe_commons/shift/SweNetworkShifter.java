@@ -27,7 +27,13 @@ import com.powsybl.loadflow.LoadFlowResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 /**
@@ -240,22 +246,22 @@ public class SweNetworkShifter implements NetworkShifter {
                 .map(scalableZonalData::getData)
                 .filter(Objects::nonNull)
                 .map(scalable -> scalable.filterInjections(network).stream()
-                .filter(Generator.class::isInstance)
-                .map(Generator.class::cast)
-                .collect(Collectors.toList())).forEach(generators -> generators.forEach(generator -> {
-                    if (Double.isNaN(generator.getTargetP())) {
-                        generator.setTargetP(0.);
-                    }
-                    InitGenerator initGenerator = new InitGenerator();
-                    initGenerator.setpMin(generator.getMinP());
-                    initGenerator.setpMax(generator.getMaxP());
-                    String genId = generator.getId();
-                    if (!initGenerators.containsKey(genId)) {
-                        initGenerators.put(genId, initGenerator);
-                    }
-                    generator.setMinP(DEFAULT_PMIN);
-                    generator.setMaxP(DEFAULT_PMAX);
-                }));
+                        .filter(Generator.class::isInstance)
+                        .map(Generator.class::cast)
+                        .collect(Collectors.toList())).forEach(generators -> generators.forEach(generator -> {
+                            if (Double.isNaN(generator.getTargetP())) {
+                                generator.setTargetP(0.);
+                            }
+                            InitGenerator initGenerator = new InitGenerator();
+                            initGenerator.setpMin(generator.getMinP());
+                            initGenerator.setpMax(generator.getMaxP());
+                            String genId = generator.getId();
+                            if (!initGenerators.containsKey(genId)) {
+                                initGenerators.put(genId, initGenerator);
+                            }
+                            generator.setMinP(DEFAULT_PMIN);
+                            generator.setMaxP(DEFAULT_PMAX);
+                        }));
         LOGGER.info("Pmax and Pmin are set to default values for network {}", network.getNameOrId());
         return initGenerators;
     }
@@ -268,7 +274,7 @@ public class SweNetworkShifter implements NetworkShifter {
                 List<Generator> generators = scalable.filterInjections(network).stream()
                         .filter(Generator.class::isInstance)
                         .map(Generator.class::cast)
-                        .collect(Collectors.toList());
+                        .toList();
 
                 generators.forEach(generator -> {
                     generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).getpMax()));

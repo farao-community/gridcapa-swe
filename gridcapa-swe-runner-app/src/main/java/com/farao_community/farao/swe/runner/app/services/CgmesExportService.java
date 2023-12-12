@@ -30,7 +30,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 
 import static com.farao_community.farao.swe.runner.app.services.NetworkService.TSO_BY_COUNTRY;
 
@@ -73,7 +78,7 @@ public class CgmesExportService {
             try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
                 Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
                 applyHvdcSetPointToAcEquivalentModel(networkWithPra);
-                LoadFlow.run(networkWithPra,  networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), LoadFlowParameters.load());
+                LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), LoadFlowParameters.load());
                 Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
                 return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
             } catch (IOException | XMLStreamException e) {

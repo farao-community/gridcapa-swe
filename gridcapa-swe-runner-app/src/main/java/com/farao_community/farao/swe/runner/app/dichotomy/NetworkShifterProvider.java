@@ -10,9 +10,12 @@ import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
-import com.farao_community.farao.gridcapa_swe_commons.shift.*;
+import com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter;
+import com.farao_community.farao.gridcapa_swe_commons.shift.ZonalScalableProvider;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
@@ -55,15 +58,10 @@ public class NetworkShifterProvider {
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
-        switch (processType) {
-            case D2CC:
-                return new SweD2ccShiftDispatcher(direction, initialNetPositions);
-            case IDCC:
-            case IDCC_IDCF:
-                return new SweIdccShiftDispatcher(direction, initialNetPositions);
-            default:
-                throw new SweInvalidDataException(String.format("Unknown target process for SWE: %s", processType));
-        }
+        return switch (processType) {
+            case D2CC -> new SweD2ccShiftDispatcher(direction, initialNetPositions);
+            case IDCC, IDCC_IDCF -> new SweIdccShiftDispatcher(direction, initialNetPositions);
+        };
     }
 }
 
