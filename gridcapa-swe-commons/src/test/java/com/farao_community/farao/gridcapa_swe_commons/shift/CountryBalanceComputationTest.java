@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
-@SpringBootTest(classes = CountryBalanceComputation.class)
 class CountryBalanceComputationTest {
 
     @Test
@@ -25,7 +24,5 @@ class CountryBalanceComputationTest {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         Map<String, Double> countriesBalances = CountryBalanceComputation.computeSweCountriesBalances(network);
         assertEquals(3, countriesBalances.size());
-
     }
-
 }
