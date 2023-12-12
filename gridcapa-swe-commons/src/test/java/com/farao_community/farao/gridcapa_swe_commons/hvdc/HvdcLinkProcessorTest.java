@@ -5,10 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package gridcapa_swe_commons.hvdc;
+package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;

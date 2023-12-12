@@ -5,7 +5,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package gridcapa_swe_commons.hvdc;
+package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Network;

@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package gridcapa_swe_commons.shift;
+package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
@@ -13,10 +13,6 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
-import com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation;
-import com.farao_community.farao.gridcapa_swe_commons.shift.NetworkUtil;
-import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
-import com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter;
 import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.commons.ZonalDataImpl;
@@ -37,7 +33,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -235,64 +230,64 @@ class SweNetworkShifterTest {
     void updateScalingValuesWithMismatchPtEsTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.PT_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
+                Map.of(EIC_FR, 12.0,
+                        EIC_ES, 27.0,
+                        EIC_PT, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, 12.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1510.0);
+                .containsEntry(EIC_FR, 12.0)
+                .containsEntry(EIC_ES, 45.0)
+                .containsEntry(EIC_PT, 1510.0);
     }
 
     @Test
     void updateScalingValuesWithMismatchEsPtTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_PT, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
+                Map.of(EIC_FR, 12.0,
+                        EIC_ES, 27.0,
+                        EIC_PT, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, 12.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1510.0);
+                .containsEntry(EIC_FR, 12.0)
+                .containsEntry(EIC_ES, 45.0)
+                .containsEntry(EIC_PT, 1510.0);
     }
 
     @Test
     void updateScalingValuesWithMismatchFrEsTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.FR_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
+                Map.of(EIC_FR, 12.0,
+                        EIC_ES, 27.0,
+                        EIC_PT, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, -1.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1515.0);
+                .containsEntry(EIC_FR, -1.0)
+                .containsEntry(EIC_ES, 45.0)
+                .containsEntry(EIC_PT, 1515.0);
     }
 
     @Test
     void updateScalingValuesWithMismatchEsFrTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_FR, zonalScalable, null, 10, 10, Map.of(), processConfiguration);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-            Map.of(EIC_FR, 12.0,
-                EIC_ES, 27.0,
-                EIC_PT, 1515.0));
+                Map.of(EIC_FR, 12.0,
+                        EIC_ES, 27.0,
+                        EIC_PT, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-            .containsEntry(EIC_FR, -1.0)
-            .containsEntry(EIC_ES, 45.0)
-            .containsEntry(EIC_PT, 1515.0);
+                .containsEntry(EIC_FR, -1.0)
+                .containsEntry(EIC_ES, 45.0)
+                .containsEntry(EIC_PT, 1515.0);
     }
 
     @Test
@@ -305,7 +300,7 @@ class SweNetworkShifterTest {
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-            DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
+                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 
@@ -359,7 +354,7 @@ class SweNetworkShifterTest {
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.PT_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-            DichotomyDirection.PT_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
+                DichotomyDirection.PT_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 
@@ -406,14 +401,14 @@ class SweNetworkShifterTest {
         List<Double> percentages = new ArrayList<>();
         List<Generator> generators;
         generators = network.getGeneratorStream()
-            .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
-            .filter(NetworkUtil::isCorrect)
-            .collect(Collectors.toList());
+                .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
+                .filter(NetworkUtil::isCorrect)
+                .toList();
         //calculate sum P of country's generators
         double totalCountryP = generators.stream().mapToDouble(NetworkUtil::pseudoTargetP).sum();
         //calculate factor of each generator
         generators.forEach(generator -> {
-            double generatorPercentage =  100 * NetworkUtil.pseudoTargetP(generator) / totalCountryP;
+            double generatorPercentage = 100 * NetworkUtil.pseudoTargetP(generator) / totalCountryP;
             percentages.add(generatorPercentage);
             scalables.add(Scalable.onGenerator(generator.getId()));
         });

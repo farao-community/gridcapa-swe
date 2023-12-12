@@ -4,10 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package gridcapa_swe_commons.exception;
+package com.farao_community.farao.gridcapa_swe_commons.exception;
 
-import com.farao_community.farao.gridcapa_swe_commons.exception.AbstractSweException;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

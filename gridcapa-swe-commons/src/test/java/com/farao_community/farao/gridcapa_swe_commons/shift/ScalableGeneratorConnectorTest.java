@@ -4,12 +4,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package gridcapa_swe_commons.shift;
+package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
-import com.farao_community.farao.gridcapa_swe_commons.shift.NetworkUtil;
-import com.farao_community.farao.gridcapa_swe_commons.shift.ScalableGeneratorConnector;
 import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.commons.ZonalDataImpl;
@@ -28,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,9 +53,9 @@ class ScalableGeneratorConnectorTest {
         List<Double> percentages = new ArrayList<>();
         List<Generator> generators;
         generators = network.getGeneratorStream()
-            .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
-            .filter(NetworkUtil::isCorrect)
-            .collect(Collectors.toList());
+                .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
+                .filter(NetworkUtil::isCorrect)
+                .toList();
         //calculate sum P of country's generators
         double totalCountryP = generators.stream().mapToDouble(NetworkUtil::pseudoTargetP).sum();
         //calculate factor of each generator

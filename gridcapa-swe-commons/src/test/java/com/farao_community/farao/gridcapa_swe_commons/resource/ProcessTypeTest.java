@@ -1,6 +1,5 @@
-package gridcapa_swe_commons.resource;
+package com.farao_community.farao.gridcapa_swe_commons.resource;
 
-import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,5 +15,4 @@ class ProcessTypeTest {
         assertEquals("ID", ProcessType.IDCC.getCode(), "IDCC should return 'ID'");
         assertEquals("IDCF", ProcessType.IDCC_IDCF.getCode(), "IDCC_IDCF should return 'IDCF'");
     }
-
 }

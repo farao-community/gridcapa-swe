@@ -4,9 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package gridcapa_swe_commons.hvdc;
+package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 

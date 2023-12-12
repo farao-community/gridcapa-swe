@@ -1,6 +1,5 @@
-package gridcapa_swe_commons.shift;
+package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.gridcapa_swe_commons.shift.ZonalScalableProvider;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
@@ -26,7 +25,7 @@ class ZonalScalableProviderTest {
         String glskUrl = Objects.requireNonNull(getClass().getResource("/shift/" + glskFilename)).toString(); //Glsk file does not contains FR
         OffsetDateTime timestamp = OffsetDateTime.parse("2021-02-09T19:30:00Z");
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
-        ZonalData<Scalable>  zonalData = zonalScalable.get(glskUrl, network, timestamp);
+        ZonalData<Scalable> zonalData = zonalScalable.get(glskUrl, network, timestamp);
         Scalable scalableFR = zonalData.getData("10YFR-RTE------C");
         assertNotNull(scalableFR);
         assertEquals(5, scalableFR.filterInjections(network).size());

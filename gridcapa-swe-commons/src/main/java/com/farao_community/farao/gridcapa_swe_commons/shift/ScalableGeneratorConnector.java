@@ -46,12 +46,12 @@ public class ScalableGeneratorConnector {
      */
     void connectGeneratorsToMainComponent(Network network, Country country) throws ShiftingException {
         Set<Generator> generators = zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network)
-            .stream()
-            .filter(Generator.class::isInstance)
-            .map(Generator.class::cast)
-            .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
-                && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country))
-                && !getBus(gen.getTerminal()).isInMainConnectedComponent()).collect(Collectors.toSet());
+                .stream()
+                .filter(Generator.class::isInstance)
+                .map(Generator.class::cast)
+                .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
+                        && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country))
+                        && !getBus(gen.getTerminal()).isInMainConnectedComponent()).collect(Collectors.toSet());
         for (Generator gen : generators) {
             connectGeneratorTwoWindingsTransformer(gen, network);
         }
@@ -86,7 +86,7 @@ public class ScalableGeneratorConnector {
         changedGeneratorsInitialState.forEach((genId, initialState) -> {
             Generator gen = network.getGenerator(genId);
             if (!getBus(gen.getTerminal()).isInMainConnectedComponent()
-                || Math.abs(gen.getTargetP()) < 1e-6 && Math.abs(initialState.targetP) < 1e-6) {
+                    || Math.abs(gen.getTargetP()) < 1e-6 && Math.abs(initialState.targetP) < 1e-6) {
                 // Generator is not connected to the main island, even after connecting it and its TWT
                 // Or it has 0 production and has not moved
                 // Reset it to its state before scaling

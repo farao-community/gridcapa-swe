@@ -4,9 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package gridcapa_swe_commons.configuration;
+package com.farao_community.farao.gridcapa_swe_commons.configuration;
 
-import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
