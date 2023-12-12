@@ -21,7 +21,6 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -30,7 +29,6 @@ import java.util.Map;
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 @Service
-@Import(ProcessConfiguration.class)
 public class NetworkShifterProvider {
 
     private final DichotomyConfiguration dichotomyConfiguration;

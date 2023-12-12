@@ -23,15 +23,14 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBContext;
@@ -57,7 +56,6 @@ import java.util.zip.ZipOutputStream;
  */
 
 @Service
-@Import(ProcessConfiguration.class)
 public class CneFileExportService {
 
     public static final String FILENAME_TIMESTAMP_REGEX = "yyyyMMdd'_'HHmm'_CNE_[direction]_[secureType].zip'";
@@ -84,7 +82,7 @@ public class CneFileExportService {
         MemDataSource memDataSource = new MemDataSource();
         String targetZipFileName = generateCneZipFileName(timestamp, isHighestValid, direction);
         exportAndZipCneFile(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext, memDataSource, targetZipFileName, isHighestValid);
-        String cneResultPath =  fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
+        String cneResultPath = fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
         uploadFileToMinio(isHighestValid, sweData.getProcessType(), direction, timestamp, memDataSource, targetZipFileName, cneResultPath);
         return minioAdapter.generatePreSignedUrl(cneResultPath);
     }
@@ -143,7 +141,7 @@ public class CneFileExportService {
         }
     }
 
-    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction,  DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
+    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
         CriticalNetworkElementMarketDocument marketDocument = createErrorMarketDocumentAndInitializeHeader(sweData, direction, cneExporterParameters);
         OffsetDateTime offsetDateTime = cracCreationContext.getTimeStamp().withMinute(0);
         Point point = SweCneClassCreator.newPoint(1);
@@ -212,7 +210,7 @@ public class CneFileExportService {
 
     private CneExporterParameters getCneExporterParameters(OffsetDateTime timestamp) {
         // limit size to 35 characters, a UUID is 36 characters long
-        String mRid =  UUID.randomUUID().toString().substring(1);
+        String mRid = UUID.randomUUID().toString().substring(1);
         return new CneExporterParameters(
                 mRid, 1, "", CneExporterParameters.ProcessType.Z01,
                 RTE_SYSTEM_OPERATOR_SENDER_ID, CneExporterParameters.RoleType.SYSTEM_OPERATOR,
