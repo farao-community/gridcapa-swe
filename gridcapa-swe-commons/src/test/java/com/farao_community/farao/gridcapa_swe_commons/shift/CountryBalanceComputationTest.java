@@ -13,8 +13,10 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,10 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
+@SpringBootTest(classes = CountryBalanceComputation.class)
 class CountryBalanceComputationTest {
 
     @Autowired
     CountryBalanceComputation countryBalanceComputation;
+
+    @MockBean
+    Logger businessLogger;
 
     @Test
     void testCountryGeneratorsScalableforFR() {

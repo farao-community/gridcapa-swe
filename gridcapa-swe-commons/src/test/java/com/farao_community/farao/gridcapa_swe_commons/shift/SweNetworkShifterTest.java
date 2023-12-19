@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
  */
-@SpringBootTest(classes = ProcessConfiguration.class)
+@SpringBootTest(classes = {ProcessConfiguration.class, CountryBalanceComputation.class})
 class SweNetworkShifterTest {
 
     private static final String EIC_FR = "10YFR-RTE------C";

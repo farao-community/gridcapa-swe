@@ -8,12 +8,14 @@ package com.farao_community.farao.swe.runner.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @SuppressWarnings("HideUtilityClassConstructor")
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.farao_community.farao.swe.runner.app", "com.farao_community.farao.gridcapa_swe_commons"})
 public class SweApplication {
     public static void main(String[] args) {
         SpringApplication.run(SweApplication.class, args);
