@@ -55,15 +55,14 @@ public final class CountryBalanceComputation {
             countriesBalances.put(spainEic, bordersExchanges.values().stream().reduce(0., Double::sum));
             countriesBalances.put(franceEic, -bordersExchanges.get("ES_FR"));
             businessLogger.info("Base case loadflow is secure");
-            return countriesBalances;
+        } else {
+            LOGGER.warn("Base case is not secure: using net interchange values (Loadflow computation diverged on network '{}')", network.getId());
+            businessLogger.warn("Base case loadflow is not secure: using net interchange values");
+            // If the loadflow diverges, we use the netinterchange values instead
+            countriesBalances.put(portugalEic, getNetInterchange(network, portugalEic));
+            countriesBalances.put(spainEic, getNetInterchange(network, spainEic));
+            countriesBalances.put(franceEic, getNetInterchange(network, franceEic));
         }
-        LOGGER.warn("Base case is not secure: using net interchange values (Loadflow computation diverged on network '{}')", network.getId());
-        businessLogger.warn("Base case loadflow is not secure: using net interchange values");
-        // If the loadflow diverges, we use the netinterchange values instead
-        countriesBalances.put(portugalEic, getNetInterchange(network, portugalEic));
-        countriesBalances.put(spainEic, getNetInterchange(network, spainEic));
-        countriesBalances.put(franceEic, getNetInterchange(network, franceEic));
-
         return countriesBalances;
     }
 
