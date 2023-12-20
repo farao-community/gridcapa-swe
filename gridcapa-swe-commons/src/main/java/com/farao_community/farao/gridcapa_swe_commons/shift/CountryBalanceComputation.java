@@ -67,9 +67,10 @@ public final class CountryBalanceComputation {
     }
 
     private static double getNetInterchange(Network network, String eic) {
-        return network.getExtension(CgmesControlAreas.class).getCgmesControlAreas().stream()
-                .filter(a -> StringUtils.equals(eic, a.getEnergyIdentificationCodeEIC()))
-                .map(CgmesControlArea::getNetInterchange).findFirst().orElse(0d);
+        return network.getSubnetworks().stream()
+                .map(n -> n.getExtension(CgmesControlAreas.class).getCgmesControlAreas().stream().filter(a -> StringUtils.equals(eic, a.getEnergyIdentificationCodeEIC())).map(CgmesControlArea::getNetInterchange).findFirst().orElse(0d))
+                .filter(d -> d != 0d)
+                .findFirst().orElse(0d);
     }
 
     private static boolean runLoadFlow(Network network, String workingStateId) {
