@@ -20,7 +20,6 @@ import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.iidm.network.Network;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -32,6 +31,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -79,7 +79,7 @@ class CneFileExportServiceTest {
     private DichotomyStepResult<SweDichotomyValidationData> lowestInvalidStep;
 
     private final OffsetDateTime offsetDateTime = OffsetDateTime.parse(DATE_STRING);
-    private final DateTime dateTime = DateTime.parse(DATE_STRING);
+    private final ZonedDateTime dateTime = ZonedDateTime.parse(DATE_STRING);
 
     @BeforeEach
     public void setup() {

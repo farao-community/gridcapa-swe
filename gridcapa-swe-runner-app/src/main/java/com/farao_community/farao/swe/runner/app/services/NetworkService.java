@@ -141,6 +141,7 @@ public class NetworkService {
         try {
             network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
             network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
+
             businessLogger.info("Regulation mode of the PSTs modified");
         } catch (NullPointerException e) {
             businessLogger.warn("The PST mode could not be changed because it was not found");

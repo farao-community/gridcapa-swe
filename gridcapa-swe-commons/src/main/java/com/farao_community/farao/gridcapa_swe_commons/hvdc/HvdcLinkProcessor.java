@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.VoltageLevel;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
@@ -49,23 +50,23 @@ public final class HvdcLinkProcessor {
 
     private static void replaceEquivalentModelByHvdc(Network network, HvdcCreationParameters creationParameters) {
         // Disconnect equivalent generators & loads on both sides
-        disconnectGeneratorAndLoad(network, creationParameters, HvdcLine.Side.ONE);
-        disconnectGeneratorAndLoad(network, creationParameters, HvdcLine.Side.TWO);
+        disconnectGeneratorAndLoad(network, creationParameters, TwoSides.ONE);
+        disconnectGeneratorAndLoad(network, creationParameters, TwoSides.TWO);
 
         // Create one VSC converter station on each side
-        createVscStation(network, creationParameters, HvdcLine.Side.ONE);
-        createVscStation(network, creationParameters, HvdcLine.Side.TWO);
+        createVscStation(network, creationParameters, TwoSides.ONE);
+        createVscStation(network, creationParameters, TwoSides.TWO);
 
         // Create the HVDC line
         createHvdcLine(network, creationParameters);
     }
 
-    private static void disconnectGeneratorAndLoad(Network network, HvdcCreationParameters creationParameters, HvdcLine.Side side) {
+    private static void disconnectGeneratorAndLoad(Network network, HvdcCreationParameters creationParameters, TwoSides side) {
         getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(side)).getTerminal().disconnect();
         getLoadOrThrow(network, creationParameters.getEquivalentLoadId(side)).getTerminal().disconnect();
     }
 
-    private static void createVscStation(Network network, HvdcCreationParameters creationParameters, HvdcLine.Side side) {
+    private static void createVscStation(Network network, HvdcCreationParameters creationParameters, TwoSides side) {
         Generator equivalentGenerator = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(side));
         Terminal terminal = equivalentGenerator.getTerminal();
         // WARNING : in CVG, this is done for the equivalent generator of HVDC line 1 for both HVDC lines. Here it is more generic => check if OK
@@ -91,8 +92,8 @@ public final class HvdcLinkProcessor {
                 .setNominalV(creationParameters.getNominalV())
                 .setId(creationParameters.getId())
                 .setEnsureIdUnicity(true)
-                .setConverterStationId1(creationParameters.getVscCreationParameters(HvdcLine.Side.ONE).getId())
-                .setConverterStationId2(creationParameters.getVscCreationParameters(HvdcLine.Side.TWO).getId())
+                .setConverterStationId1(creationParameters.getVscCreationParameters(TwoSides.ONE).getId())
+                .setConverterStationId2(creationParameters.getVscCreationParameters(TwoSides.TWO).getId())
                 .setConvertersMode(HvdcLine.ConvertersMode.SIDE_1_RECTIFIER_SIDE_2_INVERTER)
                 .setActivePowerSetpoint(0)
                 .add();
@@ -131,8 +132,8 @@ public final class HvdcLinkProcessor {
         connectEquivalentAcLine(network, creationParameters);
 
         network.getHvdcLine(creationParameters.getId()).remove();
-        network.getVscConverterStation(creationParameters.getVscCreationParameters(HvdcLine.Side.ONE).getId()).remove();
-        network.getVscConverterStation(creationParameters.getVscCreationParameters(HvdcLine.Side.TWO).getId()).remove();
+        network.getVscConverterStation(creationParameters.getVscCreationParameters(TwoSides.ONE).getId()).remove();
+        network.getVscConverterStation(creationParameters.getVscCreationParameters(TwoSides.TWO).getId()).remove();
     }
 
     private static void connectEquivalentAcLine(Network network, HvdcCreationParameters creationParameters) {
@@ -148,10 +149,10 @@ public final class HvdcLinkProcessor {
 
     private static void connectEquivalentGeneratorsAndLoads(Network network, HvdcCreationParameters creationParameters, HvdcLine hvdcLine) {
 
-        Load load1 = getLoadOrThrow(network, creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE));
-        Generator gen1 = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE));
-        Load load2 = getLoadOrThrow(network, creationParameters.getEquivalentLoadId(HvdcLine.Side.TWO));
-        Generator gen2 = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(HvdcLine.Side.TWO));
+        Load load1 = getLoadOrThrow(network, creationParameters.getEquivalentLoadId(TwoSides.ONE));
+        Generator gen1 = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(TwoSides.ONE));
+        Load load2 = getLoadOrThrow(network, creationParameters.getEquivalentLoadId(TwoSides.TWO));
+        Generator gen2 = getGeneratorOrThrow(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO));
 
         load1.getTerminal().connect();
         gen1.getTerminal().connect();

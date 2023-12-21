@@ -7,7 +7,7 @@
 
 package com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters;
 
-import com.powsybl.iidm.network.HvdcLine;
+import com.powsybl.iidm.network.TwoSides;
 
 import java.util.Map;
 import java.util.Objects;
@@ -17,17 +17,17 @@ import java.util.Objects;
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public class HvdcAcEquivalentModel {
-    private Map<HvdcLine.Side, String> generatorIds;
-    private Map<HvdcLine.Side, String> loadIds;
+    private Map<TwoSides, String> generatorIds;
+    private Map<TwoSides, String> loadIds;
     private String acLineId;
 
-    public HvdcAcEquivalentModel(Map<HvdcLine.Side, String> generatorIds, Map<HvdcLine.Side, String> loadIds, String acLineId) {
+    public HvdcAcEquivalentModel(Map<TwoSides, String> generatorIds, Map<TwoSides, String> loadIds, String acLineId) {
         Objects.requireNonNull(generatorIds);
-        Objects.requireNonNull(generatorIds.get(HvdcLine.Side.ONE));
-        Objects.requireNonNull(generatorIds.get(HvdcLine.Side.TWO));
+        Objects.requireNonNull(generatorIds.get(TwoSides.ONE));
+        Objects.requireNonNull(generatorIds.get(TwoSides.TWO));
         Objects.requireNonNull(loadIds);
-        Objects.requireNonNull(loadIds.get(HvdcLine.Side.ONE));
-        Objects.requireNonNull(loadIds.get(HvdcLine.Side.TWO));
+        Objects.requireNonNull(loadIds.get(TwoSides.ONE));
+        Objects.requireNonNull(loadIds.get(TwoSides.TWO));
         Objects.requireNonNull(acLineId);
 
         this.generatorIds = generatorIds;
@@ -35,11 +35,11 @@ public class HvdcAcEquivalentModel {
         this.acLineId = acLineId;
     }
 
-    public String getGeneratorId(HvdcLine.Side side) {
+    public String getGeneratorId(TwoSides side) {
         return generatorIds.get(side);
     }
 
-    public String getLoadId(HvdcLine.Side side) {
+    public String getLoadId(TwoSides side) {
         return loadIds.get(side);
     }
 

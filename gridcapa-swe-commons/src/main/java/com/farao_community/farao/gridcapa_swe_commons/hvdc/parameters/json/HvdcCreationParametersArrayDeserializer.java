@@ -13,7 +13,7 @@ import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreati
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.VscStationCreationParameters;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.powsybl.iidm.network.HvdcLine;
+import com.powsybl.iidm.network.TwoSides;
 import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public final class HvdcCreationParametersArrayDeserializer {
             Double maxP = null;
             Double r = null;
             Double nominalV = null;
-            Map<HvdcLine.Side, VscStationCreationParameters> vscCreationParameters = new EnumMap<>(HvdcLine.Side.class);
+            Map<TwoSides, VscStationCreationParameters> vscCreationParameters = new EnumMap<>(TwoSides.class);
             AngleDroopActivePowerControlParameters angleDroopActivePowerControlParameters = null;
             HvdcAcEquivalentModel hvdcAcEquivalentModel = null;
 
@@ -71,7 +71,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                     case VSC_PARAMS:
                         jsonParser.nextToken();
                         while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-                            Pair<HvdcLine.Side, VscStationCreationParameters> result = VscStationCreationParametersDeserializer.deserialize(jsonParser);
+                            Pair<TwoSides, VscStationCreationParameters> result = VscStationCreationParametersDeserializer.deserialize(jsonParser);
                             vscCreationParameters.put(result.getKey(), result.getValue());
                         }
                         break;
@@ -104,8 +104,8 @@ public final class HvdcCreationParametersArrayDeserializer {
         private static final String VOLTAGE_REGULATOR_ON = "voltageRegulatorOn";
         private static final String DEFAULT_VOLTAGE_SETPOINT = "defaultVoltageSetpoint";
 
-        static Pair<HvdcLine.Side, VscStationCreationParameters> deserialize(JsonParser jsonParser) throws IOException, NoSuchFieldException {
-            HvdcLine.Side side = null;
+        static Pair<TwoSides, VscStationCreationParameters> deserialize(JsonParser jsonParser) throws IOException, NoSuchFieldException {
+            TwoSides side = null;
             String id = null;
             Double reactivePowerSetpoint = null;
             Float lossFactor = null;
@@ -117,9 +117,9 @@ public final class HvdcCreationParametersArrayDeserializer {
                     case SIDE:
                         int sideInt = jsonParser.nextIntValue(0);
                         if (sideInt == 1) {
-                            side = HvdcLine.Side.ONE;
+                            side = TwoSides.ONE;
                         } else if (sideInt == 2) {
-                            side = HvdcLine.Side.TWO;
+                            side = TwoSides.TWO;
                         } else {
                             throw new IllegalArgumentException("VscStationCreationParameters Side must be 1 or 2");
                         }
@@ -183,22 +183,22 @@ public final class HvdcCreationParametersArrayDeserializer {
         private static final String AC_LINE_ID = "acLineId";
 
         static HvdcAcEquivalentModel deserialize(JsonParser jsonParser) throws IOException, NoSuchFieldException {
-            Map<HvdcLine.Side, String> generatorIds = new EnumMap<>(HvdcLine.Side.class);
-            Map<HvdcLine.Side, String> loadIds = new EnumMap<>(HvdcLine.Side.class);
+            Map<TwoSides, String> generatorIds = new EnumMap<>(TwoSides.class);
+            Map<TwoSides, String> loadIds = new EnumMap<>(TwoSides.class);
             String acLineId = null;
             while (!jsonParser.nextToken().isStructEnd()) {
                 switch (jsonParser.getCurrentName()) {
                     case SIDE_1_GEN_ID:
-                        generatorIds.put(HvdcLine.Side.ONE, jsonParser.nextTextValue());
+                        generatorIds.put(TwoSides.ONE, jsonParser.nextTextValue());
                         break;
                     case SIDE_2_GEN_ID:
-                        generatorIds.put(HvdcLine.Side.TWO, jsonParser.nextTextValue());
+                        generatorIds.put(TwoSides.TWO, jsonParser.nextTextValue());
                         break;
                     case SIDE_1_LOAD_ID:
-                        loadIds.put(HvdcLine.Side.ONE, jsonParser.nextTextValue());
+                        loadIds.put(TwoSides.ONE, jsonParser.nextTextValue());
                         break;
                     case SIDE_2_LOAD_ID:
-                        loadIds.put(HvdcLine.Side.TWO, jsonParser.nextTextValue());
+                        loadIds.put(TwoSides.TWO, jsonParser.nextTextValue());
                         break;
                     case AC_LINE_ID:
                         acLineId = jsonParser.nextTextValue();

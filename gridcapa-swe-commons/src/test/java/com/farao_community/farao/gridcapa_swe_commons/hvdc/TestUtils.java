@@ -9,7 +9,7 @@ package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.xml.XMLExporter;
+import com.powsybl.iidm.serde.XMLExporter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
