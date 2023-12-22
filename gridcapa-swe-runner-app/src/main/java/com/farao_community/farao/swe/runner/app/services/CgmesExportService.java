@@ -8,7 +8,10 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
@@ -34,6 +37,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -91,8 +95,9 @@ public class CgmesExportService {
     }
 
     private void applyHvdcSetPointToAcEquivalentModel(Network networkWithPra) {
-        SweHvdcPreprocessor sweHvdcPreprocessor = new SweHvdcPreprocessor();
-        sweHvdcPreprocessor.applyParametersToNetwork(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"), networkWithPra);
+        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
+        Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
+        HvdcLinkProcessor.replaceHvdcByEquivalentModel(networkWithPra, hvdcCreationParameters);
     }
 
     Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws XMLStreamException, IOException {
