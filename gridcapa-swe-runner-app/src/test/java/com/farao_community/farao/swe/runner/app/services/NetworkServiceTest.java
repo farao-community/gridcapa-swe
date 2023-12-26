@@ -22,7 +22,9 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import static com.farao_community.farao.swe.runner.app.services.NetworkService.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
