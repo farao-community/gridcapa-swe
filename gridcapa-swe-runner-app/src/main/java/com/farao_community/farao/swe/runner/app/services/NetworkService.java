@@ -165,7 +165,7 @@ public class NetworkService {
         }
     }
 
-    public void initclones(Network mergedNetwork) {
+    public void initClones(Network mergedNetwork) {
         mergedNetwork.getVariantManager().allowVariantMultiThreadAccess(true);
         mergedNetwork.getVariantManager().cloneVariant(mergedNetwork.getVariantManager().getWorkingVariantId(), Arrays.asList(ES_FR_VARIANT_ID, ES_PT_VARIANT_ID, FR_ES_VARIANT_ID, PT_ES_VARIANT_ID), true);
     }

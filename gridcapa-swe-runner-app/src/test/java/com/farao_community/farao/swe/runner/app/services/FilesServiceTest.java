@@ -48,7 +48,7 @@ class FilesServiceTest {
     @Test
     void simpleImport() {
         when(networkService.importMergedNetwork(any(SweRequest.class))).thenReturn(mock(Network.class));
-        doNothing().when(networkService).initclones(any());
+        doNothing().when(networkService).initClones(any());
         when(fileImporter.importCimCrac(any(SweRequest.class))).thenReturn(mock(CimCrac.class));
         when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString())).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");

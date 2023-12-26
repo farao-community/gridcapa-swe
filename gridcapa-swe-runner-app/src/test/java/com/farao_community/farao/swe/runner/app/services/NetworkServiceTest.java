@@ -21,8 +21,8 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static com.farao_community.farao.swe.runner.app.services.NetworkService.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -73,5 +73,16 @@ class NetworkServiceTest {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         networkImporter.addHvdcAndPstToNetwork(network);
         assertEquals(2, network.getHvdcLineCount());
+    }
+
+    @Test
+    void initClonesTest() {
+        Network network = networkImporter.importMergedNetwork(sweRequest);
+        networkImporter.initClones(network);
+        assertEquals(5, network.getVariantManager().getVariantIds().size());
+        assertTrue(network.getVariantManager().getVariantIds().contains(ES_FR_VARIANT_ID));
+        assertTrue(network.getVariantManager().getVariantIds().contains(FR_ES_VARIANT_ID));
+        assertTrue(network.getVariantManager().getVariantIds().contains(PT_ES_VARIANT_ID));
+        assertTrue(network.getVariantManager().getVariantIds().contains(ES_PT_VARIANT_ID));
     }
 }
