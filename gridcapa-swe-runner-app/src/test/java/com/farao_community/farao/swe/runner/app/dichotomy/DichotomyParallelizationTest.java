@@ -118,10 +118,7 @@ class DichotomyParallelizationTest {
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(cracCreationContext.getCrac()).thenReturn(crac);
-        when(sweData.getNetworkEsFr()).thenReturn(network);
-        when(sweData.getNetworkEsPt()).thenReturn(network);
-        when(sweData.getNetworkFrEs()).thenReturn(network);
-        when(sweData.getNetworkPtEs()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(new AsyncResult<>(result));
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(new AsyncResult<>(result));
@@ -140,7 +137,7 @@ class DichotomyParallelizationTest {
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(cracCreationContext.getCrac()).thenReturn(crac);
-        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(new AsyncResult<>(result));
@@ -160,7 +157,7 @@ class DichotomyParallelizationTest {
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(cracCreationContext.getCrac()).thenReturn(crac);
-        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, null, null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(new AsyncResult<>(result));
@@ -180,7 +177,7 @@ class DichotomyParallelizationTest {
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(cracCreationContext.getCrac()).thenReturn(crac);
-        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, null, null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
@@ -199,7 +196,7 @@ class DichotomyParallelizationTest {
         when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(cracCreationContext.getCrac()).thenReturn(crac);
-        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, null, null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(future);

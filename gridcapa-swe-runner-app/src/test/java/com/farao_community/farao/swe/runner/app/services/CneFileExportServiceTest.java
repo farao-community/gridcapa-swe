@@ -21,9 +21,11 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.iidm.network.Network;
 import org.joda.time.DateTime;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,19 +83,27 @@ class CneFileExportServiceTest {
     private final OffsetDateTime offsetDateTime = OffsetDateTime.parse(DATE_STRING);
     private final DateTime dateTime = DateTime.parse(DATE_STRING);
 
+    MockedStatic<NetworkService> networkService =  Mockito.mockStatic(NetworkService.class);
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Paris"));
     }
 
+    @AfterEach
+    public void set() {
+        networkService.close();
+    }
+
     @Test
     void exportCneUrlEsFrHighestValid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        networkService.when(() -> NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(network);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
@@ -108,9 +118,10 @@ class CneFileExportServiceTest {
     void exportCneUrlFrEsLowestInvalid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetworkFrEs()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        networkService.when(() -> NetworkService.getNetworkByDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(network);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
@@ -126,9 +137,10 @@ class CneFileExportServiceTest {
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
         //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetworkEsPt()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        networkService.when(() -> NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(network);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.hasValidStep()).thenReturn(true);
@@ -145,9 +157,10 @@ class CneFileExportServiceTest {
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
         //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetworkPtEs()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        networkService.when(() -> NetworkService.getNetworkByDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(network);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
@@ -161,11 +174,12 @@ class CneFileExportServiceTest {
     void exportLowestInvalidCneUrlFailConditionKOAndReturnNull() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        when(sweData.getNetworkPtEs()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        networkService.when(() -> NetworkService.getNetworkByDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(network);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
@@ -182,9 +196,10 @@ class CneFileExportServiceTest {
 
         //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
-        when(sweData.getNetworkEsPt()).thenReturn(network);
+        when(sweData.getMergedNetwork()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        networkService.when(() -> NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(network);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.hasValidStep()).thenReturn(false);

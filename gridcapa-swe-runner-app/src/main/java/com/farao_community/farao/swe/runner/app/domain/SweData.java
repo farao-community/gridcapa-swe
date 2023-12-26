@@ -22,10 +22,7 @@ public class SweData {
     private final String id;
     private final OffsetDateTime timestamp;
     private final ProcessType processType;
-    private final Network networkEsFr;
-    private final Network networkFrEs;
-    private final Network networkEsPt;
-    private final Network networkPtEs;
+    private final Network mergedNetwork;
     private final CimCracCreationContext cracEsPt;
     private final CimCracCreationContext cracFrEs;
     private final String glskUrl;
@@ -35,14 +32,11 @@ public class SweData {
     private final String raoParametersEsPtUrl;
     private final Map<CgmesFileType, SweFileResource> mapCgmesInputFiles;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
+    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network mergedNetwork, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
         this.id = id;
         this.timestamp = timestamp;
         this.processType = processType;
-        this.networkEsFr = networkEsFr;
-        this.networkFrEs = networkFrEs;
-        this.networkEsPt = networkEsPt;
-        this.networkPtEs = networkPtEs;
+        this.mergedNetwork = mergedNetwork;
         this.cracEsPt = cracEsPt;
         this.cracFrEs = cracFrEs;
         this.glskUrl = glskUrl;
@@ -65,20 +59,8 @@ public class SweData {
         return processType;
     }
 
-    public Network getNetworkEsFr() {
-        return networkEsFr;
-    }
-
-    public Network getNetworkFrEs() {
-        return networkFrEs;
-    }
-
-    public Network getNetworkEsPt() {
-        return networkEsPt;
-    }
-
-    public Network getNetworkPtEs() {
-        return networkPtEs;
+    public Network getMergedNetwork() {
+        return mergedNetwork;
     }
 
     public CimCracCreationContext getCracEsPt() {

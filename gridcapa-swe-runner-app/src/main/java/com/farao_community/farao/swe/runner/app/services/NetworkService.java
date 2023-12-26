@@ -8,7 +8,6 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
-import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
@@ -31,12 +30,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -50,25 +44,16 @@ public class NetworkService {
     public static final String PST_1 = "_e071a1d4-fef5-1bd9-5278-d195c5597b6e";
     public static final String PST_2 = "_7824bc48-fc86-51db-8f9c-01b44933839e";
 
-    private final MinioAdapter minioAdapter;
-
-    private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
+    static final String ES_FR_VARIANT_ID = "EsFr_variant";
+    static final String FR_ES_VARIANT_ID = "FrEs_variant";
+    static final String ES_PT_VARIANT_ID = "EsPt_variant";
+    static final String PT_ES_VARIANT_ID = "PtEs_variant";
     private final Logger businessLogger;
 
     static final Map<Country, String> TSO_BY_COUNTRY = Map.of(Country.FR, "RTE", Country.ES, "REE", Country.PT, "REN");
 
-    public NetworkService(MinioAdapter minioAdapter, Logger businessLogger) {
-        this.minioAdapter = minioAdapter;
+    public NetworkService(Logger businessLogger) {
         this.businessLogger = businessLogger;
-    }
-
-    public Network loadNetworkFromMinio(OffsetDateTime targetDateTime) {
-        String fileName = networkFormatter.format(targetDateTime);
-        try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + fileName)) {
-            return Network.read(fileName, xiidm);
-        } catch (IOException e) {
-            throw new SweInternalException("Could not load network from XIIDM file", e);
-        }
     }
 
     public Network importMergedNetwork(SweRequest sweRequest) {
@@ -176,22 +161,26 @@ public class NetworkService {
         }
     }
 
+    public void initclones(Network mergedNetwork) {
+        mergedNetwork.getVariantManager().allowVariantMultiThreadAccess(true);
+        mergedNetwork.getVariantManager().cloneVariant(mergedNetwork.getVariantManager().getWorkingVariantId(), Arrays.asList(ES_FR_VARIANT_ID, ES_PT_VARIANT_ID, FR_ES_VARIANT_ID, PT_ES_VARIANT_ID), true);
+    }
+
     public static Network getNetworkByDirection(SweData sweData, DichotomyDirection direction) {
-        Network network = null;
         switch (direction) {
             case ES_FR:
-                network = sweData.getNetworkEsFr();
+                sweData.getMergedNetwork().getVariantManager().setWorkingVariant(ES_FR_VARIANT_ID);
                 break;
             case ES_PT:
-                network =  sweData.getNetworkEsPt();
+                sweData.getMergedNetwork().getVariantManager().setWorkingVariant(ES_PT_VARIANT_ID);
                 break;
             case FR_ES:
-                network =  sweData.getNetworkFrEs();
+                sweData.getMergedNetwork().getVariantManager().setWorkingVariant(FR_ES_VARIANT_ID);
                 break;
             case PT_ES:
-                network =  sweData.getNetworkPtEs();
+                sweData.getMergedNetwork().getVariantManager().setWorkingVariant(PT_ES_VARIANT_ID);
                 break;
         }
-        return network;
+        return sweData.getMergedNetwork();
     }
 }

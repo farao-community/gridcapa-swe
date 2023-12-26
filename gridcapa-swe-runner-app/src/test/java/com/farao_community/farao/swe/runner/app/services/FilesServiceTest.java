@@ -25,8 +25,7 @@ import java.time.OffsetDateTime;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -49,7 +48,7 @@ class FilesServiceTest {
     @Test
     void simpleImport() {
         when(networkService.importMergedNetwork(any(SweRequest.class))).thenReturn(mock(Network.class));
-        when(networkService.loadNetworkFromMinio(any(OffsetDateTime.class))).thenReturn(mock(Network.class));
+        doNothing().when(networkService).initclones(any());
         when(fileImporter.importCimCrac(any(SweRequest.class))).thenReturn(mock(CimCrac.class));
         when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString())).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");
