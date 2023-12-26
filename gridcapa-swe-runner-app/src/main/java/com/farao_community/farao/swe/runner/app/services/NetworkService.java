@@ -172,7 +172,7 @@ public class NetworkService {
             zos.close();
             return zipPath;
         } catch (IOException ioe) {
-            throw new SweInvalidDataException("Error creating netowrk zip file", ioe);
+            throw new SweInvalidDataException("Error creating network zip file", ioe);
         }
     }
 
