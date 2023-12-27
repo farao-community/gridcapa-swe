@@ -55,7 +55,7 @@ public class NetworkService {
     private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     private final Logger businessLogger;
 
-    static final Map<Country, String> TSO_BY_COUNTRY = Map.of(Country.FR, "RTE", Country.ES, "REE", Country.PT, "REN");
+    static final Map<Country, String> TSO_BY_COUNTRY = Map.of(Country.FR, "RTEFRANCE", Country.ES, "REE", Country.PT, "REN");
 
     public NetworkService(MinioAdapter minioAdapter, Logger businessLogger) {
         this.minioAdapter = minioAdapter;
@@ -172,7 +172,7 @@ public class NetworkService {
             zos.close();
             return zipPath;
         } catch (IOException ioe) {
-            throw new SweInvalidDataException("Error creating netowrk zip file", ioe);
+            throw new SweInvalidDataException("Error creating network zip file", ioe);
         }
     }
 

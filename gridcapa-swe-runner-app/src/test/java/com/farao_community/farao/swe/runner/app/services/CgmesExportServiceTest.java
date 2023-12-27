@@ -82,9 +82,9 @@ class CgmesExportServiceTest {
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_EQ_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_SSH_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_TP_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_EQ_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
     }
 
@@ -102,9 +102,9 @@ class CgmesExportServiceTest {
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_EQ_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_SSH_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_TP_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_EQ_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
     }
 
