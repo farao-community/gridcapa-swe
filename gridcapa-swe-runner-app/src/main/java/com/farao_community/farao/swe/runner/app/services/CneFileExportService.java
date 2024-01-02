@@ -77,7 +77,7 @@ public class CneFileExportService {
 
     public String exportCneUrl(SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid, DichotomyDirection direction) {
 
-        //if base case unsecure, then is highest valid with limiting cause index evalutation, then we don't want an error file
+        //if base case unsecure, then is highest valid with limiting cause index evaluation, then we don't want an error file
         if (!dichotomyResult.hasValidStep() && isHighestValid && dichotomyResult.getLimitingCause() == LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION) {
             return null;
         }
