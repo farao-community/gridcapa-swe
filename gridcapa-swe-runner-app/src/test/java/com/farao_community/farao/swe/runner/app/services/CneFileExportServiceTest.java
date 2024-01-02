@@ -206,6 +206,7 @@ class CneFileExportServiceTest {
         assertEquals("2021/02/09/20_30/OUTPUTS/20210209_2030_CNE_PTES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, DichotomyDirection.PT_ES));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
     }
+
     @Test
     void exportHighestValidCneUrlFailConditionKOAndReturnNullNoErrorFileExport() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
