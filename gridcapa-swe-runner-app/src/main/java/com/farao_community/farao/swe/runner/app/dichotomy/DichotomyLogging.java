@@ -106,7 +106,7 @@ public class DichotomyLogging {
     }
 
     private String getTimestampLocalized(OffsetDateTime timestamp) {
-        OffsetDateTime localDateTime = OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
-        return DATE_TIME_FORMATTER.format(localDateTime);
+        OffsetDateTime localOffsetDateTime = OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
+        return DATE_TIME_FORMATTER.format(localOffsetDateTime);
     }
 }
