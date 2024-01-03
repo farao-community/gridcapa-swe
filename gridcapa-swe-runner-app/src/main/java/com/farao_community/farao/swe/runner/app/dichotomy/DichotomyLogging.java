@@ -9,6 +9,7 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.rao_result_api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
@@ -17,6 +18,9 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationDat
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,19 +34,24 @@ public class DichotomyLogging {
     private static final String NONE = "NONE";
     private static final String FAILURE = "FAILURE";
     private final Logger businessLogger;
-    private static final String SUMMARY = "Summary :  " +
-            "Limiting event : {},  \n" +
-            "Limiting element : {},  \n" +
-            "PRAs : {},  \n" +
-            "CRAs : {}.";
-    private static final String SUMMARY_BD = "Summary BD :  " +
-            "Current TTC : {},  \n" +
-            "Previous TTC : {},  \n" +
-            "Voltage Check : {},  \n" +
-            "Angle Check : {}.";
+    private final ZoneId zoneId;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd' 'HH':'mm");
+    private static final String SUMMARY = """
+            Summary :
+            Limiting event : {},
+            Limiting element : {},
+            PRAs : {},
+            CRAs : {}.""";
+    private static final String SUMMARY_BD = """
+            Summary BD :  {}
+            Current TTC : {},
+            Previous TTC : {},
+            Voltage Check : {},
+            Angle Check : {}.""";
 
-    public DichotomyLogging(Logger businessLogger) {
+    public DichotomyLogging(Logger businessLogger, ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
+        this.zoneId = ZoneId.of(processConfiguration.getZoneId());
     }
 
     public void logStartDichotomy(Parameters parameters) {
@@ -61,6 +70,7 @@ public class DichotomyLogging {
         String limitingElement = NONE;
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
+        String timestamp = getTimestampLocalized(sweData.getTimestamp());
         String currentTtc = String.valueOf(dichotomyResult.getHighestValidStepValue());
         String previousTtc = String.valueOf(dichotomyResult.getLowestInvalidStepValue());
         String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult);
@@ -77,7 +87,7 @@ public class DichotomyLogging {
             }
         }
         businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
-        businessLogger.info(SUMMARY_BD, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
+        businessLogger.info(SUMMARY_BD, timestamp, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
     }
 
     private static String toString(Collection<String> c) {
@@ -93,5 +103,10 @@ public class DichotomyLogging {
             }
         }
         return NONE;
+    }
+
+    private String getTimestampLocalized(OffsetDateTime timestamp) {
+        OffsetDateTime localOffsetDateTime = OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
+        return DATE_TIME_FORMATTER.format(localOffsetDateTime);
     }
 }
