@@ -35,31 +35,32 @@ logback:
 swe-commons:
   zone-id: "Europe/Paris"
   shift-max-iteration-number: 20
+  modeling-authority-set: "https://farao-community.github.io/"
 
 swe-runner:
   dichotomy:
     parameters:
       ES_FR:
         min-value: 0
-        max-value: 6400
+        max-value: 50
         precision: 50
         tolerance-Es-Fr: 10
         tolerance-Es-Pt: 50
       FR_ES:
         min-value: 0
-        max-value: 6400
+        max-value: 50
         precision: 50
         tolerance-Es-Fr: 10
         tolerance-Es-Pt: 50
       ES_PT:
         min-value: 0
-        max-value: 6400
+        max-value: 50
         precision: 50
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
       PT_ES:
         min-value: 0
-        max-value: 6400
+        max-value: 50
         precision: 50
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
@@ -78,4 +79,4 @@ minio-adapter:
   base-path: /SWE/D2CC
   access-key: gridcapa
   secret-key: gridcapa
-  url: http://localhost:9000
+  url: http://minio:9000

@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
@@ -52,27 +53,24 @@ public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
     private static final List<String> CGMES_PROFILES = List.of("EQ", "TP", "SSH");
     private static final double DEFAULT_P_TOLERANCE = 10;
-    private final Logger businessLogger;
     private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_001.xml'");
+    private final Logger businessLogger;
     private final FileExporter fileExporter;
     private final UrlValidationService urlValidationService;
+    private final Properties tsoFilesExportParams = new Properties();
+    private final Properties svFileExportParams = new Properties();
 
-    private static final Properties TSO_FILES_EXPORT_PARAMS = new Properties();
-
-    private static final Properties SV_FILE_EXPORT_PARAMS = new Properties();
-
-    static {
-        TSO_FILES_EXPORT_PARAMS.put(CgmesExport.PROFILES, CGMES_PROFILES);
-        TSO_FILES_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SV");
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-    }
-
-    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, UrlValidationService urlValidationService) {
+    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
         this.fileExporter = fileExporter;
         this.urlValidationService = urlValidationService;
+        String modelingAuthoritySet = processConfiguration.getModelingAuthoritySet();
+        tsoFilesExportParams.put(CgmesExport.PROFILES, CGMES_PROFILES);
+        tsoFilesExportParams.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
+        tsoFilesExportParams.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthoritySet);
+        svFileExportParams.put(CgmesExport.PROFILES, "SV");
+        svFileExportParams.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
+        svFileExportParams.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthoritySet);
     }
 
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
@@ -134,7 +132,7 @@ public class CgmesExportService {
         updateControlAreasExtension(network);
         Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
         MemDataSource memDataSource = new MemDataSource();
-        network.write("CGMES", TSO_FILES_EXPORT_PARAMS, memDataSource);
+        network.write("CGMES", tsoFilesExportParams, memDataSource);
         for (String profile : CGMES_PROFILES) {
             putAndRenameFile(network.getNameOrId(), sweData, tso, memDataSource, mapFiles, profile);
         }
@@ -170,7 +168,7 @@ public class CgmesExportService {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             MemDataSource memDataSource = new MemDataSource();
-            network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
+            network.write("CGMES", svFileExportParams, memDataSource);
             String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
             String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV");
