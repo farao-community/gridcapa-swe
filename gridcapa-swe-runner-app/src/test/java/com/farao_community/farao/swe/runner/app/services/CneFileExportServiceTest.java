@@ -35,6 +35,7 @@ import java.time.OffsetDateTime;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -124,7 +125,6 @@ class CneFileExportServiceTest {
     void exportCneUrlEsPtHighestValid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
@@ -143,7 +143,6 @@ class CneFileExportServiceTest {
     void exportCneUrlPtEsLowestInvalid() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-        //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(sweData.getNetworkPtEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
@@ -162,7 +161,6 @@ class CneFileExportServiceTest {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
         when(sweData.getNetworkPtEs()).thenReturn(network);
-        //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
@@ -179,8 +177,6 @@ class CneFileExportServiceTest {
     void exportHighestValidCneUrlFailConditionKOAndReturnNull() {
         when(sweData.getTimestamp()).thenReturn(offsetDateTime);
         when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
-
-        //TODO
         when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
@@ -192,5 +188,38 @@ class CneFileExportServiceTest {
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
         assertEquals("2021/02/09/20_30/OUTPUTS/20210209_2030_CNE_ESPT_LAST_SECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, DichotomyDirection.ES_PT));
         verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
+    }
+
+    @Test
+    void exportLowestInvalidCneUrlFailConditionKOAndReturnNullWithErrorFileExport() {
+        when(sweData.getTimestamp()).thenReturn(offsetDateTime);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(dichotomyResult.getLimitingCause()).thenReturn(LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION);
+        when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
+        assertEquals("2021/02/09/20_30/OUTPUTS/20210209_2030_CNE_PTES_FIRST_UNSECURE.zip", cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, DichotomyDirection.PT_ES));
+        verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(anyString(), any(InputStream.class), anyString(), anyString(), any(OffsetDateTime.class));
+    }
+
+    @Test
+    void exportHighestValidCneUrlFailConditionKOAndReturnNullNoErrorFileExport() {
+        when(sweData.getTimestamp()).thenReturn(offsetDateTime);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(dichotomyResult.hasValidStep()).thenReturn(false);
+        when(dichotomyResult.getLimitingCause()).thenReturn(LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION);
+        when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
+        assertNull(cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, DichotomyDirection.ES_PT));
     }
 }
