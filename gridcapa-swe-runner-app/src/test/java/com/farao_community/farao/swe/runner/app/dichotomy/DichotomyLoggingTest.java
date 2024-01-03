@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,9 @@ class DichotomyLoggingTest {
     @Test
     void getVoltageCheckResult() {
         Logger logger = Mockito.mock(Logger.class);
-        DichotomyLogging businessLogger = new DichotomyLogging(logger);
+        ProcessConfiguration processConfiguration = Mockito.mock(ProcessConfiguration.class);
+        Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Brussels");
+        DichotomyLogging businessLogger = new DichotomyLogging(logger, processConfiguration);
         assertEquals("FAILURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.ES_FR, Optional.empty()));
         assertEquals("NONE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.PT_ES, Optional.empty()));
         assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(new VoltageMonitoringResult(Collections.emptyMap(), Collections.emptyMap(), VoltageMonitoringResult.Status.SECURE))));
