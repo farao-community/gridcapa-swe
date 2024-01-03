@@ -40,9 +40,9 @@ class DichotomyLoggingTest {
         ProcessConfiguration processConfiguration = Mockito.mock(ProcessConfiguration.class);
         Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Brussels");
         DichotomyLogging businessLogger = new DichotomyLogging(logger, processConfiguration);
-        OffsetDateTime timestampSummer = OffsetDateTime.of(2022,6, 18, 23, 29, 1, 0, ZoneOffset.UTC);
+        OffsetDateTime timestampSummer = OffsetDateTime.of(2022, 6, 18, 23, 29, 1, 0, ZoneOffset.UTC);
         assertEquals("2022-06-19 01:29", ReflectionTestUtils.invokeMethod(businessLogger, "getTimestampLocalized", timestampSummer));
-        OffsetDateTime timestampWinter = OffsetDateTime.of(2022,11, 18, 22, 27, 2, 0, ZoneOffset.UTC);
+        OffsetDateTime timestampWinter = OffsetDateTime.of(2022, 11, 18, 22, 27, 2, 0, ZoneOffset.UTC);
         assertEquals("2022-11-18 23:27", ReflectionTestUtils.invokeMethod(businessLogger, "getTimestampLocalized", timestampWinter));
     }
 }
