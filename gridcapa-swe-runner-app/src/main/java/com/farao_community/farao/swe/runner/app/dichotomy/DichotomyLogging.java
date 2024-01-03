@@ -35,7 +35,7 @@ public class DichotomyLogging {
     private static final String FAILURE = "FAILURE";
     private final Logger businessLogger;
     private final ZoneId zoneId;
-    private static final String DATE_TIME_FORMAT = "yyyy'-'MM'-'dd' 'HH':'mm";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy'-'MM'-'dd' 'HH':'mm");
     private static final String SUMMARY = """
             Summary :
             Limiting event : {},
@@ -106,8 +106,7 @@ public class DichotomyLogging {
     }
 
     private String getTimestampLocalized(OffsetDateTime timestamp) {
-        OffsetDateTime localTime = java.time.OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
-        DateTimeFormatter df = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-        return df.format(localTime);
+        OffsetDateTime localDateTime = OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
+        return DATE_TIME_FORMATTER.format(localDateTime);
     }
 }
