@@ -21,6 +21,9 @@ public class ProcessConfiguration {
     @Value("${swe-commons.shift-max-iteration-number}")
     private Integer shiftMaxIterationNumber;
 
+    @Value("${swe-commons.modeling-authority-set}")
+    private String modelingAuthoritySet;
+
     public String getZoneId() {
         return zoneId;
     }
@@ -28,4 +31,9 @@ public class ProcessConfiguration {
     public Integer getShiftMaxIterationNumber() {
         return shiftMaxIterationNumber;
     }
+
+    public String getModelingAuthoritySet() {
+        return modelingAuthoritySet;
+    }
+
 }
