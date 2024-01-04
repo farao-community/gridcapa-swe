@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -75,7 +76,11 @@ public class NetworkService {
         try {
             businessLogger.info("Start import of input CGMES files");
             List<Network> networks = TSO_BY_COUNTRY.keySet().stream().map(country -> getNetworkForCountry(sweRequest, country)).toList();
-            return Network.merge("network_merged", networks.toArray(new Network[0]));
+            Network mergedNetwork = Network.merge("network_merged", networks.toArray(new Network[0]));
+            // by default merged network doesn't have a case date set to same case date as subnetworks
+            Optional<Network> firstNetwork = networks.stream().findFirst();
+            firstNetwork.ifPresent(network -> mergedNetwork.setCaseDate(network.getCaseDate()));
+            return mergedNetwork;
         } catch (Exception e) {
             throw new SweInternalException("Exception occurred during input CGM import", e);
         }

@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,9 +37,11 @@ class NetworkServiceTest {
 
     private SweRequest sweRequest;
 
+    private final OffsetDateTime offsetDateTime =  OffsetDateTime.of(2023, 7, 31, 0, 30, 0, 0, ZoneOffset.UTC);
+
     @BeforeAll
     void setUp() {
-        sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(),
+        sweRequest = new SweRequest("id", ProcessType.D2CC, offsetDateTime,
                 new SweFileResource("CORESO_SV.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_SV.xml")).toExternalForm()),
                 new SweFileResource("REE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_EQ.xml")).toExternalForm()),
                 new SweFileResource("REE_SSH.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_SSH.xml")).toExternalForm()),
@@ -66,6 +69,7 @@ class NetworkServiceTest {
         Network mergedNetwork = networkImporter.importMergedNetwork(sweRequest);
         assertNotNull(mergedNetwork);
         assertEquals(3, mergedNetwork.getSubnetworks().size());
+        assertEquals(offsetDateTime.toEpochSecond() * 1000, mergedNetwork.getCaseDate().getMillis());
     }
 
     @Test
