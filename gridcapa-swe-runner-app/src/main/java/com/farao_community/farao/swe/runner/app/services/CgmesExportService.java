@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,8 +93,8 @@ public class CgmesExportService {
                 LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), LoadFlowParameters.load());
                 Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
                 return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
-            } catch (IOException | XMLStreamException e) {
-                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new SweInvalidDataException(String.format("Can not export cgmes file associated with direction %s", direction.getDashName()), e);
             }
         } else {
             businessLogger.error("Dichotomy does not have a valid step, CGMES files won't be exported");
@@ -109,7 +108,7 @@ public class CgmesExportService {
         HvdcLinkProcessor.replaceHvdcByEquivalentModel(networkWithPra, hvdcCreationParameters);
     }
 
-    Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws XMLStreamException, IOException {
+    Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws IOException {
         Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
         mapCgmesFiles.putAll(createAllSshFiles(mergedNetwork, sweData));
         mapCgmesFiles.putAll(createCommonFile(mergedNetwork, sweData));
