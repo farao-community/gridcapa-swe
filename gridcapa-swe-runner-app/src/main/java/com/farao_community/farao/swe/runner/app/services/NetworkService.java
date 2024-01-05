@@ -20,7 +20,6 @@ import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,8 +138,8 @@ public class NetworkService {
 
     private void addPst(Network network) {
         try {
-            network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
-            network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
+            network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulating(false);
+            network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulating(false);
             businessLogger.info("Regulation mode of the PSTs modified");
         } catch (NullPointerException e) {
             businessLogger.warn("The PST mode could not be changed because it was not found");
