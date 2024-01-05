@@ -76,12 +76,15 @@ public class NetworkService {
             businessLogger.info("Start import of input CGMES files");
             List<Network> networks = TSO_BY_COUNTRY.keySet().stream().map(country -> getNetworkForCountry(sweRequest, country)).toList();
             Network mergedNetwork = Network.merge("network_merged", networks.toArray(new Network[0]));
-            // by default merged network doesn't have a case date set to same case date as subnetworks
-            networks.stream().findFirst().ifPresent(network -> mergedNetwork.setCaseDate(network.getCaseDate()));
+            initializeMergedNetworkCaseDate(networks, mergedNetwork);
             return mergedNetwork;
         } catch (Exception e) {
             throw new SweInternalException("Exception occurred during input CGM import", e);
         }
+    }
+
+    private void initializeMergedNetworkCaseDate(List<Network> networks, Network mergedNetwork) {
+        networks.stream().findFirst().ifPresent(network -> mergedNetwork.setCaseDate(network.getCaseDate()));
     }
 
     private Network getNetworkForCountry(SweRequest sweRequest, Country country) {
