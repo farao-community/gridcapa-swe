@@ -14,9 +14,9 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 public enum CgmesFileType {
     CORESO_SV("CORESO", "SV"),
-    RTE_SSH("RTE", "SSH"),
-    RTE_EQ("RTE", "EQ"),
-    RTE_TP("RTE", "TP"),
+    RTE_SSH("RTEFRANCE", "SSH"),
+    RTE_EQ("RTEFRANCE", "EQ"),
+    RTE_TP("RTEFRANCE", "TP"),
     REE_SSH("REE", "SSH"),
     REE_EQ("REE", "EQ"),
     REE_TP("REE", "TP"),

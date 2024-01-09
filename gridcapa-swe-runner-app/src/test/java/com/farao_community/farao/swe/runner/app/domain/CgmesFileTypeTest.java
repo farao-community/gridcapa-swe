@@ -19,9 +19,9 @@ class CgmesFileTypeTest {
     void getTsoTest() {
         SoftAssertions assertions = new SoftAssertions();
         assertions.assertThat(CgmesFileType.CORESO_SV.getTso()).isEqualTo("CORESO");
-        assertions.assertThat(CgmesFileType.RTE_SSH.getTso()).isEqualTo("RTE");
-        assertions.assertThat(CgmesFileType.RTE_EQ.getTso()).isEqualTo("RTE");
-        assertions.assertThat(CgmesFileType.RTE_TP.getTso()).isEqualTo("RTE");
+        assertions.assertThat(CgmesFileType.RTE_SSH.getTso()).isEqualTo("RTEFRANCE");
+        assertions.assertThat(CgmesFileType.RTE_EQ.getTso()).isEqualTo("RTEFRANCE");
+        assertions.assertThat(CgmesFileType.RTE_TP.getTso()).isEqualTo("RTEFRANCE");
         assertions.assertThat(CgmesFileType.REE_SSH.getTso()).isEqualTo("REE");
         assertions.assertThat(CgmesFileType.REE_EQ.getTso()).isEqualTo("REE");
         assertions.assertThat(CgmesFileType.REE_TP.getTso()).isEqualTo("REE");
