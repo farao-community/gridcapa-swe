@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +53,8 @@ class NetworkServiceTest {
                 new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
                 new SweFileResource("BOUNDARY_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/20171002T0930Z_ENTSO-E_EQ_BD_2.xml")).toExternalForm()),
                 new SweFileResource("BOUNDARY_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/20171002T0930Z_ENTSO-E_EQ_BD_2.xml")).toExternalForm()),
-                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
+                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"),
+                new ArrayList<>());
     }
 
     @Test

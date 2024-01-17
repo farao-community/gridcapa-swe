@@ -11,6 +11,7 @@ import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyParallelization;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,8 @@ public class SweRunner {
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         SweData sweData = filesService.importFiles(sweRequest);
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(sweRequest.getTaskParameterList());
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, sweTaskParameters);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return sweResponse;
     }

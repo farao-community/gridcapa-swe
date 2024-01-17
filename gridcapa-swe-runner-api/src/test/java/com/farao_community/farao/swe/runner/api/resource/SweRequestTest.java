@@ -10,6 +10,7 @@ import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,7 +37,8 @@ class SweRequestTest {
                 new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
                 new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"),
-                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
+                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"),
+                new ArrayList<>());
         assertNotNull(sweRequest);
         assertEquals("id", sweRequest.getId());
         assertEquals(ProcessType.D2CC, sweRequest.getProcessType());

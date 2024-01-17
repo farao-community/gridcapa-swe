@@ -11,6 +11,7 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalExcep
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
@@ -38,21 +39,29 @@ public class DichotomyParallelization {
         this.worker = worker;
     }
 
-    public SweResponse launchDichotomy(SweData sweData) {
-        ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData);
+    public SweResponse launchDichotomy(SweData sweData, SweTaskParameters sweTaskParameters) {
+        ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters);
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         return new SweResponse(sweData.getId(), ttcDocUrl);
     }
 
-    private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData) {
+    private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData, SweTaskParameters sweTaskParameters) {
         List<SweDichotomyResult> results = new ArrayList<>();
         List<Future<SweDichotomyResult>> futures = new ArrayList<>();
         try {
-            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR));
-            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES));
-            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT));
-            futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES));
+            if (sweTaskParameters.isRunDirectionEsToFr()) {
+                futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_FR));
+            }
+            if (sweTaskParameters.isRunDirectionEsToPt()) {
+                futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT));
+            }
+            if (sweTaskParameters.isRunDirectionFrToES()) {
+                futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES));
+            }
+            if (sweTaskParameters.isRunDirectionPtToEs()) {
+                futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES));
+            }
             for (Future<SweDichotomyResult> future : futures) {
                 results.add(waitAndGet(future));
             }
