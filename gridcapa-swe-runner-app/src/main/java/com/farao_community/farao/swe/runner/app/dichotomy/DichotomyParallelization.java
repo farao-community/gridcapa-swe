@@ -56,12 +56,13 @@ public class DichotomyParallelization {
             if (sweTaskParameters.isRunDirectionEsToPt()) {
                 futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.ES_PT));
             }
-            if (sweTaskParameters.isRunDirectionFrToES()) {
+            if (sweTaskParameters.isRunDirectionFrToEs()) {
                 futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.FR_ES));
             }
             if (sweTaskParameters.isRunDirectionPtToEs()) {
                 futures.add(worker.runDichotomyForOneDirection(sweData, DichotomyDirection.PT_ES));
             }
+
             for (Future<SweDichotomyResult> future : futures) {
                 results.add(waitAndGet(future));
             }

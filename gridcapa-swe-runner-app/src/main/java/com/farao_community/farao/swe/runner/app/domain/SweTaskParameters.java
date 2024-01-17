@@ -15,23 +15,19 @@ public class SweTaskParameters {
 
     private boolean runDirectionEsToFr;
     private boolean runDirectionEsToPt;
-    private boolean runDirectionFrToES;
+    private boolean runDirectionFrToEs;
     private boolean runDirectionPtToEs;
 
     public SweTaskParameters(List<TaskParameterDto> parameters) {
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
-                case IS_RUN_ES_FR:  runDirectionEsToFr = validateIsBooleanAndGet(parameter);
-                break;
-                case IS_RUN_ES_PT: runDirectionEsToPt = validateIsBooleanAndGet(parameter);
-                break;
-                case IS_RUN_FR_ES: runDirectionFrToES =  validateIsBooleanAndGet(parameter);
-                break;
-                case IS_RUN_PT_ES: runDirectionPtToEs = validateIsBooleanAndGet(parameter);
-                break;
-                default:
+                case IS_RUN_ES_FR -> runDirectionEsToFr = validateIsBooleanAndGet(parameter);
+                case IS_RUN_ES_PT -> runDirectionEsToPt = validateIsBooleanAndGet(parameter);
+                case IS_RUN_FR_ES -> runDirectionFrToEs = validateIsBooleanAndGet(parameter);
+                case IS_RUN_PT_ES -> runDirectionPtToEs = validateIsBooleanAndGet(parameter);
+                default -> {
                     //do nothing
-
+                }
             }
         }
     }
@@ -42,7 +38,6 @@ public class SweTaskParameters {
         } else {
             throw new SweInvalidDataException(String.format("Invalid boolean parameter with id %s and value %s", parameter.getId(), parameter.getValue()));
         }
-
     }
 
     public boolean isRunDirectionEsToFr() {
@@ -53,8 +48,8 @@ public class SweTaskParameters {
         return runDirectionEsToPt;
     }
 
-    public boolean isRunDirectionFrToES() {
-        return runDirectionFrToES;
+    public boolean isRunDirectionFrToEs() {
+        return runDirectionFrToEs;
     }
 
     public boolean isRunDirectionPtToEs() {
