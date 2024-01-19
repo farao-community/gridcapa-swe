@@ -12,7 +12,6 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
-import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class DichotomyLogging {
         this.zoneId = ZoneId.of(processConfiguration.getZoneId());
     }
 
-    public void logStartDichotomy(Parameters parameters) {
+    public void logStartDichotomy(DichotomyParmaters parameters) {
         businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 

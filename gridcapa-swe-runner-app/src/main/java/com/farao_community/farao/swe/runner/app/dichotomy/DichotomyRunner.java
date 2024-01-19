@@ -13,10 +13,9 @@ import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
-import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
-import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Service;
 public class DichotomyRunner {
     private static final HalfRangeDivisionIndexStrategy HALF_INDEX_STRATEGY_CONFIGURATION = new HalfRangeDivisionIndexStrategy(false);
 
-    private final DichotomyConfiguration dichotomyConfiguration;
     private final DichotomyLogging dichotomyLogging;
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
@@ -40,14 +38,12 @@ public class DichotomyRunner {
 
     private final Logger businessLogger;
 
-    public DichotomyRunner(DichotomyConfiguration dichotomyConfiguration,
-                           DichotomyLogging dichotomyLogging,
+    public DichotomyRunner(DichotomyLogging dichotomyLogging,
                            FileExporter fileExporter,
                            FileImporter fileImporter,
                            NetworkShifterProvider networkShifterProvider,
                            RaoRunnerClient raoRunnerClient,
                            Logger businessLogger) {
-        this.dichotomyConfiguration = dichotomyConfiguration;
         this.dichotomyLogging = dichotomyLogging;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
@@ -56,15 +52,15 @@ public class DichotomyRunner {
         this.businessLogger = businessLogger;
     }
 
-    public DichotomyResult<SweDichotomyValidationData> run(SweData sweData, DichotomyDirection direction) {
-        Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
-        dichotomyLogging.logStartDichotomy(parameters);
-        DichotomyEngine<SweDichotomyValidationData> engine = buildDichotomyEngine(sweData, direction, parameters);
+    public DichotomyResult<SweDichotomyValidationData> run(SweData sweData, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        DichotomyParmaters dichotomyParameters = getDirectionParameters(sweTaskParameters, direction);
+        dichotomyLogging.logStartDichotomy(dichotomyParameters);
+        DichotomyEngine<SweDichotomyValidationData> engine = buildDichotomyEngine(sweData, direction, dichotomyParameters);
         Network network = NetworkService.getNetworkByDirection(sweData, direction);
         return engine.run(network);
     }
 
-    DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, Parameters parameters) {
+    DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, DichotomyParmaters parameters) {
         return new DichotomyEngine<>(
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 HALF_INDEX_STRATEGY_CONFIGURATION,
@@ -76,4 +72,30 @@ public class DichotomyRunner {
         return new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, direction, businessLogger);
     }
 
+    private DichotomyParmaters getDirectionParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        DichotomyParmaters result = new DichotomyParmaters();
+        switch (direction) {
+            case ES_FR -> {
+                result.setMinValue(sweTaskParameters.getMinPointEsFr());
+                result.setMaxValue(sweTaskParameters.getStartingPointEsFr());
+                result.setPrecision(sweTaskParameters.getSensitivityEsFr());
+            }
+            case ES_PT -> {
+                result.setMinValue(sweTaskParameters.getMinPointEsPt());
+                result.setMaxValue(sweTaskParameters.getStartingPointEsPt());
+                result.setPrecision(sweTaskParameters.getSensitivityEsPt());
+            }
+            case FR_ES -> {
+                result.setMinValue(sweTaskParameters.getMinPointFrEs());
+                result.setMaxValue(sweTaskParameters.getStartingPointFrEs());
+                result.setPrecision(sweTaskParameters.getSensitivityFrEs());
+            }
+            case PT_ES -> {
+                result.setMinValue(sweTaskParameters.getMinPointPtEs());
+                result.setMaxValue(sweTaskParameters.getStartingPointPtEs());
+                result.setPrecision(sweTaskParameters.getSensitivityPtEs());
+            }
+        }
+        return result;
+    }
 }

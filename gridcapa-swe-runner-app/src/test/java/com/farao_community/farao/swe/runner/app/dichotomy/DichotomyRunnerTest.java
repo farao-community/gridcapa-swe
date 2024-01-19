@@ -12,9 +12,9 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
-import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
@@ -54,7 +54,7 @@ class DichotomyRunnerTest {
     private SweData sweData;
 
     @Mock
-    private Parameters parameters;
+    private DichotomyParmaters parameters;
 
     @Test
     void testBuildDichotomyEngine() {
@@ -71,9 +71,13 @@ class DichotomyRunnerTest {
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(network);
         DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
-        Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), Mockito.any(Parameters.class));
+        Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), Mockito.any(DichotomyParmaters.class));
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
-        DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, DichotomyDirection.ES_FR);
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.getMinPointEsFr()).thenReturn(0);
+        Mockito.when(sweTaskParameters.getStartingPointEsFr()).thenReturn(6400);
+        Mockito.when(sweTaskParameters.getSensitivityEsFr()).thenReturn(50);
+        DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, sweTaskParameters, DichotomyDirection.ES_FR);
         assertEquals(mockDichotomyResult, dichotomyResult);
     }
 }

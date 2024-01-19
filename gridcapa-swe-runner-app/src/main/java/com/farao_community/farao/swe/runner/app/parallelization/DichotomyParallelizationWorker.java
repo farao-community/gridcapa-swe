@@ -15,6 +15,7 @@ import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
@@ -53,11 +54,11 @@ public class DichotomyParallelizationWorker {
     }
 
     @Async("threadPoolTaskExecutor")
-    public Future<SweDichotomyResult> runDichotomyForOneDirection(SweData sweData, DichotomyDirection direction) {
+    public Future<SweDichotomyResult> runDichotomyForOneDirection(SweData sweData, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
         // propagate in logs MDC the task requestId as an extra field to be able to send logs with calculation tasks.
         MDC.put("gridcapa-task-id", sweData.getId());
         MDC.put("eventPrefix", direction.getDashName());
-        DichotomyResult<SweDichotomyValidationData> dichotomyResult = dichotomyRunner.run(sweData, direction);
+        DichotomyResult<SweDichotomyValidationData> dichotomyResult = dichotomyRunner.run(sweData, sweTaskParameters, direction);
         dichotomyLogging.logEndOneDichotomy();
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
         String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
