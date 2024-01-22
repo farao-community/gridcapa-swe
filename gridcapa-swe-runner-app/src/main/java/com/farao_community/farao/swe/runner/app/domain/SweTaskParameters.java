@@ -31,6 +31,7 @@ public class SweTaskParameters {
     private static final String MIN_POINT_PT_ES =  "MIN_POINT_PT-ES";
     private static final String SENSITIVITY_PT_ES = "SENSITIVITY_PT-ES";
     private static final String RUN_ANGLE_CHECK = "RUN_ANGLE_CHECK";
+    private static final String RUN_VOLTAGE_CHECK = "RUN_VOLTAGE_CHECK";
 
     private boolean runDirectionEsToFr;
     private int startingPointEsFr;
@@ -49,6 +50,7 @@ public class SweTaskParameters {
     private int minPointPtEs;
     private int sensitivityPtEs;
     private boolean runAngleCheck;
+    private boolean runVoltageCheck;
 
     public SweTaskParameters(List<TaskParameterDto> parameters) {
         for (TaskParameterDto parameter : parameters) {
@@ -70,6 +72,7 @@ public class SweTaskParameters {
                 case MIN_POINT_PT_ES -> minPointPtEs = validateIsIntegerAndGet(parameter);
                 case SENSITIVITY_PT_ES -> sensitivityPtEs = validateIsIntegerAndGet(parameter);
                 case RUN_ANGLE_CHECK -> runAngleCheck = validateIsBooleanAndGet(parameter);
+                case RUN_VOLTAGE_CHECK -> runVoltageCheck = validateIsBooleanAndGet(parameter);
                 default -> {
                     //do nothing
                 }
@@ -159,5 +162,9 @@ public class SweTaskParameters {
 
     public boolean isRunAngleCheck() {
         return runAngleCheck;
+    }
+
+    public boolean isRunVoltageCheck() {
+        return runVoltageCheck;
     }
 }

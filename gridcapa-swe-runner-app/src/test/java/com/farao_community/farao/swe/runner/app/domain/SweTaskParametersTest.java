@@ -34,7 +34,8 @@ class SweTaskParametersTest {
             new TaskParameterDto("SENSITIVITY_FR-ES", "INT", "51", "1515"),
             new TaskParameterDto("SENSITIVITY_ES-PT", "INT", "52", "1515"),
             new TaskParameterDto("SENSITIVITY_PT-ES", "INT", "53", "1515"),
-            new TaskParameterDto("RUN_ANGLE_CHECK", "BOOLEAN", "true", "true")
+            new TaskParameterDto("RUN_ANGLE_CHECK", "BOOLEAN", "true", "true"),
+            new TaskParameterDto("RUN_VOLTAGE_CHECK", "BOOLEAN", "true", "true")
         );
 
         SweTaskParameters sweTaskParameters = new SweTaskParameters(parameters);
@@ -56,6 +57,7 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.getSensitivityEsPt()).isEqualTo(52);
         Assertions.assertThat(sweTaskParameters.getSensitivityPtEs()).isEqualTo(53);
         Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isTrue();
+        Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isTrue();
     }
 
     @Test

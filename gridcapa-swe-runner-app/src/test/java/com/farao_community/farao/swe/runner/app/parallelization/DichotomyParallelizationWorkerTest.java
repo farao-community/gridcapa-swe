@@ -29,8 +29,14 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -65,7 +71,7 @@ class DichotomyParallelizationWorkerTest {
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(result);
         when(cgmesExportService.buildAndExportCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class))).thenReturn("cgmesZipFileUrl");
         when(cneFileExportService.exportCneUrl(any(SweData.class), any(DichotomyResult.class), anyBoolean(), any(DichotomyDirection.class))).thenReturn("CneUrl");
-        when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
+        when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
         Mockito.when(sweTaskParameters.getMinPointEsPt()).thenReturn(0);
         Mockito.when(sweTaskParameters.getStartingPointEsPt()).thenReturn(6400);
