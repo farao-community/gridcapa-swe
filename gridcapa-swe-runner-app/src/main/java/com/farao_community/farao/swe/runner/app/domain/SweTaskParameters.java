@@ -30,6 +30,7 @@ public class SweTaskParameters {
     private static final String STARTING_POINT_PT_ES =  "STARTING_POINT_PT-ES";
     private static final String MIN_POINT_PT_ES =  "MIN_POINT_PT-ES";
     private static final String SENSITIVITY_PT_ES = "SENSITIVITY_PT-ES";
+    private static final String RUN_ANGLE_CHECK = "RUN_ANGLE_CHECK";
 
     private boolean runDirectionEsToFr;
     private int startingPointEsFr;
@@ -47,6 +48,7 @@ public class SweTaskParameters {
     private int startingPointPtEs;
     private int minPointPtEs;
     private int sensitivityPtEs;
+    private boolean runAngleCheck;
 
     public SweTaskParameters(List<TaskParameterDto> parameters) {
         for (TaskParameterDto parameter : parameters) {
@@ -67,6 +69,7 @@ public class SweTaskParameters {
                 case STARTING_POINT_PT_ES -> startingPointPtEs = validateIsIntegerAndGet(parameter);
                 case MIN_POINT_PT_ES -> minPointPtEs = validateIsIntegerAndGet(parameter);
                 case SENSITIVITY_PT_ES -> sensitivityPtEs = validateIsIntegerAndGet(parameter);
+                case RUN_ANGLE_CHECK -> runAngleCheck = validateIsBooleanAndGet(parameter);
                 default -> {
                     //do nothing
                 }
@@ -152,5 +155,9 @@ public class SweTaskParameters {
 
     public int getMinPointPtEs() {
         return minPointPtEs;
+    }
+
+    public boolean isRunAngleCheck() {
+        return runAngleCheck;
     }
 }

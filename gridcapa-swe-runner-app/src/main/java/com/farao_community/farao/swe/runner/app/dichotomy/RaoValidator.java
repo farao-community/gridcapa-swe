@@ -41,16 +41,18 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private final RaoRunnerClient raoRunnerClient;
     private final SweData sweData;
     private final DichotomyDirection direction;
+    private final boolean runAngleCheck;
     private int variantCounter = 0;
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, Logger businessLogger) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, Logger businessLogger) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoRunnerClient = raoRunnerClient;
         this.sweData = sweData;
         this.direction = direction;
+        this.runAngleCheck = runAngleCheck;
         this.businessLogger = businessLogger;
     }
 
@@ -65,7 +67,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
-            if (isPortugalInDirection() && raoResultIsSecure(raoResult)) {
+            if (this.runAngleCheck && isPortugalInDirection() && raoResultIsSecure(raoResult)) {
                 AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
                 AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
                 businessLogger.info("Angle monitoring result {}", angleMonitoringResult.getStatus());

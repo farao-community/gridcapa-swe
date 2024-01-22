@@ -6,11 +6,12 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-public class DichotomyParmaters {
+public class DichotomyParameters {
 
     private double minValue;
     private double maxValue;
     private double precision;
+    private boolean runAngleCheck;
 
     public double getMinValue() {
         return minValue;
@@ -36,4 +37,11 @@ public class DichotomyParmaters {
         this.precision = precision;
     }
 
+    public boolean isRunAngleCheck() {
+        return runAngleCheck;
+    }
+
+    public void setRunAngleCheck(boolean runAngleCheck) {
+        this.runAngleCheck = runAngleCheck;
+    }
 }

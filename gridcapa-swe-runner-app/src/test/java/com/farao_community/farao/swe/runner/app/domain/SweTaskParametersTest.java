@@ -21,7 +21,20 @@ class SweTaskParametersTest {
             new TaskParameterDto("RUN_ES-FR", "BOOLEAN", "true", "true"),
             new TaskParameterDto("RUN_FR-ES", "BOOLEAN", "false", "true"),
             new TaskParameterDto("RUN_ES-PT", "BOOLEAN", "true", "true"),
-            new TaskParameterDto("RUN_PT-ES", "BOOLEAN", "false", "true")
+            new TaskParameterDto("RUN_PT-ES", "BOOLEAN", "false", "true"),
+            new TaskParameterDto("STARTING_POINT_ES-FR", "INT", "42", "1515"),
+            new TaskParameterDto("STARTING_POINT_FR-ES", "INT", "43", "1515"),
+            new TaskParameterDto("STARTING_POINT_ES-PT", "INT", "44", "1515"),
+            new TaskParameterDto("STARTING_POINT_PT-ES", "INT", "45", "1515"),
+            new TaskParameterDto("MIN_POINT_ES-FR", "INT", "46", "1515"),
+            new TaskParameterDto("MIN_POINT_FR-ES", "INT", "47", "1515"),
+            new TaskParameterDto("MIN_POINT_ES-PT", "INT", "48", "1515"),
+            new TaskParameterDto("MIN_POINT_PT-ES", "INT", "49", "1515"),
+            new TaskParameterDto("SENSITIVITY_ES-FR", "INT", "50", "1515"),
+            new TaskParameterDto("SENSITIVITY_FR-ES", "INT", "51", "1515"),
+            new TaskParameterDto("SENSITIVITY_ES-PT", "INT", "52", "1515"),
+            new TaskParameterDto("SENSITIVITY_PT-ES", "INT", "53", "1515"),
+            new TaskParameterDto("RUN_ANGLE_CHECK", "BOOLEAN", "true", "true")
         );
 
         SweTaskParameters sweTaskParameters = new SweTaskParameters(parameters);
@@ -30,6 +43,19 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.isRunDirectionFrToEs()).isFalse();
         Assertions.assertThat(sweTaskParameters.isRunDirectionEsToPt()).isTrue();
         Assertions.assertThat(sweTaskParameters.isRunDirectionPtToEs()).isFalse();
+        Assertions.assertThat(sweTaskParameters.getStartingPointEsFr()).isEqualTo(42);
+        Assertions.assertThat(sweTaskParameters.getStartingPointFrEs()).isEqualTo(43);
+        Assertions.assertThat(sweTaskParameters.getStartingPointEsPt()).isEqualTo(44);
+        Assertions.assertThat(sweTaskParameters.getStartingPointPtEs()).isEqualTo(45);
+        Assertions.assertThat(sweTaskParameters.getMinPointEsFr()).isEqualTo(46);
+        Assertions.assertThat(sweTaskParameters.getMinPointFrEs()).isEqualTo(47);
+        Assertions.assertThat(sweTaskParameters.getMinPointEsPt()).isEqualTo(48);
+        Assertions.assertThat(sweTaskParameters.getMinPointPtEs()).isEqualTo(49);
+        Assertions.assertThat(sweTaskParameters.getSensitivityEsFr()).isEqualTo(50);
+        Assertions.assertThat(sweTaskParameters.getSensitivityFrEs()).isEqualTo(51);
+        Assertions.assertThat(sweTaskParameters.getSensitivityEsPt()).isEqualTo(52);
+        Assertions.assertThat(sweTaskParameters.getSensitivityPtEs()).isEqualTo(53);
+        Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isTrue();
     }
 
     @Test
@@ -53,7 +79,7 @@ class SweTaskParametersTest {
     }
 
     @Test
-    void badTypeParameterTest() {
+    void badTypeParameterBooleanTest() {
         List<TaskParameterDto> parameters = List.of(
             new TaskParameterDto("RUN_FR-ES", "STRING", "test", "default")
         );
@@ -62,5 +88,17 @@ class SweTaskParametersTest {
         Assertions.assertThatExceptionOfType(SweInvalidDataException.class)
             .isThrownBy(() -> new SweTaskParameters(parameters))
             .withMessage("Invalid boolean parameter with id RUN_FR-ES and value test");
+    }
+
+    @Test
+    void badTypeParameterIntTest() {
+        List<TaskParameterDto> parameters = List.of(
+            new TaskParameterDto("SENSITIVITY_FR-ES", "STRING", "test", "default")
+        );
+
+        // expected: object is created and no exception is thrown
+        Assertions.assertThatExceptionOfType(SweInvalidDataException.class)
+            .isThrownBy(() -> new SweTaskParameters(parameters))
+            .withMessage("Invalid integer parameter with id SENSITIVITY_FR-ES and value test");
     }
 }

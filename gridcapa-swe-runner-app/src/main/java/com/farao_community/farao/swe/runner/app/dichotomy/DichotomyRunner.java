@@ -53,27 +53,27 @@ public class DichotomyRunner {
     }
 
     public DichotomyResult<SweDichotomyValidationData> run(SweData sweData, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
-        DichotomyParmaters dichotomyParameters = getDirectionParameters(sweTaskParameters, direction);
+        DichotomyParameters dichotomyParameters = getDichotomyParameters(sweTaskParameters, direction);
         dichotomyLogging.logStartDichotomy(dichotomyParameters);
         DichotomyEngine<SweDichotomyValidationData> engine = buildDichotomyEngine(sweData, direction, dichotomyParameters);
         Network network = NetworkService.getNetworkByDirection(sweData, direction);
         return engine.run(network);
     }
 
-    DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, DichotomyParmaters parameters) {
+    DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, DichotomyParameters parameters) {
         return new DichotomyEngine<>(
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 HALF_INDEX_STRATEGY_CONFIGURATION,
                 networkShifterProvider.get(sweData, direction),
-                getNetworkValidator(sweData, direction));
+                getNetworkValidator(sweData, direction, parameters.isRunAngleCheck()));
     }
 
-    private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction) {
-        return new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, direction, businessLogger);
+    private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction, boolean runAngleCheck) {
+        return new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, direction, runAngleCheck, businessLogger);
     }
 
-    private DichotomyParmaters getDirectionParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
-        DichotomyParmaters result = new DichotomyParmaters();
+    private DichotomyParameters getDichotomyParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        DichotomyParameters result = new DichotomyParameters();
         switch (direction) {
             case ES_FR -> {
                 result.setMinValue(sweTaskParameters.getMinPointEsFr());
@@ -96,6 +96,7 @@ public class DichotomyRunner {
                 result.setPrecision(sweTaskParameters.getSensitivityPtEs());
             }
         }
+        result.setRunAngleCheck(sweTaskParameters.isRunAngleCheck());
         return result;
     }
 }

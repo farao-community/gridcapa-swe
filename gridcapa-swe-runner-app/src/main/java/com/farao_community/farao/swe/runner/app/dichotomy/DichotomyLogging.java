@@ -53,7 +53,7 @@ public class DichotomyLogging {
         this.zoneId = ZoneId.of(processConfiguration.getZoneId());
     }
 
-    public void logStartDichotomy(DichotomyParmaters parameters) {
+    public void logStartDichotomy(DichotomyParameters parameters) {
         businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 
