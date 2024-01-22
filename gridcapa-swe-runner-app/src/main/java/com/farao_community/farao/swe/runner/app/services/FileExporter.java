@@ -19,6 +19,7 @@ import com.farao_community.farao.rao_api.parameters.RaoParameters;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
 import com.farao_community.farao.swe.runner.app.voltage.json.FailureVoltageCheckResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -190,8 +191,8 @@ public class FileExporter {
         }
     }
 
-    public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, DichotomyDirection direction) {
-        RaoParameters raoParameters = getSweRaoParameters(direction);
+    public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        RaoParameters raoParameters = getSweRaoParameters(sweTaskParameters, direction);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonRaoParameters.write(raoParameters, baos);
         String raoParametersFileName = String.format(RAO_PARAMETERS_FILE_NAME, direction);
@@ -201,12 +202,13 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    RaoParameters getSweRaoParameters(DichotomyDirection direction) {
+    RaoParameters getSweRaoParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
         RaoParameters raoParameters = RaoParameters.load();
         if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
             // The cnec in series with pst concern only ES/FR border
             raoParameters.getNotOptimizedCnecsParameters().setDoNotOptimizeCnecsSecuredByTheirPst(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
         }
+        raoParameters.getRaUsageLimitsPerContingencyParameters().setMaxCurativeRa(sweTaskParameters.getMaxCra());
         return raoParameters;
     }
 

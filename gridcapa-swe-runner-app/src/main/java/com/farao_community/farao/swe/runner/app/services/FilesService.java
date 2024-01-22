@@ -14,6 +14,7 @@ import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ public class FilesService {
         this.fileExporter = fileExporter;
     }
 
-    public SweData importFiles(SweRequest sweRequest) {
+    public SweData importFiles(SweRequest sweRequest, SweTaskParameters sweTaskParameters) {
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
         networkService.addHvdcAndPstToNetwork(mergedNetwork);
@@ -60,8 +61,8 @@ public class FilesService {
         Crac cracEsPt = cracCreationContextEsPt.getCrac();
         String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());
         String jsonCracPathEsPt = fileExporter.saveCracInJsonFormat(cracEsPt, "cracEsPt.json", targetProcessDateTime, sweRequest.getProcessType());
-        String raoParametersEsFrUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), DichotomyDirection.ES_FR);
-        String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), DichotomyDirection.ES_PT);
+        String raoParametersEsFrUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_FR);
+        String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_PT);
         EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = fillMapCgmesInputFiles(sweRequest);
         return new SweData(sweRequest.getId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, mapCgmesInputFiles);
     }

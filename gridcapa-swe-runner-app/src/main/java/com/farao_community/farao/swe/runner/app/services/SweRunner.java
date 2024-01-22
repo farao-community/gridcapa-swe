@@ -34,8 +34,8 @@ public class SweRunner {
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
-        SweData sweData = filesService.importFiles(sweRequest);
         SweTaskParameters sweTaskParameters = new SweTaskParameters(sweRequest.getTaskParameterList());
+        SweData sweData = filesService.importFiles(sweRequest, sweTaskParameters);
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, sweTaskParameters);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return sweResponse;

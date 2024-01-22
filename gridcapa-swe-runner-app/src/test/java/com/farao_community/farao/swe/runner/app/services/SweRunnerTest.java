@@ -36,7 +36,7 @@ class SweRunnerTest {
 
     @Test
     void run() {
-        when(filesService.importFiles(any(SweRequest.class))).thenReturn(mock(SweData.class));
+        when(filesService.importFiles(any(SweRequest.class), any(SweTaskParameters.class))).thenReturn(mock(SweData.class));
         when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl"));
         SweResponse sweResponse = sweRunner.run(mock(SweRequest.class));
         assertNotNull(sweResponse);

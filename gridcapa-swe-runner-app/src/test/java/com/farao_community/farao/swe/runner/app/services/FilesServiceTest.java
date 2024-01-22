@@ -12,6 +12,7 @@ import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.Cim
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.SweTaskParametersTestUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,7 @@ class FilesServiceTest {
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");
         when(fileImporter.importCgmesFiles(anyString())).thenReturn(InputStream.nullInputStream());
         SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, null, new SweFileResource("name", "url"), new ArrayList<>());
-        SweData sweData = filesService.importFiles(sweRequest);
+        SweData sweData = filesService.importFiles(sweRequest, SweTaskParametersTestUtil.getSweTaskParameters());
         assertNotNull(sweData);
     }
 

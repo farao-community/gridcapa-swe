@@ -8,11 +8,13 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.data.crac_api.Crac;
 import com.farao_community.farao.data.crac_impl.CracImpl;
+import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
 import com.farao_community.farao.rao_api.parameters.RaoParameters;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -105,22 +108,27 @@ class FileExporterTest {
 
     @Test
     void saveRaoParametersTest() {
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "27", "12")));
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("raoParametersUrl");
-        String raoParametersUrl = fileExporter.saveRaoParameters(OffsetDateTime.now(), ProcessType.D2CC, DichotomyDirection.ES_FR);
+        String raoParametersUrl = fileExporter.saveRaoParameters(OffsetDateTime.now(), ProcessType.D2CC, sweTaskParameters, DichotomyDirection.ES_FR);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
         assertEquals("raoParametersUrl", raoParametersUrl);
     }
 
     @Test
     void sweRaoParametersEsFrTest() {
-        RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_FR);
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "27", "12")));
+        RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters, DichotomyDirection.ES_FR);
         assertEquals(2, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
+        assertEquals(27, raoParameters.getRaUsageLimitsPerContingencyParameters().getMaxCurativeRa());
     }
 
     @Test
     void sweRaoParametersEsPtTest() {
-        RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_PT);
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "32", "12")));
+        RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters, DichotomyDirection.ES_PT);
         assertEquals(0, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
+        assertEquals(32, raoParameters.getRaUsageLimitsPerContingencyParameters().getMaxCurativeRa());
     }
 
     @Test

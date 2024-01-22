@@ -32,6 +32,7 @@ public class SweTaskParameters {
     private static final String SENSITIVITY_PT_ES = "SENSITIVITY_PT-ES";
     private static final String RUN_ANGLE_CHECK = "RUN_ANGLE_CHECK";
     private static final String RUN_VOLTAGE_CHECK = "RUN_VOLTAGE_CHECK";
+    private static final String MAX_CRA = "MAX_CRA";
 
     private boolean runDirectionEsToFr;
     private int startingPointEsFr;
@@ -51,6 +52,7 @@ public class SweTaskParameters {
     private int sensitivityPtEs;
     private boolean runAngleCheck;
     private boolean runVoltageCheck;
+    private int maxCra;
 
     public SweTaskParameters(List<TaskParameterDto> parameters) {
         for (TaskParameterDto parameter : parameters) {
@@ -73,6 +75,7 @@ public class SweTaskParameters {
                 case SENSITIVITY_PT_ES -> sensitivityPtEs = validateIsIntegerAndGet(parameter);
                 case RUN_ANGLE_CHECK -> runAngleCheck = validateIsBooleanAndGet(parameter);
                 case RUN_VOLTAGE_CHECK -> runVoltageCheck = validateIsBooleanAndGet(parameter);
+                case MAX_CRA -> maxCra = validateIsIntegerAndGet(parameter);
                 default -> {
                     //do nothing
                 }
@@ -166,5 +169,9 @@ public class SweTaskParameters {
 
     public boolean isRunVoltageCheck() {
         return runVoltageCheck;
+    }
+
+    public int getMaxCra() {
+        return maxCra;
     }
 }

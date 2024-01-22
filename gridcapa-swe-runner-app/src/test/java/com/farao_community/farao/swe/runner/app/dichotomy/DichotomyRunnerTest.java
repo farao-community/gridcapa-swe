@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -62,7 +63,8 @@ class DichotomyRunnerTest {
     @Test
     void testBuildDichotomyEngine() {
         when(networkShifterProvider.get(any(SweData.class), any(DichotomyDirection.class))).thenReturn(networkShifter);
-        when(fileExporter.saveRaoParameters(OffsetDateTime.now(), ProcessType.D2CC, DichotomyDirection.ES_FR)).thenReturn("raoParameters.json");
+        when(fileExporter.saveRaoParameters(eq(OffsetDateTime.now()), eq(ProcessType.D2CC), any(SweTaskParameters.class), eq(DichotomyDirection.ES_FR)))
+            .thenReturn("raoParameters.json");
         DichotomyEngine<SweDichotomyValidationData> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, parameters);
         assertNotNull(engine);
     }

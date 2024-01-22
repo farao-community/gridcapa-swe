@@ -12,7 +12,11 @@ import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SweTaskParametersTestUtil {
+public final class SweTaskParametersTestUtil {
+    private SweTaskParametersTestUtil() {
+        // Util class should not be instanced
+    }
+
     public static SweTaskParameters getSweTaskParameters() {
         List<TaskParameterDto> parameters = new ArrayList<>();
         parameters.add(new TaskParameterDto("RUN_ES-FR", "BOOLEAN", "true", "true"));
