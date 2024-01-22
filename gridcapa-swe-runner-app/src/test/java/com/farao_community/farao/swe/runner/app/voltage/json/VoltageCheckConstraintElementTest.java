@@ -6,9 +6,10 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
-import com.farao_community.farao.data.crac_api.Instant;
+import com.powsybl.openrao.data.cracapi.Instant;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,10 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class VoltageCheckConstraintElementTest {
 
+    private static final Instant PREVENTIVE_INSTANT = Mockito.mock(Instant.class);
+    private static final Instant CURATIVE_INSTANT = Mockito.mock(Instant.class);
+
     @Test
     void testEmptyNetworkElementIdParameter() {
+        Mockito.when(PREVENTIVE_INSTANT.isPreventive()).thenReturn(true);
         NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckConstraintElement(null, Instant.PREVENTIVE, null, 1.2, 1.3, 1.4, 1.5);
+            new VoltageCheckConstraintElement(null, "PREVENTIVE", null, 1.2, 1.3, 1.4, 1.5);
             fail("Should have thrown npe exception because no network element id");
         });
         assertEquals("The value of networkElementId cannot be null in VoltageCheckConstraintElement", npe.getMessage());
@@ -38,8 +43,9 @@ class VoltageCheckConstraintElementTest {
 
     @Test
     void testEmptyMinVoltageParameter() {
+        Mockito.when(CURATIVE_INSTANT.isCurative()).thenReturn(true);
         NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckConstraintElement("testid", Instant.CURATIVE, "test", null, 1.3, 1.4, 1.5);
+            new VoltageCheckConstraintElement("testid", "CURATIVE", "test", null, 1.3, 1.4, 1.5);
             fail("Should have thrown npe exception because no minVoltage");
         });
         assertEquals("The value of minVoltage cannot be null in VoltageCheckConstraintElement", npe.getMessage());
@@ -47,8 +53,9 @@ class VoltageCheckConstraintElementTest {
 
     @Test
     void testEmptyMaxVoltageParameter() {
+        Mockito.when(CURATIVE_INSTANT.isCurative()).thenReturn(true);
         NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckConstraintElement("testid", Instant.CURATIVE, "test", 1.2, null, 1.4, 1.5);
+            new VoltageCheckConstraintElement("testid", "CURATIVE", "test", 1.2, null, 1.4, 1.5);
             fail("Should have thrown npe exception because no maxVoltage");
         });
         assertEquals("The value of maxVoltage cannot be null in VoltageCheckConstraintElement", npe.getMessage());
@@ -56,8 +63,9 @@ class VoltageCheckConstraintElementTest {
 
     @Test
     void testEmptyLowerBoundParameter() {
+        Mockito.when(CURATIVE_INSTANT.isCurative()).thenReturn(true);
         NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckConstraintElement("testid", Instant.CURATIVE, "test", 1.2, 1.3, null, 1.5);
+            new VoltageCheckConstraintElement("testid", "CURATIVE", "test", 1.2, 1.3, null, 1.5);
             fail("Should have thrown npe exception because no lowerBound");
         });
         assertEquals("The value of lowerBound cannot be null in VoltageCheckConstraintElement", npe.getMessage());
@@ -65,8 +73,9 @@ class VoltageCheckConstraintElementTest {
 
     @Test
     void testEmptyHigherBoundParameter() {
+        Mockito.when(CURATIVE_INSTANT.isCurative()).thenReturn(true);
         NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckConstraintElement("testid", Instant.CURATIVE, "test", 1.2, 1.3, 1.4, null);
+            new VoltageCheckConstraintElement("testid", "CURATIVE", "test", 1.2, 1.3, 1.4, null);
             fail("Should have thrown npe exception because no higherBound");
         });
         assertEquals("The value of upperBound cannot be null in VoltageCheckConstraintElement", npe.getMessage());
@@ -74,11 +83,12 @@ class VoltageCheckConstraintElementTest {
 
     @Test
     void testOKAllParameter() {
+        Mockito.when(CURATIVE_INSTANT.isCurative()).thenReturn(true);
         try {
-            VoltageCheckConstraintElement result = new VoltageCheckConstraintElement("testid", Instant.CURATIVE, "test", 1.2, 1.3, 1.4, 1.5);
+            VoltageCheckConstraintElement result = new VoltageCheckConstraintElement("testid", "CURATIVE", "test", 1.2, 1.3, 1.4, 1.5);
             assertNotNull(result);
             assertEquals("testid", result.getNetworkElementId());
-            assertEquals(Instant.CURATIVE, result.getInstant());
+            assertEquals("CURATIVE", result.getInstant());
             assertEquals("test", result.getContingencyId());
             assertEquals(1.2, result.getMinVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
             assertEquals(1.3, result.getMaxVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
@@ -92,8 +102,9 @@ class VoltageCheckConstraintElementTest {
 
     @Test
     void testOKAllParameterNullContigency() {
+        Mockito.when(CURATIVE_INSTANT.isCurative()).thenReturn(true);
         try {
-            VoltageCheckConstraintElement result = new VoltageCheckConstraintElement("testid", Instant.CURATIVE, null, 1.2, 1.3, 1.4, 1.5);
+            VoltageCheckConstraintElement result = new VoltageCheckConstraintElement("testid", "CURATIVE", null, 1.2, 1.3, 1.4, 1.5);
             assertNotNull(result);
         } catch (NullPointerException npe) {
             fail("Should not have thrown npe exception");

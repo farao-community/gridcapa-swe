@@ -6,11 +6,11 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.openrao.commons.EICode;
 
 import java.util.Map;
 import java.util.TreeMap;

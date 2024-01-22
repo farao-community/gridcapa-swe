@@ -6,13 +6,13 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_impl.CracImpl;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracimpl.CracImpl;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
-import com.farao_community.farao.rao_api.parameters.RaoParameters;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

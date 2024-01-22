@@ -6,13 +6,14 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage;
 
-import com.farao_community.farao.commons.Unit;
-import com.farao_community.farao.data.crac_api.Contingency;
-import com.farao_community.farao.data.crac_api.Instant;
-import com.farao_community.farao.data.crac_api.NetworkElement;
-import com.farao_community.farao.data.crac_api.State;
-import com.farao_community.farao.data.crac_api.cnec.VoltageCnec;
-import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.commons.Unit;
+import com.powsybl.openrao.data.cracapi.Contingency;
+import com.powsybl.openrao.data.cracapi.Instant;
+import com.powsybl.openrao.data.cracapi.InstantKind;
+import com.powsybl.openrao.data.cracapi.NetworkElement;
+import com.powsybl.openrao.data.cracapi.State;
+import com.powsybl.openrao.data.cracapi.cnec.VoltageCnec;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import org.mockito.Mockito;
 
 import java.util.HashSet;
@@ -36,14 +37,21 @@ public final class VoltageMonitoringResultTestUtils {
     public static final double EXPECTED_MAX_1 = 155.666;
     public static final double DELTA_SMALL = 0.001;
     public static final double DELTA_BIG = 0.0000001;
+    private static final Instant PREVENTIVE_INSTANT = Mockito.mock(Instant.class);
+    private static final Instant CURATIVE_INSTANT = Mockito.mock(Instant.class);
 
     public static VoltageMonitoringResult getMonitoringResult() {
+        Mockito.when(PREVENTIVE_INSTANT.isPreventive()).thenReturn(true);
+        Mockito.when(PREVENTIVE_INSTANT.getKind()).thenReturn(InstantKind.PREVENTIVE);
+        Mockito.when(CURATIVE_INSTANT.isPreventive()).thenReturn(false);
+        Mockito.when(CURATIVE_INSTANT.isCurative()).thenReturn(true);
+        Mockito.when(CURATIVE_INSTANT.getKind()).thenReturn(InstantKind.CURATIVE);
         VoltageMonitoringResult voltageMonitoringResult = Mockito.mock(VoltageMonitoringResult.class);
         Mockito.when(voltageMonitoringResult.getStatus()).thenReturn(VoltageMonitoringResult.Status.SECURE);
         Set<VoltageCnec> constraintElements = new HashSet<>();
         VoltageCnec voltageCnec1 = Mockito.mock(VoltageCnec.class);
         State state1 = Mockito.mock(State.class);
-        Mockito.when(state1.getInstant()).thenReturn(Instant.PREVENTIVE);
+        Mockito.when(state1.getInstant()).thenReturn(PREVENTIVE_INSTANT);
         Mockito.when(voltageCnec1.getState()).thenReturn(state1);
         NetworkElement networkElement1 = Mockito.mock(NetworkElement.class);
         Mockito.when(networkElement1.getId()).thenReturn(NETWORK_1_ID);
@@ -53,7 +61,7 @@ public final class VoltageMonitoringResultTestUtils {
         constraintElements.add(voltageCnec1);
         VoltageCnec voltageCnec2 = Mockito.mock(VoltageCnec.class);
         State state2 = Mockito.mock(State.class);
-        Mockito.when(state2.getInstant()).thenReturn(Instant.CURATIVE);
+        Mockito.when(state2.getInstant()).thenReturn(CURATIVE_INSTANT);
         Contingency contingency = Mockito.mock(Contingency.class);
         Mockito.when(contingency.getId()).thenReturn(CONTINGENCY_ID);
         Mockito.when(state2.getContingency()).thenReturn(Optional.of(contingency));

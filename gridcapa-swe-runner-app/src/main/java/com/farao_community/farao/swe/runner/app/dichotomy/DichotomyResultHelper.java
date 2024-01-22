@@ -6,13 +6,12 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.farao_community.farao.commons.Unit;
-import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_api.Instant;
-import com.farao_community.farao.data.crac_api.cnec.FlowCnec;
-import com.farao_community.farao.data.crac_api.network_action.NetworkAction;
-import com.farao_community.farao.data.crac_api.range_action.RangeAction;
-import com.farao_community.farao.data.rao_result_api.RaoResult;
+import com.powsybl.openrao.commons.Unit;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.cnec.FlowCnec;
+import com.powsybl.openrao.data.cracapi.networkaction.NetworkAction;
+import com.powsybl.openrao.data.cracapi.rangeaction.RangeAction;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 
 import java.util.ArrayList;
@@ -73,11 +72,7 @@ public final class DichotomyResultHelper {
     public static List<String> getActivatedActionInCurative(Crac crac, RaoResult raoResult) {
         //CURATIVE && AUTO
         Set<String> crasNames = new HashSet<>();
-        crac.getStates(Instant.CURATIVE).forEach(state -> {
-            crasNames.addAll(raoResult.getActivatedNetworkActionsDuringState(state).stream().map(NetworkAction::getName).collect(Collectors.toSet()));
-            crasNames.addAll(raoResult.getActivatedRangeActionsDuringState(state).stream().map(RangeAction::getName).collect(Collectors.toSet()));
-        });
-        crac.getStates(Instant.AUTO).forEach(state -> {
+        crac.getStates().stream().filter(state -> state.getInstant().isCurative() || state.getInstant().isAuto()).forEach(state -> {
             crasNames.addAll(raoResult.getActivatedNetworkActionsDuringState(state).stream().map(NetworkAction::getName).collect(Collectors.toSet()));
             crasNames.addAll(raoResult.getActivatedRangeActionsDuringState(state).stream().map(RangeAction::getName).collect(Collectors.toSet()));
         });

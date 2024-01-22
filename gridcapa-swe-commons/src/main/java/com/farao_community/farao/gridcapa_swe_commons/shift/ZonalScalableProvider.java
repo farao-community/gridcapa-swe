@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
 import com.powsybl.glsk.commons.ZonalData;
@@ -16,6 +15,7 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
+import com.powsybl.openrao.commons.EICode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

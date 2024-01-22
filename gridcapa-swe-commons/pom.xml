@@ -62,8 +62,8 @@
             <artifactId>powsybl-iidm-modification</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-io-api</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-io-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>

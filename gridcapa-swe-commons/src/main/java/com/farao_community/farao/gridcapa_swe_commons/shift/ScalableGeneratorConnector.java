@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
@@ -16,6 +15,7 @@ import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
+import com.powsybl.openrao.commons.EICode;
 import org.jgrapht.alg.util.Pair;
 
 import java.util.HashMap;

@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.powsybl.balances_adjustment.util.CountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
@@ -16,6 +15,7 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
+import com.powsybl.openrao.commons.EICode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
