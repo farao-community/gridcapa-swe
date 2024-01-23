@@ -68,7 +68,8 @@ public class SweTaskParameters {
 
     private boolean validateIsBooleanAndGet(TaskParameterDto parameter) {
         if (StringUtils.equals("BOOLEAN", parameter.getParameterType())) {
-            return Boolean.parseBoolean(parameter.getValue());
+            String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
+            return Boolean.parseBoolean(value);
         } else {
             throw new SweInvalidDataException(String.format("Invalid boolean parameter with id %s and value %s", parameter.getId(), parameter.getValue()));
         }
@@ -76,7 +77,8 @@ public class SweTaskParameters {
 
     private int validateIsIntegerAndGet(TaskParameterDto parameter) {
         if (StringUtils.equals("INT", parameter.getParameterType())) {
-            return Integer.parseInt(parameter.getValue());
+            String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
+            return Integer.parseInt(value);
         } else {
             throw new SweInvalidDataException(String.format("Invalid integer parameter with id %s and value %s", parameter.getId(), parameter.getValue()));
         }
