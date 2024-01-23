@@ -7,6 +7,7 @@
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlowParameters;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -21,7 +22,7 @@ class CountryBalanceComputationTest {
     @Test
     void testCountryGeneratorsScalableforFR() {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
-        Map<String, Double> countriesBalances = CountryBalanceComputation.computeSweCountriesBalances(network);
+        Map<String, Double> countriesBalances = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         assertEquals(3, countriesBalances.size());
     }
 }

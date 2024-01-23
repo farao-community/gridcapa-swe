@@ -69,7 +69,7 @@ class DichotomyParallelizationWorkerTest {
     void testRunDichotomyForOneDirection() {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(result);
-        when(cgmesExportService.buildAndExportCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class))).thenReturn("cgmesZipFileUrl");
+        when(cgmesExportService.buildAndExportCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesZipFileUrl");
         when(cneFileExportService.exportCneUrl(any(SweData.class), any(DichotomyResult.class), anyBoolean(), any(DichotomyDirection.class))).thenReturn("CneUrl");
         when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);

@@ -61,7 +61,7 @@ public class DichotomyParallelizationWorker {
         DichotomyResult<SweDichotomyValidationData> dichotomyResult = dichotomyRunner.run(sweData, sweTaskParameters, direction);
         dichotomyLogging.logEndOneDichotomy();
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
-        String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult);
+        String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult, sweTaskParameters);
         String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, direction);
         String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, sweTaskParameters, direction);

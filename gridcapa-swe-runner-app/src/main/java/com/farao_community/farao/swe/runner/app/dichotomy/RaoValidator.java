@@ -12,12 +12,12 @@ import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoring;
 import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
@@ -42,17 +42,19 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private final SweData sweData;
     private final DichotomyDirection direction;
     private final boolean runAngleCheck;
+    private final LoadFlowParameters loadFlowParameters;
     private int variantCounter = 0;
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, Logger businessLogger) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters, Logger businessLogger) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoRunnerClient = raoRunnerClient;
         this.sweData = sweData;
         this.direction = direction;
         this.runAngleCheck = runAngleCheck;
+        this.loadFlowParameters = loadFlowParameters;
         this.businessLogger = businessLogger;
     }
 
@@ -69,7 +71,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
             if (this.runAngleCheck && isPortugalInDirection() && raoResultIsSecure(raoResult)) {
                 AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
-                AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
+                AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), loadFlowParameters, 4, sweData.getTimestamp());
                 businessLogger.info("Angle monitoring result {}", angleMonitoringResult.getStatus());
                 return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, angleMonitoringResult), angleMonitoringResult.isSecure());
             }

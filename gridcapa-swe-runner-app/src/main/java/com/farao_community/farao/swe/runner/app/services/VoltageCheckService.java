@@ -15,6 +15,7 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalExcep
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
@@ -58,7 +59,8 @@ public class VoltageCheckService {
             Crac crac = sweData.getCracFrEs().getCrac();
             Network network = getNetworkWithPra(dichotomyResult);
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
-            return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));
+            LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
+            return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), loadFlowParameters, 4));
         } catch (Exception e) {
             businessLogger.error("Exception during voltage check : {}", e.getMessage());
             return Optional.empty();

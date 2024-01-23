@@ -37,6 +37,8 @@ public final class SweTaskParametersTestUtil {
         parameters.add(new TaskParameterDto("SENSITIVITY_PT-ES", "INT", "15", "1515"));
         parameters.add(new TaskParameterDto("RUN_ANGLE_CHECK", "BOOLEAN", "true", "true"));
         parameters.add(new TaskParameterDto("RUN_VOLTAGE_CHECK", "BOOLEAN", "true", "true"));
+        parameters.add(new TaskParameterDto("MAX_CRA", "INT", "8", "10"));
+        parameters.add(new TaskParameterDto("MAX_NEWTON_RAPHSON_ITERATIONS", "INT", "5", "15"));
         return new SweTaskParameters(parameters);
     }
 

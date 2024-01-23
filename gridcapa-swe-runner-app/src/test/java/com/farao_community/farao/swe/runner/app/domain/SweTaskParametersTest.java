@@ -36,7 +36,8 @@ class SweTaskParametersTest {
             new TaskParameterDto("SENSITIVITY_PT-ES", "INT", "53", "1515"),
             new TaskParameterDto("RUN_ANGLE_CHECK", "BOOLEAN", "true", "true"),
             new TaskParameterDto("RUN_VOLTAGE_CHECK", "BOOLEAN", "true", "true"),
-            new TaskParameterDto("MAX_CRA", "INT", "72", "25")
+            new TaskParameterDto("MAX_CRA", "INT", "72", "25"),
+            new TaskParameterDto("MAX_NEWTON_RAPHSON_ITERATIONS", "INT", "38", "63")
         );
 
         SweTaskParameters sweTaskParameters = new SweTaskParameters(parameters);
@@ -60,6 +61,7 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isTrue();
         Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isTrue();
         Assertions.assertThat(sweTaskParameters.getMaxCra()).isEqualTo(72);
+        Assertions.assertThat(sweTaskParameters.getMaxNewtonRaphsonIterations()).isEqualTo(38);
     }
 
     @Test
@@ -80,6 +82,22 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.isRunDirectionFrEs()).isFalse();
         Assertions.assertThat(sweTaskParameters.isRunDirectionEsPt()).isFalse();
         Assertions.assertThat(sweTaskParameters.isRunDirectionPtEs()).isFalse();
+        Assertions.assertThat(sweTaskParameters.getStartingPointEsFr()).isZero();
+        Assertions.assertThat(sweTaskParameters.getStartingPointFrEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getStartingPointEsPt()).isZero();
+        Assertions.assertThat(sweTaskParameters.getStartingPointPtEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinPointEsFr()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinPointFrEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinPointEsPt()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinPointPtEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getSensitivityEsFr()).isZero();
+        Assertions.assertThat(sweTaskParameters.getSensitivityFrEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getSensitivityEsPt()).isZero();
+        Assertions.assertThat(sweTaskParameters.getSensitivityPtEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isFalse();
+        Assertions.assertThat(sweTaskParameters.getMaxCra()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMaxNewtonRaphsonIterations()).isZero();
     }
 
     @Test

@@ -9,10 +9,13 @@ package com.farao_community.farao.swe.runner.app.domain;
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class SweTaskParameters {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SweTaskParameters.class);
 
     private static final String IS_RUN_ES_FR = "RUN_ES-FR";
     private static final String IS_RUN_FR_ES = "RUN_FR-ES";
@@ -33,6 +36,7 @@ public class SweTaskParameters {
     private static final String RUN_ANGLE_CHECK = "RUN_ANGLE_CHECK";
     private static final String RUN_VOLTAGE_CHECK = "RUN_VOLTAGE_CHECK";
     private static final String MAX_CRA = "MAX_CRA";
+    private static final String MAX_NEWTON_RAPHSON_ITERATIONS = "MAX_NEWTON_RAPHSON_ITERATIONS";
 
     private boolean runDirectionEsFr;
     private boolean runDirectionFrEs;
@@ -53,6 +57,7 @@ public class SweTaskParameters {
     private boolean runAngleCheck;
     private boolean runVoltageCheck;
     private int maxCra;
+    private int maxNewtonRaphsonIterations;
 
     public SweTaskParameters(List<TaskParameterDto> parameters) {
         for (TaskParameterDto parameter : parameters) {
@@ -76,9 +81,8 @@ public class SweTaskParameters {
                 case RUN_ANGLE_CHECK -> runAngleCheck = validateIsBooleanAndGet(parameter);
                 case RUN_VOLTAGE_CHECK -> runVoltageCheck = validateIsBooleanAndGet(parameter);
                 case MAX_CRA -> maxCra = validateIsIntegerAndGet(parameter);
-                default -> {
-                    //do nothing
-                }
+                case MAX_NEWTON_RAPHSON_ITERATIONS -> maxNewtonRaphsonIterations = validateIsIntegerAndGet(parameter);
+                default -> LOGGER.warn("Unknown parameter {} (value {}) will be ignored", parameter.getId(), parameter.getValue());
             }
         }
     }
@@ -173,5 +177,9 @@ public class SweTaskParameters {
 
     public int getMaxCra() {
         return maxCra;
+    }
+
+    public int getMaxNewtonRaphsonIterations() {
+        return maxNewtonRaphsonIterations;
     }
 }

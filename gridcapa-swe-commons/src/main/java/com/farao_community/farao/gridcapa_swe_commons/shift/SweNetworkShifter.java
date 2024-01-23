@@ -57,8 +57,9 @@ public class SweNetworkShifter implements NetworkShifter {
     private final double toleranceEsFr;
     private final Map<String, Double> initialNetPositions;
     private final ProcessConfiguration processConfiguration;
+    private final LoadFlowParameters loadFlowParameters;
 
-    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration) {
+    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration, LoadFlowParameters loadFlowParameters) {
         this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
@@ -68,6 +69,7 @@ public class SweNetworkShifter implements NetworkShifter {
         this.toleranceEsFr = toleranceEsFr;
         this.initialNetPositions = initialNetPositions;
         this.processConfiguration = processConfiguration;
+        this.loadFlowParameters = loadFlowParameters;
     }
 
     @Override
@@ -123,7 +125,7 @@ public class SweNetworkShifter implements NetworkShifter {
                 }
 
                 // Step 2: Compute exchanges mismatch
-                LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), LoadFlowParameters.load());
+                LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), loadFlowParameters);
                 if (!result.isOk()) {
                     LOGGER.error("Loadflow computation diverged on network '{}' for direction {}", network.getId(), direction.getDashName());
                     businessLogger.error("Loadflow computation diverged on network during balancing adjustment");

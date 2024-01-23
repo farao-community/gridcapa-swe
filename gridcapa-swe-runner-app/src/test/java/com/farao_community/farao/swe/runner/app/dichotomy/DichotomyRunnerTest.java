@@ -19,6 +19,8 @@ import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openloadflow.OpenLoadFlowParameters;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -58,14 +60,16 @@ class DichotomyRunnerTest {
     private SweData sweData;
 
     @Mock
-    private DichotomyParameters parameters;
+    private DichotomyParameters dichotomyParameters;
+    @Mock
+    private LoadFlowParameters loadFlowParameters;
 
     @Test
     void testBuildDichotomyEngine() {
-        when(networkShifterProvider.get(any(SweData.class), any(DichotomyDirection.class))).thenReturn(networkShifter);
+        when(networkShifterProvider.get(any(SweData.class), any(DichotomyDirection.class), any(LoadFlowParameters.class))).thenReturn(networkShifter);
         when(fileExporter.saveRaoParameters(eq(OffsetDateTime.now()), eq(ProcessType.D2CC), any(SweTaskParameters.class), eq(DichotomyDirection.ES_FR)))
             .thenReturn("raoParameters.json");
-        DichotomyEngine<SweDichotomyValidationData> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, parameters);
+        DichotomyEngine<SweDichotomyValidationData> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, dichotomyParameters, loadFlowParameters);
         assertNotNull(engine);
     }
 
@@ -76,18 +80,31 @@ class DichotomyRunnerTest {
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(network);
         DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
-        ArgumentCaptor<DichotomyParameters> argumentCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
-        Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), argumentCaptor.capture());
+        ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
+        ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
+        Mockito.doReturn(mockEngine)
+            .when(spyDichotomyRunner).buildDichotomyEngine(
+                Mockito.any(SweData.class),
+                Mockito.any(DichotomyDirection.class),
+                dichotomyParametersCaptor.capture(),
+                loadFlowParametersCaptor.capture());
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
         SweTaskParameters sweTaskParameters = SweTaskParametersTestUtil.getSweTaskParameters();
+
         DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, sweTaskParameters, DichotomyDirection.ES_FR);
+
         assertEquals(mockDichotomyResult, dichotomyResult);
-        DichotomyParameters captorValue = argumentCaptor.getValue();
-        assertNotNull(captorValue);
-        assertEquals(42, captorValue.getMaxValue());
-        assertEquals(82, captorValue.getMinValue());
-        assertEquals(12, captorValue.getPrecision());
-        assertTrue(captorValue.isRunAngleCheck());
+
+        DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
+        assertNotNull(dichotomyParametersCaptorValue);
+        assertEquals(42, dichotomyParametersCaptorValue.getMaxValue());
+        assertEquals(82, dichotomyParametersCaptorValue.getMinValue());
+        assertEquals(12, dichotomyParametersCaptorValue.getPrecision());
+        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+
+        LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
+        assertNotNull(loadFlowParametersCaptorValue);
+        assertEquals(5, loadFlowParametersCaptorValue.getExtension(OpenLoadFlowParameters.class).getMaxNewtonRaphsonIterations());
     }
 
     @Test
@@ -97,18 +114,30 @@ class DichotomyRunnerTest {
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(network);
         DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
-        ArgumentCaptor<DichotomyParameters> argumentCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
-        Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), argumentCaptor.capture());
+        ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
+        ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
+        Mockito.doReturn(mockEngine)
+            .when(spyDichotomyRunner).buildDichotomyEngine(
+                Mockito.any(SweData.class),
+                Mockito.any(DichotomyDirection.class),
+                dichotomyParametersCaptor.capture(),
+                loadFlowParametersCaptor.capture());
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
         SweTaskParameters sweTaskParameters = SweTaskParametersTestUtil.getSweTaskParameters();
         DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, sweTaskParameters, DichotomyDirection.FR_ES);
+
         assertEquals(mockDichotomyResult, dichotomyResult);
-        DichotomyParameters captorValue = argumentCaptor.getValue();
-        assertNotNull(captorValue);
-        assertEquals(43, captorValue.getMaxValue());
-        assertEquals(83, captorValue.getMinValue());
-        assertEquals(13, captorValue.getPrecision());
-        assertTrue(captorValue.isRunAngleCheck());
+
+        DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
+        assertNotNull(dichotomyParametersCaptorValue);
+        assertEquals(43, dichotomyParametersCaptorValue.getMaxValue());
+        assertEquals(83, dichotomyParametersCaptorValue.getMinValue());
+        assertEquals(13, dichotomyParametersCaptorValue.getPrecision());
+        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+
+        LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
+        assertNotNull(loadFlowParametersCaptorValue);
+        assertEquals(5, loadFlowParametersCaptorValue.getExtension(OpenLoadFlowParameters.class).getMaxNewtonRaphsonIterations());
     }
 
     @Test
@@ -118,18 +147,30 @@ class DichotomyRunnerTest {
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(network);
         DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
-        ArgumentCaptor<DichotomyParameters> argumentCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
-        Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), argumentCaptor.capture());
+        ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
+        ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
+        Mockito.doReturn(mockEngine)
+            .when(spyDichotomyRunner).buildDichotomyEngine(
+                Mockito.any(SweData.class),
+                Mockito.any(DichotomyDirection.class),
+                dichotomyParametersCaptor.capture(),
+                loadFlowParametersCaptor.capture());
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
         SweTaskParameters sweTaskParameters = SweTaskParametersTestUtil.getSweTaskParameters();
         DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, sweTaskParameters, DichotomyDirection.ES_PT);
+
         assertEquals(mockDichotomyResult, dichotomyResult);
-        DichotomyParameters captorValue = argumentCaptor.getValue();
-        assertNotNull(captorValue);
-        assertEquals(44, captorValue.getMaxValue());
-        assertEquals(84, captorValue.getMinValue());
-        assertEquals(14, captorValue.getPrecision());
-        assertTrue(captorValue.isRunAngleCheck());
+
+        DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
+        assertNotNull(dichotomyParametersCaptorValue);
+        assertEquals(44, dichotomyParametersCaptorValue.getMaxValue());
+        assertEquals(84, dichotomyParametersCaptorValue.getMinValue());
+        assertEquals(14, dichotomyParametersCaptorValue.getPrecision());
+        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+
+        LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
+        assertNotNull(loadFlowParametersCaptorValue);
+        assertEquals(5, loadFlowParametersCaptorValue.getExtension(OpenLoadFlowParameters.class).getMaxNewtonRaphsonIterations());
     }
 
     @Test
@@ -139,17 +180,29 @@ class DichotomyRunnerTest {
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(network);
         DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
-        ArgumentCaptor<DichotomyParameters> argumentCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
-        Mockito.doReturn(mockEngine).when(spyDichotomyRunner).buildDichotomyEngine(Mockito.any(SweData.class), Mockito.any(DichotomyDirection.class), argumentCaptor.capture());
+        ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
+        ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
+        Mockito.doReturn(mockEngine)
+            .when(spyDichotomyRunner).buildDichotomyEngine(
+                Mockito.any(SweData.class),
+                Mockito.any(DichotomyDirection.class),
+                dichotomyParametersCaptor.capture(),
+                loadFlowParametersCaptor.capture());
         Mockito.when(mockEngine.run(Mockito.any(Network.class))).thenReturn(mockDichotomyResult);
         SweTaskParameters sweTaskParameters = SweTaskParametersTestUtil.getSweTaskParameters();
         DichotomyResult<SweDichotomyValidationData> dichotomyResult = spyDichotomyRunner.run(sweData, sweTaskParameters, DichotomyDirection.PT_ES);
+
         assertEquals(mockDichotomyResult, dichotomyResult);
-        DichotomyParameters captorValue = argumentCaptor.getValue();
-        assertNotNull(captorValue);
-        assertEquals(45, captorValue.getMaxValue());
-        assertEquals(85, captorValue.getMinValue());
-        assertEquals(15, captorValue.getPrecision());
-        assertTrue(captorValue.isRunAngleCheck());
+
+        DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
+        assertNotNull(dichotomyParametersCaptorValue);
+        assertEquals(45, dichotomyParametersCaptorValue.getMaxValue());
+        assertEquals(85, dichotomyParametersCaptorValue.getMinValue());
+        assertEquals(15, dichotomyParametersCaptorValue.getPrecision());
+        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+
+        LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
+        assertNotNull(loadFlowParametersCaptorValue);
+        assertEquals(5, loadFlowParametersCaptorValue.getExtension(OpenLoadFlowParameters.class).getMaxNewtonRaphsonIterations());
     }
 }
