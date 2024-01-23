@@ -50,16 +50,16 @@ public class DichotomyParallelization {
         List<SweDichotomyResult> results = new ArrayList<>();
         List<Future<SweDichotomyResult>> futures = new ArrayList<>();
         try {
-            if (sweTaskParameters.isRunDirectionEsToFr()) {
+            if (sweTaskParameters.isRunDirectionEsFr()) {
                 futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_FR));
             }
-            if (sweTaskParameters.isRunDirectionEsToPt()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_PT));
-            }
-            if (sweTaskParameters.isRunDirectionFrToEs()) {
+            if (sweTaskParameters.isRunDirectionFrEs()) {
                 futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.FR_ES));
             }
-            if (sweTaskParameters.isRunDirectionPtToEs()) {
+            if (sweTaskParameters.isRunDirectionEsPt()) {
+                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_PT));
+            }
+            if (sweTaskParameters.isRunDirectionPtEs()) {
                 futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.PT_ES));
             }
 

@@ -15,40 +15,40 @@ import java.util.List;
 public class SweTaskParameters {
 
     private static final String IS_RUN_ES_FR = "RUN_ES-FR";
-    private static final String STARTING_POINT_ES_FR =  "STARTING_POINT_ES-FR";
-    private static final String MIN_POINT_ES_FR =  "MIN_POINT_ES-FR";
-    private static final String SENSITIVITY_ES_FR = "SENSITIVITY_ES-FR";
-    private static final String IS_RUN_ES_PT = "RUN_ES-PT";
-    private static final String STARTING_POINT_ES_PT =  "STARTING_POINT_ES-PT";
-    private static final String MIN_POINT_ES_PT =  "MIN_POINT_ES-PT";
-    private static final String SENSITIVITY_ES_PT = "SENSITIVITY_ES-PT";
     private static final String IS_RUN_FR_ES = "RUN_FR-ES";
-    private static final String STARTING_POINT_FR_ES =  "STARTING_POINT_FR-ES";
-    private static final String MIN_POINT_FR_ES =  "MIN_POINT_FR-ES";
-    private static final String SENSITIVITY_FR_ES = "SENSITIVITY_FR-ES";
+    private static final String IS_RUN_ES_PT = "RUN_ES-PT";
     private static final String IS_RUN_PT_ES = "RUN_PT-ES";
-    private static final String STARTING_POINT_PT_ES =  "STARTING_POINT_PT-ES";
-    private static final String MIN_POINT_PT_ES =  "MIN_POINT_PT-ES";
+    private static final String STARTING_POINT_ES_FR = "STARTING_POINT_ES-FR";
+    private static final String STARTING_POINT_FR_ES = "STARTING_POINT_FR-ES";
+    private static final String STARTING_POINT_ES_PT = "STARTING_POINT_ES-PT";
+    private static final String STARTING_POINT_PT_ES = "STARTING_POINT_PT-ES";
+    private static final String MIN_POINT_ES_FR = "MIN_POINT_ES-FR";
+    private static final String MIN_POINT_FR_ES = "MIN_POINT_FR-ES";
+    private static final String MIN_POINT_ES_PT = "MIN_POINT_ES-PT";
+    private static final String MIN_POINT_PT_ES = "MIN_POINT_PT-ES";
+    private static final String SENSITIVITY_ES_FR = "SENSITIVITY_ES-FR";
+    private static final String SENSITIVITY_FR_ES = "SENSITIVITY_FR-ES";
+    private static final String SENSITIVITY_ES_PT = "SENSITIVITY_ES-PT";
     private static final String SENSITIVITY_PT_ES = "SENSITIVITY_PT-ES";
     private static final String RUN_ANGLE_CHECK = "RUN_ANGLE_CHECK";
     private static final String RUN_VOLTAGE_CHECK = "RUN_VOLTAGE_CHECK";
     private static final String MAX_CRA = "MAX_CRA";
 
-    private boolean runDirectionEsToFr;
+    private boolean runDirectionEsFr;
+    private boolean runDirectionFrEs;
+    private boolean runDirectionEsPt;
+    private boolean runDirectionPtEs;
     private int startingPointEsFr;
-    private int minPointEsFr;
-    private int sensitivityEsFr;
-    private boolean runDirectionEsToPt;
-    private int startingPointEsPt;
-    private int minPointEsPt;
-    private int sensitivityEsPt;
-    private boolean runDirectionFrToEs;
     private int startingPointFrEs;
-    private int minPointFrEs;
-    private int sensitivityFrEs;
-    private boolean runDirectionPtToEs;
+    private int startingPointEsPt;
     private int startingPointPtEs;
+    private int minPointEsFr;
+    private int minPointFrEs;
+    private int minPointEsPt;
     private int minPointPtEs;
+    private int sensitivityEsFr;
+    private int sensitivityFrEs;
+    private int sensitivityEsPt;
     private int sensitivityPtEs;
     private boolean runAngleCheck;
     private boolean runVoltageCheck;
@@ -57,21 +57,21 @@ public class SweTaskParameters {
     public SweTaskParameters(List<TaskParameterDto> parameters) {
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
-                case IS_RUN_ES_FR -> runDirectionEsToFr = validateIsBooleanAndGet(parameter);
+                case IS_RUN_ES_FR -> runDirectionEsFr = validateIsBooleanAndGet(parameter);
+                case IS_RUN_FR_ES -> runDirectionFrEs = validateIsBooleanAndGet(parameter);
+                case IS_RUN_ES_PT -> runDirectionEsPt = validateIsBooleanAndGet(parameter);
+                case IS_RUN_PT_ES -> runDirectionPtEs = validateIsBooleanAndGet(parameter);
                 case STARTING_POINT_ES_FR -> startingPointEsFr = validateIsIntegerAndGet(parameter);
-                case MIN_POINT_ES_FR -> minPointEsFr = validateIsIntegerAndGet(parameter);
-                case SENSITIVITY_ES_FR -> sensitivityEsFr = validateIsIntegerAndGet(parameter);
-                case IS_RUN_ES_PT -> runDirectionEsToPt = validateIsBooleanAndGet(parameter);
-                case STARTING_POINT_ES_PT -> startingPointEsPt = validateIsIntegerAndGet(parameter);
-                case MIN_POINT_ES_PT -> minPointEsPt = validateIsIntegerAndGet(parameter);
-                case SENSITIVITY_ES_PT -> sensitivityEsPt = validateIsIntegerAndGet(parameter);
-                case IS_RUN_FR_ES -> runDirectionFrToEs = validateIsBooleanAndGet(parameter);
                 case STARTING_POINT_FR_ES -> startingPointFrEs = validateIsIntegerAndGet(parameter);
-                case MIN_POINT_FR_ES -> minPointFrEs = validateIsIntegerAndGet(parameter);
-                case SENSITIVITY_FR_ES -> sensitivityFrEs = validateIsIntegerAndGet(parameter);
-                case IS_RUN_PT_ES -> runDirectionPtToEs = validateIsBooleanAndGet(parameter);
+                case STARTING_POINT_ES_PT -> startingPointEsPt = validateIsIntegerAndGet(parameter);
                 case STARTING_POINT_PT_ES -> startingPointPtEs = validateIsIntegerAndGet(parameter);
+                case MIN_POINT_ES_FR -> minPointEsFr = validateIsIntegerAndGet(parameter);
+                case MIN_POINT_FR_ES -> minPointFrEs = validateIsIntegerAndGet(parameter);
+                case MIN_POINT_ES_PT -> minPointEsPt = validateIsIntegerAndGet(parameter);
                 case MIN_POINT_PT_ES -> minPointPtEs = validateIsIntegerAndGet(parameter);
+                case SENSITIVITY_ES_FR -> sensitivityEsFr = validateIsIntegerAndGet(parameter);
+                case SENSITIVITY_FR_ES -> sensitivityFrEs = validateIsIntegerAndGet(parameter);
+                case SENSITIVITY_ES_PT -> sensitivityEsPt = validateIsIntegerAndGet(parameter);
                 case SENSITIVITY_PT_ES -> sensitivityPtEs = validateIsIntegerAndGet(parameter);
                 case RUN_ANGLE_CHECK -> runAngleCheck = validateIsBooleanAndGet(parameter);
                 case RUN_VOLTAGE_CHECK -> runVoltageCheck = validateIsBooleanAndGet(parameter);
@@ -99,68 +99,68 @@ public class SweTaskParameters {
         }
     }
 
-    public boolean isRunDirectionEsToFr() {
-        return runDirectionEsToFr;
+    public boolean isRunDirectionEsFr() {
+        return runDirectionEsFr;
     }
 
-    public boolean isRunDirectionEsToPt() {
-        return runDirectionEsToPt;
+    public boolean isRunDirectionFrEs() {
+        return runDirectionFrEs;
     }
 
-    public boolean isRunDirectionFrToEs() {
-        return runDirectionFrToEs;
+    public boolean isRunDirectionEsPt() {
+        return runDirectionEsPt;
     }
 
-    public boolean isRunDirectionPtToEs() {
-        return runDirectionPtToEs;
+    public boolean isRunDirectionPtEs() {
+        return runDirectionPtEs;
     }
 
     public int getStartingPointEsFr() {
         return startingPointEsFr;
     }
 
-    public int getSensitivityEsFr() {
-        return sensitivityEsFr;
+    public int getStartingPointFrEs() {
+        return startingPointFrEs;
     }
 
     public int getStartingPointEsPt() {
         return startingPointEsPt;
     }
 
-    public int getSensitivityEsPt() {
-        return sensitivityEsPt;
-    }
-
-    public int getStartingPointFrEs() {
-        return startingPointFrEs;
-    }
-
-    public int getSensitivityFrEs() {
-        return sensitivityFrEs;
-    }
-
     public int getStartingPointPtEs() {
         return startingPointPtEs;
-    }
-
-    public int getSensitivityPtEs() {
-        return sensitivityPtEs;
     }
 
     public int getMinPointEsFr() {
         return minPointEsFr;
     }
 
-    public int getMinPointEsPt() {
-        return minPointEsPt;
-    }
-
     public int getMinPointFrEs() {
         return minPointFrEs;
     }
 
+    public int getMinPointEsPt() {
+        return minPointEsPt;
+    }
+
     public int getMinPointPtEs() {
         return minPointPtEs;
+    }
+
+    public int getSensitivityEsFr() {
+        return sensitivityEsFr;
+    }
+
+    public int getSensitivityFrEs() {
+        return sensitivityFrEs;
+    }
+
+    public int getSensitivityEsPt() {
+        return sensitivityEsPt;
+    }
+
+    public int getSensitivityPtEs() {
+        return sensitivityPtEs;
     }
 
     public boolean isRunAngleCheck() {

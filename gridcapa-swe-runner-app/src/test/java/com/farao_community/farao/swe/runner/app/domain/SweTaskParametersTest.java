@@ -41,10 +41,10 @@ class SweTaskParametersTest {
 
         SweTaskParameters sweTaskParameters = new SweTaskParameters(parameters);
 
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsToFr()).isTrue();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionFrToEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsToPt()).isTrue();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionPtToEs()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionEsFr()).isTrue();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionFrEs()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionEsPt()).isTrue();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionPtEs()).isFalse();
         Assertions.assertThat(sweTaskParameters.getStartingPointEsFr()).isEqualTo(42);
         Assertions.assertThat(sweTaskParameters.getStartingPointFrEs()).isEqualTo(43);
         Assertions.assertThat(sweTaskParameters.getStartingPointEsPt()).isEqualTo(44);
@@ -76,10 +76,10 @@ class SweTaskParametersTest {
     void absentParametersTest() {
         SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of());
 
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsToFr()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionFrToEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsToPt()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionPtToEs()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionEsFr()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionFrEs()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionEsPt()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isRunDirectionPtEs()).isFalse();
     }
 
     @Test

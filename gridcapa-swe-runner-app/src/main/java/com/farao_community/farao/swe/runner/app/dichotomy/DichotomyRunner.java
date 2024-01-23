@@ -80,15 +80,15 @@ public class DichotomyRunner {
                 result.setMaxValue(sweTaskParameters.getStartingPointEsFr());
                 result.setPrecision(sweTaskParameters.getSensitivityEsFr());
             }
-            case ES_PT -> {
-                result.setMinValue(sweTaskParameters.getMinPointEsPt());
-                result.setMaxValue(sweTaskParameters.getStartingPointEsPt());
-                result.setPrecision(sweTaskParameters.getSensitivityEsPt());
-            }
             case FR_ES -> {
                 result.setMinValue(sweTaskParameters.getMinPointFrEs());
                 result.setMaxValue(sweTaskParameters.getStartingPointFrEs());
                 result.setPrecision(sweTaskParameters.getSensitivityFrEs());
+            }
+            case ES_PT -> {
+                result.setMinValue(sweTaskParameters.getMinPointEsPt());
+                result.setMaxValue(sweTaskParameters.getStartingPointEsPt());
+                result.setPrecision(sweTaskParameters.getSensitivityEsPt());
             }
             case PT_ES -> {
                 result.setMinValue(sweTaskParameters.getMinPointPtEs());
