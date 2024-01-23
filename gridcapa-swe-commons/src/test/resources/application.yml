@@ -5,3 +5,4 @@ spring:
 swe-commons:
   zone-id: "Europe/Paris"
   shift-max-iteration-number: 20
+  modeling-authority-set: "https://farao-community.github.io/"

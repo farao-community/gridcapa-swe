@@ -20,7 +20,6 @@ import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.PhaseTapChanger;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class NetworkService {
     private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     private final Logger businessLogger;
 
-    static final Map<Country, String> TSO_BY_COUNTRY = Map.of(Country.FR, "RTE", Country.ES, "REE", Country.PT, "REN");
+    static final Map<Country, String> TSO_BY_COUNTRY = Map.of(Country.FR, "RTEFRANCE", Country.ES, "REE", Country.PT, "REN");
 
     public NetworkService(MinioAdapter minioAdapter, Logger businessLogger) {
         this.minioAdapter = minioAdapter;
@@ -139,9 +138,8 @@ public class NetworkService {
 
     private void addPst(Network network) {
         try {
-            network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
-            network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulationMode(PhaseTapChanger.RegulationMode.FIXED_TAP);
-
+            network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulating(false);
+            network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulating(false);
             businessLogger.info("Regulation mode of the PSTs modified");
         } catch (NullPointerException e) {
             businessLogger.warn("The PST mode could not be changed because it was not found");
@@ -173,7 +171,7 @@ public class NetworkService {
             zos.close();
             return zipPath;
         } catch (IOException ioe) {
-            throw new SweInvalidDataException("Error creating netowrk zip file", ioe);
+            throw new SweInvalidDataException("Error creating network zip file", ioe);
         }
     }
 

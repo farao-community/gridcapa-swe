@@ -25,6 +25,7 @@ class ProcessConfigurationTest {
     void checkProcessConfiguration() {
         assertEquals(20, processConfiguration.getShiftMaxIterationNumber());
         assertEquals("Europe/Paris", processConfiguration.getZoneId());
+        assertEquals("https://farao-community.github.io/", processConfiguration.getModelingAuthoritySet());
     }
 
 }

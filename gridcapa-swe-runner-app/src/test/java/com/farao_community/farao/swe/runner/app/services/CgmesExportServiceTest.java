@@ -8,6 +8,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
@@ -73,7 +74,16 @@ class CgmesExportServiceTest {
     void exportCgmesFilesTest() throws IOException, XMLStreamException {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        String  emptyXmlFile = "/export_cgmes/emptyXmlFile.xml";
+        Map<CgmesFileType, SweFileResource> cgmesInputFiles = new EnumMap<>(CgmesFileType.class);
+        SweFileResource sweFileResource = new SweFileResource("test.xml", getClass().getResource(emptyXmlFile).toExternalForm());
+        cgmesInputFiles.put(CgmesFileType.REE_EQ, sweFileResource);
+        cgmesInputFiles.put(CgmesFileType.REE_TP, sweFileResource);
+        cgmesInputFiles.put(CgmesFileType.REN_EQ, sweFileResource);
+        cgmesInputFiles.put(CgmesFileType.REN_TP, sweFileResource);
+        cgmesInputFiles.put(CgmesFileType.RTE_EQ, sweFileResource);
+        cgmesInputFiles.put(CgmesFileType.RTE_TP, sweFileResource);
+        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
         Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
         assertEquals(10, cgmesFiles.size());
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
@@ -82,10 +92,22 @@ class CgmesExportServiceTest {
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_EQ_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_SSH_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_TP_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_EQ_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
+    }
+
+    @Test
+    void exportCgmesSshTest() throws IOException, XMLStreamException {
+        String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData);
+        assertEquals(3, sshFiles.size());
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
     }
 
     @Test
@@ -94,18 +116,10 @@ class CgmesExportServiceTest {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
-        assertEquals(7, cgmesFiles.size());
-        assertFalse(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
-        assertFalse(cgmesFiles.containsKey("20230731T0030Z_2D_REE_EQ_001.xml"));
-        assertFalse(cgmesFiles.containsKey("20230731T0030Z_2D_REE_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_SSH_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTE_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData);
+        assertEquals(2, sshFiles.size());
+        assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
     }
 
 }

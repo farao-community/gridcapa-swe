@@ -9,6 +9,7 @@ spring:
 swe-commons:
   shift-max-iteration-number: 20
   zone-id: "Europe/Paris"
+  modeling-authority-set: "https://farao-community.github.io/"
 
 swe-runner:
   dichotomy:
