@@ -20,6 +20,27 @@ import java.util.List;
 public class SweTaskParameters {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweTaskParameters.class);
 
+    private static final String IS_RUN_ES_FR = "RUN_ES-FR";
+    private static final String IS_RUN_FR_ES = "RUN_FR-ES";
+    private static final String IS_RUN_ES_PT = "RUN_ES-PT";
+    private static final String IS_RUN_PT_ES = "RUN_PT-ES";
+    private static final String STARTING_POINT_ES_FR = "STARTING_POINT_ES-FR";
+    private static final String STARTING_POINT_FR_ES = "STARTING_POINT_FR-ES";
+    private static final String STARTING_POINT_ES_PT = "STARTING_POINT_ES-PT";
+    private static final String STARTING_POINT_PT_ES = "STARTING_POINT_PT-ES";
+    private static final String MIN_POINT_ES_FR = "MIN_POINT_ES-FR";
+    private static final String MIN_POINT_FR_ES = "MIN_POINT_FR-ES";
+    private static final String MIN_POINT_ES_PT = "MIN_POINT_ES-PT";
+    private static final String MIN_POINT_PT_ES = "MIN_POINT_PT-ES";
+    private static final String SENSITIVITY_ES_FR = "SENSITIVITY_ES-FR";
+    private static final String SENSITIVITY_FR_ES = "SENSITIVITY_FR-ES";
+    private static final String SENSITIVITY_ES_PT = "SENSITIVITY_ES-PT";
+    private static final String SENSITIVITY_PT_ES = "SENSITIVITY_PT-ES";
+    private static final String RUN_ANGLE_CHECK = "RUN_ANGLE_CHECK";
+    private static final String RUN_VOLTAGE_CHECK = "RUN_VOLTAGE_CHECK";
+    private static final String MAX_CRA = "MAX_CRA";
+    private static final String MAX_NEWTON_RAPHSON_ITERATIONS = "MAX_NEWTON_RAPHSON_ITERATIONS";
+
     private boolean runDirectionEsFr;
     private boolean runDirectionFrEs;
     private boolean runDirectionEsPt;
@@ -45,26 +66,26 @@ public class SweTaskParameters {
         List<String> errors = new ArrayList<>();
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
-                case "RUN_ES-FR" -> runDirectionEsFr = validateIsBooleanAndGet(parameter, errors);
-                case "RUN_FR-ES" -> runDirectionFrEs = validateIsBooleanAndGet(parameter, errors);
-                case "RUN_ES-PT" -> runDirectionEsPt = validateIsBooleanAndGet(parameter, errors);
-                case "RUN_PT-ES" -> runDirectionPtEs = validateIsBooleanAndGet(parameter, errors);
-                case "STARTING_POINT_ES-FR" -> startingPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "STARTING_POINT_FR-ES" -> startingPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "STARTING_POINT_ES-PT" -> startingPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "STARTING_POINT_PT-ES" -> startingPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "MIN_POINT_ES-FR" -> minPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "MIN_POINT_FR-ES" -> minPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "MIN_POINT_ES-PT" -> minPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "MIN_POINT_PT-ES" -> minPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "SENSITIVITY_ES-FR" -> sensitivityEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "SENSITIVITY_FR-ES" -> sensitivityFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "SENSITIVITY_ES-PT" -> sensitivityEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "SENSITIVITY_PT-ES" -> sensitivityPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "RUN_ANGLE_CHECK" -> runAngleCheck = validateIsBooleanAndGet(parameter, errors);
-                case "RUN_VOLTAGE_CHECK" -> runVoltageCheck = validateIsBooleanAndGet(parameter, errors);
-                case "MAX_CRA" -> maxCra = validateIsPositiveIntegerAndGet(parameter, errors);
-                case "MAX_NEWTON_RAPHSON_ITERATIONS" -> maxNewtonRaphsonIterations = validateIsPositiveIntegerAndGet(parameter, errors);
+                case IS_RUN_ES_FR -> runDirectionEsFr = validateIsBooleanAndGet(parameter, errors);
+                case IS_RUN_FR_ES -> runDirectionFrEs = validateIsBooleanAndGet(parameter, errors);
+                case IS_RUN_ES_PT -> runDirectionEsPt = validateIsBooleanAndGet(parameter, errors);
+                case IS_RUN_PT_ES -> runDirectionPtEs = validateIsBooleanAndGet(parameter, errors);
+                case STARTING_POINT_ES_FR -> startingPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case STARTING_POINT_FR_ES -> startingPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case STARTING_POINT_ES_PT -> startingPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case STARTING_POINT_PT_ES -> startingPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_POINT_ES_FR -> minPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_POINT_FR_ES -> minPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_POINT_ES_PT -> minPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_POINT_PT_ES -> minPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case SENSITIVITY_ES_FR -> sensitivityEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case SENSITIVITY_FR_ES -> sensitivityFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case SENSITIVITY_ES_PT -> sensitivityEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case SENSITIVITY_PT_ES -> sensitivityPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case RUN_ANGLE_CHECK -> runAngleCheck = validateIsBooleanAndGet(parameter, errors);
+                case RUN_VOLTAGE_CHECK -> runVoltageCheck = validateIsBooleanAndGet(parameter, errors);
+                case MAX_CRA -> maxCra = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MAX_NEWTON_RAPHSON_ITERATIONS -> maxNewtonRaphsonIterations = validateIsPositiveIntegerAndGet(parameter, errors);
                 default -> LOGGER.warn("Unknown parameter {} (value: {}) will be ignored", parameter.getId(), parameter.getValue());
             }
         }
