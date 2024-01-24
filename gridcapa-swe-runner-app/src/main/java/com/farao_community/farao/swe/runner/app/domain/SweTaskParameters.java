@@ -19,6 +19,7 @@ import java.util.List;
 
 public class SweTaskParameters {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweTaskParameters.class);
+    private static final String KEY_VALUE_FORMAT = "%n\t\"%s\": %s";
 
     private static final String IS_RUN_ES_FR = "RUN_ES-FR";
     private static final String IS_RUN_FR_ES = "RUN_FR-ES";
@@ -237,6 +238,28 @@ public class SweTaskParameters {
     }
 
     public String toJsonString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+        List<String> appender = new ArrayList<>();
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_ES_FR, runDirectionEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_FR_ES, runDirectionFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_ES_PT, runDirectionEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_PT_ES, runDirectionPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_ES_FR, startingPointEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_FR_ES, startingPointFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_ES_PT, startingPointEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_PT_ES, startingPointPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_ES_FR, minPointEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_FR_ES, minPointFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_ES_PT, minPointEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_PT_ES, minPointPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_ES_FR, sensitivityEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_FR_ES, sensitivityFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_ES_PT, sensitivityEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_PT_ES, sensitivityPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, RUN_ANGLE_CHECK, runAngleCheck));
+        appender.add(String.format(KEY_VALUE_FORMAT, RUN_VOLTAGE_CHECK, runVoltageCheck));
+        appender.add(String.format(KEY_VALUE_FORMAT, MAX_CRA, maxCra));
+        appender.add(String.format(KEY_VALUE_FORMAT, MAX_NEWTON_RAPHSON_ITERATIONS, maxNewtonRaphsonIterations));
+
+        return String.format("{%s%n}", String.join(", ", appender));
     }
 }

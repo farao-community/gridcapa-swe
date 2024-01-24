@@ -58,7 +58,7 @@ class SweRunnerTest {
         when(filesService.importFiles(any(SweRequest.class), any(SweTaskParameters.class))).thenReturn(mock(SweData.class));
         when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl"));
         SweRequest sweRequest = mock(SweRequest.class);
-        Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("TEST", "INT", "35", "35")));
+        Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("MAX_CRA", "INT", "35", "35")));
 
         sweRunner.run(sweRequest);
 
@@ -71,7 +71,7 @@ class SweRunnerTest {
         when(filesService.importFiles(any(SweRequest.class), any(SweTaskParameters.class))).thenReturn(mock(SweData.class));
         when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl"));
         SweRequest sweRequest = mock(SweRequest.class);
-        Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("TEST", "INT", "17", "35")));
+        Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("MAX_CRA", "INT", "17", "35")));
 
         sweRunner.run(sweRequest);
 
