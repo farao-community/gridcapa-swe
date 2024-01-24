@@ -14,6 +14,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SweTaskParameters {
@@ -41,48 +42,92 @@ public class SweTaskParameters {
     private int maxNewtonRaphsonIterations;
 
     public SweTaskParameters(List<TaskParameterDto> parameters) {
+        List<String> errors = new ArrayList<>();
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
-                case "RUN_ES-FR" -> runDirectionEsFr = validateIsBooleanAndGet(parameter);
-                case "RUN_FR-ES" -> runDirectionFrEs = validateIsBooleanAndGet(parameter);
-                case "RUN_ES-PT" -> runDirectionEsPt = validateIsBooleanAndGet(parameter);
-                case "RUN_PT-ES" -> runDirectionPtEs = validateIsBooleanAndGet(parameter);
-                case "STARTING_POINT_ES-FR" -> startingPointEsFr = validateIsIntegerAndGet(parameter);
-                case "STARTING_POINT_FR-ES" -> startingPointFrEs = validateIsIntegerAndGet(parameter);
-                case "STARTING_POINT_ES-PT" -> startingPointEsPt = validateIsIntegerAndGet(parameter);
-                case "STARTING_POINT_PT-ES" -> startingPointPtEs = validateIsIntegerAndGet(parameter);
-                case "MIN_POINT_ES-FR" -> minPointEsFr = validateIsIntegerAndGet(parameter);
-                case "MIN_POINT_FR-ES" -> minPointFrEs = validateIsIntegerAndGet(parameter);
-                case "MIN_POINT_ES-PT" -> minPointEsPt = validateIsIntegerAndGet(parameter);
-                case "MIN_POINT_PT-ES" -> minPointPtEs = validateIsIntegerAndGet(parameter);
-                case "SENSITIVITY_ES-FR" -> sensitivityEsFr = validateIsIntegerAndGet(parameter);
-                case "SENSITIVITY_FR-ES" -> sensitivityFrEs = validateIsIntegerAndGet(parameter);
-                case "SENSITIVITY_ES-PT" -> sensitivityEsPt = validateIsIntegerAndGet(parameter);
-                case "SENSITIVITY_PT-ES" -> sensitivityPtEs = validateIsIntegerAndGet(parameter);
-                case "RUN_ANGLE_CHECK" -> runAngleCheck = validateIsBooleanAndGet(parameter);
-                case "RUN_VOLTAGE_CHECK" -> runVoltageCheck = validateIsBooleanAndGet(parameter);
-                case "MAX_CRA" -> maxCra = validateIsIntegerAndGet(parameter);
-                case "MAX_NEWTON_RAPHSON_ITERATIONS" -> maxNewtonRaphsonIterations = validateIsIntegerAndGet(parameter);
-                default -> LOGGER.warn("Unknown parameter {} (value {}) will be ignored", parameter.getId(), parameter.getValue());
+                case "RUN_ES-FR" -> runDirectionEsFr = validateIsBooleanAndGet(parameter, errors);
+                case "RUN_FR-ES" -> runDirectionFrEs = validateIsBooleanAndGet(parameter, errors);
+                case "RUN_ES-PT" -> runDirectionEsPt = validateIsBooleanAndGet(parameter, errors);
+                case "RUN_PT-ES" -> runDirectionPtEs = validateIsBooleanAndGet(parameter, errors);
+                case "STARTING_POINT_ES-FR" -> startingPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "STARTING_POINT_FR-ES" -> startingPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "STARTING_POINT_ES-PT" -> startingPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "STARTING_POINT_PT-ES" -> startingPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "MIN_POINT_ES-FR" -> minPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "MIN_POINT_FR-ES" -> minPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "MIN_POINT_ES-PT" -> minPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "MIN_POINT_PT-ES" -> minPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "SENSITIVITY_ES-FR" -> sensitivityEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "SENSITIVITY_FR-ES" -> sensitivityFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "SENSITIVITY_ES-PT" -> sensitivityEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "SENSITIVITY_PT-ES" -> sensitivityPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "RUN_ANGLE_CHECK" -> runAngleCheck = validateIsBooleanAndGet(parameter, errors);
+                case "RUN_VOLTAGE_CHECK" -> runVoltageCheck = validateIsBooleanAndGet(parameter, errors);
+                case "MAX_CRA" -> maxCra = validateIsPositiveIntegerAndGet(parameter, errors);
+                case "MAX_NEWTON_RAPHSON_ITERATIONS" -> maxNewtonRaphsonIterations = validateIsPositiveIntegerAndGet(parameter, errors);
+                default -> LOGGER.warn("Unknown parameter {} (value: {}) will be ignored", parameter.getId(), parameter.getValue());
             }
+        }
+
+        crossValidateParameters(errors);
+
+        if (!errors.isEmpty()) {
+            String message = String.format("Validation of parameters failed. Failure reasons are: [\"%s\"].", String.join("\" ; \"", errors));
+            throw new SweInvalidDataException(message);
         }
     }
 
-    private boolean validateIsBooleanAndGet(TaskParameterDto parameter) {
+    private boolean validateIsBooleanAndGet(TaskParameterDto parameter, List<String> errors) {
         if (StringUtils.equals("BOOLEAN", parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             return Boolean.parseBoolean(value);
         } else {
-            throw new SweInvalidDataException(String.format("Invalid boolean parameter with id %s and value %s", parameter.getId(), parameter.getValue()));
+            errors.add(String.format("Parameter %s was expected to be of type BOOLEAN, got %s", parameter.getId(), parameter.getParameterType()));
+            return false; // default return value, won't be used as this return can be reached only in case of validation error
         }
     }
 
-    private int validateIsIntegerAndGet(TaskParameterDto parameter) {
+    private int validateIsIntegerAndGet(TaskParameterDto parameter, List<String> errors) {
         if (StringUtils.equals("INT", parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
-            return Integer.parseInt(value);
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                errors.add(String.format("Parameter %s could not be parsed as integer (value: %s)", parameter.getId(), parameter.getValue()));
+            }
         } else {
-            throw new SweInvalidDataException(String.format("Invalid integer parameter with id %s and value %s", parameter.getId(), parameter.getValue()));
+            errors.add(String.format("Parameter %s was expected to be of type INT, got %s", parameter.getId(), parameter.getParameterType()));
+        }
+        return 0; // default return value, won't be used as this return can be reached only in case of validation error
+    }
+
+    private int validateIsPositiveIntegerAndGet(TaskParameterDto parameter, List<String> errors) {
+        int value = validateIsIntegerAndGet(parameter, errors);
+        if (value < 0) {
+            errors.add(String.format("Parameter %s should be positive (value: %s)", parameter.getId(), parameter.getValue()));
+            return 0; // default return value, won't be used as this return can be reached only in case of validation error
+        }
+        return value;
+    }
+
+    private void crossValidateParameters(List<String> errors) {
+        if (runDirectionEsFr) {
+            validateStartingPointAndMinPoint("ES-FR", startingPointEsFr, minPointEsFr, errors);
+        }
+        if (runDirectionFrEs) {
+            validateStartingPointAndMinPoint("FR-ES", startingPointFrEs, minPointFrEs, errors);
+        }
+        if (runDirectionEsPt) {
+            validateStartingPointAndMinPoint("ES-PT", startingPointEsPt, minPointEsPt, errors);
+        }
+        if (runDirectionPtEs) {
+            validateStartingPointAndMinPoint("PT-ES", startingPointPtEs, minPointPtEs, errors);
+        }
+    }
+
+    private void validateStartingPointAndMinPoint(String direction, int startingPointValue, int minPointValue, List<String> errors) {
+        if (startingPointValue < minPointValue) {
+            errors.add(String.format("[%s] Starting point (value: %d) should be greater than minimum point (value: %d)", direction, startingPointValue, minPointValue));
         }
     }
 
