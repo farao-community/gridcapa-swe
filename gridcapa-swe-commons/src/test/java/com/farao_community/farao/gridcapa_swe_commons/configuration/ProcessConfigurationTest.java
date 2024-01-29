@@ -27,7 +27,7 @@ class ProcessConfigurationTest {
         assertEquals("Europe/Paris", processConfiguration.getZoneId());
         assertEquals("http://www.ree.es/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("REE"));
         assertEquals("http://www.ren.pt/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("REN"));
-        assertEquals("http://www.rte-france.com/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("RTE"));
+        assertEquals("http://www.rte-france.com/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("RTEFRANCE"));
         assertEquals("http://www.coreso.eu/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("SV"));
     }
 
