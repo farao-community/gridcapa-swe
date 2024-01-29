@@ -33,9 +33,13 @@ logback:
     routing-key: "#"
 
 swe-commons:
-  zone-id: "Europe/Paris"
-  shift-max-iteration-number: 20
-  modeling-authority-set: "https://farao-community.github.io/"
+zone-id: "Europe/Paris"
+shift-max-iteration-number: 20
+modeling-authority-set:
+  REE: "http://www.ree.es/OperationalPlanning"
+  REN: "http://www.ren.pt/OperationalPlanning"
+  RTE: "http://www.rte-france.com/OperationalPlanning"
+  SV: "http://www.coreso.eu/OperationalPlanning"
 
 swe-runner:
   dichotomy:

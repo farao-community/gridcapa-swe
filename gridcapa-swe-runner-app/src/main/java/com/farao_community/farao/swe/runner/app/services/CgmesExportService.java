@@ -78,7 +78,7 @@ public class CgmesExportService {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
-        String modelingAuthoritySet = processConfiguration.getModelingAuthoritySet();
+        String modelingAuthoritySet = processConfiguration.getModelingAuthoritySet().toString(); // todo
         SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthoritySet);
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthoritySet);
     }
