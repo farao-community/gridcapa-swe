@@ -25,10 +25,10 @@ class ProcessConfigurationTest {
     void checkProcessConfiguration() {
         assertEquals(20, processConfiguration.getShiftMaxIterationNumber());
         assertEquals("Europe/Paris", processConfiguration.getZoneId());
-        assertEquals("http://www.ree.es/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("REE"));
-        assertEquals("http://www.ren.pt/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("REN"));
-        assertEquals("http://www.rte-france.com/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("RTEFRANCE"));
-        assertEquals("http://www.coreso.eu/OperationalPlanning", processConfiguration.getModelingAuthoritySet().get("SV"));
+        assertEquals("http://www.ree.es/OperationalPlanning", processConfiguration.getModelingAuthorityMap().get("REE"));
+        assertEquals("http://www.ren.pt/OperationalPlanning", processConfiguration.getModelingAuthorityMap().get("REN"));
+        assertEquals("http://www.rte-france.com/OperationalPlanning", processConfiguration.getModelingAuthorityMap().get("RTEFRANCE"));
+        assertEquals("http://www.coreso.eu/OperationalPlanning", processConfiguration.getModelingAuthorityMap().get("SV"));
     }
 
 }

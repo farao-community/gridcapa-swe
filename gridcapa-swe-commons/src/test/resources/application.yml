@@ -5,7 +5,7 @@ spring:
 swe-commons:
   zone-id: "Europe/Paris"
   shift-max-iteration-number: 20
-  modeling-authority-set:
+  modeling-authority-map:
     REE: "http://www.ree.es/OperationalPlanning"
     REN: "http://www.ren.pt/OperationalPlanning"
     RTEFRANCE: "http://www.rte-france.com/OperationalPlanning"

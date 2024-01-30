@@ -20,7 +20,7 @@ public class ProcessConfiguration {
 
     private String zoneId;
     private Integer shiftMaxIterationNumber;
-    private Map<String, String> modelingAuthoritySet;
+    private Map<String, String> modelingAuthorityMap;
 
     public String getZoneId() {
         return zoneId;
@@ -38,12 +38,12 @@ public class ProcessConfiguration {
         this.shiftMaxIterationNumber = shiftMaxIterationNumber;
     }
 
-    public Map<String, String> getModelingAuthoritySet() {
-        return modelingAuthoritySet;
+    public Map<String, String> getModelingAuthorityMap() {
+        return modelingAuthorityMap;
     }
 
-    public void setModelingAuthoritySet(Map<String, String> modelingAuthoritySet) {
-        this.modelingAuthoritySet = modelingAuthoritySet;
+    public void setModelingAuthorityMap(Map<String, String> modelingAuthoritySet) {
+        this.modelingAuthorityMap = modelingAuthoritySet;
     }
 
 }

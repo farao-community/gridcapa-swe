@@ -61,7 +61,7 @@ public class CgmesExportService {
 
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
-    private final Map<String, String> modelingAuthorityMap;
+    private final ProcessConfiguration processConfiguration;
 
     private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
 
@@ -80,8 +80,8 @@ public class CgmesExportService {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
-        modelingAuthorityMap = processConfiguration.getModelingAuthoritySet();
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthorityMap.getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
+        this.processConfiguration = processConfiguration;
+        SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
     }
 
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
@@ -168,11 +168,14 @@ public class CgmesExportService {
 
     private void updateModelAuthorityParameter(String tso) {
         if (tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
-            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthorityMap.getOrDefault(TSO_BY_COUNTRY.get(Country.FR), MODELING_AUTHORITY_DEFAULT_VALUE));
+            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
+                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.FR), MODELING_AUTHORITY_DEFAULT_VALUE));
         } else if (tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
-            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthorityMap.getOrDefault(TSO_BY_COUNTRY.get(Country.ES), MODELING_AUTHORITY_DEFAULT_VALUE));
+            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
+                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.ES), MODELING_AUTHORITY_DEFAULT_VALUE));
         } else if (tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
-            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthorityMap.getOrDefault(TSO_BY_COUNTRY.get(Country.PT), MODELING_AUTHORITY_DEFAULT_VALUE));
+            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
+                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.PT), MODELING_AUTHORITY_DEFAULT_VALUE));
         }
     }
 
