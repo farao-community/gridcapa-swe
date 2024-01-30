@@ -79,24 +79,24 @@ public class DichotomyRunner {
         DichotomyParameters result = new DichotomyParameters();
         switch (direction) {
             case ES_FR -> {
-                result.setMinValue(sweTaskParameters.getMinPointEsFr());
-                result.setMaxValue(sweTaskParameters.getStartingPointEsFr());
-                result.setPrecision(sweTaskParameters.getSensitivityEsFr());
+                result.setMinValue(sweTaskParameters.getMinTtcEsFr());
+                result.setMaxValue(sweTaskParameters.getMaxTtcEsFr());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionEsFr());
             }
             case FR_ES -> {
-                result.setMinValue(sweTaskParameters.getMinPointFrEs());
-                result.setMaxValue(sweTaskParameters.getStartingPointFrEs());
-                result.setPrecision(sweTaskParameters.getSensitivityFrEs());
+                result.setMinValue(sweTaskParameters.getMinTtcFrEs());
+                result.setMaxValue(sweTaskParameters.getMaxTtcFrEs());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionFrEs());
             }
             case ES_PT -> {
-                result.setMinValue(sweTaskParameters.getMinPointEsPt());
-                result.setMaxValue(sweTaskParameters.getStartingPointEsPt());
-                result.setPrecision(sweTaskParameters.getSensitivityEsPt());
+                result.setMinValue(sweTaskParameters.getMinTtcEsPt());
+                result.setMaxValue(sweTaskParameters.getMaxTtcEsPt());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionEsPt());
             }
             case PT_ES -> {
-                result.setMinValue(sweTaskParameters.getMinPointPtEs());
-                result.setMaxValue(sweTaskParameters.getStartingPointPtEs());
-                result.setPrecision(sweTaskParameters.getSensitivityPtEs());
+                result.setMinValue(sweTaskParameters.getMinTtcPtEs());
+                result.setMaxValue(sweTaskParameters.getMaxTtcPtEs());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionPtEs());
             }
         }
         result.setRunAngleCheck(sweTaskParameters.isRunAngleCheck());

@@ -21,22 +21,22 @@ public class SweTaskParameters {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweTaskParameters.class);
     private static final String KEY_VALUE_FORMAT = "%n\t\"%s\": %s";
 
-    private static final String IS_RUN_ES_FR = "RUN_ES-FR";
-    private static final String IS_RUN_FR_ES = "RUN_FR-ES";
-    private static final String IS_RUN_ES_PT = "RUN_ES-PT";
-    private static final String IS_RUN_PT_ES = "RUN_PT-ES";
-    private static final String STARTING_POINT_ES_FR = "STARTING_POINT_ES-FR";
-    private static final String STARTING_POINT_FR_ES = "STARTING_POINT_FR-ES";
-    private static final String STARTING_POINT_ES_PT = "STARTING_POINT_ES-PT";
-    private static final String STARTING_POINT_PT_ES = "STARTING_POINT_PT-ES";
-    private static final String MIN_POINT_ES_FR = "MIN_POINT_ES-FR";
-    private static final String MIN_POINT_FR_ES = "MIN_POINT_FR-ES";
-    private static final String MIN_POINT_ES_PT = "MIN_POINT_ES-PT";
-    private static final String MIN_POINT_PT_ES = "MIN_POINT_PT-ES";
-    private static final String SENSITIVITY_ES_FR = "SENSITIVITY_ES-FR";
-    private static final String SENSITIVITY_FR_ES = "SENSITIVITY_FR-ES";
-    private static final String SENSITIVITY_ES_PT = "SENSITIVITY_ES-PT";
-    private static final String SENSITIVITY_PT_ES = "SENSITIVITY_PT-ES";
+    private static final String RUN_ES_FR = "RUN_ES-FR";
+    private static final String RUN_FR_ES = "RUN_FR-ES";
+    private static final String RUN_ES_PT = "RUN_ES-PT";
+    private static final String RUN_PT_ES = "RUN_PT-ES";
+    private static final String MAX_TTC_ES_FR = "MAX_TTC_ES-FR";
+    private static final String MAX_TTC_FR_ES = "MAX_TTC_FR-ES";
+    private static final String MAX_TTC_ES_PT = "MAX_TTC_ES-PT";
+    private static final String MAX_TTC_PT_ES = "MAX_TTC_PT-ES";
+    private static final String MIN_TTC_ES_FR = "MIN_TTC_ES-FR";
+    private static final String MIN_TTC_FR_ES = "MIN_TTC_FR-ES";
+    private static final String MIN_TTC_ES_PT = "MIN_TTC_ES-PT";
+    private static final String MIN_TTC_PT_ES = "MIN_TTC_PT-ES";
+    private static final String DICHOTOMY_PRECISION_ES_FR = "DICHOTOMY_PRECISION_ES-FR";
+    private static final String DICHOTOMY_PRECISION_FR_ES = "DICHOTOMY_PRECISION_FR-ES";
+    private static final String DICHOTOMY_PRECISION_ES_PT = "DICHOTOMY_PRECISION_ES-PT";
+    private static final String DICHOTOMY_PRECISION_PT_ES = "DICHOTOMY_PRECISION_PT-ES";
     private static final String RUN_ANGLE_CHECK = "RUN_ANGLE_CHECK";
     private static final String RUN_VOLTAGE_CHECK = "RUN_VOLTAGE_CHECK";
     private static final String MAX_CRA = "MAX_CRA";
@@ -46,18 +46,18 @@ public class SweTaskParameters {
     private boolean runDirectionFrEs;
     private boolean runDirectionEsPt;
     private boolean runDirectionPtEs;
-    private int startingPointEsFr;
-    private int startingPointFrEs;
-    private int startingPointEsPt;
-    private int startingPointPtEs;
-    private int minPointEsFr;
-    private int minPointFrEs;
-    private int minPointEsPt;
-    private int minPointPtEs;
-    private int sensitivityEsFr;
-    private int sensitivityFrEs;
-    private int sensitivityEsPt;
-    private int sensitivityPtEs;
+    private int maxTtcEsFr;
+    private int maxTtcFrEs;
+    private int maxTtcEsPt;
+    private int maxTtcPtEs;
+    private int minTtcEsFr;
+    private int minTtcFrEs;
+    private int minTtcEsPt;
+    private int minTtcPtEs;
+    private int dichotomyPrecisionEsFr;
+    private int dichotomyPrecisionFrEs;
+    private int dichotomyPrecisionEsPt;
+    private int dichotomyPrecisionPtEs;
     private boolean runAngleCheck;
     private boolean runVoltageCheck;
     private int maxCra;
@@ -67,22 +67,22 @@ public class SweTaskParameters {
         List<String> errors = new ArrayList<>();
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
-                case IS_RUN_ES_FR -> runDirectionEsFr = validateIsBooleanAndGet(parameter, errors);
-                case IS_RUN_FR_ES -> runDirectionFrEs = validateIsBooleanAndGet(parameter, errors);
-                case IS_RUN_ES_PT -> runDirectionEsPt = validateIsBooleanAndGet(parameter, errors);
-                case IS_RUN_PT_ES -> runDirectionPtEs = validateIsBooleanAndGet(parameter, errors);
-                case STARTING_POINT_ES_FR -> startingPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
-                case STARTING_POINT_FR_ES -> startingPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case STARTING_POINT_ES_PT -> startingPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
-                case STARTING_POINT_PT_ES -> startingPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case MIN_POINT_ES_FR -> minPointEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
-                case MIN_POINT_FR_ES -> minPointFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case MIN_POINT_ES_PT -> minPointEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
-                case MIN_POINT_PT_ES -> minPointPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case SENSITIVITY_ES_FR -> sensitivityEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
-                case SENSITIVITY_FR_ES -> sensitivityFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
-                case SENSITIVITY_ES_PT -> sensitivityEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
-                case SENSITIVITY_PT_ES -> sensitivityPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case RUN_ES_FR -> runDirectionEsFr = validateIsBooleanAndGet(parameter, errors);
+                case RUN_FR_ES -> runDirectionFrEs = validateIsBooleanAndGet(parameter, errors);
+                case RUN_ES_PT -> runDirectionEsPt = validateIsBooleanAndGet(parameter, errors);
+                case RUN_PT_ES -> runDirectionPtEs = validateIsBooleanAndGet(parameter, errors);
+                case MAX_TTC_ES_FR -> maxTtcEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MAX_TTC_FR_ES -> maxTtcFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MAX_TTC_ES_PT -> maxTtcEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MAX_TTC_PT_ES -> maxTtcPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_TTC_ES_FR -> minTtcEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_TTC_FR_ES -> minTtcFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_TTC_ES_PT -> minTtcEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MIN_TTC_PT_ES -> minTtcPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case DICHOTOMY_PRECISION_ES_FR -> dichotomyPrecisionEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
+                case DICHOTOMY_PRECISION_FR_ES -> dichotomyPrecisionFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
+                case DICHOTOMY_PRECISION_ES_PT -> dichotomyPrecisionEsPt = validateIsPositiveIntegerAndGet(parameter, errors);
+                case DICHOTOMY_PRECISION_PT_ES -> dichotomyPrecisionPtEs = validateIsPositiveIntegerAndGet(parameter, errors);
                 case RUN_ANGLE_CHECK -> runAngleCheck = validateIsBooleanAndGet(parameter, errors);
                 case RUN_VOLTAGE_CHECK -> runVoltageCheck = validateIsBooleanAndGet(parameter, errors);
                 case MAX_CRA -> maxCra = validateIsPositiveIntegerAndGet(parameter, errors);
@@ -134,16 +134,16 @@ public class SweTaskParameters {
 
     private void crossValidateParameters(List<String> errors) {
         if (runDirectionEsFr) {
-            validateStartingPointAndMinPoint("ES-FR", startingPointEsFr, minPointEsFr, errors);
+            validateStartingPointAndMinPoint("ES-FR", maxTtcEsFr, minTtcEsFr, errors);
         }
         if (runDirectionFrEs) {
-            validateStartingPointAndMinPoint("FR-ES", startingPointFrEs, minPointFrEs, errors);
+            validateStartingPointAndMinPoint("FR-ES", maxTtcFrEs, minTtcFrEs, errors);
         }
         if (runDirectionEsPt) {
-            validateStartingPointAndMinPoint("ES-PT", startingPointEsPt, minPointEsPt, errors);
+            validateStartingPointAndMinPoint("ES-PT", maxTtcEsPt, minTtcEsPt, errors);
         }
         if (runDirectionPtEs) {
-            validateStartingPointAndMinPoint("PT-ES", startingPointPtEs, minPointPtEs, errors);
+            validateStartingPointAndMinPoint("PT-ES", maxTtcPtEs, minTtcPtEs, errors);
         }
     }
 
@@ -169,52 +169,52 @@ public class SweTaskParameters {
         return runDirectionPtEs;
     }
 
-    public int getStartingPointEsFr() {
-        return startingPointEsFr;
+    public int getMaxTtcEsFr() {
+        return maxTtcEsFr;
     }
 
-    public int getStartingPointFrEs() {
-        return startingPointFrEs;
+    public int getMaxTtcFrEs() {
+        return maxTtcFrEs;
     }
 
-    public int getStartingPointEsPt() {
-        return startingPointEsPt;
+    public int getMaxTtcEsPt() {
+        return maxTtcEsPt;
     }
 
-    public int getStartingPointPtEs() {
-        return startingPointPtEs;
+    public int getMaxTtcPtEs() {
+        return maxTtcPtEs;
     }
 
-    public int getMinPointEsFr() {
-        return minPointEsFr;
+    public int getMinTtcEsFr() {
+        return minTtcEsFr;
     }
 
-    public int getMinPointFrEs() {
-        return minPointFrEs;
+    public int getMinTtcFrEs() {
+        return minTtcFrEs;
     }
 
-    public int getMinPointEsPt() {
-        return minPointEsPt;
+    public int getMinTtcEsPt() {
+        return minTtcEsPt;
     }
 
-    public int getMinPointPtEs() {
-        return minPointPtEs;
+    public int getMinTtcPtEs() {
+        return minTtcPtEs;
     }
 
-    public int getSensitivityEsFr() {
-        return sensitivityEsFr;
+    public int getDichotomyPrecisionEsFr() {
+        return dichotomyPrecisionEsFr;
     }
 
-    public int getSensitivityFrEs() {
-        return sensitivityFrEs;
+    public int getDichotomyPrecisionFrEs() {
+        return dichotomyPrecisionFrEs;
     }
 
-    public int getSensitivityEsPt() {
-        return sensitivityEsPt;
+    public int getDichotomyPrecisionEsPt() {
+        return dichotomyPrecisionEsPt;
     }
 
-    public int getSensitivityPtEs() {
-        return sensitivityPtEs;
+    public int getDichotomyPrecisionPtEs() {
+        return dichotomyPrecisionPtEs;
     }
 
     public boolean isRunAngleCheck() {
@@ -239,22 +239,22 @@ public class SweTaskParameters {
 
     public String toJsonString() {
         List<String> appender = new ArrayList<>();
-        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_ES_FR, runDirectionEsFr));
-        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_FR_ES, runDirectionFrEs));
-        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_ES_PT, runDirectionEsPt));
-        appender.add(String.format(KEY_VALUE_FORMAT, IS_RUN_PT_ES, runDirectionPtEs));
-        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_ES_FR, startingPointEsFr));
-        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_FR_ES, startingPointFrEs));
-        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_ES_PT, startingPointEsPt));
-        appender.add(String.format(KEY_VALUE_FORMAT, STARTING_POINT_PT_ES, startingPointPtEs));
-        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_ES_FR, minPointEsFr));
-        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_FR_ES, minPointFrEs));
-        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_ES_PT, minPointEsPt));
-        appender.add(String.format(KEY_VALUE_FORMAT, MIN_POINT_PT_ES, minPointPtEs));
-        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_ES_FR, sensitivityEsFr));
-        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_FR_ES, sensitivityFrEs));
-        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_ES_PT, sensitivityEsPt));
-        appender.add(String.format(KEY_VALUE_FORMAT, SENSITIVITY_PT_ES, sensitivityPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, RUN_ES_FR, runDirectionEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, RUN_FR_ES, runDirectionFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, RUN_ES_PT, runDirectionEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, RUN_PT_ES, runDirectionPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, MAX_TTC_ES_FR, maxTtcEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, MAX_TTC_FR_ES, maxTtcFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, MAX_TTC_ES_PT, maxTtcEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, MAX_TTC_PT_ES, maxTtcPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_TTC_ES_FR, minTtcEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_TTC_FR_ES, minTtcFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_TTC_ES_PT, minTtcEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, MIN_TTC_PT_ES, minTtcPtEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, DICHOTOMY_PRECISION_ES_FR, dichotomyPrecisionEsFr));
+        appender.add(String.format(KEY_VALUE_FORMAT, DICHOTOMY_PRECISION_FR_ES, dichotomyPrecisionFrEs));
+        appender.add(String.format(KEY_VALUE_FORMAT, DICHOTOMY_PRECISION_ES_PT, dichotomyPrecisionEsPt));
+        appender.add(String.format(KEY_VALUE_FORMAT, DICHOTOMY_PRECISION_PT_ES, dichotomyPrecisionPtEs));
         appender.add(String.format(KEY_VALUE_FORMAT, RUN_ANGLE_CHECK, runAngleCheck));
         appender.add(String.format(KEY_VALUE_FORMAT, RUN_VOLTAGE_CHECK, runVoltageCheck));
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_CRA, maxCra));

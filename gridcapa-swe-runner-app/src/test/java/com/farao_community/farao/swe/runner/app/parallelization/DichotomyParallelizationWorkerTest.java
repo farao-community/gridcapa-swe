@@ -73,9 +73,9 @@ class DichotomyParallelizationWorkerTest {
         when(cneFileExportService.exportCneUrl(any(SweData.class), any(DichotomyResult.class), anyBoolean(), any(DichotomyDirection.class))).thenReturn("CneUrl");
         when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
-        Mockito.when(sweTaskParameters.getMinPointEsPt()).thenReturn(0);
-        Mockito.when(sweTaskParameters.getStartingPointEsPt()).thenReturn(6400);
-        Mockito.when(sweTaskParameters.getSensitivityEsPt()).thenReturn(50);
+        Mockito.when(sweTaskParameters.getMinTtcEsPt()).thenReturn(0);
+        Mockito.when(sweTaskParameters.getMaxTtcEsPt()).thenReturn(6400);
+        Mockito.when(sweTaskParameters.getDichotomyPrecisionEsPt()).thenReturn(50);
         Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction);
         try {
             SweDichotomyResult sweDichotomyResult = futurResult.get();

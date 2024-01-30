@@ -22,18 +22,18 @@ class SweTaskParametersTest {
             new TaskParameterDto("RUN_FR-ES", "BOOLEAN", "false", "true"),
             new TaskParameterDto("RUN_ES-PT", "BOOLEAN", "true", "true"),
             new TaskParameterDto("RUN_PT-ES", "BOOLEAN", "false", "true"),
-            new TaskParameterDto("STARTING_POINT_ES-FR", "INT", "42", "1515"),
-            new TaskParameterDto("STARTING_POINT_FR-ES", "INT", "43", "1515"),
-            new TaskParameterDto("STARTING_POINT_ES-PT", "INT", "44", "1515"),
-            new TaskParameterDto("STARTING_POINT_PT-ES", "INT", "45", "1515"),
-            new TaskParameterDto("MIN_POINT_ES-FR", "INT", "26", "1515"),
-            new TaskParameterDto("MIN_POINT_FR-ES", "INT", "27", "1515"),
-            new TaskParameterDto("MIN_POINT_ES-PT", "INT", "28", "1515"),
-            new TaskParameterDto("MIN_POINT_PT-ES", "INT", "29", "1515"),
-            new TaskParameterDto("SENSITIVITY_ES-FR", "INT", "10", "1515"),
-            new TaskParameterDto("SENSITIVITY_FR-ES", "INT", "11", "1515"),
-            new TaskParameterDto("SENSITIVITY_ES-PT", "INT", "12", "1515"),
-            new TaskParameterDto("SENSITIVITY_PT-ES", "INT", "13", "1515"),
+            new TaskParameterDto("MAX_TTC_ES-FR", "INT", "42", "1515"),
+            new TaskParameterDto("MAX_TTC_FR-ES", "INT", "43", "1515"),
+            new TaskParameterDto("MAX_TTC_ES-PT", "INT", "44", "1515"),
+            new TaskParameterDto("MAX_TTC_PT-ES", "INT", "45", "1515"),
+            new TaskParameterDto("MIN_TTC_ES-FR", "INT", "26", "1515"),
+            new TaskParameterDto("MIN_TTC_FR-ES", "INT", "27", "1515"),
+            new TaskParameterDto("MIN_TTC_ES-PT", "INT", "28", "1515"),
+            new TaskParameterDto("MIN_TTC_PT-ES", "INT", "29", "1515"),
+            new TaskParameterDto("DICHOTOMY_PRECISION_ES-FR", "INT", "10", "1515"),
+            new TaskParameterDto("DICHOTOMY_PRECISION_FR-ES", "INT", "11", "1515"),
+            new TaskParameterDto("DICHOTOMY_PRECISION_ES-PT", "INT", "12", "1515"),
+            new TaskParameterDto("DICHOTOMY_PRECISION_PT-ES", "INT", "13", "1515"),
             new TaskParameterDto("RUN_ANGLE_CHECK", "BOOLEAN", "true", "true"),
             new TaskParameterDto("RUN_VOLTAGE_CHECK", "BOOLEAN", "true", "true"),
             new TaskParameterDto("MAX_CRA", "INT", "72", "25"),
@@ -46,18 +46,18 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.isRunDirectionFrEs()).isFalse();
         Assertions.assertThat(sweTaskParameters.isRunDirectionEsPt()).isTrue();
         Assertions.assertThat(sweTaskParameters.isRunDirectionPtEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.getStartingPointEsFr()).isEqualTo(42);
-        Assertions.assertThat(sweTaskParameters.getStartingPointFrEs()).isEqualTo(43);
-        Assertions.assertThat(sweTaskParameters.getStartingPointEsPt()).isEqualTo(44);
-        Assertions.assertThat(sweTaskParameters.getStartingPointPtEs()).isEqualTo(45);
-        Assertions.assertThat(sweTaskParameters.getMinPointEsFr()).isEqualTo(26);
-        Assertions.assertThat(sweTaskParameters.getMinPointFrEs()).isEqualTo(27);
-        Assertions.assertThat(sweTaskParameters.getMinPointEsPt()).isEqualTo(28);
-        Assertions.assertThat(sweTaskParameters.getMinPointPtEs()).isEqualTo(29);
-        Assertions.assertThat(sweTaskParameters.getSensitivityEsFr()).isEqualTo(10);
-        Assertions.assertThat(sweTaskParameters.getSensitivityFrEs()).isEqualTo(11);
-        Assertions.assertThat(sweTaskParameters.getSensitivityEsPt()).isEqualTo(12);
-        Assertions.assertThat(sweTaskParameters.getSensitivityPtEs()).isEqualTo(13);
+        Assertions.assertThat(sweTaskParameters.getMaxTtcEsFr()).isEqualTo(42);
+        Assertions.assertThat(sweTaskParameters.getMaxTtcFrEs()).isEqualTo(43);
+        Assertions.assertThat(sweTaskParameters.getMaxTtcEsPt()).isEqualTo(44);
+        Assertions.assertThat(sweTaskParameters.getMaxTtcPtEs()).isEqualTo(45);
+        Assertions.assertThat(sweTaskParameters.getMinTtcEsFr()).isEqualTo(26);
+        Assertions.assertThat(sweTaskParameters.getMinTtcFrEs()).isEqualTo(27);
+        Assertions.assertThat(sweTaskParameters.getMinTtcEsPt()).isEqualTo(28);
+        Assertions.assertThat(sweTaskParameters.getMinTtcPtEs()).isEqualTo(29);
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsFr()).isEqualTo(10);
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionFrEs()).isEqualTo(11);
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsPt()).isEqualTo(12);
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionPtEs()).isEqualTo(13);
         Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isTrue();
         Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isTrue();
         Assertions.assertThat(sweTaskParameters.getMaxCra()).isEqualTo(72);
@@ -82,18 +82,18 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.isRunDirectionFrEs()).isFalse();
         Assertions.assertThat(sweTaskParameters.isRunDirectionEsPt()).isFalse();
         Assertions.assertThat(sweTaskParameters.isRunDirectionPtEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.getStartingPointEsFr()).isZero();
-        Assertions.assertThat(sweTaskParameters.getStartingPointFrEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getStartingPointEsPt()).isZero();
-        Assertions.assertThat(sweTaskParameters.getStartingPointPtEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinPointEsFr()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinPointFrEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinPointEsPt()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinPointPtEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getSensitivityEsFr()).isZero();
-        Assertions.assertThat(sweTaskParameters.getSensitivityFrEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getSensitivityEsPt()).isZero();
-        Assertions.assertThat(sweTaskParameters.getSensitivityPtEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMaxTtcEsFr()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMaxTtcFrEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMaxTtcEsPt()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMaxTtcPtEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinTtcEsFr()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinTtcFrEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinTtcEsPt()).isZero();
+        Assertions.assertThat(sweTaskParameters.getMinTtcPtEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsFr()).isZero();
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionFrEs()).isZero();
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsPt()).isZero();
+        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionPtEs()).isZero();
         Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isFalse();
         Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isFalse();
         Assertions.assertThat(sweTaskParameters.getMaxCra()).isZero();
@@ -114,23 +114,23 @@ class SweTaskParametersTest {
     @Test
     void badTypeParameterIntTest() {
         List<TaskParameterDto> parameters = List.of(
-            new TaskParameterDto("SENSITIVITY_FR-ES", "STRING", "test", "default")
+            new TaskParameterDto("DICHOTOMY_PRECISION_FR-ES", "STRING", "test", "default")
         );
 
         Assertions.assertThatExceptionOfType(SweInvalidDataException.class)
             .isThrownBy(() -> new SweTaskParameters(parameters))
-            .withMessage("Validation of parameters failed. Failure reasons are: [\"Parameter SENSITIVITY_FR-ES was expected to be of type INT, got STRING\"].");
+            .withMessage("Validation of parameters failed. Failure reasons are: [\"Parameter DICHOTOMY_PRECISION_FR-ES was expected to be of type INT, got STRING\"].");
     }
 
     @Test
     void validationFailureIntParameterNotParseableTest() {
         List<TaskParameterDto> parameters = List.of(
-            new TaskParameterDto("MIN_POINT_ES-FR", "INT", "3.14", "25")
+            new TaskParameterDto("MIN_TTC_ES-FR", "INT", "3.14", "25")
         );
 
         Assertions.assertThatExceptionOfType(SweInvalidDataException.class)
             .isThrownBy(() -> new SweTaskParameters(parameters))
-            .withMessage("Validation of parameters failed. Failure reasons are: [\"Parameter MIN_POINT_ES-FR could not be parsed as integer (value: 3.14)\"].");
+            .withMessage("Validation of parameters failed. Failure reasons are: [\"Parameter MIN_TTC_ES-FR could not be parsed as integer (value: 3.14)\"].");
     }
 
     @Test
@@ -155,14 +155,14 @@ class SweTaskParametersTest {
             new TaskParameterDto("RUN_FR-ES", "BOOLEAN", "true", "true"),
             new TaskParameterDto("RUN_ES-PT", "BOOLEAN", "true", "true"),
             new TaskParameterDto("RUN_PT-ES", "BOOLEAN", "true", "true"),
-            new TaskParameterDto("STARTING_POINT_ES-FR", "INT", "15", "6400"),
-            new TaskParameterDto("STARTING_POINT_FR-ES", "INT", "16", "6400"),
-            new TaskParameterDto("STARTING_POINT_ES-PT", "INT", "17", "6400"),
-            new TaskParameterDto("STARTING_POINT_PT-ES", "INT", "18", "6400"),
-            new TaskParameterDto("MIN_POINT_ES-FR", "INT", "100", "0"),
-            new TaskParameterDto("MIN_POINT_FR-ES", "INT", "101", "0"),
-            new TaskParameterDto("MIN_POINT_ES-PT", "INT", "102", "0"),
-            new TaskParameterDto("MIN_POINT_PT-ES", "INT", "103", "0")
+            new TaskParameterDto("MAX_TTC_ES-FR", "INT", "15", "6400"),
+            new TaskParameterDto("MAX_TTC_FR-ES", "INT", "16", "6400"),
+            new TaskParameterDto("MAX_TTC_ES-PT", "INT", "17", "6400"),
+            new TaskParameterDto("MAX_TTC_PT-ES", "INT", "18", "6400"),
+            new TaskParameterDto("MIN_TTC_ES-FR", "INT", "100", "0"),
+            new TaskParameterDto("MIN_TTC_FR-ES", "INT", "101", "0"),
+            new TaskParameterDto("MIN_TTC_ES-PT", "INT", "102", "0"),
+            new TaskParameterDto("MIN_TTC_PT-ES", "INT", "103", "0")
         );
 
         Assertions.assertThatExceptionOfType(SweInvalidDataException.class)
