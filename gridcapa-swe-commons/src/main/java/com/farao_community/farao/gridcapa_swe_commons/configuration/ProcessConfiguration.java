@@ -42,8 +42,8 @@ public class ProcessConfiguration {
         return modelingAuthorityMap;
     }
 
-    public void setModelingAuthorityMap(Map<String, String> modelingAuthoritySet) {
-        this.modelingAuthorityMap = modelingAuthoritySet;
+    public void setModelingAuthorityMap(Map<String, String> modelingAuthorityMap) {
+        this.modelingAuthorityMap = modelingAuthorityMap;
     }
 
 }
