@@ -37,7 +37,7 @@ public abstract class AbstractSweException extends RuntimeException {
             while (cause != null) {
                 sb.append("; nested exception is ").append(cause);
                 cause = cause.getCause();
-                if(cause instanceof SweInvalidDataNoDetailsException){
+                if (cause instanceof SweInvalidDataNoDetailsException) {
                     return cause.getMessage();
                 }
             }
