@@ -24,7 +24,6 @@ import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManager;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -41,7 +40,6 @@ import static org.mockito.Mockito.*;
  */
 
 @SpringBootTest
-@Disabled
 class RaoValidatorTest {
 
     @MockBean
