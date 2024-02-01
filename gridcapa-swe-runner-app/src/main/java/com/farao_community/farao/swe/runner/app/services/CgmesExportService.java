@@ -55,11 +55,13 @@ public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
     private static final double DEFAULT_P_TOLERANCE = 10;
     private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_001.xml'");
+    public static final String MODELING_AUTHORITY_DEFAULT_VALUE = "https://farao-community.github.io/";
     private final Logger businessLogger;
     private final FileExporter fileExporter;
 
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
+    private final ProcessConfiguration processConfiguration;
 
     private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
 
@@ -78,9 +80,8 @@ public class CgmesExportService {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
-        String modelingAuthoritySet = processConfiguration.getModelingAuthoritySet();
-        SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthoritySet);
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, modelingAuthoritySet);
+        this.processConfiguration = processConfiguration;
+        SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
     }
 
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
@@ -156,11 +157,25 @@ public class CgmesExportService {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             updateControlAreasExtension(network);
             MemDataSource memDataSource = new MemDataSource();
+            updateModelAuthorityParameter(tso);
             network.write("CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource);
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
             String newFileName = buildCgmesFilename(sweData, tso, "SSH");
             return Map.of(newFileName, baos);
+        }
+    }
+
+    private void updateModelAuthorityParameter(String tso) {
+        if (tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
+            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
+                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.FR), MODELING_AUTHORITY_DEFAULT_VALUE));
+        } else if (tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
+            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
+                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.ES), MODELING_AUTHORITY_DEFAULT_VALUE));
+        } else if (tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
+            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
+                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.PT), MODELING_AUTHORITY_DEFAULT_VALUE));
         }
     }
 
