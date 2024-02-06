@@ -7,7 +7,7 @@
 
 package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNoDetailsException;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
@@ -151,6 +151,6 @@ class HvdcLinkProcessorTest {
     void testNoinputFails(String xiidm) {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream(xiidm));
         Set<HvdcCreationParameters> params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json")).getHvdcCreationParametersSet();
-        assertThrows(SweInvalidDataException.class, () -> HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params));
+        assertThrows(SweInvalidDataNoDetailsException.class, () -> HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params));
     }
 }
