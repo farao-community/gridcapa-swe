@@ -6,7 +6,7 @@
     <parent>
         <artifactId>farao-parent-ws</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
@@ -58,10 +58,10 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <farao.dependencies.version>1.22.1-SNAPSHOT</farao.dependencies.version>
-        <farao.dichotomy.version>4.14.1-SNAPSHOT</farao.dichotomy.version>
+        <farao.dependencies.version>1.25.0</farao.dependencies.version>
+        <farao.dichotomy.version>4.14.1</farao.dichotomy.version>
         <gridcapa.starter.minio.version>1.1.1</gridcapa.starter.minio.version>
-        <gridcapa.rao.runner.version>1.19.2-SNAPSHOT</gridcapa.rao.runner.version>
+        <gridcapa.rao.runner.version>1.19.1</gridcapa.rao.runner.version>
         <gridcapa.task-manager.version>1.23.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.13.4</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>

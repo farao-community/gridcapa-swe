@@ -70,9 +70,11 @@ public class CgmesExportService {
     static {
         SSH_FILES_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SSH");
         SSH_FILES_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
+        SSH_FILES_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, "cgmes");
 
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SV");
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
+        SV_FILE_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, "cgmes");
     }
 
     public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration) {
