@@ -23,8 +23,12 @@ import com.powsybl.cgmes.conversion.CgmesExport;
 import com.powsybl.cgmes.extensions.CgmesControlArea;
 import com.powsybl.cgmes.extensions.CgmesControlAreas;
 import com.powsybl.commons.datasource.MemDataSource;
+import com.powsybl.commons.reporter.Report;
+import com.powsybl.commons.reporter.ReporterModel;
+import com.powsybl.commons.reporter.TypedValue;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.ExportersServiceLoader;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -43,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 import static com.farao_community.farao.swe.runner.app.services.NetworkService.TSO_BY_COUNTRY;
 
@@ -160,7 +165,7 @@ public class CgmesExportService {
             updateControlAreasExtension(network);
             MemDataSource memDataSource = new MemDataSource();
             updateModelAuthorityParameter(tso);
-            network.write("CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource);
+            network.write("CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporter);
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
             String newFileName = buildCgmesFilename(sweData, tso, "SSH");
@@ -218,7 +223,20 @@ public class CgmesExportService {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             MemDataSource memDataSource = new MemDataSource();
-            network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
+            ReporterModel reporter = new ReporterModel("reporter", "test");
+            network.write(new ExportersServiceLoader(), "CGMES", SV_FILE_EXPORT_PARAMS, memDataSource, reporter);
+            System.out.println("size reporter " + reporter.getReports().size());
+            for (Report report : reporter.getReports()) {
+                System.out.println("report key " + report.getReportKey());
+                System.out.println("Default " + report.getDefaultMessage());
+                Map<String, TypedValue> values = report.getValues();
+                for (Map.Entry<String, TypedValue> entry : values.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue().toString();
+                    System.out.println("Key=" + key + ", Value=" + value);
+                }
+            }
+
             String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
             String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV");
