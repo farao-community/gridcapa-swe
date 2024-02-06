@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 
 import static com.farao_community.farao.swe.runner.app.services.NetworkService.TSO_BY_COUNTRY;
 
@@ -67,6 +66,8 @@ public class CgmesExportService {
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
     private final ProcessConfiguration processConfiguration;
+
+    ReporterModel reporter = new ReporterModel("reporter", "test");
 
     private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
 
@@ -165,7 +166,7 @@ public class CgmesExportService {
             updateControlAreasExtension(network);
             MemDataSource memDataSource = new MemDataSource();
             updateModelAuthorityParameter(tso);
-            network.write("CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporter);
+            network.write(new ExportersServiceLoader(), "CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporter);
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
             String newFileName = buildCgmesFilename(sweData, tso, "SSH");
@@ -223,9 +224,7 @@ public class CgmesExportService {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             MemDataSource memDataSource = new MemDataSource();
-            ReporterModel reporter = new ReporterModel("reporter", "test");
-            network.write(new ExportersServiceLoader(), "CGMES", SV_FILE_EXPORT_PARAMS, memDataSource, reporter);
-            System.out.println("size reporter " + reporter.getReports().size());
+            network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
             for (Report report : reporter.getReports()) {
                 System.out.println("report key " + report.getReportKey());
                 System.out.println("Default " + report.getDefaultMessage());
