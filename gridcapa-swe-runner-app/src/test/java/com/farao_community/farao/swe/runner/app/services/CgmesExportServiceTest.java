@@ -71,7 +71,7 @@ class CgmesExportServiceTest {
     }
 
     @Test
-    void exportCgmesFilesTest() throws IOException, XMLStreamException {
+    void exportCgmesFilesTest() throws IOException {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
         String  emptyXmlFile = "/export_cgmes/emptyXmlFile.xml";
@@ -111,7 +111,7 @@ class CgmesExportServiceTest {
     }
 
     @Test
-    void exportCgmesFilesWithMissingCountryTest() throws IOException, XMLStreamException {
+    void exportCgmesFilesWithMissingCountryTest() throws IOException {
         //In cas of subnetwork contains many countries it will not be exported
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));

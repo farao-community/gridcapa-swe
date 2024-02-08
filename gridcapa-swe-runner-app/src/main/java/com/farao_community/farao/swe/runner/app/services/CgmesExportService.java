@@ -22,17 +22,20 @@ import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
 import com.powsybl.cgmes.extensions.CgmesControlArea;
 import com.powsybl.cgmes.extensions.CgmesControlAreas;
+import com.powsybl.cgmes.extensions.CgmesSshMetadata;
+import com.powsybl.cgmes.extensions.CgmesSvMetadata;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.commons.reporter.Report;
 import com.powsybl.commons.reporter.ReporterModel;
-import com.powsybl.commons.reporter.TypedValue;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ExportersServiceLoader;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.util.Identifiables;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,14 +44,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 import static com.farao_community.farao.swe.runner.app.services.NetworkService.TSO_BY_COUNTRY;
+import static com.powsybl.cgmes.conversion.Conversion.CGMES_PREFIX_ALIAS_PROPERTIES;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -66,12 +72,12 @@ public class CgmesExportService {
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
     private final ProcessConfiguration processConfiguration;
-
-    ReporterModel reporter = new ReporterModel("reporter", "test");
+    private final Map<CgmesFileType, String> mapCgmesIds = new HashMap<>();
 
     private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
 
     private static final Properties SV_FILE_EXPORT_PARAMS = new Properties();
+    ReporterModel reporter = new ReporterModel("reporter", "test");
 
     static {
         SSH_FILES_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SSH");
@@ -166,12 +172,47 @@ public class CgmesExportService {
             updateControlAreasExtension(network);
             MemDataSource memDataSource = new MemDataSource();
             updateModelAuthorityParameter(tso);
-            network.write(new ExportersServiceLoader(), "CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporter);
+            ReporterModel reporterSsh = new ReporterModel("CgmesId", tso);
+            network.write(new ExportersServiceLoader(), "CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporterSsh);
+            mapCgmesIds.put(buildFileTypeForMap("SSH", tso), getCgmesIdFromReporter(reporterSsh));
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
             String newFileName = buildCgmesFilename(sweData, tso, "SSH");
             return Map.of(newFileName, baos);
         }
+    }
+
+    private CgmesFileType buildFileTypeForMap(String fileType, String tso) {
+        if (fileType.equals("SSH") && tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
+            return CgmesFileType.RTE_SSH;
+        } else if (fileType.equals("SSH") && tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
+            return CgmesFileType.REE_SSH;
+        } else if (fileType.equals("SSH") && tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
+            return CgmesFileType.REN_SSH;
+        } else if (fileType.equals("EQ") && tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
+            return CgmesFileType.REN_SSH;
+        } else if (fileType.equals("EQ") && tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
+            return CgmesFileType.REN_SSH;
+        } else if (fileType.equals("EQ") && tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
+            return CgmesFileType.REN_SSH;
+        } else if (fileType.equals("TP") && tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
+            return CgmesFileType.REN_SSH;
+        } else if (fileType.equals("TP") && tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
+            return CgmesFileType.REN_SSH;
+        } else if (fileType.equals("TP") && tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
+            return CgmesFileType.REN_SSH;
+        } else {
+            return null;
+        }
+    }
+
+    private String getCgmesIdFromReporter(ReporterModel reporterSsh) {
+        for (Report report : reporterSsh.getReports()) {
+            if (report.getReportKey().equals("CgmesId")) {
+                return report.getDefaultMessage();
+            }
+        }
+        return "no id";
     }
 
     private void updateModelAuthorityParameter(String tso) {
@@ -224,23 +265,46 @@ public class CgmesExportService {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             MemDataSource memDataSource = new MemDataSource();
-            network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
-            for (Report report : reporter.getReports()) {
-                System.out.println("report key " + report.getReportKey());
-                System.out.println("Default " + report.getDefaultMessage());
-                Map<String, TypedValue> values = report.getValues();
-                for (Map.Entry<String, TypedValue> entry : values.entrySet()) {
-                    String key = entry.getKey();
-                    String value = entry.getValue().toString();
-                    System.out.println("Key=" + key + ", Value=" + value);
-                }
-            }
-
+            buildSvDependencies(network);
+            network.write(new ExportersServiceLoader(), "CGMES", SV_FILE_EXPORT_PARAMS, memDataSource, reporter);
             String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
             String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV");
             return Map.of(outputFilename, os);
         }
+    }
+
+    private void buildSvDependencies(Network network) {
+        Network subnetwork = (Network) network.getSubnetworks().toArray()[0];
+        CgmesSvMetadata cgmesSvMetadata = subnetwork.getExtension(CgmesSvMetadata.class);
+        List<String> initialSvDependantOn = copyListDependencies(cgmesSvMetadata);
+        removeInitialSshFromInitialDependencies(network, initialSvDependantOn);
+        for (String dependency : initialSvDependantOn) {
+            network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "TP_ID", network::hasProperty), dependency);
+        }
+        network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "SSH_ID", network::hasProperty),
+                mapCgmesIds.getOrDefault(CgmesFileType.REN_SSH, ""));
+        network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "SSH_ID", network::hasProperty),
+                mapCgmesIds.getOrDefault(CgmesFileType.REE_SSH, ""));
+        network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "SSH_ID", network::hasProperty),
+                mapCgmesIds.getOrDefault(CgmesFileType.RTE_SSH, ""));
+    }
+
+    private static void removeInitialSshFromInitialDependencies(Network network, List<String> initialSvDependantOn) {
+        for (Network sub : network.getSubnetworks()) {
+            if (sub.getExtension(CgmesSshMetadata.class) != null) {
+                CgmesSshMetadata cgmesSshMetadata = sub.getExtension(CgmesSshMetadata.class);
+                initialSvDependantOn.remove(cgmesSshMetadata.getId());
+            }
+        }
+    }
+
+    @NotNull
+    private static List<String> copyListDependencies(CgmesSvMetadata cgmesSvMetadata) {
+        if (cgmesSvMetadata != null && cgmesSvMetadata.getDependencies() != null) {
+            return new ArrayList<>(cgmesSvMetadata.getDependencies());
+        }
+        return new ArrayList<>();
     }
 
     String buildCgmesFilename(SweData sweData, String tso, String type) {
