@@ -77,7 +77,6 @@ public class CgmesExportService {
     private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
 
     private static final Properties SV_FILE_EXPORT_PARAMS = new Properties();
-    ReporterModel reporter = new ReporterModel("reporter", "test");
 
     static {
         SSH_FILES_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SSH");

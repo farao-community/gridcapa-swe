@@ -39,8 +39,8 @@ class VoltageResultMapperTest {
 
     @Test
     void mapVoltageResultTestCheckListElememnts() {
-        result.getConstraintElements().stream().forEach(voltResult -> {
-            if (voltResult.getInstant().equals("CURATIVE")) {
+        result.getConstraintElements().forEach(voltResult -> {
+            if ("CURATIVE".equals(voltResult.getInstant())) {
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_LOWER_0, voltResult.getLowerBound(), VoltageMonitoringResultTestUtils.DELTA_BIG);
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_UPPER_0, voltResult.getUpperBound(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_MIN_0, voltResult.getMinVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
