@@ -174,7 +174,7 @@ public class CgmesExportService {
             updateModelAuthorityParameter(tso);
             ReporterModel reporterSsh = new ReporterModel("CgmesId", tso);
             network.write(new ExportersServiceLoader(), "CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporterSsh);
-            mapCgmesIds.put(buildFileTypeForMap("SSH", tso), getCgmesIdFromReporter(reporterSsh));
+            addCgmesIdToMap(tso, reporterSsh);
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
             String newFileName = buildCgmesFilename(sweData, tso, "SSH");
@@ -182,15 +182,20 @@ public class CgmesExportService {
         }
     }
 
-    private CgmesFileType buildFileTypeForMap(String fileType, String tso) {
+    private void addCgmesIdToMap(String tso, ReporterModel reporterSsh) {
+        Optional<CgmesFileType> optionalCgmesFileType = buildFileTypeForMap("SSH", tso);
+        optionalCgmesFileType.ifPresent(cgmesFileType -> mapCgmesIds.put(cgmesFileType, getCgmesIdFromReporter(reporterSsh)));
+    }
+
+    private Optional<CgmesFileType> buildFileTypeForMap(String fileType, String tso) {
         if (fileType.equals("SSH") && tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
-            return CgmesFileType.RTE_SSH;
+            return Optional.of(CgmesFileType.RTE_SSH);
         } else if (fileType.equals("SSH") && tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
-            return CgmesFileType.REE_SSH;
+            return Optional.of(CgmesFileType.REE_SSH);
         } else if (fileType.equals("SSH") && tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
-            return CgmesFileType.REN_SSH;
+            return Optional.of(CgmesFileType.REN_SSH);
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
