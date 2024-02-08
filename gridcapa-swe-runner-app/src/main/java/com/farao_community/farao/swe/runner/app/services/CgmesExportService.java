@@ -189,18 +189,6 @@ public class CgmesExportService {
             return CgmesFileType.REE_SSH;
         } else if (fileType.equals("SSH") && tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
             return CgmesFileType.REN_SSH;
-        } else if (fileType.equals("EQ") && tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
-            return CgmesFileType.REN_SSH;
-        } else if (fileType.equals("EQ") && tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
-            return CgmesFileType.REN_SSH;
-        } else if (fileType.equals("EQ") && tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
-            return CgmesFileType.REN_SSH;
-        } else if (fileType.equals("TP") && tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
-            return CgmesFileType.REN_SSH;
-        } else if (fileType.equals("TP") && tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
-            return CgmesFileType.REN_SSH;
-        } else if (fileType.equals("TP") && tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
-            return CgmesFileType.REN_SSH;
         } else {
             return null;
         }
