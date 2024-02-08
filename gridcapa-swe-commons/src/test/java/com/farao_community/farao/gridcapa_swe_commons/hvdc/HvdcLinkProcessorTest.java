@@ -13,6 +13,7 @@ import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreproc
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +21,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,6 +47,43 @@ class HvdcLinkProcessorTest {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
+        // Check generators was disconnected
+        assertFalse(network.getGenerator("FFR4AA1 _generator").getTerminal().isConnected());
+        assertFalse(network.getGenerator("DDE1AA1 _generator").getTerminal().isConnected());
+        assertFalse(network.getGenerator("BBE2AA1 _generator").getTerminal().isConnected());
+        assertFalse(network.getGenerator("FFR3AA1 _generator").getTerminal().isConnected());
+
+        // Check loads was disconnected
+        assertFalse(network.getLoad("FFR4AA1 _load").getTerminal().isConnected());
+        assertFalse(network.getLoad("DDE1AA1 _load").getTerminal().isConnected());
+        assertFalse(network.getLoad("BBE2AA1 _load").getTerminal().isConnected());
+        assertFalse(network.getLoad("FFR3AA1 _load").getTerminal().isConnected());
+
+        // Check hvdc line 1 creation
+        assertEquals(2, network.getHvdcLineCount());
+        HvdcLine hvdcLine1 = network.getHvdcLine("HVDC_FR4-DE1");
+        assertEquals(1000.0, hvdcLine1.getMaxP());
+        assertEquals(0.5, hvdcLine1.getR());
+        assertEquals(400, hvdcLine1.getNominalV());
+        assertEquals(HvdcLine.ConvertersMode.SIDE_1_RECTIFIER_SIDE_2_INVERTER, hvdcLine1.getConvertersMode());
+        assertEquals(0, hvdcLine1.getActivePowerSetpoint());
+        assertEquals("HVDC_FR4-DE1_VSC1", hvdcLine1.getConverterStation1().getId());
+        assertEquals(1.0, hvdcLine1.getConverterStation1().getLossFactor());
+        assertEquals("HVDC_FR4-DE1_VSC2", hvdcLine1.getConverterStation2().getId());
+        assertEquals(10.0, hvdcLine1.getConverterStation2().getLossFactor());
+
+        // Check hvdc line 2 creation
+        HvdcLine hvdcLine2 = network.getHvdcLine("HVDC_BE2-FR3");
+        assertEquals(200.0, hvdcLine2.getMaxP());
+        assertEquals(0.75, hvdcLine2.getR());
+        assertEquals(220, hvdcLine2.getNominalV());
+        assertEquals(HvdcLine.ConvertersMode.SIDE_1_RECTIFIER_SIDE_2_INVERTER, hvdcLine2.getConvertersMode());
+        assertEquals(0, hvdcLine2.getActivePowerSetpoint());
+        assertEquals("HVDC_BE2-FR3_VSC1", hvdcLine2.getConverterStation1().getId());
+        assertEquals(2.0, hvdcLine2.getConverterStation1().getLossFactor());
+        assertEquals("HVDC_BE2-FR3_VSC2", hvdcLine2.getConverterStation2().getId());
+        assertEquals(15.0, hvdcLine2.getConverterStation2().getLossFactor());
+
         TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs.xiidm", getClass());
     }
 
@@ -92,8 +131,8 @@ class HvdcLinkProcessorTest {
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         network.getLine("FFR4AA1  DDE1AA1  1").getTerminal1().disconnect();
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
-        assertFalse(network.getHvdcLine("HVDC_FR4-DE1").getConverterStation(HvdcLine.Side.ONE).getTerminal().isConnected());
-        assertTrue(network.getHvdcLine("HVDC_FR4-DE1").getConverterStation(HvdcLine.Side.TWO).getTerminal().isConnected());
+        assertFalse(network.getHvdcLine("HVDC_FR4-DE1").getConverterStation(TwoSides.ONE).getTerminal().isConnected());
+        assertTrue(network.getHvdcLine("HVDC_FR4-DE1").getConverterStation(TwoSides.TWO).getTerminal().isConnected());
     }
 
     @Test
@@ -101,7 +140,7 @@ class HvdcLinkProcessorTest {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
-        network.getHvdcLine("HVDC_FR4-DE1").getConverterStation(HvdcLine.Side.TWO).getTerminal().disconnect();
+        network.getHvdcLine("HVDC_FR4-DE1").getConverterStation(TwoSides.TWO).getTerminal().disconnect();
         HvdcLinkProcessor.replaceHvdcByEquivalentModel(network, params.getHvdcCreationParametersSet());
         assertTrue(network.getLine("FFR4AA1  DDE1AA1  1").getTerminal1().isConnected());
         assertFalse(network.getLine("FFR4AA1  DDE1AA1  1").getTerminal2().isConnected());

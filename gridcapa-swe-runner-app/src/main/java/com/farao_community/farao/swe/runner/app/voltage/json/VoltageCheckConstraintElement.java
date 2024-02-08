@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
-import com.farao_community.farao.data.crac_api.Instant;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.Objects;
@@ -17,7 +16,7 @@ import java.util.Objects;
 public class VoltageCheckConstraintElement {
 
     private final String networkElementId;
-    private final Instant instant;
+    private final String instant;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String contingencyId;
@@ -27,7 +26,7 @@ public class VoltageCheckConstraintElement {
     private final Double upperBound;
 
     public VoltageCheckConstraintElement(String networkElementId,
-                                         Instant instant,
+                                         String instant,
                                          String contingencyId,
                                          Double minVoltage,
                                          Double maxVoltage,
@@ -52,7 +51,7 @@ public class VoltageCheckConstraintElement {
         return networkElementId;
     }
 
-    public Instant getInstant() {
+    public String getInstant() {
         return instant;
     }
 

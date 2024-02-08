@@ -6,14 +6,13 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.farao_community.farao.data.crac_api.Instant;
-import com.farao_community.farao.data.rao_result_api.RaoResult;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoring;
-import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
+import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoring;
+import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
@@ -65,7 +64,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
-            if (isPortugalInDirection() && raoResultIsSecure(raoResult)) {
+            if (isPortugalInDirection() && raoResult.isSecure()) {
                 AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
                 AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
                 businessLogger.info("Angle monitoring result {}", angleMonitoringResult.getStatus());
@@ -116,9 +115,5 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
 
     private boolean isPortugalInDirection() {
         return direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES;
-    }
-
-    private boolean raoResultIsSecure(RaoResult raoResult) {
-        return raoResult.getFunctionalCost(Instant.CURATIVE) <= 0.0;
     }
 }

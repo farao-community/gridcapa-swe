@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.VoltageLevel;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
@@ -68,18 +69,18 @@ public final class HvdcLinkProcessor {
     private static void replaceEquivalentModelByHvdc(Network network, HvdcCreationParameters creationParameters,
                                                      Map<NetworkElement, Collection<String>> missingElementsMap) {
         // Disconnect equivalent generators & loads on both sides
-        disconnectGeneratorAndLoad(network, creationParameters, HvdcLine.Side.ONE, missingElementsMap);
-        disconnectGeneratorAndLoad(network, creationParameters, HvdcLine.Side.TWO, missingElementsMap);
+        disconnectGeneratorAndLoad(network, creationParameters, TwoSides.ONE, missingElementsMap);
+        disconnectGeneratorAndLoad(network, creationParameters, TwoSides.TWO, missingElementsMap);
 
         // Create one VSC converter station on each side
-        createVscStation(network, creationParameters, HvdcLine.Side.ONE, missingElementsMap);
-        createVscStation(network, creationParameters, HvdcLine.Side.TWO, missingElementsMap);
+        createVscStation(network, creationParameters, TwoSides.ONE, missingElementsMap);
+        createVscStation(network, creationParameters, TwoSides.TWO, missingElementsMap);
 
         // Create the HVDC line
         createHvdcLine(network, creationParameters, missingElementsMap);
     }
 
-    private static void disconnectGeneratorAndLoad(Network network, HvdcCreationParameters creationParameters, HvdcLine.Side side,
+    private static void disconnectGeneratorAndLoad(Network network, HvdcCreationParameters creationParameters, TwoSides side,
                                                    Map<NetworkElement, Collection<String>> missingElementsMap) {
         getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(side), missingElementsMap)
                 .ifPresent(gen -> gen.getTerminal().disconnect());
@@ -87,7 +88,7 @@ public final class HvdcLinkProcessor {
                 .ifPresent(load -> load.getTerminal().disconnect());
     }
 
-    private static void createVscStation(Network network, HvdcCreationParameters creationParameters, HvdcLine.Side side,
+    private static void createVscStation(Network network, HvdcCreationParameters creationParameters, TwoSides side,
                                          Map<NetworkElement, Collection<String>> missingElementsMap) {
         getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(side), missingElementsMap)
                 .ifPresent(gen -> {
@@ -123,8 +124,8 @@ public final class HvdcLinkProcessor {
                                 .setNominalV(creationParameters.getNominalV())
                                 .setId(creationParameters.getId())
                                 .setEnsureIdUnicity(true)
-                                .setConverterStationId1(creationParameters.getVscCreationParameters(HvdcLine.Side.ONE).getId())
-                                .setConverterStationId2(creationParameters.getVscCreationParameters(HvdcLine.Side.TWO).getId())
+                                .setConverterStationId1(creationParameters.getVscCreationParameters(TwoSides.ONE).getId())
+                                .setConverterStationId2(creationParameters.getVscCreationParameters(TwoSides.TWO).getId())
                                 .setConvertersMode(HvdcLine.ConvertersMode.SIDE_1_RECTIFIER_SIDE_2_INVERTER)
                                 .setActivePowerSetpoint(0)
                                 .add();
@@ -168,8 +169,8 @@ public final class HvdcLinkProcessor {
         connectEquivalentAcLine(network, creationParameters, missingElementsMap);
 
         network.getHvdcLine(creationParameters.getId()).remove();
-        network.getVscConverterStation(creationParameters.getVscCreationParameters(HvdcLine.Side.ONE).getId()).remove();
-        network.getVscConverterStation(creationParameters.getVscCreationParameters(HvdcLine.Side.TWO).getId()).remove();
+        network.getVscConverterStation(creationParameters.getVscCreationParameters(TwoSides.ONE).getId()).remove();
+        network.getVscConverterStation(creationParameters.getVscCreationParameters(TwoSides.TWO).getId()).remove();
     }
 
     private static void connectEquivalentAcLine(Network network, HvdcCreationParameters creationParameters,
@@ -190,10 +191,10 @@ public final class HvdcLinkProcessor {
                                                             HvdcLine hvdcLine,
                                                             Map<NetworkElement, Collection<String>> missingElementsMap) {
 
-        Optional<Load> optionalLoad1 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(HvdcLine.Side.ONE), missingElementsMap);
-        Optional<Generator> optionalGen1 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(HvdcLine.Side.ONE), missingElementsMap);
-        Optional<Load> optionalLoad2 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(HvdcLine.Side.TWO), missingElementsMap);
-        Optional<Generator> optionalGen2 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(HvdcLine.Side.TWO), missingElementsMap);
+        Optional<Load> optionalLoad1 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap);
+        Optional<Generator> optionalGen1 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.ONE), missingElementsMap);
+        Optional<Load> optionalLoad2 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.TWO), missingElementsMap);
+        Optional<Generator> optionalGen2 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO), missingElementsMap);
 
         if (optionalLoad1.isPresent() && optionalGen1.isPresent() && optionalLoad2.isPresent() && optionalGen2.isPresent()) {
             Load load1 = optionalLoad1.get();

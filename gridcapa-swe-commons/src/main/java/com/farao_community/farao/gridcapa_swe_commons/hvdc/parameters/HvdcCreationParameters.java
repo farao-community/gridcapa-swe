@@ -7,7 +7,7 @@
 
 package com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters;
 
-import com.powsybl.iidm.network.HvdcLine;
+import com.powsybl.iidm.network.TwoSides;
 
 import java.util.Map;
 import java.util.Objects;
@@ -21,18 +21,18 @@ public class HvdcCreationParameters {
     private double maxP;
     private double r;
     private double nominalV;
-    private Map<HvdcLine.Side, VscStationCreationParameters> vscCreationParameters;
+    private Map<TwoSides, VscStationCreationParameters> vscCreationParameters;
     private AngleDroopActivePowerControlParameters angleDroopActivePowerControlParameters;
     private HvdcAcEquivalentModel hvdcAcEquivalentModel;
 
-    public HvdcCreationParameters(String id, Double maxP, Double r, Double nominalV, Map<HvdcLine.Side, VscStationCreationParameters> vscCreationParameters, AngleDroopActivePowerControlParameters angleDroopActivePowerControlParameters, HvdcAcEquivalentModel hvdcAcEquivalentModel) {
+    public HvdcCreationParameters(String id, Double maxP, Double r, Double nominalV, Map<TwoSides, VscStationCreationParameters> vscCreationParameters, AngleDroopActivePowerControlParameters angleDroopActivePowerControlParameters, HvdcAcEquivalentModel hvdcAcEquivalentModel) {
         Objects.requireNonNull(id);
         Objects.requireNonNull(maxP);
         Objects.requireNonNull(r);
         Objects.requireNonNull(nominalV);
         Objects.requireNonNull(vscCreationParameters);
-        Objects.requireNonNull(vscCreationParameters.get(HvdcLine.Side.ONE));
-        Objects.requireNonNull(vscCreationParameters.get(HvdcLine.Side.TWO));
+        Objects.requireNonNull(vscCreationParameters.get(TwoSides.ONE));
+        Objects.requireNonNull(vscCreationParameters.get(TwoSides.TWO));
         Objects.requireNonNull(hvdcAcEquivalentModel);
 
         this.id = id;
@@ -44,11 +44,11 @@ public class HvdcCreationParameters {
         this.hvdcAcEquivalentModel = hvdcAcEquivalentModel;
     }
 
-    public String getEquivalentGeneratorId(HvdcLine.Side side) {
+    public String getEquivalentGeneratorId(TwoSides side) {
         return hvdcAcEquivalentModel.getGeneratorId(side);
     }
 
-    public String getEquivalentLoadId(HvdcLine.Side side) {
+    public String getEquivalentLoadId(TwoSides side) {
         return hvdcAcEquivalentModel.getLoadId(side);
     }
 
@@ -56,7 +56,7 @@ public class HvdcCreationParameters {
         return hvdcAcEquivalentModel.getAcLineId();
     }
 
-    public VscStationCreationParameters getVscCreationParameters(HvdcLine.Side side) {
+    public VscStationCreationParameters getVscCreationParameters(TwoSides side) {
         return vscCreationParameters.get(side);
     }
 

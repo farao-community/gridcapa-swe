@@ -6,7 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
-import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult.Status;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult.Status;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +17,7 @@ import java.util.Objects;
  */
 public class VoltageCheckResult {
 
-    private final Status isSecure;
+    private final VoltageMonitoringResult.Status isSecure;
     private final List<VoltageCheckConstraintElement> constraintElements;
 
     public VoltageCheckResult(Status isSecure,
