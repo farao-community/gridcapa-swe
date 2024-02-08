@@ -259,7 +259,7 @@ public class CgmesExportService {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             MemDataSource memDataSource = new MemDataSource();
             buildSvDependencies(network);
-            network.write(new ExportersServiceLoader(), "CGMES", SV_FILE_EXPORT_PARAMS, memDataSource, reporter);
+            network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
             String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
             String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV");
