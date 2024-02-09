@@ -6,11 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.powsybl.openrao.data.cracapi.Crac;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoring;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
@@ -18,11 +15,18 @@ import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.commons.Unit;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.cnec.VoltageCnec;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoring;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -53,11 +57,38 @@ public class VoltageCheckService {
             Crac crac = sweData.getCracFrEs().getCrac();
             Network network = getNetworkWithPra(dichotomyResult);
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
-            return Optional.of(voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4));
+            VoltageMonitoringResult result = voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4);
+            printHighAndLowVoltageConstraints(result).forEach(businessLogger::warn);
+            return Optional.of(result);
         } catch (Exception e) {
             businessLogger.error("Exception during voltage check : {}", e.getMessage());
             return Optional.empty();
         }
+    }
+
+    protected List<String> printHighAndLowVoltageConstraints(final VoltageMonitoringResult result) {
+        final List<String> voltageConstraints = new ArrayList<>();
+        for (final VoltageCnec vc : result.getConstrainedElements()) {
+            vc.getLowerBound(Unit.KILOVOLT).ifPresent(ub -> {
+                final Double minVoltage = result.getMinVoltage(vc);
+                if (ub > minVoltage) {
+                    voltageConstraints.add(String.format("Low Voltage constraint reached due to %s %.0f/%.0f kV",
+                            vc.getNetworkElement().getId(),
+                            minVoltage,
+                            ub));
+                }
+            });
+            vc.getUpperBound(Unit.KILOVOLT).ifPresent(ub -> {
+                final Double maxVoltage = result.getMaxVoltage(vc);
+                if (ub < maxVoltage) {
+                    voltageConstraints.add(String.format("High Voltage constraint reached due to %s %.0f/%.0f kV",
+                            vc.getNetworkElement().getId(),
+                            maxVoltage,
+                            ub));
+                }
+            });
+        }
+        return voltageConstraints;
     }
 
     private Network getNetworkWithPra(DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
