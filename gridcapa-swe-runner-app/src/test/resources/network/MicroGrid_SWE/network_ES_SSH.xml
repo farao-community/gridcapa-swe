@@ -7,7 +7,7 @@
         <md:Model.version>1</md:Model.version>
         <md:Model.DependentOn rdf:resource="urn:uuid:5ab3047b-5c17-4e01-94ab-0c416f996e66"/>
         <md:Model.profile>http://entsoe.eu/CIM/SteadyStateHypothesis/1/1</md:Model.profile>
-        <md:Model.modelingAuthoritySet>powsybl.org</md:Model.modelingAuthoritySet>
+        <md:Model.modelingAuthoritySet>powsybl.org.es</md:Model.modelingAuthoritySet>
     </md:FullModel>
     <cim:EnergyConsumer rdf:about="#_EES1AA11_load">
         <cim:EnergyConsumer.p>2500</cim:EnergyConsumer.p>
