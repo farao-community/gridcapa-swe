@@ -6,18 +6,10 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage;
 
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,19 +52,8 @@ class VoltageResultMapperTest {
     }
 
     @BeforeAll
-    private static void getVoltageMonitoringResult() throws IOException {
+    private static void getVoltageMonitoringResult() {
         VoltageMonitoringResult voltageMonitoringResult = VoltageMonitoringResultTestUtils.getMonitoringResult();
         result = mapper.mapVoltageResult(voltageMonitoringResult);
-        String path = Paths.get("src", "test", "resources").toFile().getAbsolutePath().concat("/voltage_result_test-unitaire.json");
-        saveVoltageMonitoringResultnJson(result, path);
-    }
-
-    private static void saveVoltageMonitoringResultnJson(VoltageCheckResult result, String path) throws IOException {
-        try (OutputStream os = new FileOutputStream(path)) {
-            ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            os.write(objectWriter.writeValueAsBytes(result));
-        } catch (IOException e) {
-            throw new SweInvalidDataException("Error while trying to save voltage monitoring result file.", e);
-        }
     }
 }
