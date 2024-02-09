@@ -7,7 +7,7 @@
         <md:Model.version>1</md:Model.version>
         <md:Model.DependentOn rdf:resource="urn:uuid:6bd7268e-3054-4c6c-b5bb-6cbffb15a687"/>
         <md:Model.profile>http://entsoe.eu/CIM/Topology/4/1</md:Model.profile>
-        <md:Model.modelingAuthoritySet>powsybl.org</md:Model.modelingAuthoritySet>
+        <md:Model.modelingAuthoritySet>powsybl.org.fr</md:Model.modelingAuthoritySet>
     </md:FullModel>
     <cim:TopologicalNode rdf:ID="_FFR1AA11">
         <cim:IdentifiedObject.mRID>FFR1AA11</cim:IdentifiedObject.mRID>

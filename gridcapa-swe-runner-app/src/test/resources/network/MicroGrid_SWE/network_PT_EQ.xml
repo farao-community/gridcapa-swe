@@ -6,7 +6,7 @@
         <md:Model.description>EQ Model</md:Model.description>
         <md:Model.version>1</md:Model.version>
         <md:Model.profile>http://entsoe.eu/CIM/EquipmentCore/3/1</md:Model.profile>
-        <md:Model.modelingAuthoritySet>powsybl.org</md:Model.modelingAuthoritySet>
+        <md:Model.modelingAuthoritySet>powsybl.org.pt</md:Model.modelingAuthoritySet>
     </md:FullModel>
     <cim:Terminal rdf:ID="_afcdc2ef-bcdc-4642-b777-ddf495cd9122">
         <cim:IdentifiedObject.mRID>afcdc2ef-bcdc-4642-b777-ddf495cd9122</cim:IdentifiedObject.mRID>
