@@ -142,13 +142,13 @@ class VoltageCheckServiceTest {
         Mockito.when(vc.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(500d));
         NetworkElement ne = Mockito.mock(NetworkElement.class);
         Mockito.when(vc.getNetworkElement()).thenReturn(ne);
-        Mockito.when(ne.getId()).thenReturn("VL1");
+        Mockito.when(ne.getName()).thenReturn("VL1");
         //When
         final List<String> constraints = service.generateHighAndLowVoltageConstraints(result);
         //Then
         assertEquals(2, constraints.size());
-        assertEquals("Low Voltage constraint reached due to VL1 0/100 kV", constraints.get(0));
-        assertEquals("High Voltage constraint reached due to VL1 600/500 kV", constraints.get(1));
+        assertEquals("Low Voltage constraint reached due to VL1 0,0/100,0 kV", constraints.get(0));
+        assertEquals("High Voltage constraint reached due to VL1 600,0/500,0 kV", constraints.get(1));
     }
 
     @Test
