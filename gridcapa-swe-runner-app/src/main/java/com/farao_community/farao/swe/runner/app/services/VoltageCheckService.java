@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -72,7 +73,8 @@ public class VoltageCheckService {
             voltageCnec.getLowerBound(Unit.KILOVOLT).ifPresent(lowerBound -> {
                 final Double minVoltage = result.getMinVoltage(voltageCnec);
                 if (Double.compare(lowerBound, minVoltage) > 0) {
-                    voltageConstraints.add(String.format("Low Voltage constraint reached due to %s %.1f/%.1f kV",
+                    voltageConstraints.add(String.format(Locale.ENGLISH,
+                            "Low Voltage constraint reached due to %s %.1f/%.1f kV",
                             voltageCnec.getNetworkElement().getName(),
                             minVoltage,
                             lowerBound));
@@ -81,7 +83,8 @@ public class VoltageCheckService {
             voltageCnec.getUpperBound(Unit.KILOVOLT).ifPresent(upperBound -> {
                 final Double maxVoltage = result.getMaxVoltage(voltageCnec);
                 if (Double.compare(maxVoltage, upperBound) > 0) {
-                    voltageConstraints.add(String.format("High Voltage constraint reached due to %s %.1f/%.1f kV",
+                    voltageConstraints.add(String.format(Locale.ENGLISH,
+                            "High Voltage constraint reached due to %s %.1f/%.1f kV",
                             voltageCnec.getNetworkElement().getName(),
                             maxVoltage,
                             upperBound));
