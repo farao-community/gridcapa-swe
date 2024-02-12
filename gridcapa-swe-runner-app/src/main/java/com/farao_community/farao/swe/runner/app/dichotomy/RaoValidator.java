@@ -71,7 +71,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                 if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE)) {
                     businessLogger.info("Angle monitoring result is secure");
                 } else {
-                    businessLogger.info("Angle monitoring result is unsecure"); //todo should log separately the case of divergence ?
+                    businessLogger.info("Angle monitoring result is unsecure");
                 }
                 return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse), raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE));
             }
