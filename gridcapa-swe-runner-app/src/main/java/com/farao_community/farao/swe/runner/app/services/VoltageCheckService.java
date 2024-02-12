@@ -58,7 +58,7 @@ public class VoltageCheckService {
             Network network = getNetworkWithPra(dichotomyResult);
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
             VoltageMonitoringResult result = voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4);
-            printHighAndLowVoltageConstraints(result).forEach(businessLogger::warn);
+            generateHighAndLowVoltageConstraints(result).forEach(businessLogger::warn);
             return Optional.of(result);
         } catch (Exception e) {
             businessLogger.error("Exception during voltage check : {}", e.getMessage());
@@ -66,25 +66,25 @@ public class VoltageCheckService {
         }
     }
 
-    protected List<String> printHighAndLowVoltageConstraints(final VoltageMonitoringResult result) {
+    protected List<String> generateHighAndLowVoltageConstraints(final VoltageMonitoringResult result) {
         final List<String> voltageConstraints = new ArrayList<>();
-        for (final VoltageCnec vc : result.getConstrainedElements()) {
-            vc.getLowerBound(Unit.KILOVOLT).ifPresent(ub -> {
-                final Double minVoltage = result.getMinVoltage(vc);
-                if (ub > minVoltage) {
-                    voltageConstraints.add(String.format("Low Voltage constraint reached due to %s %.0f/%.0f kV",
-                            vc.getNetworkElement().getId(),
+        for (final VoltageCnec voltageCnec : result.getConstrainedElements()) {
+            voltageCnec.getLowerBound(Unit.KILOVOLT).ifPresent(lowerBound -> {
+                final Double minVoltage = result.getMinVoltage(voltageCnec);
+                if (Double.compare(lowerBound, minVoltage) > 0) {
+                    voltageConstraints.add(String.format("Low Voltage constraint reached due to %s %.1f/%.1f kV",
+                            voltageCnec.getNetworkElement().getName(),
                             minVoltage,
-                            ub));
+                            lowerBound));
                 }
             });
-            vc.getUpperBound(Unit.KILOVOLT).ifPresent(ub -> {
-                final Double maxVoltage = result.getMaxVoltage(vc);
-                if (ub < maxVoltage) {
-                    voltageConstraints.add(String.format("High Voltage constraint reached due to %s %.0f/%.0f kV",
-                            vc.getNetworkElement().getId(),
+            voltageCnec.getUpperBound(Unit.KILOVOLT).ifPresent(upperBound -> {
+                final Double maxVoltage = result.getMaxVoltage(voltageCnec);
+                if (Double.compare(maxVoltage, upperBound) > 0) {
+                    voltageConstraints.add(String.format("High Voltage constraint reached due to %s %.1f/%.1f kV",
+                            voltageCnec.getNetworkElement().getName(),
                             maxVoltage,
-                            ub));
+                            upperBound));
                 }
             });
         }

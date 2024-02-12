@@ -126,7 +126,7 @@ class VoltageCheckServiceTest {
         Mockito.when(result.getConstrainedElements()).thenReturn(Collections.emptySet());
 
         //Expect
-        assertTrue(service.printHighAndLowVoltageConstraints(result).isEmpty());
+        assertTrue(service.generateHighAndLowVoltageConstraints(result).isEmpty());
     }
 
     @Test
@@ -144,7 +144,7 @@ class VoltageCheckServiceTest {
         Mockito.when(vc.getNetworkElement()).thenReturn(ne);
         Mockito.when(ne.getId()).thenReturn("VL1");
         //When
-        final List<String> constraints = service.printHighAndLowVoltageConstraints(result);
+        final List<String> constraints = service.generateHighAndLowVoltageConstraints(result);
         //Then
         assertEquals(2, constraints.size());
         assertEquals("Low Voltage constraint reached due to VL1 0/100 kV", constraints.get(0));
@@ -163,6 +163,21 @@ class VoltageCheckServiceTest {
         Mockito.when(result.getMinVoltage(vc)).thenReturn(200d);
         Mockito.when(vc.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(100d));
         //Expect
-        assertTrue(service.printHighAndLowVoltageConstraints(result).isEmpty());
+        assertTrue(service.generateHighAndLowVoltageConstraints(result).isEmpty());
+    }
+
+    @Test
+    void checkNoLogWhenHighAndLowVoltageConstraintsEqualToBounds() {
+        //Given
+        VoltageMonitoringResult result = Mockito.mock(VoltageMonitoringResult.class);
+        VoltageCnec vc = Mockito.mock(VoltageCnec.class);
+        Set<VoltageCnec> constrainedElements = Set.of(vc);
+        Mockito.when(result.getConstrainedElements()).thenReturn(constrainedElements);
+        Mockito.when(result.getMaxVoltage(vc)).thenReturn(600d);
+        Mockito.when(vc.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(600d));
+        Mockito.when(result.getMinVoltage(vc)).thenReturn(100d);
+        Mockito.when(vc.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(100d));
+        //Expect
+        assertTrue(service.generateHighAndLowVoltageConstraints(result).isEmpty());
     }
 }
