@@ -26,7 +26,6 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoringResult;
 import  com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
@@ -106,20 +105,6 @@ public class CneFileExportService {
         return raoResult;
     }
 
-    private AngleMonitoringResult extractAngleMonitoringResult(DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid) {
-        AngleMonitoringResult angleMonitoringResult = null;
-        if (isHighestValid) {
-            if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getValidationData() != null) {
-                angleMonitoringResult = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult();
-            }
-        } else {
-            if (!Double.isNaN(dichotomyResult.getLowestInvalidStepValue()) && dichotomyResult.getLowestInvalidStep().getValidationData() != null) {
-                angleMonitoringResult = dichotomyResult.getLowestInvalidStep().getValidationData().getAngleMonitoringResult();
-            }
-        }
-        return angleMonitoringResult;
-    }
-
     private CimCracCreationContext getCimCracCreationContext(SweData sweData, DichotomyDirection direction) {
         if (direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES) {
             return sweData.getCracEsPt();
@@ -132,7 +117,6 @@ public class CneFileExportService {
              ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
             RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
-            AngleMonitoringResult angleMonitoringResult = extractAngleMonitoringResult(dichotomyResult, isHighestValid);
             if (raoResult == null) {
                 marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
             } else {
