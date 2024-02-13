@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoringResult;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 
 /**
@@ -16,22 +15,23 @@ import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 public class SweDichotomyValidationData {
 
     private final RaoResponse raoResponse;
-    private final AngleMonitoringResult angleMonitoringResult;
+    private final AngleMonitoringStatus angleMonitoringStatus;
 
-    public SweDichotomyValidationData(RaoResponse raoResponse, AngleMonitoringResult angleMonitoringResult) {
-        this.raoResponse = raoResponse;
-        this.angleMonitoringResult = angleMonitoringResult;
+    public enum AngleMonitoringStatus {
+        SECURE, UNSECURE, FAILURE, NONE
     }
 
-    public SweDichotomyValidationData(RaoResponse raoResponse) {
-        this(raoResponse, null);
+    public SweDichotomyValidationData(RaoResponse raoResponse,
+                                      AngleMonitoringStatus status) {
+        this.raoResponse = raoResponse;
+        this.angleMonitoringStatus = status;
     }
 
     public RaoResponse getRaoResponse() {
         return raoResponse;
     }
 
-    public AngleMonitoringResult getAngleMonitoringResult() {
-        return angleMonitoringResult;
+    public AngleMonitoringStatus getAngleMonitoringResult() {
+        return angleMonitoringStatus;
     }
 }

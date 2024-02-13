@@ -82,8 +82,8 @@ public class DichotomyLogging {
             limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
             printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
             printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
-            if (dichotomyResult.getHighestValidStep().getValidationData() != null && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult() != null) {
-                angleCheckStatus = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult().getStatus().name();
+            if (dichotomyResult.getHighestValidStep().getValidationData() != null) {
+                angleCheckStatus = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult().name();
             }
         }
         businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
