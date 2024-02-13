@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.app.parallelization;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyLogging;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -20,6 +19,7 @@ import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;

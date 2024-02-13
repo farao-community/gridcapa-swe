@@ -6,14 +6,11 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.powsybl.openrao.commons.PhysicalParameter;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoring;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
@@ -24,6 +21,9 @@ import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.commons.PhysicalParameter;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoring;
 import com.powsybl.openrao.monitoring.anglemonitoring.RaoResultWithAngleMonitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,14 +6,14 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
