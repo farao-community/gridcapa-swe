@@ -31,7 +31,7 @@ public class SweDichotomyValidationData {
         return raoResponse;
     }
 
-    public AngleMonitoringStatus getAngleMonitoringResult() {
+    public AngleMonitoringStatus getAngleMonitoringStatus() {
         return angleMonitoringStatus;
     }
 }
