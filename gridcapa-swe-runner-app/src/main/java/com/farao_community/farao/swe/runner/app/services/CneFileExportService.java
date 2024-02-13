@@ -7,18 +7,18 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.farao_community.farao.commons.FaraoException;
-import com.farao_community.farao.data.cne_exporter_commons.CneExporterParameters;
-import com.farao_community.farao.data.cne_exporter_commons.CneUtil;
-import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
-import com.farao_community.farao.data.rao_result_api.RaoResult;
-import com.farao_community.farao.data.swe_cne_exporter.SweCneClassCreator;
-import com.farao_community.farao.data.swe_cne_exporter.SweCneExporter;
-import com.farao_community.farao.data.swe_cne_exporter.SweCneUtil;
-import com.farao_community.farao.data.swe_cne_exporter.xsd.CriticalNetworkElementMarketDocument;
-import com.farao_community.farao.data.swe_cne_exporter.xsd.Point;
-import com.farao_community.farao.data.swe_cne_exporter.xsd.Reason;
-import com.farao_community.farao.data.swe_cne_exporter.xsd.SeriesPeriod;
+import com.powsybl.openrao.commons.OpenRaoException;
+import com.powsybl.openrao.data.cneexportercommons.CneExporterParameters;
+import com.powsybl.openrao.data.cneexportercommons.CneUtil;
+import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.data.swecneexporter.SweCneClassCreator;
+import com.powsybl.openrao.data.swecneexporter.SweCneExporter;
+import com.powsybl.openrao.data.swecneexporter.SweCneUtil;
+import com.powsybl.openrao.data.swecneexporter.xsd.CriticalNetworkElementMarketDocument;
+import com.powsybl.openrao.data.swecneexporter.xsd.Point;
+import com.powsybl.openrao.data.swecneexporter.xsd.Reason;
+import com.powsybl.openrao.data.swecneexporter.xsd.SeriesPeriod;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
@@ -26,8 +26,7 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
-import com.farao_community.farao.rao_api.parameters.RaoParameters;
+import  com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
@@ -106,20 +105,6 @@ public class CneFileExportService {
         return raoResult;
     }
 
-    private AngleMonitoringResult extractAngleMonitoringResult(DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid) {
-        AngleMonitoringResult angleMonitoringResult = null;
-        if (isHighestValid) {
-            if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getValidationData() != null) {
-                angleMonitoringResult = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult();
-            }
-        } else {
-            if (!Double.isNaN(dichotomyResult.getLowestInvalidStepValue()) && dichotomyResult.getLowestInvalidStep().getValidationData() != null) {
-                angleMonitoringResult = dichotomyResult.getLowestInvalidStep().getValidationData().getAngleMonitoringResult();
-            }
-        }
-        return angleMonitoringResult;
-    }
-
     private CimCracCreationContext getCimCracCreationContext(SweData sweData, DichotomyDirection direction) {
         if (direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES) {
             return sweData.getCracEsPt();
@@ -132,16 +117,15 @@ public class CneFileExportService {
              ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
             RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
-            AngleMonitoringResult angleMonitoringResult = extractAngleMonitoringResult(dichotomyResult, isHighestValid);
             if (raoResult == null) {
                 marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
             } else {
                 SweCneExporter sweCneExporter = new SweCneExporter();
                 sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkService.getNetworkByDirection(sweData, direction), cracCreationContext,
-                        raoResult, angleMonitoringResult, RaoParameters.load(), cneExporterParameters, zipOs);
+                        raoResult, RaoParameters.load(), cneExporterParameters, zipOs);
             }
             zipOs.closeEntry();
-        } catch (IOException | JAXBException | DatatypeConfigurationException | FaraoException e) {
+        } catch (IOException | JAXBException | DatatypeConfigurationException | OpenRaoException e) {
             throw new SweInvalidDataException(String.format("Error while trying to save cne result file [%s].", targetZipFileName), e);
         }
     }
@@ -169,7 +153,7 @@ public class CneFileExportService {
         marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterParameters.getReceiverRole().getCode());
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterParameters.getTimeInterval()));
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkService.getNetworkByDirection(sweData, direction).getCaseDate().toDate().toInstant().atOffset(ZoneOffset.UTC)));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkService.getNetworkByDirection(sweData, direction).getCaseDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
 

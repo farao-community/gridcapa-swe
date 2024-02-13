@@ -6,14 +6,14 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage;
 
-import com.farao_community.farao.data.crac_api.Instant;
-import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -31,8 +31,8 @@ class VoltageResultMapperTest {
 
     @Test
     void mapVoltageResultTestCheckListElememnts() {
-        result.getConstraintElements().stream().forEach(voltResult -> {
-            if (voltResult.getInstant() == Instant.CURATIVE) {
+        result.getConstraintElements().forEach(voltResult -> {
+            if ("CURATIVE".equals(voltResult.getInstant())) {
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_LOWER_0, voltResult.getLowerBound(), VoltageMonitoringResultTestUtils.DELTA_BIG);
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_UPPER_0, voltResult.getUpperBound(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_MIN_0, voltResult.getMinVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
@@ -45,7 +45,7 @@ class VoltageResultMapperTest {
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_MIN_1, voltResult.getMinVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
                 assertEquals(VoltageMonitoringResultTestUtils.EXPECTED_MAX_1, voltResult.getMaxVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
                 assertEquals(VoltageMonitoringResultTestUtils.NETWORK_1_ID, voltResult.getNetworkElementId());
-                assertEquals(Instant.PREVENTIVE, voltResult.getInstant());
+                assertEquals("PREVENTIVE", voltResult.getInstant());
                 assertNull(voltResult.getContingencyId());
             }
         });

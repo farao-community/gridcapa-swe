@@ -6,15 +6,14 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.farao_community.farao.data.crac_api.Instant;
-import com.farao_community.farao.data.rao_result_api.RaoResult;
+import com.powsybl.openrao.commons.PhysicalParameter;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoring;
-import com.farao_community.farao.monitoring.angle_monitoring.AngleMonitoringResult;
+import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoring;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
@@ -25,6 +24,7 @@ import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.monitoring.anglemonitoring.RaoResultWithAngleMonitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,11 +69,15 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
-            if (this.runAngleCheck && isPortugalInDirection() && raoResultIsSecure(raoResult)) {
+            if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure()) {
                 AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
-                AngleMonitoringResult angleMonitoringResult = angleMonitoring.run(LoadFlow.find().getName(), loadFlowParameters, 4, sweData.getTimestamp());
-                businessLogger.info("Angle monitoring result {}", angleMonitoringResult.getStatus());
-                return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, angleMonitoringResult), angleMonitoringResult.isSecure());
+                RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, sweData.getTimestamp());
+                if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE)) {
+                    businessLogger.info("Angle monitoring result is secure");
+                } else {
+                    businessLogger.info("Angle monitoring result is unsecure");
+                }
+                return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse), raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE));
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse));
         } catch (RuntimeException e) {
@@ -120,9 +124,5 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
 
     private boolean isPortugalInDirection() {
         return direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES;
-    }
-
-    private boolean raoResultIsSecure(RaoResult raoResult) {
-        return raoResult.getFunctionalCost(Instant.CURATIVE) <= 0.0;
     }
 }

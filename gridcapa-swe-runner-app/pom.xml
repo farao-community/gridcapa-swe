@@ -6,13 +6,13 @@
     <parent>
         <artifactId>gridcapa-swe</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>1.15.1-SNAPSHOT</version>
+        <version>1.16.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>gridcapa-swe-runner-app</artifactId>
     <name>GridCapa SWE runner application</name>
     <description>Application that performs capacity calculation on SWE zone</description>
-    <version>1.15.1-SNAPSHOT</version>
+    <version>1.16.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <build>
@@ -47,24 +47,24 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-creation-util</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-creation-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-creator-api</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-creator-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-creator-cim</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-creator-cim</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-io-api</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-io-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-io-json</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-io-json</artifactId>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
@@ -83,40 +83,40 @@
             <artifactId>farao-dichotomy-shift</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-voltage-monitoring</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-voltage-monitoring</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-angle-monitoring</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-angle-monitoring</artifactId>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-rao-runner-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-rao-result-json</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-rao-result-json</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-rao-api</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-rao-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-swe-cne-exporter</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-swe-cne-exporter</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-cne-exporter-commons</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-cne-exporter-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-cgmes-conversion</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-search-tree-rao</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-search-tree-rao</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
@@ -148,7 +148,7 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-iidm-xml-converter</artifactId>
+            <artifactId>powsybl-iidm-serde</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>

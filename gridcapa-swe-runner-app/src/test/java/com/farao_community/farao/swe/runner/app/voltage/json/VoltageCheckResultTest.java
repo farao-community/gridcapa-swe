@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
-import com.farao_community.farao.monitoring.voltage_monitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

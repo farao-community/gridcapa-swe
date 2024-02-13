@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.commons.EICode;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
@@ -22,6 +21,7 @@ import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.commons.EICode;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.farao-community.farao</groupId>
         <artifactId>gridcapa-swe</artifactId>
-        <version>1.15.1-SNAPSHOT</version>
+        <version>1.16.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>gridcapa-swe-commons</artifactId>
     <name>GridCapa SWE commons</name>
-    <version>1.15.1-SNAPSHOT</version>
+    <version>1.16.1-SNAPSHOT</version>
     <description>Common lib to gridcapa swe process</description>
     <packaging>jar</packaging>
 
@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-iidm-xml-converter</artifactId>
+            <artifactId>powsybl-iidm-serde</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
@@ -62,8 +62,8 @@
             <artifactId>powsybl-iidm-modification</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
-            <artifactId>farao-crac-io-api</artifactId>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-io-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>

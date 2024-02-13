@@ -6,11 +6,11 @@
     <parent>
         <artifactId>farao-parent-ws</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
-    <version>1.15.1-SNAPSHOT</version>
+    <version>1.16.1-SNAPSHOT</version>
     <name>GridCapa SWE</name>
     <description>A full suite to perform capacity calculations on SWE zone</description>
     <packaging>pom</packaging>
@@ -58,8 +58,8 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <farao.dependencies.version>1.22.0</farao.dependencies.version>
-        <farao.dichotomy.version>4.14.0</farao.dichotomy.version>
+        <farao.dependencies.version>1.25.0</farao.dependencies.version>
+        <farao.dichotomy.version>4.14.1</farao.dichotomy.version>
         <gridcapa.starter.minio.version>1.1.1</gridcapa.starter.minio.version>
         <gridcapa.rao.runner.version>1.19.1</gridcapa.rao.runner.version>
         <gridcapa.task-manager.version>1.23.0-SNAPSHOT</gridcapa.task-manager.version>

@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.farao_community.farao.data.crac_api.Crac;
-import com.farao_community.farao.data.crac_api.Instant;
-import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
-import com.farao_community.farao.data.rao_result_api.RaoResult;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.Instant;
+import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
@@ -27,6 +27,7 @@ import com.powsybl.iidm.network.VariantManager;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -68,6 +69,8 @@ class RaoValidatorTest {
     @Mock
     private CimGlskDocument cimGlskDocument;
 
+    private static final Instant CURATIVE_INSTANT = Mockito.mock(Instant.class);
+
     @Test
     void simpleTestPortugalSecureWithAngleCheckParameterTrue() {
         RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, true, LoadFlowParameters.load(), businessLogger);
@@ -80,7 +83,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(Instant.CURATIVE)).thenReturn(-1.0);
+        when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
@@ -108,7 +111,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(Instant.CURATIVE)).thenReturn(22.0);
+        when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(22.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
@@ -137,7 +140,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(Instant.CURATIVE)).thenReturn(-1.0);
+        when(raoResult.getFunctionalCost(Mockito.any())).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);

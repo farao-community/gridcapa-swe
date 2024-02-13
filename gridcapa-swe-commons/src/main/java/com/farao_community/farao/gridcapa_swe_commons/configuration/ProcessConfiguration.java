@@ -6,34 +6,44 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Map;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 @Configuration
+@ConfigurationProperties(prefix = "swe-commons")
 public class ProcessConfiguration {
 
-    @Value("${swe-commons.zone-id}")
     private String zoneId;
-
-    @Value("${swe-commons.shift-max-iteration-number}")
     private Integer shiftMaxIterationNumber;
-
-    @Value("${swe-commons.modeling-authority-set}")
-    private String modelingAuthoritySet;
+    private Map<String, String> modelingAuthorityMap;
 
     public String getZoneId() {
         return zoneId;
+    }
+
+    public void setZoneId(String zoneId) {
+        this.zoneId = zoneId;
     }
 
     public Integer getShiftMaxIterationNumber() {
         return shiftMaxIterationNumber;
     }
 
-    public String getModelingAuthoritySet() {
-        return modelingAuthoritySet;
+    public void setShiftMaxIterationNumber(Integer shiftMaxIterationNumber) {
+        this.shiftMaxIterationNumber = shiftMaxIterationNumber;
+    }
+
+    public Map<String, String> getModelingAuthorityMap() {
+        return modelingAuthorityMap;
+    }
+
+    public void setModelingAuthorityMap(Map<String, String> modelingAuthorityMap) {
+        this.modelingAuthorityMap = modelingAuthorityMap;
     }
 
 }

@@ -73,15 +73,18 @@ public class NetworkService {
     public Network importMergedNetwork(SweRequest sweRequest) {
         try {
             businessLogger.info("Start import of input CGMES files");
-            List<Network> networks = TSO_BY_COUNTRY.keySet().stream().map(country -> getNetworkForCountry(sweRequest, country)).toList();
-            return Network.merge("network_merged", networks.toArray(new Network[0]));
+            String zipPath = buildZipFile(sweRequest);
+            Network mergedNetwork = importFromZip(zipPath);
+            Files.deleteIfExists(Path.of(zipPath));
+            return mergedNetwork;
         } catch (Exception e) {
             throw new SweInternalException("Exception occurred during input CGM import", e);
         }
     }
 
-    private Network getNetworkForCountry(SweRequest sweRequest, Country country) {
-        return importFromZip(buildZipFile(sweRequest, country));
+    private String buildZipFile(SweRequest sweRequest) {
+        List<SweFileResource> listFiles = getFiles(sweRequest);
+        return buildZipFromListOfFiles(listFiles);
     }
 
     public void addHvdcAndPstToNetwork(Network network) {
@@ -89,31 +92,20 @@ public class NetworkService {
         addPst(network);
     }
 
-    private String buildZipFile(SweRequest sweRequest, Country country) {
-        List<SweFileResource> listFiles = getFiles(sweRequest, country);
-        return buildZipFromListOfFiles(listFiles, country);
-    }
-
-    private List<SweFileResource> getFiles(SweRequest sweRequest, Country country) {
+    private List<SweFileResource> getFiles(SweRequest sweRequest) {
         List<SweFileResource> listFiles = new ArrayList<>();
         listFiles.add(sweRequest.getCoresoSv());
         listFiles.add(sweRequest.getBoundaryEq());
         listFiles.add(sweRequest.getBoundaryTp());
-
-        if (country.equals(Country.FR)) {
-            listFiles.add(sweRequest.getRteEq());
-            listFiles.add(sweRequest.getRteSsh());
-            listFiles.add(sweRequest.getRteTp());
-        } else if (country.equals(Country.ES)) {
-            listFiles.add(sweRequest.getReeEq());
-            listFiles.add(sweRequest.getReeSsh());
-            listFiles.add(sweRequest.getReeTp());
-        } else if (country.equals(Country.PT)) {
-            listFiles.add(sweRequest.getRenEq());
-            listFiles.add(sweRequest.getRenSsh());
-            listFiles.add(sweRequest.getRenTp());
-        }
-
+        listFiles.add(sweRequest.getRteEq());
+        listFiles.add(sweRequest.getRteSsh());
+        listFiles.add(sweRequest.getRteTp());
+        listFiles.add(sweRequest.getReeEq());
+        listFiles.add(sweRequest.getReeSsh());
+        listFiles.add(sweRequest.getReeTp());
+        listFiles.add(sweRequest.getRenEq());
+        listFiles.add(sweRequest.getRenSsh());
+        listFiles.add(sweRequest.getRenTp());
         return listFiles;
     }
 
@@ -146,11 +138,11 @@ public class NetworkService {
         }
     }
 
-    private String buildZipFromListOfFiles(List<SweFileResource> listFiles, Country country) {
+    private String buildZipFromListOfFiles(List<SweFileResource> listFiles) {
         try {
             Path tmp = Files.createTempDirectory("pref_");
             byte[] buffer = new byte[1024];
-            String zipPath = tmp.toAbsolutePath() + "/network_" + country.toString() + ".zip";
+            String zipPath = tmp.toAbsolutePath() + "/network.zip";
             FileOutputStream fos = new FileOutputStream(zipPath);
             ZipOutputStream zos = new ZipOutputStream(fos);
 

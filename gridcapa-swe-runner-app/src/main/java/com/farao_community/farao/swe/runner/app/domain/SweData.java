@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.farao_community.farao.data.crac_creation.creator.cim.crac_creator.CimCracCreationContext;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
