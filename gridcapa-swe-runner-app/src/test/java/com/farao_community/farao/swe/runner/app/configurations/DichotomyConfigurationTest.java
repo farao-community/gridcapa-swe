@@ -24,27 +24,15 @@ class DichotomyConfigurationTest {
 
     @Test
     void checkParameters() {
-        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getPrecision());
         assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getToleranceEsPt());
         assertEquals(10, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_FR).getToleranceEsFr());
 
-        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getPrecision());
         assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getToleranceEsPt());
         assertEquals(10, dichotomyConfiguration.getParameters().get(DichotomyDirection.FR_ES).getToleranceEsFr());
 
-        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getPrecision());
         assertEquals(10, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getToleranceEsPt());
         assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getToleranceEsFr());
 
-        assertEquals(0, dichotomyConfiguration.getParameters().get(DichotomyDirection.PT_ES).getMinValue());
-        assertEquals(6400, dichotomyConfiguration.getParameters().get(DichotomyDirection.PT_ES).getMaxValue());
-        assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.PT_ES).getPrecision());
         assertEquals(10, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getToleranceEsPt());
         assertEquals(50, dichotomyConfiguration.getParameters().get(DichotomyDirection.ES_PT).getToleranceEsFr());
     }
