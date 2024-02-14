@@ -6,10 +6,6 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.Instant;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
@@ -24,6 +20,12 @@ import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManager;
+import com.powsybl.openrao.commons.PhysicalParameter;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.Instant;
+import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -33,8 +35,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.OffsetDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
+
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
@@ -82,7 +90,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(-1.0);
+        when(raoResult.isSecure()).thenReturn(false);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
@@ -92,6 +100,7 @@ class RaoValidatorTest {
             DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
             assertNotNull(result);
             assertFalse(result.isFailed());
+            assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.NONE, result.getValidationData().getAngleMonitoringStatus());
         } catch (ValidationException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }
@@ -109,7 +118,7 @@ class RaoValidatorTest {
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(22.0);
+        when(raoResult.isSecure()).thenReturn(true);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
@@ -119,6 +128,37 @@ class RaoValidatorTest {
             DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
             assertNotNull(result);
             assertFalse(result.isFailed());
+            assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.FAILURE, result.getValidationData().getAngleMonitoringStatus());
+        } catch (ValidationException e) {
+            fail("RaoValidator shouldn't throw exception here", e);
+        }
+    }
+
+    @Test
+    void simpleTestPortugal3() {
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.PT_ES, businessLogger);
+        when(network.getVariantManager()).thenReturn(variantManager);
+        when(network.getNameOrId()).thenReturn("network-id");
+        when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
+        when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
+        when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
+        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
+        when(raoResult.isSecure()).thenReturn(true);
+        when(raoResult.isSecure(PhysicalParameter.ANGLE)).thenReturn(true);
+        when(raoResult.getComputationStatus()).thenReturn(ComputationStatus.DEFAULT);
+        when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
+        when(sweData.getGlskUrl()).thenReturn("glsk-url");
+        when(cimCracCreationContext.getCrac()).thenReturn(crac);
+        when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+        try {
+            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
+            assertNotNull(result);
+            assertFalse(result.isFailed());
+            assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.SECURE, result.getValidationData().getAngleMonitoringStatus());
         } catch (ValidationException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }
