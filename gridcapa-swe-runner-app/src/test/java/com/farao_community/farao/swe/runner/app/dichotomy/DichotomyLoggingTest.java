@@ -6,8 +6,15 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,11 +22,11 @@ import org.slf4j.Logger;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static java.time.ZoneOffset.UTC;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DichotomyLoggingTest {
 
@@ -40,9 +47,53 @@ class DichotomyLoggingTest {
         ProcessConfiguration processConfiguration = Mockito.mock(ProcessConfiguration.class);
         Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Brussels");
         DichotomyLogging businessLogger = new DichotomyLogging(logger, processConfiguration);
-        OffsetDateTime timestampSummer = OffsetDateTime.of(2022, 6, 18, 23, 29, 1, 0, ZoneOffset.UTC);
+        OffsetDateTime timestampSummer = OffsetDateTime.of(2022, 6, 18, 23, 29, 1, 0, UTC);
         assertEquals("2022-06-19 01:29", ReflectionTestUtils.invokeMethod(businessLogger, "getTimestampLocalized", timestampSummer));
-        OffsetDateTime timestampWinter = OffsetDateTime.of(2022, 11, 18, 22, 27, 2, 0, ZoneOffset.UTC);
+        OffsetDateTime timestampWinter = OffsetDateTime.of(2022, 11, 18, 22, 27, 2, 0, UTC);
         assertEquals("2022-11-18 23:27", ReflectionTestUtils.invokeMethod(businessLogger, "getTimestampLocalized", timestampWinter));
+    }
+
+    @Test
+    void testGenerateSummaryEvents() {
+        //Given
+        DichotomyDirection dichotomyDirection = DichotomyDirection.PT_ES;
+        DichotomyResult<SweDichotomyValidationData> result = Mockito.mock(DichotomyResult.class);
+        Mockito.when(result.getHighestValidStepValue()).thenReturn(2000d);
+        Mockito.when(result.getLowestInvalidStepValue()).thenReturn(1000d);
+        Mockito.when(result.hasValidStep()).thenReturn(true);
+        DichotomyStepResult stepResult = Mockito.mock(DichotomyStepResult.class);
+        Mockito.when(result.getHighestValidStep()).thenReturn(stepResult);
+        RaoResult raoResult = Mockito.mock(RaoResult.class);
+        Mockito.when(stepResult.getRaoResult()).thenReturn(raoResult);
+        SweDichotomyValidationData validationData = new SweDichotomyValidationData(null, SweDichotomyValidationData.AngleMonitoringStatus.SECURE);
+        Mockito.when(stepResult.getValidationData()).thenReturn(validationData);
+        SweData sweData = Mockito.mock(SweData.class);
+        OffsetDateTime timestamp = OffsetDateTime.parse("2024-02-14T08:21:00Z");
+        Mockito.when(sweData.getTimestamp()).thenReturn(timestamp);
+        CimCracCreationContext context = Mockito.mock(CimCracCreationContext.class);
+        Mockito.when(sweData.getCracEsPt()).thenReturn(context);
+        Crac crac = Mockito.mock(Crac.class);
+        Mockito.when(context.getCrac()).thenReturn(crac);
+        Mockito.when(crac.getFlowCnecs()).thenReturn(Collections.emptySet());
+        ProcessConfiguration processConfiguration = new ProcessConfiguration();
+        processConfiguration.setZoneId("UTC");
+        Logger logger = Mockito.mock(Logger.class);
+        //When
+        DichotomyLogging dichotomyLogging = new DichotomyLogging(logger, processConfiguration);
+        dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty());
+        //Then
+        String summary = "Summary :\n" +
+                "Limiting event : {},\n" +
+                "Limiting element : {},\n" +
+                "PRAs : {},\n" +
+                "CRAs : {}.";
+        String summaryBd = """
+                Summary BD :  {}
+                Current TTC : {},
+                Previous TTC : {},
+                Voltage Check : {},
+                Angle Check : {}.""";
+        Mockito.verify(logger, Mockito.times(1)).info(summary, "NONE", "None", "", "");
+        Mockito.verify(logger, Mockito.times(1)).info(summaryBd, "2024-02-14 08:21", "2000.0", "1000.0", "NONE", "SECURE");
     }
 }

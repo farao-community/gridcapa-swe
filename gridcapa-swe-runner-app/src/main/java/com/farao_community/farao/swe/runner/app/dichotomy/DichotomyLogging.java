@@ -65,7 +65,7 @@ public class DichotomyLogging {
         businessLogger.info("All - Dichotomies are done");
     }
 
-    public  void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+    public void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
         String limitingElement = NONE;
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
@@ -81,8 +81,8 @@ public class DichotomyLogging {
             limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
             printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
             printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
-            if (dichotomyResult.getHighestValidStep().getValidationData() != null && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult() != null) {
-                angleCheckStatus = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringResult().getStatus().name();
+            if (dichotomyResult.getHighestValidStep().getValidationData() != null && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus() != null) {
+                angleCheckStatus = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus().name();
             }
         }
         businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);

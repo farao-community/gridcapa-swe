@@ -22,6 +22,7 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openrao.commons.PhysicalParameter;
+import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoring;
 import com.powsybl.openrao.monitoring.anglemonitoring.RaoResultWithAngleMonitoring;
@@ -72,14 +73,24 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure()) {
                 AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
                 RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, sweData.getTimestamp());
-                if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE)) {
+                if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
+                    businessLogger.warn("Angle monitoring result is failure");
+                    return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
+                            SweDichotomyValidationData.AngleMonitoringStatus.FAILURE),
+                            false);
+                } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE)) {
                     businessLogger.info("Angle monitoring result is secure");
+                    return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
+                                    SweDichotomyValidationData.AngleMonitoringStatus.SECURE),
+                            true);
                 } else {
                     businessLogger.info("Angle monitoring result is unsecure");
+                    return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
+                                    SweDichotomyValidationData.AngleMonitoringStatus.UNSECURE),
+                            false);
                 }
-                return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse), raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE));
             }
-            return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse));
+            return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
         } catch (RuntimeException e) {
             throw new ValidationException("RAO run failed", e);
         }
