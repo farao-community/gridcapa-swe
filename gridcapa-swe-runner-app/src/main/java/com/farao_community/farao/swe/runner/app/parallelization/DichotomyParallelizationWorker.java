@@ -65,8 +65,8 @@ public class DichotomyParallelizationWorker {
         String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, direction);
         String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
         Optional<VoltageMonitoringResult> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, sweTaskParameters, direction);
-        outputService.buildAndExportVoltageDoc(direction, sweData, voltageMonitoringResult);
-        dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult);
+        outputService.buildAndExportVoltageDoc(direction, sweData, voltageMonitoringResult, sweTaskParameters);
+        dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult, sweTaskParameters);
         // fill response for one dichotomy
         return new AsyncResult<>(new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl));
     }

@@ -12,6 +12,7 @@ import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfi
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
@@ -36,9 +37,11 @@ class DichotomyLoggingTest {
         ProcessConfiguration processConfiguration = Mockito.mock(ProcessConfiguration.class);
         Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Brussels");
         DichotomyLogging businessLogger = new DichotomyLogging(logger, processConfiguration);
-        assertEquals("FAILURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.ES_FR, Optional.empty()));
-        assertEquals("NONE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.PT_ES, Optional.empty()));
-        assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(new VoltageMonitoringResult(Collections.emptyMap(), Collections.emptyMap(), VoltageMonitoringResult.Status.SECURE))));
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(true);
+        assertEquals("FAILURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.ES_FR, Optional.empty(), sweTaskParameters));
+        assertEquals("NONE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.PT_ES, Optional.empty(), sweTaskParameters));
+        assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(new VoltageMonitoringResult(Collections.emptyMap(), Collections.emptyMap(), VoltageMonitoringResult.Status.SECURE)), sweTaskParameters));
     }
 
     @Test
@@ -78,9 +81,11 @@ class DichotomyLoggingTest {
         ProcessConfiguration processConfiguration = new ProcessConfiguration();
         processConfiguration.setZoneId("UTC");
         Logger logger = Mockito.mock(Logger.class);
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(false);
         //When
         DichotomyLogging dichotomyLogging = new DichotomyLogging(logger, processConfiguration);
-        dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty());
+        dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty(), sweTaskParameters);
         //Then
         String summary = "Summary :\n" +
                 "Limiting event : {},\n" +

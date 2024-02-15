@@ -11,6 +11,7 @@ import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfi
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
@@ -65,14 +66,14 @@ public class DichotomyLogging {
         businessLogger.info("All - Dichotomies are done");
     }
 
-    public void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
+    public void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult, SweTaskParameters sweTaskParameters) {
         String limitingElement = NONE;
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
         String timestamp = getTimestampLocalized(sweData.getTimestamp());
         String currentTtc = String.valueOf(dichotomyResult.getHighestValidStepValue());
         String previousTtc = String.valueOf(dichotomyResult.getLowestInvalidStepValue());
-        String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult);
+        String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
         String angleCheckStatus = NONE;
         String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
         Crac crac = (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) ? sweData.getCracFrEs().getCrac() : sweData.getCracEsPt().getCrac();
@@ -93,8 +94,8 @@ public class DichotomyLogging {
         return c.stream().map(Object::toString).collect(Collectors.joining(", "));
     }
 
-    private String getVoltageCheckResult(DichotomyDirection direction, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
-        if (direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR)) {
+    private String getVoltageCheckResult(DichotomyDirection direction, Optional<VoltageMonitoringResult> voltageMonitoringResult, SweTaskParameters sweTaskParameters) {
+        if (sweTaskParameters.isRunVoltageCheck() && (direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR))) {
             if (voltageMonitoringResult.isPresent()) {
                 return String.valueOf(voltageMonitoringResult.get().getStatus());
             } else {
