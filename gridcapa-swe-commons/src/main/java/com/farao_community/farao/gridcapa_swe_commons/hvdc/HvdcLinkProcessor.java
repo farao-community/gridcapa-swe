@@ -178,11 +178,14 @@ public final class HvdcLinkProcessor {
         HvdcLine hvdcLine = network.getHvdcLine(creationParameters.getId());
         getOptionalLine(network, creationParameters.getEquivalentAcLineId(), missingElementsMap)
                 .ifPresent(ol -> {
-                    if (hvdcLine.getConverterStation1().getTerminal().isConnected()) {
-                        ol.getTerminal1().connect();
-                    }
-                    if (hvdcLine.getConverterStation2().getTerminal().isConnected()) {
-                        ol.getTerminal2().connect();
+                    HvdcAngleDroopActivePowerControl angleDroopActivePowerControl = hvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class);
+                    if (angleDroopActivePowerControl != null && angleDroopActivePowerControl.isEnabled()) {
+                        if (hvdcLine.getConverterStation1().getTerminal().isConnected()) {
+                            ol.getTerminal1().connect();
+                        }
+                        if (hvdcLine.getConverterStation2().getTerminal().isConnected()) {
+                            ol.getTerminal2().connect();
+                        }
                     }
                 });
     }
