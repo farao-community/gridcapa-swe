@@ -60,7 +60,7 @@ public class NetworkShifterProvider {
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
         return switch (processType) {
             case D2CC -> new SweD2ccShiftDispatcher(direction, initialNetPositions);
-            case IDCC, IDCC_IDCF -> new SweIdccShiftDispatcher(direction, initialNetPositions);
+            case IDCC, IDCC_IDCF, BTCC -> new SweIdccShiftDispatcher(direction, initialNetPositions);
         };
     }
 }
