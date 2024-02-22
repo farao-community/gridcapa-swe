@@ -7,6 +7,8 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.powsybl.openrao.commons.PhysicalParameter;
+import com.powsybl.openrao.commons.Unit;
+import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
@@ -67,7 +69,8 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
             if (isPortugalInDirection() && raoResult.isSecure()) {
-                AngleMonitoring angleMonitoring = new AngleMonitoring(sweData.getCracEsPt().getCrac(), network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
+                Crac crac = sweData.getCracEsPt().getCrac();
+                AngleMonitoring angleMonitoring = new AngleMonitoring(crac, network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
                 RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
                 if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
                     businessLogger.warn("Angle monitoring result is failure");
@@ -81,6 +84,13 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                             true);
                 } else {
                     businessLogger.info("Angle monitoring result is unsecure");
+                    crac.getAngleCnecs().forEach(
+                            angleCnec -> {
+                                if (raoResultWithAngleMonitoring.getMargin(crac.getLastInstant(), angleCnec, Unit.DEGREE) < 0) {
+                                    businessLogger.info("Angle {}'s value is {} degrees", angleCnec.getName(), raoResultWithAngleMonitoring.getAngle(crac.getLastInstant(), angleCnec, Unit.DEGREE));
+                                }
+                            });
+
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
                                     SweDichotomyValidationData.AngleMonitoringStatus.UNSECURE),
                             false);
