@@ -126,6 +126,21 @@ class HvdcLinkProcessorTest {
     }
 
     @Test
+    void testHvdcCreationWithoutAngleDroopParameter() {
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_no_angle_droop.json"));
+        HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
+        // Modify the state of the HVDC lines and check that activePowerPoint has not changed => it should remain at 0 in xiidm
+        HvdcLine hvdcLine1 = network.getHvdcLine("HVDC_FR4-DE1");
+        hvdcLine1.setActivePowerSetpoint(200.);
+        HvdcLine hvdcLine2 = network.getHvdcLine("HVDC_BE2-FR3");
+        hvdcLine2.setActivePowerSetpoint(200.);
+        hvdcLine2.setConvertersMode(HvdcLine.ConvertersMode.SIDE_1_INVERTER_SIDE_2_RECTIFIER);
+        HvdcLinkProcessor.replaceHvdcByEquivalentModel(network, params.getHvdcCreationParametersSet());
+        TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_no_angle_droop_afterModif.xiidm", getClass());
+    }
+
+    @Test
     void testDisconnectedAcLine() {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
