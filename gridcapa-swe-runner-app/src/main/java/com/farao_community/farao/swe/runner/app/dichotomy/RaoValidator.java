@@ -87,7 +87,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                     crac.getAngleCnecs().forEach(
                             angleCnec -> {
                                 if (raoResultWithAngleMonitoring.getMargin(crac.getLastInstant(), angleCnec, Unit.DEGREE) < 0) {
-                                    businessLogger.info("Angle {} value's {}", angleCnec.getName(), raoResultWithAngleMonitoring.getAngle(crac.getLastInstant(), angleCnec, Unit.DEGREE));
+                                    businessLogger.info("Angle {}'s value is {} degrees", angleCnec.getName(), raoResultWithAngleMonitoring.getAngle(crac.getLastInstant(), angleCnec, Unit.DEGREE));
                                 }
                             });
 
