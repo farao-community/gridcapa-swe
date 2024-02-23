@@ -37,22 +37,22 @@ public class GeneratorLimitsHandler {
     void setPminPmaxToDefaultValue(Network network, Set<Country> countries) {
         initGenerators = new HashMap<>();
         countries.forEach(country -> {
-                    Set<Generator> generators = zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
-                            .stream()
-                            .filter(Generator.class::isInstance)
-                            .map(Generator.class::cast)
-                            .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
-                                    && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country)))
-                            .collect(Collectors.toSet());
-                    generators.forEach(generator -> {
-                        saveInitLimits(generator);
-                        if (Double.isNaN(generator.getTargetP())) {
-                            generator.setTargetP(0.);
-                        }
-                        generator.setMinP(DEFAULT_PMIN);
-                        generator.setMaxP(DEFAULT_PMAX);
-                    });
-                });
+            Set<Generator> generators = zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
+                    .stream()
+                    .filter(Generator.class::isInstance)
+                    .map(Generator.class::cast)
+                    .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
+                            && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country)))
+                    .collect(Collectors.toSet());
+            generators.forEach(generator -> {
+                saveInitLimits(generator);
+                if (Double.isNaN(generator.getTargetP())) {
+                    generator.setTargetP(0.);
+                }
+                generator.setMinP(DEFAULT_PMIN);
+                generator.setMaxP(DEFAULT_PMAX);
+            });
+        });
         LOGGER.info("Pmax and Pmin are set to default values for network {}", network.getNameOrId());
     }
 

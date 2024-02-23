@@ -129,11 +129,11 @@ public class SweNetworkShifter implements NetworkShifter {
                 throw new ShiftingException(message);
             }
         } finally {
-            PostProcessNetwork(network, initialVariantId, workingVariantCopyId, scalableGeneratorConnector, generatorLimitsHandler);
+            postProcessNetwork(network, initialVariantId, workingVariantCopyId, scalableGeneratorConnector, generatorLimitsHandler);
         }
     }
 
-    private static void PostProcessNetwork(Network network, String initialVariantId, String workingVariantCopyId, ScalableGeneratorConnector scalableGeneratorConnector, GeneratorLimitsHandler generatorLimitsHandler) {
+    private static void postProcessNetwork(Network network, String initialVariantId, String workingVariantCopyId, ScalableGeneratorConnector scalableGeneratorConnector, GeneratorLimitsHandler generatorLimitsHandler) {
         // Step 5: Reset current variant with initial state
         network.getVariantManager().setWorkingVariant(initialVariantId);
         network.getVariantManager().removeVariant(workingVariantCopyId);
