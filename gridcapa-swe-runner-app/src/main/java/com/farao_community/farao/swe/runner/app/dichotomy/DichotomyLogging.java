@@ -71,8 +71,8 @@ public class DichotomyLogging {
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
         String timestamp = getTimestampLocalized(sweData.getTimestamp());
-        String currentTtc = String.valueOf(dichotomyResult.getHighestValidStepValue());
-        String previousTtc = String.valueOf(dichotomyResult.getLowestInvalidStepValue());
+        String currentTtc = String.valueOf((int) dichotomyResult.getHighestValidStepValue());
+        String previousTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
         String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult);
         String angleCheckStatus = NONE;
         String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;

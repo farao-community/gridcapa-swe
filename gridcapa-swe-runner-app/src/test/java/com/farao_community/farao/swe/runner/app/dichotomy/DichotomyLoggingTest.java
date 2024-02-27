@@ -94,6 +94,6 @@ class DichotomyLoggingTest {
                 Voltage Check : {},
                 Angle Check : {}.""";
         Mockito.verify(logger, Mockito.times(1)).info(summary, "NONE", "None", "", "");
-        Mockito.verify(logger, Mockito.times(1)).info(summaryBd, "2024-02-14 08:21", "2000.0", "1000.0", "NONE", "SECURE");
+        Mockito.verify(logger, Mockito.times(1)).info(summaryBd, "2024-02-14 08:21", "2000", "1000", "NONE", "SECURE");
     }
 }
