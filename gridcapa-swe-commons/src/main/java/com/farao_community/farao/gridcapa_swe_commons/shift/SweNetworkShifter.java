@@ -115,6 +115,8 @@ public class SweNetworkShifter implements NetworkShifter {
                         limitingCountries.add(zoneId);
                     }
                 }
+                scalableGeneratorConnector.connectGeneratorsTransformers(network, CONNECT_GENERATORS_IN_COUNTRIES);
+
                 if (!limitingCountries.isEmpty()) {
                     StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
                     limitingCountries.forEach(sj::add);
@@ -163,8 +165,6 @@ public class SweNetworkShifter implements NetworkShifter {
             network.getVariantManager().removeVariant(processedVariantId);
             network.getVariantManager().removeVariant(workingVariantCopyId);
         } finally {
-            // revert connections of TWT on generators that were not used by the scaling
-            scalableGeneratorConnector.revertUnnecessaryChanges(network);
             // here set working variant generators pmin and pmax values to initial values
             resetInitialPminPmax(network, zonalScalable, zoneIds, initGenerators);
         }
@@ -173,7 +173,7 @@ public class SweNetworkShifter implements NetworkShifter {
     private void preProcessNetwork(Network network, ScalableGeneratorConnector scalableGeneratorConnector, String initialVariantId, String processedVariantId, String workingVariantCopyId) throws ShiftingException {
         network.getVariantManager().cloneVariant(initialVariantId, processedVariantId, true);
         network.getVariantManager().setWorkingVariant(processedVariantId);
-        scalableGeneratorConnector.prepareForScaling(network, CONNECT_GENERATORS_IN_COUNTRIES);
+        //scalableGeneratorConnector.prepareForScaling(network, CONNECT_GENERATORS_IN_COUNTRIES); todo refactoring preProcess
         network.getVariantManager().cloneVariant(processedVariantId, workingVariantCopyId, true);
         network.getVariantManager().setWorkingVariant(workingVariantCopyId);
     }

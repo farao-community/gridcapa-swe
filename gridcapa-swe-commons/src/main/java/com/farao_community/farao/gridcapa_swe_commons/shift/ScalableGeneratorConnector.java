@@ -12,13 +12,17 @@ import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Generator;
+import com.powsybl.iidm.network.IdentifiableType;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
 import com.powsybl.openrao.commons.EICode;
 import org.jgrapht.alg.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,8 +37,11 @@ import java.util.stream.Collectors;
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public class ScalableGeneratorConnector {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScalableGeneratorConnector.class);
     private Map<String, GeneratorState> changedGeneratorsInitialState;
     private final ZonalData<Scalable> zonalScalable;
+
+    private Set<Generator> changedGeneratorsConnected = new HashSet<>();
 
     public ScalableGeneratorConnector(ZonalData<Scalable> zonalScalable) {
         this.zonalScalable = zonalScalable;
@@ -108,6 +115,30 @@ public class ScalableGeneratorConnector {
         return terminal.getBusBreakerView().getConnectableBus();
     }
 
+    public void connectGeneratorsTransformers(Network network, Set<Country> countriesToProcess) {
+        for (Country c : countriesToProcess) {
+            Set<Generator> generators = getShiftedGeneratorsDisconnectedFromMainComponent(network, c);
+            generators.forEach(generator -> {
+                connectTransformersOfGenerator(generator);
+                changedGeneratorsConnected.add(generator);
+            });
+
+        }
+    }
+
+    private Set<Generator> getShiftedGeneratorsDisconnectedFromMainComponent(Network network, Country country) {
+        Set<Generator> generators = zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network)
+                .stream()
+                .filter(Generator.class::isInstance)
+                .map(Generator.class::cast)
+                .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
+                        && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country))
+                        && gen.getTerminal().isConnected()
+                        && Math.abs(gen.getTargetP()) > 0.0
+                        && !getBus(gen.getTerminal()).isInMainConnectedComponent()).collect(Collectors.toSet());
+        return generators;
+    }
+
     /**
      * Stores info about the state of the generator and its eventual transformer in the network
      */
@@ -156,5 +187,21 @@ public class ScalableGeneratorConnector {
                 terminal.disconnect();
             }
         }
+    }
+
+    /**
+     * Checks if generator is connected to the network with transformers and connecting them.
+     * (If no transformer exist, nothing is modified)
+     */
+    private static void connectTransformersOfGenerator(Generator generator) {
+        ConnectableTopologyVisitor connectableTopologyVisitor = new ConnectableTopologyVisitor();
+        generator.getTerminal().getBusBreakerView().getConnectableBus().visitConnectedOrConnectableEquipments(connectableTopologyVisitor);
+        //todo use directly getVoltageLevel().getConnectables
+        connectableTopologyVisitor.getConnectables().stream().filter(connectable -> connectable.getType().equals(IdentifiableType.TWO_WINDINGS_TRANSFORMER))
+                .map(c -> (TwoWindingsTransformer) c)
+                .forEach(twt -> {
+                    LOGGER.info("Connecting twoWindingsTransformer {} linked to generator {}", twt.getId(), generator.getId());
+                    twt.getTerminals().forEach(Terminal::connect);
+                });
     }
 }
