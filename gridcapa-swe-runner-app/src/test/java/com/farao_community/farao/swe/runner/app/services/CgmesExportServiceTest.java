@@ -48,16 +48,16 @@ class CgmesExportServiceTest {
         when(sweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.of("UTC")));
 
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        String d2ccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
+        String d2ccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "001");
         assertions.assertThat(d2ccResult).isEqualTo("20221130T0000Z_2D_FR_ESFR_001.xml");
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC);
-        String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
-        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_ID_FR_ESFR_001.xml");
+        String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
+        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_ID_FR_ESFR_002.xml");
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
-        String idccIdcfResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR");
-        assertions.assertThat(idccIdcfResult).isEqualTo("20221130T0000Z_IDCF_FR_ESFR_001.xml");
+        String idccIdcfResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "003");
+        assertions.assertThat(idccIdcfResult).isEqualTo("20221130T0000Z_IDCF_FR_ESFR_003.xml");
 
         assertions.assertAll();
     }
