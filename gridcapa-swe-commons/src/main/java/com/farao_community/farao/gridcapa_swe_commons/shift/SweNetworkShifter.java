@@ -80,6 +80,7 @@ public class SweNetworkShifter implements NetworkShifter {
         final Set<String> zoneIds = scalingValuesByCountry.keySet();
         Map<String, InitGenerator> initGenerators = setPminPmaxToDefaultValue(network, zonalScalable, zoneIds);
         ScalableGeneratorConnector scalableGeneratorConnector = new ScalableGeneratorConnector(zonalScalable);
+        scalableGeneratorConnector.fillGeneratorsInitialState(network, CONNECT_GENERATORS_IN_COUNTRIES);
 
         try {
             String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT")));
@@ -115,6 +116,8 @@ public class SweNetworkShifter implements NetworkShifter {
                         limitingCountries.add(zoneId);
                     }
                 }
+                // During the shift some generators linked to the main network with a transformers are not connected correctly
+                // Waiting for a fix in powsybl-core, we connect the transformers linked to these generators to be correctly connected to the main network component
                 scalableGeneratorConnector.connectGeneratorsTransformers(network, CONNECT_GENERATORS_IN_COUNTRIES);
 
                 if (!limitingCountries.isEmpty()) {
