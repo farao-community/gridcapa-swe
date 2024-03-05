@@ -189,6 +189,10 @@ public class CgmesExportService {
         }
     }
 
+    private static String getFormattedVersionString(int version) {
+        return String.format("%03d", version + 1);
+    }
+
     private void addCgmesIdToMap(String tso, ReporterModel reporterSsh) {
         Optional<CgmesFileType> optionalCgmesFileType = buildFileTypeForMap("SSH", tso);
         optionalCgmesFileType.ifPresent(cgmesFileType -> mapCgmesIds.put(cgmesFileType, getCgmesIdFromReporter(reporterSsh)));
@@ -269,24 +273,14 @@ public class CgmesExportService {
             network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
             String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
-            CgmesSvMetadata cgmesSvMetadata = getCgmesSvMetadata(network);
-            String svVersionInFileName = null;
-            if (cgmesSvMetadata != null && cgmesSvMetadata.getSvVersion() != 0) {
-                svVersionInFileName = getFormattedVersionString(cgmesSvMetadata.getSvVersion());
-            } else {
-                svVersionInFileName = DEFAULT_VERSION;
-            }
-            String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", svVersionInFileName);
+            String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", DEFAULT_VERSION);
             return Map.of(outputFilename, os);
         }
     }
 
-    private static String getFormattedVersionString(int version) {
-        return String.format("%d3", version + 1);
-    }
-
     private void buildSvDependencies(Network network) {
-        CgmesSvMetadata cgmesSvMetadata = getCgmesSvMetadata(network);
+        Network subnetwork = (Network) network.getSubnetworks().toArray()[0];
+        CgmesSvMetadata cgmesSvMetadata = subnetwork.getExtension(CgmesSvMetadata.class);
         List<String> initialSvDependantOn = copyListDependencies(cgmesSvMetadata);
         removeInitialSshFromInitialDependencies(network, initialSvDependantOn);
         for (String dependency : initialSvDependantOn) {
@@ -298,11 +292,6 @@ public class CgmesExportService {
                 mapCgmesIds.getOrDefault(CgmesFileType.REE_SSH, ""));
         network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "SSH_ID", network::hasProperty),
                 mapCgmesIds.getOrDefault(CgmesFileType.RTE_SSH, ""));
-    }
-
-    private CgmesSvMetadata getCgmesSvMetadata(Network network) {
-        Network subnetwork = (Network) network.getSubnetworks().toArray()[0];
-        return subnetwork.getExtension(CgmesSvMetadata.class);
     }
 
     private static void removeInitialSshFromInitialDependencies(Network network, List<String> initialSvDependantOn) {
