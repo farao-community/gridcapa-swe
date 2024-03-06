@@ -178,12 +178,7 @@ public class CgmesExportService {
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
             CgmesSshMetadata cgmesSshMetadata = network.getExtension(CgmesSshMetadata.class);
-            String sshVersionInFileName = null;
-            if (cgmesSshMetadata != null) {
-                sshVersionInFileName = getFormattedVersionString(cgmesSshMetadata.getSshVersion());
-            } else {
-                sshVersionInFileName = DEFAULT_VERSION;
-            }
+            String sshVersionInFileName = cgmesSshMetadata != null ? getFormattedVersionString(cgmesSshMetadata.getSshVersion()) : DEFAULT_VERSION;
             String newFileName = buildCgmesFilename(sweData, tso, "SSH", sshVersionInFileName);
             return Map.of(newFileName, baos);
         }
