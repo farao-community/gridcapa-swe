@@ -179,7 +179,7 @@ public class CgmesExportService {
             baos.write(memDataSource.getData(filenameFromCgmesExport));
             CgmesSshMetadata cgmesSshMetadata = network.getExtension(CgmesSshMetadata.class);
             String sshVersionInFileName = null;
-            if (cgmesSshMetadata != null && cgmesSshMetadata.getSshVersion() != 0) {
+            if (cgmesSshMetadata != null) {
                 sshVersionInFileName = getFormattedVersionString(cgmesSshMetadata.getSshVersion());
             } else {
                 sshVersionInFileName = DEFAULT_VERSION;
