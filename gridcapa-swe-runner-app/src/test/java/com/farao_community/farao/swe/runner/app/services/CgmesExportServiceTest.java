@@ -86,7 +86,7 @@ class CgmesExportServiceTest {
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
         Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
         assertEquals(10, cgmesFiles.size());
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_006.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_EQ_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_TP_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
@@ -105,7 +105,7 @@ class CgmesExportServiceTest {
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData);
         assertEquals(3, sshFiles.size());
-        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006.xml"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
     }
