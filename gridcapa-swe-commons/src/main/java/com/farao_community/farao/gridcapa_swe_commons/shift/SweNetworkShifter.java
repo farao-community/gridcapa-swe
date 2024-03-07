@@ -107,7 +107,7 @@ public class SweNetworkShifter implements NetworkShifter {
                 double mismatchEsFr = targetExchanges.get(ES_FR) - bordersExchanges.get(ES_FR);
 
                 // Step 3: Checks balance adjustment results
-                if (isShiftSucceed(targetExchanges, bordersExchanges)) {
+                if (isShiftSucceed(mismatchEsPt, mismatchEsFr)) {
                     logShiftSuccess(iterationCounter, bordersExchanges);
                     network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                     shiftSucceed = true;
@@ -145,9 +145,7 @@ public class SweNetworkShifter implements NetworkShifter {
         businessLogger.info(msg);
     }
 
-    private boolean isShiftSucceed(Map<String, Double> targetExchanges, Map<String, Double> computedBordersExchanges) {
-        double mismatchEsPt = targetExchanges.get(ES_PT) - computedBordersExchanges.get(ES_PT);
-        double mismatchEsFr = targetExchanges.get(ES_FR) - computedBordersExchanges.get(ES_FR);
+    private boolean isShiftSucceed(double mismatchEsPt,  double mismatchEsFr) {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
@@ -190,7 +188,10 @@ public class SweNetworkShifter implements NetworkShifter {
 
     private static ScalingParameters getScalingParameters() {
         ScalingParameters scalingParameters = new ScalingParameters();
-        scalingParameters.setIterative(true);
+        // RESPECT_OF_VOLUME_ASKED: this parameter allows to do an iterative shift for proportional Glsk until achieving the asked value
+        // if in the first iteration some generators was limited by maximum value, the missing power will be distributed to others generators in the next iteration
+        scalingParameters.setPriority(ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED);
+        // allow scaling to reconnect generators that are initially disconnected
         scalingParameters.setReconnect(true);
         return scalingParameters;
     }

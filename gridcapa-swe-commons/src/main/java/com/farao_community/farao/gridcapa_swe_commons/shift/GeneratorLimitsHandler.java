@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Before scaling: set generators pmin and pmax values to default values,
@@ -43,33 +41,32 @@ public class GeneratorLimitsHandler {
     void setPminPmaxToDefaultValue(Network network, Set<Country> countries) {
         initGenerators = new HashMap<>();
         countries.forEach(country -> {
-            Set<Generator> generators = zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
+            zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
                     .stream()
                     .filter(Generator.class::isInstance)
                     .map(Generator.class::cast)
                     .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
                             && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country)))
-                    .collect(Collectors.toSet());
-            generators.forEach(generator -> {
-                saveInitLimits(generator);
-                if (Double.isNaN(generator.getTargetP())) {
-                    generator.setTargetP(0.);
-                }
-                generator.setMinP(DEFAULT_PMIN);
-                generator.setMaxP(DEFAULT_PMAX);
-            });
+                    .forEach(generator -> {
+                        saveInitLimits(generator);
+                        setLimitsToDefault(generator);
+                    });
         });
         LOGGER.info("Pmax and Pmin are set to default values for network {}", network.getNameOrId());
     }
 
-    private void saveInitLimits(Generator generator) {
-        InitGeneratorLimits initGeneratorLimits = new InitGeneratorLimits();
-        initGeneratorLimits.setpMin(generator.getMinP());
-        initGeneratorLimits.setpMax(generator.getMaxP());
-        String genId = generator.getId();
-        if (!initGenerators.containsKey(genId)) {
-            initGenerators.put(genId, initGeneratorLimits);
+    private static void setLimitsToDefault(Generator generator) {
+        if (Double.isNaN(generator.getTargetP())) {
+            generator.setTargetP(0.);
         }
+        generator.setMinP(DEFAULT_PMIN);
+        generator.setMaxP(DEFAULT_PMAX);
+    }
+
+    private void saveInitLimits(Generator generator) {
+        InitGeneratorLimits initGeneratorLimits = new InitGeneratorLimits(generator.getMinP(), generator.getMaxP());
+        String genId = generator.getId();
+        initGenerators.computeIfAbsent(genId, k -> initGeneratorLimits);
     }
 
     void resetInitialPminPmax(Network network) {
@@ -90,20 +87,17 @@ public class GeneratorLimitsHandler {
         double pMin;
         double pMax;
 
+        public InitGeneratorLimits(double pMin, double pMax) {
+            this.pMin = pMin;
+            this.pMax = pMax;
+        }
+
         public double getpMin() {
             return pMin;
         }
 
-        public void setpMin(double pMin) {
-            this.pMin = pMin;
-        }
-
         public double getpMax() {
             return pMax;
-        }
-
-        public void setpMax(double pMax) {
-            this.pMax = pMax;
         }
     }
 }
