@@ -2,6 +2,7 @@
 <iidm:network xmlns:iidm="http://www.powsybl.org/schema/iidm/1_11"
     xmlns:hapc="http://www.itesla_project.eu/schema/iidm/ext/hvdc_angle_droop_active_power_control/1_0"
     xmlns:cca="http://www.powsybl.org/schema/iidm/ext/cgmes_control_areas/1_0"
+    xmlns:csshm="http://www.powsybl.org/schema/iidm/ext/cgmes_ssh_metadata/1_0"
     id="TestCase16Nodes" caseDate="2021-08-27T17:22:10.856+02:00" forecastDistance="0"
     sourceFormat="CGMES" minimumValidationLevel="STEADY_STATE_HYPOTHESIS">
     <!-- subnetwork ES -->
@@ -151,7 +152,10 @@
                         <cca:controlArea id="_cb354e3c-97fe-4fde-f9a6-b3fe750d4a34" name="_CA_ES" energyIdentificationCodeEic="10YES-REE------0" netInterchange="77.042" pTolerance="10.0">
                         </cca:controlArea>
                     </cca:cgmesControlAreas>
-                </iidm:extension>
+                    <csshm:cgmesSshMetadata id="urn:uuid:b3742d36-d567-44f0-8ecd-539a05ac1668" description="SSH Model" sshVersion="5" modelingAuthoritySet="http://www.ren.pt/OperationalPlanning">
+                        <csshm:dependentOn>urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103</csshm:dependentOn>
+                    </csshm:cgmesSshMetadata>
+        </iidm:extension>
     </iidm:network>
     <!-- subnetwork PT -->
     <iidm:network id="urn:uuid:26ac088c-2e06-11ee-816e-00155d38aa10"
