@@ -1,5 +1,14 @@
 {
   "crac-factory": "CracImplFactory",
+  "ra-usage-limits-per-instant": [
+    {
+      "instant": "curative",
+      "max-ra": 10,
+      "max-tso": 2,
+      "max-ra-per-tso": {
+        "RTE": 5
+      }
+    }],
   "extensions": {
     "CimCracCreatorParameters": {
       "timeseries-mrids" : [ "REE-TimeSeries-ESFR", "RTE-TimeSeries-1", "RTE-TimeSeries-2", "RTE-TimeSeries-3", "REE-TimeSeries-70CEP-ESFR", "REE-TimeSeries-70CEP-FRES" ],

@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.RaUsageLimits;
 import com.powsybl.openrao.data.craccreation.creator.api.CracCreationContext;
 import com.powsybl.openrao.data.craccreation.creator.cim.CimCrac;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
@@ -30,11 +31,13 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -86,6 +89,15 @@ class FileImporterTest {
         Assertions.assertNotNull(cracFrEs);
         CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON);
         Assertions.assertNotNull(cracEsPt);
+        Map<com.powsybl.openrao.data.cracapi.Instant, RaUsageLimits> raUsageLimitsPerInstant = cracEsPt.getCrac().getRaUsageLimitsPerInstant();
+        assertEquals(1, raUsageLimitsPerInstant.size());
+        RaUsageLimits raUsageLimits = raUsageLimitsPerInstant.values().stream().findFirst().get();
+        assertEquals(10, raUsageLimits.getMaxRa());
+        assertEquals(2, raUsageLimits.getMaxTso());
+        assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
+        assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
+        assertEquals(5, raUsageLimits.getMaxRaPerTso().get("RTE"));
+
     }
 
     @Test
