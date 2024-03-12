@@ -19,6 +19,8 @@ swe-runner:
   pst:
     pst1-id: _e071a1d4-fef5-1bd9-5278-d195c5597b6e
     pst2-id: _7824bc48-fc86-51db-8f9c-01b44933839e
+  unoptimized-cnecs-with-pst-es-fr:
+    active: true
   dichotomy:
     parameters:
       ES_FR:
