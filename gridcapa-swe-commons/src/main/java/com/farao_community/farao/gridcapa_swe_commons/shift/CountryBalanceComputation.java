@@ -35,10 +35,10 @@ public final class CountryBalanceComputation {
          // Should not be instantiated
     }
 
-    public static Map<String, Double> computeSweCountriesBalances(Network network) {
+    public static Map<String, Double> computeSweCountriesBalances(Network network, LoadFlowParameters loadFlowParameters) {
         LOGGER.info("Computing initial SWE countries balance");
         Map<String, Double> countriesBalances = new HashMap<>();
-        runLoadFlow(network, network.getVariantManager().getWorkingVariantId());
+        runLoadFlow(network, network.getVariantManager().getWorkingVariantId(), loadFlowParameters);
         Map<String, Double> bordersExchanges = computeSweBordersExchanges(network);
         countriesBalances.put(toEic("PT"),  -bordersExchanges.get("ES_PT"));
         countriesBalances.put(toEic("ES"), bordersExchanges.values().stream().reduce(0., Double::sum));
@@ -56,8 +56,8 @@ public final class CountryBalanceComputation {
         return borderExchanges;
     }
 
-    private static void runLoadFlow(Network network, String workingStateId) {
-        LoadFlowResult result = LoadFlow.run(network, workingStateId, LocalComputationManager.getDefault(), LoadFlowParameters.load());
+    private static void runLoadFlow(Network network, String workingStateId, LoadFlowParameters loadFlowParameters) {
+        LoadFlowResult result = LoadFlow.run(network, workingStateId, LocalComputationManager.getDefault(), loadFlowParameters);
         if (!result.isOk()) {
             LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
             throw new SweInternalException(String.format("Loadflow computation diverged on network %s", network.getId()));

@@ -13,14 +13,15 @@ import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
-import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
-import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration.Parameters;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
+import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,6 @@ import org.springframework.stereotype.Service;
 public class DichotomyRunner {
     private static final HalfRangeDivisionIndexStrategy HALF_INDEX_STRATEGY_CONFIGURATION = new HalfRangeDivisionIndexStrategy(false);
 
-    private final DichotomyConfiguration dichotomyConfiguration;
     private final DichotomyLogging dichotomyLogging;
     private final FileExporter fileExporter;
     private final FileImporter fileImporter;
@@ -40,14 +40,12 @@ public class DichotomyRunner {
 
     private final Logger businessLogger;
 
-    public DichotomyRunner(DichotomyConfiguration dichotomyConfiguration,
-                           DichotomyLogging dichotomyLogging,
+    public DichotomyRunner(DichotomyLogging dichotomyLogging,
                            FileExporter fileExporter,
                            FileImporter fileImporter,
                            NetworkShifterProvider networkShifterProvider,
                            RaoRunnerClient raoRunnerClient,
                            Logger businessLogger) {
-        this.dichotomyConfiguration = dichotomyConfiguration;
         this.dichotomyLogging = dichotomyLogging;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
@@ -56,24 +54,52 @@ public class DichotomyRunner {
         this.businessLogger = businessLogger;
     }
 
-    public DichotomyResult<SweDichotomyValidationData> run(SweData sweData, DichotomyDirection direction) {
-        Parameters parameters = dichotomyConfiguration.getParameters().get(direction);
-        dichotomyLogging.logStartDichotomy(parameters);
-        DichotomyEngine<SweDichotomyValidationData> engine = buildDichotomyEngine(sweData, direction, parameters);
+    public DichotomyResult<SweDichotomyValidationData> run(SweData sweData, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        DichotomyParameters dichotomyParameters = getDichotomyParameters(sweTaskParameters, direction);
+        LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
+        dichotomyLogging.logStartDichotomy(dichotomyParameters);
+        DichotomyEngine<SweDichotomyValidationData> engine = buildDichotomyEngine(sweData, direction, dichotomyParameters, loadFlowParameters);
         Network network = NetworkService.getNetworkByDirection(sweData, direction);
         return engine.run(network);
     }
 
-    DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, Parameters parameters) {
+    DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, DichotomyParameters parameters, LoadFlowParameters loadFlowParameters) {
         return new DichotomyEngine<>(
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 HALF_INDEX_STRATEGY_CONFIGURATION,
-                networkShifterProvider.get(sweData, direction),
-                getNetworkValidator(sweData, direction));
+                networkShifterProvider.get(sweData, direction, loadFlowParameters),
+                getNetworkValidator(sweData, direction, parameters.isRunAngleCheck(), loadFlowParameters));
     }
 
-    private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction) {
-        return new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, direction, businessLogger);
+    private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters) {
+        return new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, direction, runAngleCheck, loadFlowParameters, businessLogger);
     }
 
+    private DichotomyParameters getDichotomyParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        DichotomyParameters result = new DichotomyParameters();
+        switch (direction) {
+            case ES_FR -> {
+                result.setMinValue(sweTaskParameters.getMinTtcEsFr());
+                result.setMaxValue(sweTaskParameters.getMaxTtcEsFr());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionEsFr());
+            }
+            case FR_ES -> {
+                result.setMinValue(sweTaskParameters.getMinTtcFrEs());
+                result.setMaxValue(sweTaskParameters.getMaxTtcFrEs());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionFrEs());
+            }
+            case ES_PT -> {
+                result.setMinValue(sweTaskParameters.getMinTtcEsPt());
+                result.setMaxValue(sweTaskParameters.getMaxTtcEsPt());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionEsPt());
+            }
+            case PT_ES -> {
+                result.setMinValue(sweTaskParameters.getMinTtcPtEs());
+                result.setMaxValue(sweTaskParameters.getMaxTtcPtEs());
+                result.setPrecision(sweTaskParameters.getDichotomyPrecisionPtEs());
+            }
+        }
+        result.setRunAngleCheck(sweTaskParameters.isRunAngleCheck());
+        return result;
+    }
 }

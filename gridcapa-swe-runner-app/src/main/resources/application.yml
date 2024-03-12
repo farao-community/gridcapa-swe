@@ -48,27 +48,15 @@ swe-runner:
   dichotomy:
     parameters:
       ES_FR:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 10
         tolerance-Es-Pt: 50
       FR_ES:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 10
         tolerance-Es-Pt: 50
       ES_PT:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
       PT_ES:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
   whitelist:

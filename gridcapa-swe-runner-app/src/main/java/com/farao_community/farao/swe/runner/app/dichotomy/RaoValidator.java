@@ -6,20 +6,14 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.powsybl.openrao.commons.PhysicalParameter;
-import com.powsybl.openrao.commons.Unit;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoring;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
@@ -27,6 +21,12 @@ import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.commons.PhysicalParameter;
+import com.powsybl.openrao.commons.Unit;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
+import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.monitoring.anglemonitoring.AngleMonitoring;
 import com.powsybl.openrao.monitoring.anglemonitoring.RaoResultWithAngleMonitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +44,20 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private final RaoRunnerClient raoRunnerClient;
     private final SweData sweData;
     private final DichotomyDirection direction;
+    private final boolean runAngleCheck;
+    private final LoadFlowParameters loadFlowParameters;
     private int variantCounter = 0;
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, Logger businessLogger) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters, Logger businessLogger) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoRunnerClient = raoRunnerClient;
         this.sweData = sweData;
         this.direction = direction;
+        this.runAngleCheck = runAngleCheck;
+        this.loadFlowParameters = loadFlowParameters;
         this.businessLogger = businessLogger;
     }
 
@@ -68,10 +72,10 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
-            if (isPortugalInDirection() && raoResult.isSecure()) {
+            if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure()) {
                 Crac crac = sweData.getCracEsPt().getCrac();
                 AngleMonitoring angleMonitoring = new AngleMonitoring(crac, network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
-                RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), LoadFlowParameters.load(), 4, sweData.getTimestamp());
+                RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, sweData.getTimestamp());
                 if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
                     businessLogger.warn("Angle monitoring result is failure");
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,

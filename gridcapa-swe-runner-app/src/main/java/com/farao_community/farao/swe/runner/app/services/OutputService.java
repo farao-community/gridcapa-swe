@@ -8,6 +8,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
@@ -51,8 +52,8 @@ public class OutputService {
         return df.format(localTime);
     }
 
-    public void buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult) {
-        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
+    public void buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult, SweTaskParameters sweTaskParameters) {
+        if (sweTaskParameters.isRunVoltageCheck() && (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES))) {
             OffsetDateTime timestamp = sweData.getTimestamp();
             String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
             OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));

@@ -6,21 +6,22 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.RaUsageLimits;
-import com.powsybl.openrao.data.craccreation.creator.api.CracCreationContext;
-import com.powsybl.openrao.data.craccreation.creator.cim.CimCrac;
+import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.google.common.base.Suppliers;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.glsk.commons.ZonalData;
-
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.RaUsageLimits;
+import com.powsybl.openrao.data.craccreation.creator.api.CracCreationContext;
+import com.powsybl.openrao.data.craccreation.creator.cim.CimCrac;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -85,19 +87,20 @@ class FileImporterTest {
                 importParams
         );
         SweRequest req = createEmptySweRequest();
-        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null);
+        SweTaskParameters sweTaskParametersFrEs = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "27", "12")));
+        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null, sweTaskParametersFrEs);
         Assertions.assertNotNull(cracFrEs);
-        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON);
+        SweTaskParameters sweTaskParametersEsPt = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "32", "12")));
+        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON, sweTaskParametersEsPt);
         Assertions.assertNotNull(cracEsPt);
         Map<com.powsybl.openrao.data.cracapi.Instant, RaUsageLimits> raUsageLimitsPerInstant = cracEsPt.getCrac().getRaUsageLimitsPerInstant();
         assertEquals(1, raUsageLimitsPerInstant.size());
         RaUsageLimits raUsageLimits = raUsageLimitsPerInstant.values().stream().findFirst().get();
-        assertEquals(10, raUsageLimits.getMaxRa());
+        assertEquals(32, raUsageLimits.getMaxRa());
         assertEquals(2, raUsageLimits.getMaxTso());
         assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
         assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
         assertEquals(5, raUsageLimits.getMaxRaPerTso().get("RTE"));
-
     }
 
     @Test
@@ -108,7 +111,7 @@ class FileImporterTest {
 
     SweRequest createEmptySweRequest() {
         return new SweRequest("id", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
-                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null);
+                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null, null);
     }
 
     @Test
@@ -130,7 +133,6 @@ class FileImporterTest {
         assertEquals(4, scalableBE.filterInjections(network).size());
         assertEquals(192., scalableBE.scale(network, 192), 0.001);
         assertEquals(-450., scalableBE.scale(network, -500), 0.001);
-
     }
 
     @Test
@@ -145,6 +147,5 @@ class FileImporterTest {
         assertEquals(4, scalableBE.filterInjections(network).size());
         assertEquals(192., scalableBE.scale(network, 192), 0.001);
         assertEquals(-450., scalableBE.scale(network, -500), 0.001);
-
     }
 }
