@@ -13,6 +13,7 @@ import com.farao_community.farao.minio_adapter.starter.GridcapaFileGroup;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.swe.runner.app.configurations.UnoptimizedCnecsPstConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
 import com.farao_community.farao.swe.runner.app.voltage.json.FailureVoltageCheckResult;
@@ -61,11 +62,13 @@ public class FileExporter {
     );
 
     private final ProcessConfiguration processConfiguration;
+    private final UnoptimizedCnecsPstConfiguration unoptimizedCnecsPstConfiguration;
 
-    public FileExporter(MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper, ProcessConfiguration processConfiguration) {
+    public FileExporter(MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper, ProcessConfiguration processConfiguration, UnoptimizedCnecsPstConfiguration unoptimizedCnecsPstConfiguration) {
         this.minioAdapter = minioAdapter;
         this.voltageResultMapper = voltageResultMapper;
         this.processConfiguration = processConfiguration;
+        this.unoptimizedCnecsPstConfiguration = unoptimizedCnecsPstConfiguration;
     }
 
     public void saveMergedNetworkWithHvdc(Network network, OffsetDateTime targetDateTime) {
@@ -203,7 +206,7 @@ public class FileExporter {
 
     RaoParameters getSweRaoParameters(DichotomyDirection direction) {
         RaoParameters raoParameters = RaoParameters.load();
-        if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
+        if ((direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) && unoptimizedCnecsPstConfiguration.isActive()) {
             // The cnec in series with pst concern only ES/FR border
             raoParameters.getNotOptimizedCnecsParameters().setDoNotOptimizeCnecsSecuredByTheirPst(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
         }
