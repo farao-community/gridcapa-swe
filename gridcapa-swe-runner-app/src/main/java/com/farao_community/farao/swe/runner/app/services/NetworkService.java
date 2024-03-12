@@ -13,6 +13,7 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalExcep
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.configurations.PstConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
@@ -46,19 +47,19 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class NetworkService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkService.class);
-    public static final String PST_1 = "_e071a1d4-fef5-1bd9-5278-d195c5597b6e";
-    public static final String PST_2 = "_7824bc48-fc86-51db-8f9c-01b44933839e";
 
     private final MinioAdapter minioAdapter;
 
     private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     private final Logger businessLogger;
+    private final PstConfiguration pstConfiguration;
 
     static final Map<Country, String> TSO_BY_COUNTRY = Map.of(Country.FR, "RTEFRANCE", Country.ES, "REE", Country.PT, "REN");
 
-    public NetworkService(MinioAdapter minioAdapter, Logger businessLogger) {
+    public NetworkService(MinioAdapter minioAdapter, Logger businessLogger, PstConfiguration pstConfiguration) {
         this.minioAdapter = minioAdapter;
         this.businessLogger = businessLogger;
+        this.pstConfiguration = pstConfiguration;
     }
 
     public Network loadNetworkFromMinio(OffsetDateTime targetDateTime) {
@@ -130,8 +131,8 @@ public class NetworkService {
 
     private void addPst(Network network) {
         try {
-            network.getTwoWindingsTransformer(PST_1).getPhaseTapChanger().setRegulating(false);
-            network.getTwoWindingsTransformer(PST_2).getPhaseTapChanger().setRegulating(false);
+            network.getTwoWindingsTransformer(pstConfiguration.getPst1Id()).getPhaseTapChanger().setRegulating(false);
+            network.getTwoWindingsTransformer(pstConfiguration.getPst2Id()).getPhaseTapChanger().setRegulating(false);
             businessLogger.info("Regulation mode of the PSTs modified");
         } catch (NullPointerException e) {
             businessLogger.warn("The PST mode could not be changed because it was not found");

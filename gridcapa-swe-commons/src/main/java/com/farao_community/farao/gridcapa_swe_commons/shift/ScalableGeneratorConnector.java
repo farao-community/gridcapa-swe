@@ -17,6 +17,8 @@ import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
 import com.powsybl.openrao.commons.EICode;
 import org.jgrapht.alg.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +33,10 @@ import java.util.stream.Collectors;
  * After scaling: reverts unnecessary changes.
  *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
+ * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public class ScalableGeneratorConnector {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScalableGeneratorConnector.class);
     private Map<String, GeneratorState> changedGeneratorsInitialState;
     private final ZonalData<Scalable> zonalScalable;
 
@@ -40,78 +44,94 @@ public class ScalableGeneratorConnector {
         this.zonalScalable = zonalScalable;
     }
 
-    public void prepareForScaling(Network network, Set<Country> countriesToProcess) throws ShiftingException {
+    /**
+     * This method stores information about the initial state of the generator and its transformer, in order to
+     * revert modifications after scaling, for generators that still disconnected to main network
+     */
+    public void fillGeneratorsInitialState(Network network, Set<Country> countriesToProcess) throws ShiftingException {
         changedGeneratorsInitialState = new HashMap<>();
-        for (Country c : countriesToProcess) {
-            connectGeneratorsToMainComponent(network, c);
+        for (Country country : countriesToProcess) {
+            Set<Generator> generators = getGeneratorsNotMainConnected(network, country);
+            for (Generator generator : generators) {
+                GeneratorState generatorState = new GeneratorState(generator);
+                changedGeneratorsInitialState.put(generator.getId(), generatorState);
+            }
         }
     }
 
     /**
      * Collects the list of generators of a given country, that are present in the scalable list, but not connected
      * to the network's main component
-     * For every one of these generators, checks if it has a transformer connecting it to the main component, and
-     * connects it
      */
-    void connectGeneratorsToMainComponent(Network network, Country country) throws ShiftingException {
-        Set<Generator> generators = zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network)
+    private Set<Generator> getGeneratorsNotMainConnected(Network network, Country country) {
+        return zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network)
                 .stream()
                 .filter(Generator.class::isInstance)
                 .map(Generator.class::cast)
                 .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
                         && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country))
                         && !getBus(gen.getTerminal()).isInMainConnectedComponent()).collect(Collectors.toSet());
-        for (Generator gen : generators) {
-            connectGeneratorTwoWindingsTransformer(gen, network);
+    }
+
+    private static Bus getBus(Terminal terminal) {
+        return terminal.getBusBreakerView().getConnectableBus();
+    }
+
+    /**
+     * For countriesToProcess, get the generators used during shift but are not connected to the main network
+     * For these generators, try to connect them to the network by connecting the associated transformers
+     * If Generator still disconnected from main component, revert to the initial TargetP and connexion for transformers
+     */
+    public void connectGeneratorsTransformers(Network network, Set<Country> countriesToProcess) {
+        for (Country c : countriesToProcess) {
+            Set<Generator> generators = getShiftedGeneratorsDisconnectedFromMainComponent(network, c);
+            generators.forEach(generator -> connectTransformersOfGenerator(generator, network));
         }
     }
 
     /**
-     * Checks if a generator has exactly one transformer connecting it to the main network and connects it.
+     * Checks if generator is connected to the network with transformers and connecting them.
      * (If no transformer exist, nothing is modified)
-     * (If more than one transformer exist, TODO)
-     * This method also stores information about the initial state of the generator and its transformer, in order to
-     * revert modifications after scaling, for generators that were not used
+     * If Generator still disconnected from main component, revert to the initial state
      */
-    private void connectGeneratorTwoWindingsTransformer(Generator generator, Network network) throws ShiftingException {
-        // Store initial targetP for each generator, in order to revert this change after shift,
-        // for the generators that are not connected to main island
-        GeneratorState generatorState = new GeneratorState(generator);
-        changedGeneratorsInitialState.put(generator.getId(), generatorState);
-        // If generator is connected to network through transformers, connect them
-        generatorState.twoWindingsTransformerConnection.keySet().forEach(twtId -> {
-            TwoWindingsTransformer twt = network.getTwoWindingsTransformer(twtId);
-            twt.getTerminal1().connect();
-            twt.getTerminal2().connect();
+    private void connectTransformersOfGenerator(Generator generator, Network network) {
+        Bus genBus = getBus(generator.getTerminal());
+        Set<TwoWindingsTransformer> transformers = generator.getTerminal().getVoltageLevel().getTwoWindingsTransformerStream()
+                .filter(twt -> genBus.equals(getBus(twt.getTerminal1())) || genBus.equals(getBus(twt.getTerminal2())))
+                .collect(Collectors.toSet());
+        transformers.forEach(twt -> {
+            LOGGER.info("Connecting twoWindingsTransformer {} linked to generator {}", twt.getId(), generator.getId());
+            twt.getTerminals().forEach(Terminal::connect);
         });
-    }
-
-    /**
-     * After scaling, this method resets the initial state of every generator and transformer that were modified by
-     * "connectGeneratorsToMainComponent", if the generator was not used by the scaling (i.e. if it's still not
-     * connected to the main component, or targetP = initTargetP = 0)
-     */
-    public void revertUnnecessaryChanges(Network network) {
-        changedGeneratorsInitialState.forEach((genId, initialState) -> {
-            Generator gen = network.getGenerator(genId);
-            if (!getBus(gen.getTerminal()).isInMainConnectedComponent()
-                    || Math.abs(gen.getTargetP()) < 1e-6 && Math.abs(initialState.targetP) < 1e-6) {
-                // Generator is not connected to the main island, even after connecting it and its TWT
-                // Or it has 0 production and has not moved
-                // Reset it to its state before scaling
+        // Generator is not connected to the main island, even after connecting it and its TWT
+        // Reset it to it's initial state before scaling
+        if (!genBus.isInMainConnectedComponent()) {
+            LOGGER.info("Generator {} still disconnected to the main network, reset to initial state", generator.getId());
+            GeneratorState initialState = changedGeneratorsInitialState.get(generator.getId());
+            if (initialState != null) {
                 initialState.apply(network);
             }
-        });
+        }
     }
 
-    private Bus getBus(Terminal terminal) {
-        return terminal.getBusBreakerView().getConnectableBus();
+    private Set<Generator> getShiftedGeneratorsDisconnectedFromMainComponent(Network network, Country country) {
+        Set<Generator> generators = getGeneratorsNotMainConnected(network, country);
+        return generators.stream().filter(this::isShiftedGenerator).collect(Collectors.toSet());
+    }
+
+    private boolean isShiftedGenerator(Generator gen) {
+        double initialTargetP = changedGeneratorsInitialState.containsKey(gen.getId()) ? changedGeneratorsInitialState.get(gen.getId()).targetP : 0.;
+        return gen.getTerminal().isConnected() && Math.abs(gen.getTargetP() - initialTargetP) > 1e-6;
+    }
+
+    Map<String, GeneratorState> getChangedGeneratorsInitialState() {
+        return changedGeneratorsInitialState;
     }
 
     /**
      * Stores info about the state of the generator and its eventual transformer in the network
      */
-    private class GeneratorState {
+    class GeneratorState {
         String generatorId;
         double targetP;
         boolean isTerminalConnected;
@@ -157,4 +177,5 @@ public class ScalableGeneratorConnector {
             }
         }
     }
+
 }

@@ -66,7 +66,8 @@ import static com.powsybl.cgmes.conversion.Conversion.CGMES_PREFIX_ALIAS_PROPERT
 public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
     private static final double DEFAULT_P_TOLERANCE = 10;
-    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_001.xml'");
+    private static final String DEFAULT_VERSION = "001";
+    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_[version].xml'");
     public static final String MODELING_AUTHORITY_DEFAULT_VALUE = "https://farao-community.github.io/";
     private final Logger businessLogger;
     private final FileExporter fileExporter;
@@ -179,9 +180,15 @@ public class CgmesExportService {
             addCgmesIdToMap(tso, reporterSsh);
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
-            String newFileName = buildCgmesFilename(sweData, tso, "SSH");
+            CgmesSshMetadata cgmesSshMetadata = network.getExtension(CgmesSshMetadata.class);
+            String sshVersionInFileName = cgmesSshMetadata != null ? getFormattedVersionString(cgmesSshMetadata.getSshVersion()) : DEFAULT_VERSION;
+            String newFileName = buildCgmesFilename(sweData, tso, "SSH", sshVersionInFileName);
             return Map.of(newFileName, baos);
         }
+    }
+
+    private static String getFormattedVersionString(int version) {
+        return String.format("%03d", version + 1);
     }
 
     private void addCgmesIdToMap(String tso, ReporterModel reporterSsh) {
@@ -227,7 +234,7 @@ public class CgmesExportService {
         try (InputStream inputStream = getInputStreamFromData(sweData, cgmesFileType);
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             IOUtils.copy(inputStream, outputStream);
-            return Map.of(buildCgmesFilename(sweData, cgmesFileType.getTso(), cgmesFileType.getFileType()), outputStream);
+            return Map.of(buildCgmesFilename(sweData, cgmesFileType.getTso(), cgmesFileType.getFileType(), DEFAULT_VERSION), outputStream);
         }
     }
 
@@ -264,7 +271,7 @@ public class CgmesExportService {
             network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
             String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
-            String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV");
+            String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", DEFAULT_VERSION);
             return Map.of(outputFilename, os);
         }
     }
@@ -302,11 +309,12 @@ public class CgmesExportService {
         return new ArrayList<>();
     }
 
-    String buildCgmesFilename(SweData sweData, String tso, String type) {
+    String buildCgmesFilename(SweData sweData, String tso, String type, String version) {
         return CGMES_FORMATTER.format(sweData.getTimestamp())
                 .replace("[process]", sweData.getProcessType().getCode())
                 .replace("[tso]", tso)
-                .replace("[type]", type);
+                .replace("[type]", type)
+                .replace("[version]", version);
     }
 
     String buildFileType(DichotomyDirection direction) {
