@@ -11,6 +11,8 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
@@ -44,8 +46,12 @@ public class VoltageCheckService {
         this.urlValidationService = urlValidationService;
     }
 
-    public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, DichotomyDirection direction) {
+    public Optional<VoltageMonitoringResult> runVoltageCheck(SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
 
+        if (!sweTaskParameters.isRunVoltageCheck()) {
+            businessLogger.info("Voltage check disabled in configuration and will not be run.");
+            return Optional.empty();
+        }
         if (direction != DichotomyDirection.ES_FR && direction != DichotomyDirection.FR_ES) {
             return Optional.empty();
         }
@@ -58,7 +64,8 @@ public class VoltageCheckService {
             Crac crac = sweData.getCracFrEs().getCrac();
             Network network = getNetworkWithPra(dichotomyResult);
             VoltageMonitoring voltageMonitoring = new VoltageMonitoring(crac, network, dichotomyResult.getHighestValidStep().getRaoResult());
-            VoltageMonitoringResult result = voltageMonitoring.run(LoadFlow.find().getName(), LoadFlowParameters.load(), 4);
+            LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
+            VoltageMonitoringResult result = voltageMonitoring.run(LoadFlow.find().getName(), loadFlowParameters, 4);
             generateHighAndLowVoltageConstraints(result).forEach(businessLogger::warn);
             return Optional.of(result);
         } catch (Exception e) {

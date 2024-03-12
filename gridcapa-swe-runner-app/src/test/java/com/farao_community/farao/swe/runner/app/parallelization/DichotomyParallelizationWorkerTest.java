@@ -13,12 +13,14 @@ import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,8 +29,14 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -60,11 +68,15 @@ class DichotomyParallelizationWorkerTest {
     @Test
     void testRunDichotomyForOneDirection() {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
-        when(dichotomyRunner.run(any(SweData.class), any(DichotomyDirection.class))).thenReturn(result);
-        when(cgmesExportService.buildAndExportCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class))).thenReturn("cgmesZipFileUrl");
+        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(result);
+        when(cgmesExportService.buildAndExportCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesZipFileUrl");
         when(cneFileExportService.exportCneUrl(any(SweData.class), any(DichotomyResult.class), anyBoolean(), any(DichotomyDirection.class))).thenReturn("CneUrl");
-        when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
-        Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, direction);
+        when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.getMinTtcEsPt()).thenReturn(0);
+        Mockito.when(sweTaskParameters.getMaxTtcEsPt()).thenReturn(6400);
+        Mockito.when(sweTaskParameters.getDichotomyPrecisionEsPt()).thenReturn(50);
+        Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction);
         try {
             SweDichotomyResult sweDichotomyResult = futurResult.get();
             assertTrue(futurResult.isDone());
@@ -76,8 +88,8 @@ class DichotomyParallelizationWorkerTest {
         } catch (InterruptedException | ExecutionException e) {
             fail(e);
         }
-        verify(outputService, times(1)).buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(Optional.class));
-        verify(dichotomyLogging, times(1)).generateSummaryEvents(any(DichotomyDirection.class), any(DichotomyResult.class), any(SweData.class), any(Optional.class));
+        verify(outputService, times(1)).buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class));
+        verify(dichotomyLogging, times(1)).generateSummaryEvents(any(DichotomyDirection.class), any(DichotomyResult.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class));
     }
 
 }

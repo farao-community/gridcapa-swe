@@ -10,6 +10,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
@@ -77,19 +78,33 @@ class OutputServiceTest {
 
     @Test
     void buildAndExportEsFrVoltageDoc() {
-        outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult()));
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(true);
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.ES_FR, sweData, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult()), sweTaskParameters);
         Mockito.verify(fileExporter, Mockito.times(1)).saveVoltageMonitoringResultInJsonZip(Mockito.any(VoltageMonitoringResult.class), Mockito.anyString(), Mockito.any(OffsetDateTime.class), Mockito.any(ProcessType.class), Mockito.anyString());
     }
 
     @Test
     void buildAndExportFrEsFailureVoltageDoc() {
-        outputService.buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, Optional.empty());
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(true);
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, Optional.empty(), sweTaskParameters);
         Mockito.verify(fileExporter, Mockito.times(1)).saveVoltageMonitoringResultInJsonZip(Mockito.isNull(), Mockito.anyString(), Mockito.any(OffsetDateTime.class), Mockito.any(ProcessType.class), Mockito.anyString());
     }
 
     @Test
+    void noBuildAndExportFrEsVoltageDoc() {
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(false);
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.FR_ES, sweData, Optional.empty(), sweTaskParameters);
+        Mockito.verify(fileExporter, Mockito.times(0)).saveVoltageMonitoringResultInJsonZip(Mockito.isNull(), Mockito.anyString(), Mockito.any(OffsetDateTime.class), Mockito.any(ProcessType.class), Mockito.anyString());
+    }
+
+    @Test
     void noBuildAndExportPtEsVoltageDoc() {
-        outputService.buildAndExportVoltageDoc(DichotomyDirection.PT_ES, sweData, Optional.empty());
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+        Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(true);
+        outputService.buildAndExportVoltageDoc(DichotomyDirection.PT_ES, sweData, Optional.empty(), sweTaskParameters);
         Mockito.verify(fileExporter, Mockito.times(0)).saveVoltageMonitoringResultInJsonZip(Mockito.isNull(), Mockito.anyString(), Mockito.any(OffsetDateTime.class), Mockito.any(ProcessType.class), Mockito.anyString());
     }
 

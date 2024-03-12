@@ -11,10 +11,13 @@ import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.dichotomy.DichotomyParallelization;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.utils.Threadable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -24,19 +27,30 @@ public class SweRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweRunner.class);
     private final DichotomyParallelization dichotomyParallelization;
     private final FilesService filesService;
+    private final Logger businessLogger;
 
-    public SweRunner(DichotomyParallelization dichotomyParallelization, FilesService filesService) {
+    public SweRunner(DichotomyParallelization dichotomyParallelization, FilesService filesService, Logger businessLogger) {
         this.dichotomyParallelization = dichotomyParallelization;
         this.filesService = filesService;
+        this.businessLogger = businessLogger;
     }
 
     @Threadable
     public SweResponse run(SweRequest sweRequest) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
-        SweData sweData = filesService.importFiles(sweRequest);
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData);
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(sweRequest.getTaskParameterList());
+        logSweParameters(sweRequest, sweTaskParameters);
+        SweData sweData = filesService.importFiles(sweRequest, sweTaskParameters);
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, sweTaskParameters);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return sweResponse;
     }
 
+    private void logSweParameters(SweRequest sweRequest, SweTaskParameters sweTaskParameters) {
+        if (sweRequest.getTaskParameterList().stream().anyMatch(p -> !Objects.equals(p.getValue(), p.getDefaultValue()))) {
+            businessLogger.warn("SWE task parameters: {}", sweTaskParameters.toJsonString());
+        } else {
+            businessLogger.info("SWE task parameters: {}", sweTaskParameters.toJsonString());
+        }
+    }
 }

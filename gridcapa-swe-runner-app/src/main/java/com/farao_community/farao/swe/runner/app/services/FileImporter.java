@@ -6,7 +6,17 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
+import com.powsybl.glsk.api.io.GlskDocumentImporters;
+import com.powsybl.glsk.cim.CimGlskDocument;
+import com.powsybl.glsk.commons.ZonalData;
+import com.powsybl.iidm.modification.scalable.Scalable;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.RaUsageLimits;
 import com.powsybl.openrao.data.craccreation.creator.api.CracCreators;
 import com.powsybl.openrao.data.craccreation.creator.api.parameters.CracCreationParameters;
 import com.powsybl.openrao.data.craccreation.creator.api.parameters.JsonCracCreationParameters;
@@ -16,14 +26,6 @@ import com.powsybl.openrao.data.craccreation.creator.cim.importer.CimCracImporte
 import com.powsybl.openrao.data.cracioapi.CracImporters;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.powsybl.openrao.data.raoresultjson.RaoResultImporter;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import com.farao_community.farao.swe.runner.api.resource.SweRequest;
-import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
-import com.powsybl.glsk.api.io.GlskDocumentImporters;
-import com.powsybl.glsk.cim.CimGlskDocument;
-import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.iidm.modification.scalable.Scalable;
-import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,12 +63,20 @@ public class FileImporter {
         }
     }
 
-    public CimCracCreationContext importCracFromCimCracAndNetwork(CimCrac cimCrac, OffsetDateTime processDateTime, Network network, String cracCreationParams) {
+    public CimCracCreationContext importCracFromCimCracAndNetwork(CimCrac cimCrac, OffsetDateTime processDateTime, Network network, String cracCreationParams, SweTaskParameters sweTaskParameters) {
+        CracCreationParameters cimCracCreationParameters = getCimCracCreationParameters(cracCreationParams);
+        RaUsageLimits raUsageLimits = cimCracCreationParameters.getRaUsageLimitsPerInstant().get("curative");
+        if (raUsageLimits == null) {
+            raUsageLimits = new RaUsageLimits();
+            cimCracCreationParameters.addRaUsageLimitsForInstant("curative", raUsageLimits);
+        }
+        raUsageLimits.setMaxRa(sweTaskParameters.getMaxCra());
+
         return importCrac(
                 cimCrac,
                 processDateTime,
                 network,
-                getCimCracCreationParameters(cracCreationParams));
+                cimCracCreationParameters);
     }
 
     public Crac importCracFromJson(String cracUrl) {

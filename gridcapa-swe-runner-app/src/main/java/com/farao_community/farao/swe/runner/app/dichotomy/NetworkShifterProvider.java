@@ -20,6 +20,7 @@ import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfigur
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -41,10 +42,10 @@ public class NetworkShifterProvider {
         this.processConfiguration = processConfiguration;
     }
 
-    public NetworkShifter get(SweData sweData, DichotomyDirection direction) {
+    public NetworkShifter get(SweData sweData, DichotomyDirection direction, LoadFlowParameters loadFlowParameters) {
         ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
         Network network = NetworkService.getNetworkByDirection(sweData, direction);
-        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network);
+        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, loadFlowParameters);
 
         return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                 zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
@@ -52,7 +53,8 @@ public class NetworkShifterProvider {
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
                 dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
                 initialNetPositions,
-                processConfiguration);
+                processConfiguration,
+                loadFlowParameters);
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {

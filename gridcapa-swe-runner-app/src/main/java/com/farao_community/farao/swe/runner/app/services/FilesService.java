@@ -6,15 +6,16 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -42,7 +43,7 @@ public class FilesService {
         this.fileExporter = fileExporter;
     }
 
-    public SweData importFiles(SweRequest sweRequest) {
+    public SweData importFiles(SweRequest sweRequest, SweTaskParameters sweTaskParameters) {
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
         networkService.addHvdcAndPstToNetwork(mergedNetwork);
@@ -54,8 +55,8 @@ public class FilesService {
         Network networkPtEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
         String cracCreationParamFrEs = sweRequest.getProcessType().equals(ProcessType.D2CC) ? CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON : CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_IDCC_JSON;
         String cracCreationParamEsPt = sweRequest.getProcessType().equals(ProcessType.D2CC) ? CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_D2CC_JSON : CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON;
-        CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsFr, cracCreationParamFrEs);
-        CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsPt, cracCreationParamEsPt);
+        CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsFr, cracCreationParamFrEs, sweTaskParameters);
+        CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsPt, cracCreationParamEsPt, sweTaskParameters);
         Crac cracFrEs = cracCreationContextFrEs.getCrac();
         Crac cracEsPt = cracCreationContextEsPt.getCrac();
         String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());

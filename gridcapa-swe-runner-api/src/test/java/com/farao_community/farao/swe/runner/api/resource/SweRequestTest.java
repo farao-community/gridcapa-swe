@@ -6,10 +6,12 @@
  */
 package com.farao_community.farao.swe.runner.api.resource;
 
+import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,6 +24,7 @@ class SweRequestTest {
     @Test
     void simpleRequestTest() {
         OffsetDateTime now = OffsetDateTime.now();
+        ArrayList<TaskParameterDto> taskParameterList = new ArrayList<>();
         SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, now,
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
@@ -36,7 +39,8 @@ class SweRequestTest {
                 new SweFileResource("CRAC.xml", "/network/SWE-CRAC_000.xml"),
                 new SweFileResource("BOUNDARY_EQ.xml", "/network/BOUNDARY_EQ.xml"),
                 new SweFileResource("BOUNDARY_TP.xml", "/network/BOUNDARY_TP.xml"),
-                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"));
+                new SweFileResource("GLSK.xml", "/glsk/glsk.xml"),
+                taskParameterList);
         assertNotNull(sweRequest);
         assertEquals("id", sweRequest.getId());
         assertEquals(ProcessType.D2CC, sweRequest.getProcessType());
@@ -46,6 +50,6 @@ class SweRequestTest {
         assertEquals("BOUNDARY_EQ.xml", sweRequest.getBoundaryEq().getFilename());
         assertEquals("BOUNDARY_TP.xml", sweRequest.getBoundaryTp().getFilename());
         assertEquals("GLSK.xml", sweRequest.getGlsk().getFilename());
+        assertEquals(taskParameterList, sweRequest.getTaskParameterList());
     }
-
 }

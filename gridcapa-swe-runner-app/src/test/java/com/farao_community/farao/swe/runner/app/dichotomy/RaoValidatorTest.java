@@ -20,12 +20,14 @@ import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManager;
+import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openrao.commons.PhysicalParameter;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.Instant;
 import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.monitoring.anglemonitoring.RaoResultWithAngleMonitoring;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -42,7 +44,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
-
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
@@ -79,8 +80,39 @@ class RaoValidatorTest {
     private static final Instant CURATIVE_INSTANT = Mockito.mock(Instant.class);
 
     @Test
-    void simpleTestPortugal() {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, businessLogger);
+    void simpleTestPortugalSecureWithAngleCheckParameterTrue() {
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, true, LoadFlowParameters.load(), businessLogger);
+        when(network.getVariantManager()).thenReturn(variantManager);
+        when(network.getNameOrId()).thenReturn("network-id");
+        when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
+        when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
+        when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
+        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
+        when(raoResult.isSecure()).thenReturn(true);
+        when(raoResult.isSecure(PhysicalParameter.ANGLE)).thenReturn(true);
+        when(raoResult.getComputationStatus()).thenReturn(ComputationStatus.DEFAULT);
+        when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(-1.0);
+        when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
+        when(sweData.getGlskUrl()).thenReturn("glsk-url");
+        when(cimCracCreationContext.getCrac()).thenReturn(crac);
+        when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+        try {
+            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
+            assertNotNull(result);
+            assertFalse(result.isFailed());
+            assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.SECURE, result.getValidationData().getAngleMonitoringStatus());
+        } catch (ValidationException e) {
+            fail("RaoValidator shouldn't throw exception here", e);
+        }
+    }
+
+    @Test
+    void simpleTestPortugalUnsecureWithAngleCheckParameterTrue() {
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, true, LoadFlowParameters.load(), businessLogger);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -107,36 +139,8 @@ class RaoValidatorTest {
     }
 
     @Test
-    void simpleTestPortugal2() {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.PT_ES, businessLogger);
-        when(network.getVariantManager()).thenReturn(variantManager);
-        when(network.getNameOrId()).thenReturn("network-id");
-        when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
-        when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
-        when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
-        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
-        when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
-        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
-        when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
-        when(raoResult.isSecure()).thenReturn(true);
-        when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
-        when(sweData.getGlskUrl()).thenReturn("glsk-url");
-        when(cimCracCreationContext.getCrac()).thenReturn(crac);
-        when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
-        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
-        try {
-            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
-            assertNotNull(result);
-            assertFalse(result.isFailed());
-            assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.FAILURE, result.getValidationData().getAngleMonitoringStatus());
-        } catch (ValidationException e) {
-            fail("RaoValidator shouldn't throw exception here", e);
-        }
-    }
-
-    @Test
     void simpleTestPortugal3() {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.PT_ES, businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.PT_ES, true, LoadFlowParameters.load(), businessLogger);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -165,9 +169,9 @@ class RaoValidatorTest {
     }
 
     @Test
-    void simpleTestFrance() {
+    void simpleTestFranceWithAngleCheckParameterTrue() {
 
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.FR_ES, businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.FR_ES, true, LoadFlowParameters.load(), businessLogger);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -187,6 +191,37 @@ class RaoValidatorTest {
             DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
             assertNotNull(result);
             assertFalse(result.isFailed());
+            assertFalse(result.getRaoResult() instanceof RaoResultWithAngleMonitoring);
+            assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.NONE, result.getValidationData().getAngleMonitoringStatus());
+        } catch (ValidationException e) {
+            fail("RaoValidator shouldn't throw exception here", e);
+        }
+    }
+
+    @Test
+    void simpleTestPortugalWithAngleCheckParameterFalse() {
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger);
+        when(network.getVariantManager()).thenReturn(variantManager);
+        when(network.getNameOrId()).thenReturn("network-id");
+        when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
+        when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
+        when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
+        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
+        when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(-1.0);
+        when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
+        when(sweData.getGlskUrl()).thenReturn("glsk-url");
+        when(cimCracCreationContext.getCrac()).thenReturn(crac);
+        when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+        try {
+            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
+            assertNotNull(result);
+            assertFalse(result.isFailed());
+            assertFalse(result.getRaoResult() instanceof RaoResultWithAngleMonitoring);
+            assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.NONE, result.getValidationData().getAngleMonitoringStatus());
         } catch (ValidationException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }

@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.api.resource;
 
+import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +14,7 @@ import com.github.jasminb.jsonapi.annotations.Id;
 import com.github.jasminb.jsonapi.annotations.Type;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -37,6 +39,7 @@ public class SweRequest {
     private final SweFileResource boundaryEq;
     private final SweFileResource boundaryTp;
     private final SweFileResource glsk;
+    private final List<TaskParameterDto> taskParameterList;
 
     @JsonCreator
     public SweRequest(@JsonProperty("id") String id,
@@ -55,7 +58,8 @@ public class SweRequest {
                       @JsonProperty("crac") SweFileResource crac,
                       @JsonProperty("boundaryEq") SweFileResource boundaryEq,
                       @JsonProperty("boundaryTp") SweFileResource boundaryTp,
-                      @JsonProperty("glsk") SweFileResource glsk) {
+                      @JsonProperty("glsk") SweFileResource glsk,
+                      @JsonProperty("taskParameterList") List<TaskParameterDto> taskParameterList) {
         this.id = id;
         this.processType = processType;
         this.targetProcessDateTime = targetProcessDateTime;
@@ -73,6 +77,7 @@ public class SweRequest {
         this.boundaryEq = boundaryEq;
         this.boundaryTp = boundaryTp;
         this.glsk = glsk;
+        this.taskParameterList = taskParameterList;
     }
 
     public String getId() {
@@ -141,5 +146,9 @@ public class SweRequest {
 
     public SweFileResource getGlsk() {
         return glsk;
+    }
+
+    public List<TaskParameterDto> getTaskParameterList() {
+        return taskParameterList;
     }
 }
