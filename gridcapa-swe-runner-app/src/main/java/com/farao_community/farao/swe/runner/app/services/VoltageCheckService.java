@@ -81,7 +81,7 @@ public class VoltageCheckService {
                 final Double minVoltage = result.getMinVoltage(voltageCnec);
                 if (Double.compare(lowerBound, minVoltage) > 0) {
                     voltageConstraints.add(String.format(Locale.ENGLISH,
-                            "Low Voltage constraint reached due to \"%s\" %.1f/%.1f kV",
+                            "Low Voltage constraint reached - biggest violation on node \"%s\" - Minimum voltage of %.1fkV for a limit of %.1fkV",
                             voltageCnec.getNetworkElement().getName(),
                             minVoltage,
                             lowerBound));
@@ -91,7 +91,7 @@ public class VoltageCheckService {
                 final Double maxVoltage = result.getMaxVoltage(voltageCnec);
                 if (Double.compare(maxVoltage, upperBound) > 0) {
                     voltageConstraints.add(String.format(Locale.ENGLISH,
-                            "High Voltage constraint reached due to \"%s\" %.1f/%.1f kV",
+                            "High voltage constraint reached - biggest violation on node \"%s\" - Maximum voltage of %.1fkV for a limit of %.1fkV",
                             voltageCnec.getNetworkElement().getName(),
                             maxVoltage,
                             upperBound));

@@ -159,8 +159,8 @@ class VoltageCheckServiceTest {
         final List<String> constraints = service.generateHighAndLowVoltageConstraints(result);
         //Then
         assertEquals(2, constraints.size());
-        assertEquals("Low Voltage constraint reached due to \"VL1\" 0.0/100.0 kV", constraints.get(0));
-        assertEquals("High Voltage constraint reached due to \"VL1\" 600.0/500.0 kV", constraints.get(1));
+        assertEquals("Low Voltage constraint reached - biggest violation on node \"VL1\" - Minimum voltage of 0.0kV for a limit of 100.0kV", constraints.get(0));
+        assertEquals("High voltage constraint reached - biggest violation on node \"VL1\" - Maximum voltage of 600.0kV for a limit of 500.0kV", constraints.get(1));
     }
 
     @Test
