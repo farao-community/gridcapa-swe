@@ -8,13 +8,14 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.GridcapaFileGroup;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.configurations.UnoptimizedCnecsPstConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
 import com.farao_community.farao.swe.runner.app.voltage.json.FailureVoltageCheckResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +27,7 @@ import com.powsybl.openrao.data.cracioapi.CracExporters;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
+import com.powsybl.openrao.raoapi.parameters.SecondPreventiveRaoParameters;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,8 +199,8 @@ public class FileExporter {
         }
     }
 
-    public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, DichotomyDirection direction) {
-        RaoParameters raoParameters = getSweRaoParameters(direction);
+    public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        RaoParameters raoParameters = getSweRaoParameters(sweTaskParameters, direction);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonRaoParameters.write(raoParameters, baos);
         String raoParametersFileName = String.format(RAO_PARAMETERS_FILE_NAME, direction);
@@ -208,11 +210,14 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    RaoParameters getSweRaoParameters(DichotomyDirection direction) {
+    RaoParameters getSweRaoParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
         RaoParameters raoParameters = RaoParameters.load();
         if ((direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) && unoptimizedCnecsPstConfiguration.isActive()) {
             // The cnec in series with pst concern only ES/FR border
             raoParameters.getNotOptimizedCnecsParameters().setDoNotOptimizeCnecsSecuredByTheirPst(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
+        }
+        if (sweTaskParameters.isSecondPreventiveRaoDisabled()) {
+            raoParameters.getSecondPreventiveRaoParameters().setExecutionCondition(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED);
         }
         return raoParameters;
     }

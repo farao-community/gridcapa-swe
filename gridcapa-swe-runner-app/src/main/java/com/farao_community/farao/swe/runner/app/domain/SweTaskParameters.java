@@ -41,6 +41,7 @@ public class SweTaskParameters {
     private static final String RUN_VOLTAGE_CHECK = "RUN_VOLTAGE_CHECK";
     private static final String MAX_CRA = "MAX_CRA";
     private static final String MAX_NEWTON_RAPHSON_ITERATIONS = "MAX_NEWTON_RAPHSON_ITERATIONS";
+    private static final String DISABLE_SECOND_PREVENTIVE_RAO = "DISABLE_SECOND_PREVENTIVE_RAO";
 
     private boolean runDirectionEsFr;
     private boolean runDirectionFrEs;
@@ -62,6 +63,7 @@ public class SweTaskParameters {
     private boolean runVoltageCheck;
     private int maxCra;
     private int maxNewtonRaphsonIterations;
+    private boolean secondPreventiveRaoDisabled;
 
     public SweTaskParameters(List<TaskParameterDto> parameters) {
         List<String> errors = new ArrayList<>();
@@ -87,6 +89,7 @@ public class SweTaskParameters {
                 case RUN_VOLTAGE_CHECK -> runVoltageCheck = validateIsBooleanAndGet(parameter, errors);
                 case MAX_CRA -> maxCra = validateIsPositiveIntegerAndGet(parameter, errors);
                 case MAX_NEWTON_RAPHSON_ITERATIONS -> maxNewtonRaphsonIterations = validateIsPositiveIntegerAndGet(parameter, errors);
+                case DISABLE_SECOND_PREVENTIVE_RAO -> secondPreventiveRaoDisabled = validateIsBooleanAndGet(parameter, errors);
                 default -> LOGGER.warn("Unknown parameter {} (value: {}) will be ignored", parameter.getId(), parameter.getValue());
             }
         }
@@ -233,6 +236,10 @@ public class SweTaskParameters {
         return maxNewtonRaphsonIterations;
     }
 
+    public boolean isSecondPreventiveRaoDisabled() {
+        return secondPreventiveRaoDisabled;
+    }
+
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
@@ -259,6 +266,7 @@ public class SweTaskParameters {
         appender.add(String.format(KEY_VALUE_FORMAT, RUN_VOLTAGE_CHECK, runVoltageCheck));
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_CRA, maxCra));
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_NEWTON_RAPHSON_ITERATIONS, maxNewtonRaphsonIterations));
+        appender.add(String.format(KEY_VALUE_FORMAT, DISABLE_SECOND_PREVENTIVE_RAO, secondPreventiveRaoDisabled));
 
         return String.format("{%s%n}", String.join(", ", appender));
     }

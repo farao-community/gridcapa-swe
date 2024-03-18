@@ -6,14 +6,17 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracimpl.CracImpl;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
+import com.powsybl.openrao.raoapi.parameters.SecondPreventiveRaoParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,6 +26,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -105,22 +109,27 @@ class FileExporterTest {
 
     @Test
     void saveRaoParametersTest() {
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of());
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("raoParametersUrl");
-        String raoParametersUrl = fileExporter.saveRaoParameters(OffsetDateTime.now(), ProcessType.D2CC, DichotomyDirection.ES_FR);
+        String raoParametersUrl = fileExporter.saveRaoParameters(OffsetDateTime.now(), ProcessType.D2CC, sweTaskParameters, DichotomyDirection.ES_FR);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadArtifactForTimestamp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
         assertEquals("raoParametersUrl", raoParametersUrl);
     }
 
     @Test
     void sweRaoParametersEsFrTest() {
-        RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_FR);
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false")));
+        RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters, DichotomyDirection.ES_FR);
         assertEquals(2, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
+        assertEquals(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED, raoParameters.getSecondPreventiveRaoParameters().getExecutionCondition());
     }
 
     @Test
     void sweRaoParametersEsPtTest() {
-        RaoParameters raoParameters = fileExporter.getSweRaoParameters(DichotomyDirection.ES_PT);
+        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false")));
+        RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters, DichotomyDirection.ES_PT);
         assertEquals(0, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
+        assertEquals(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED, raoParameters.getSecondPreventiveRaoParameters().getExecutionCondition());
     }
 
     @Test
