@@ -72,7 +72,6 @@ public class SweNetworkShifter implements NetworkShifter {
 
         businessLogger.info("Starting shift on network {}", network.getVariantManager().getWorkingVariantId());
         Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
-        ScalableGeneratorConnector scalableGeneratorConnector = new ScalableGeneratorConnector(zonalScalable);
         GeneratorLimitsHandler generatorLimitsHandler = new GeneratorLimitsHandler(zonalScalable);
 
         try {
@@ -85,7 +84,7 @@ public class SweNetworkShifter implements NetworkShifter {
             String initialVariantId = network.getVariantManager().getWorkingVariantId();
             String processedVariantId = initialVariantId + " PROCESSED COPY";
             String workingVariantCopyId = initialVariantId + " WORKING COPY";
-            preProcessNetwork(network, scalableGeneratorConnector, generatorLimitsHandler, initialVariantId, processedVariantId, workingVariantCopyId);
+            preProcessNetwork(network, generatorLimitsHandler, initialVariantId, processedVariantId, workingVariantCopyId);
             List<String> limitingCountries = new ArrayList<>();
             Map<String, Double> bordersExchanges;
 
@@ -95,7 +94,7 @@ public class SweNetworkShifter implements NetworkShifter {
             do {
                 // Step 1: Perform the scaling
                 LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
-                shiftIteration(network, scalingValuesByCountry, scalingParameters, limitingCountries, scalableGeneratorConnector);
+                shiftIteration(network, scalingValuesByCountry, scalingParameters, limitingCountries);
 
                 // Step 2: Compute exchanges mismatch
                 LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), loadFlowParameters);
@@ -151,7 +150,7 @@ public class SweNetworkShifter implements NetworkShifter {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
-    private void shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, List<String> limitingCountries, ScalableGeneratorConnector scalableGeneratorConnector) throws GlskLimitationException {
+    private void shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, List<String> limitingCountries) throws GlskLimitationException {
         for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
             String zoneId = entry.getKey();
             double asked = entry.getValue();
@@ -165,9 +164,6 @@ public class SweNetworkShifter implements NetworkShifter {
                 limitingCountries.add(zoneId);
             }
         }
-        // During the shift some generators linked to the main network with a transformers are not connected correctly
-        // Waiting for a fix in powsybl-core, we connect the transformers linked to these generators to be correctly connected to the main network component
-        scalableGeneratorConnector.connectGeneratorsTransformers(network, PRE_PROCESSING_COUNTRIES);
 
         if (!limitingCountries.isEmpty()) {
             StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
@@ -177,10 +173,9 @@ public class SweNetworkShifter implements NetworkShifter {
         }
     }
 
-    private void preProcessNetwork(Network network, ScalableGeneratorConnector scalableGeneratorConnector, GeneratorLimitsHandler generatorLimitsHandler, String initialVariantId, String processedVariantId, String workingVariantCopyId) throws ShiftingException {
+    private void preProcessNetwork(Network network, GeneratorLimitsHandler generatorLimitsHandler, String initialVariantId, String processedVariantId, String workingVariantCopyId) {
         network.getVariantManager().cloneVariant(initialVariantId, processedVariantId, true);
         network.getVariantManager().setWorkingVariant(processedVariantId);
-        scalableGeneratorConnector.fillGeneratorsInitialState(network, PRE_PROCESSING_COUNTRIES);
         // here set working variant generators pmin and pmax values to default values
         // so that glsk generator pmin and pmax values are used
         generatorLimitsHandler.setPminPmaxToDefaultValue(network, PRE_PROCESSING_COUNTRIES);
