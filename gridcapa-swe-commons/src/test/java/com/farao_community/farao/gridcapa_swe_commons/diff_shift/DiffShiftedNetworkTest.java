@@ -4,21 +4,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.gridcapa_swe_commons.shift;
+package com.farao_community.farao.gridcapa_swe_commons.diff_shift;
 
-import com.farao_community.farao.gridcapa_swe_commons.diff_shift.DiffShiftedGenerator;
-import com.farao_community.farao.gridcapa_swe_commons.diff_shift.ScalableInformation;
+import com.google.common.base.Suppliers;
+import com.powsybl.cgmes.conversion.CgmesImport;
+import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.api.GlskPoint;
 import com.powsybl.glsk.api.GlskRegisteredResource;
 import com.powsybl.glsk.cim.CimGlskDocumentImporter;
+import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,10 +43,11 @@ public class DiffShiftedNetworkTest {
 
     @BeforeAll
     static void setup() {
+        // This class gives an example of shift analysis that could be useful to understand what happens during the shift or to compare between shifted networks in two versions of gridcapa
         timestamp = OffsetDateTime.parse("2023-07-31T07:30:00Z");
-        // Network before shift
+        // Network before shift, the xiidm file in Minio/XIIDM directory
         networkFileName1 = "/shift/TestCase_with_transformers.xiidm";
-        // Network shifted
+        // Network shifted : we could use the shifted xiidm from the dichotomy step or use the output file in cgmes
         networkFileName2 = "/shift/TestCase_with_transformers_shift_es_fr_1000.xiidm";
 
         glskFileName = "/shift/TestCase_with_transformers_glsk.xml";
@@ -49,8 +55,8 @@ public class DiffShiftedNetworkTest {
 
     @Test
     void displayShiftDiffForSpainTest() {
-        Network network1 = Network.read(networkFileName1, getClass().getResourceAsStream(networkFileName1));
-        Network network2 = Network.read(networkFileName2, getClass().getResourceAsStream(networkFileName2));
+        Network network1 = readNetwork(networkFileName1);
+        Network network2 = readNetwork(networkFileName2);
 
         GlskDocument glskDocument = new CimGlskDocumentImporter().importGlsk(getClass().getResourceAsStream(glskFileName));
 
@@ -72,6 +78,21 @@ public class DiffShiftedNetworkTest {
         assertEquals(4, diffGeneratorsWithDifferentConnectionStatus.size());
         System.out.println("List of generators that was connected or disconnected during the shift for SPAIN :");
         displayDiffWithTwt(diffGeneratorsWithDifferentConnectionStatus);
+    }
+
+    private Network readNetwork(String networkFileName) {
+        if (networkFileName.endsWith(".xiidm")) {
+            return Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        } else if (networkFileName.endsWith(".zip")) {
+            return importFromZip(Objects.requireNonNull(getClass().getResource(networkFileName)).getPath());
+        }
+        return null;
+    }
+
+    private Network importFromZip(String zipPath) {
+        Properties importParams = new Properties();
+        importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
+        return Network.read(Paths.get(zipPath), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
     }
 
     private static void displayDiffWithTwt(List<DiffShiftedGenerator> diffShiftedGenerators) {

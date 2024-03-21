@@ -8,7 +8,6 @@ package com.farao_community.farao.gridcapa_swe_commons.diff_shift;
 
 import org.jgrapht.alg.util.Pair;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,16 +33,6 @@ public class GeneratorInformation {
         this.connected = connected;
         this.mainComponentConnected = mainComponentConnected;
         this.twoWindingsTransformerConnection = twoWindingsTransformersInfo;
-    }
-
-    public GeneratorInformation(String id, double pMin, double pMax, double targetP, boolean connected, boolean mainComponentConnected) {
-        this.id = id;
-        this.pMin = pMin;
-        this.pMax = pMax;
-        this.targetP = targetP;
-        this.connected = connected;
-        this.mainComponentConnected = mainComponentConnected;
-        this.twoWindingsTransformerConnection = new HashMap<>();
     }
 
     public String getId() {
@@ -76,19 +65,6 @@ public class GeneratorInformation {
 
     public Map<String, Pair<Boolean, Boolean>> getTwoWindingsTransformerConnection() {
         return twoWindingsTransformerConnection;
-    }
-
-    public boolean hasDifferentTwoWindingsTransformersConnection(GeneratorInformation otherGeneratorInformation) {
-        Map<String, Pair<Boolean, Boolean>> otherTwoWindingsTransformerConnection = otherGeneratorInformation.getTwoWindingsTransformerConnection();
-        for (Map.Entry<String, Pair<Boolean, Boolean>> entry : twoWindingsTransformerConnection.entrySet()) {
-            String k = entry.getKey();
-            Pair<Boolean, Boolean> v = entry.getValue();
-            Pair<Boolean, Boolean> otherStatus = otherTwoWindingsTransformerConnection.get(k);
-            if (v.getFirst() != otherStatus.getFirst() || v.getSecond() != otherStatus.getSecond()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public String displayWithoutTwt() {
