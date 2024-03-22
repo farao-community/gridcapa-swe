@@ -14,7 +14,8 @@ import java.util.Optional;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -25,7 +26,7 @@ class InterruptionServiceTest {
     @Autowired
     InterruptionService interruptionService;
 
-    private class MyThread extends Thread {
+    private static class MyThread extends Thread {
 
         public MyThread(String id) {
             super(id);
@@ -44,13 +45,13 @@ class InterruptionServiceTest {
     @Test
     void threadInterruption() {
         MyThread th = new MyThread("myThread");
-        assertEquals(false,  isRunning("myThread").isPresent());
+        assertFalse(isRunning("myThread").isPresent());
 
         th.start();
-        assertEquals(true,  isRunning("myThread").isPresent());
+        assertTrue(isRunning("myThread").isPresent());
 
         interruptionService.interruption("myThread");
-        assertEquals(false,  isRunning("myThread").isPresent());
+        assertFalse(isRunning("myThread").isPresent());
 
     }
 
