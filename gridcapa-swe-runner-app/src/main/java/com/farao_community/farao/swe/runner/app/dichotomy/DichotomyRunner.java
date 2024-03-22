@@ -20,6 +20,7 @@ import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
 import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
+import com.farao_community.farao.swe.runner.app.services.InterruptionService;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class DichotomyRunner {
     private final FileImporter fileImporter;
     private final NetworkShifterProvider networkShifterProvider;
     private final RaoRunnerClient raoRunnerClient;
+    private final InterruptionService interruptionService;
 
     private final Logger businessLogger;
 
@@ -45,12 +47,14 @@ public class DichotomyRunner {
                            FileImporter fileImporter,
                            NetworkShifterProvider networkShifterProvider,
                            RaoRunnerClient raoRunnerClient,
+                           InterruptionService interruptionService,
                            Logger businessLogger) {
         this.dichotomyLogging = dichotomyLogging;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.networkShifterProvider = networkShifterProvider;
         this.raoRunnerClient = raoRunnerClient;
+        this.interruptionService = interruptionService;
         this.businessLogger = businessLogger;
     }
 
@@ -67,8 +71,10 @@ public class DichotomyRunner {
         return new DichotomyEngine<>(
                 new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
                 HALF_INDEX_STRATEGY_CONFIGURATION,
+                interruptionService,
                 networkShifterProvider.get(sweData, direction, loadFlowParameters),
-                getNetworkValidator(sweData, direction, parameters.isRunAngleCheck(), loadFlowParameters));
+                getNetworkValidator(sweData, direction, parameters.isRunAngleCheck(), loadFlowParameters),
+                sweData.getId());
     }
 
     private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters) {

@@ -14,24 +14,24 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalExcep
 import com.farao_community.farao.swe.runner.api.JsonApiConverter;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
-import com.farao_community.farao.swe.runner.api.resource.ThreadLauncherResult;
-import com.farao_community.farao.swe.runner.app.utils.GenericThreadLauncher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
-import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
+ * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */
 @Service
 public class RequestService {
     private static final String TASK_STATUS_UPDATE = "task-status-update";
-    private static final String STOP_RAO_BINDING = "stop-rao";
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestService.class);
     private final SweRunner sweRunner;
     private final Logger businessLogger;
@@ -44,7 +44,14 @@ public class RequestService {
         this.streamBridge = streamBridge;
     }
 
-    public byte[] launchSweRequest(byte[] req) {
+    @Bean
+    public Function<Flux<byte[]>, Flux<byte[]>> request() {
+        return sweRequestFlux -> sweRequestFlux
+            .map(this::launchSweRequest)
+            .log();
+    }
+
+    protected byte[] launchSweRequest(byte[] req) {
         byte[] result;
         SweRequest sweRequest = jsonApiConverter.fromJsonMessage(req, SweRequest.class);
         // propagate in logs MDC the task id as an extra field to be able to match microservices logs with calculation tasks.
@@ -54,20 +61,9 @@ public class RequestService {
         try {
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweRequest.getId()), TaskStatus.RUNNING));
             LOGGER.info("Swe request received : {}", sweRequest);
-            GenericThreadLauncher<SweRunner, SweResponse> launcher = new GenericThreadLauncher<>(sweRunner, sweRequest.getId(), sweRequest);
-            launcher.start();
-            ThreadLauncherResult<SweResponse> sweResponse = launcher.getResult();
-            if (sweResponse.hasError() && sweResponse.getException() != null) {
-                throw sweResponse.getException();
-            }
-            Optional<SweResponse> resp = sweResponse.getResult();
-            if (resp.isPresent() && !sweResponse.hasError()) {
-                result = sendSweResponse(resp.get());
-                LOGGER.info("Swe response sent: {}", resp.get());
-            } else {
-                businessLogger.info("SWE run has been interrupted");
-                result = sendSweResponse(new SweResponse(sweRequestId, null));
-            }
+            SweResponse sweResponse = sweRunner.run(sweRequest);
+            result = sendSweResponse(sweResponse);
+            LOGGER.info("Swe response sent: {}", sweResponse);
         } catch (Exception e) {
             result = handleError(e, sweRequestId);
         }
@@ -75,8 +71,8 @@ public class RequestService {
     }
 
     private byte[] sendSweResponse(SweResponse sweResponse) {
-        if (sweResponse.getTtcDocUrl() == null) {
-            streamBridge.send(STOP_RAO_BINDING, sweResponse.getId());
+        if (sweResponse.isInterrupted()) {
+            businessLogger.info("SWE run has been interrupted");
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.INTERRUPTED));
         } else {
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.SUCCESS));
@@ -99,5 +95,4 @@ public class RequestService {
     private byte[] exceptionToJsonMessage(AbstractSweException e) {
         return jsonApiConverter.toJsonMessage(e);
     }
-
 }

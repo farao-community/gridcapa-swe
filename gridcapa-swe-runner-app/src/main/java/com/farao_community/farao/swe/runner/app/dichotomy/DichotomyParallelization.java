@@ -24,12 +24,12 @@ import java.util.concurrent.Future;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
+ * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */
 @Service
 public class DichotomyParallelization {
     private final DichotomyLogging dichotomyLogging;
     private final OutputService outputService;
-
     private final DichotomyParallelizationWorker worker;
 
     public DichotomyParallelization(DichotomyLogging dichotomyLogging, OutputService outputService, DichotomyParallelizationWorker worker) {
@@ -43,7 +43,10 @@ public class DichotomyParallelization {
         ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters);
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
-        return new SweResponse(sweData.getId(), ttcDocUrl);
+        boolean interrupted = executionResult.getResult().stream()
+            .map(SweDichotomyResult::isInterrupted)
+            .reduce(false, Boolean::logicalOr);
+        return new SweResponse(sweData.getId(), ttcDocUrl, interrupted);
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData, SweTaskParameters sweTaskParameters) {

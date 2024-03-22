@@ -23,6 +23,7 @@ public class SweDichotomyResult {
     private final String exportedCgmesUrl;
     private final String highestValidStepUrl;
     private final String lowestInvalidStepUrl;
+    private boolean interrupted;
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<SweDichotomyValidationData> dichotomyResult,
@@ -36,6 +37,7 @@ public class SweDichotomyResult {
         this.exportedCgmesUrl = exportedCgmesUrl;
         this.highestValidStepUrl = highestValidStepUrl;
         this.lowestInvalidStepUrl = lowestInvalidStepUrl;
+        this.interrupted = dichotomyResult.isInterrupted();
     }
 
     public DichotomyDirection getDichotomyDirection() {
@@ -60,5 +62,9 @@ public class SweDichotomyResult {
 
     public String getLowestInvalidStepUrl() {
         return lowestInvalidStepUrl;
+    }
+
+    public boolean isInterrupted() {
+        return interrupted;
     }
 }
