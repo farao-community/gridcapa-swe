@@ -14,6 +14,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
+import com.farao_community.farao.swe.runner.app.services.InterruptionService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +32,14 @@ public class DichotomyParallelization {
     private final DichotomyLogging dichotomyLogging;
     private final OutputService outputService;
     private final DichotomyParallelizationWorker worker;
+    private final InterruptionService interruptionService;
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, OutputService outputService, DichotomyParallelizationWorker worker) {
+    public DichotomyParallelization(DichotomyLogging dichotomyLogging, OutputService outputService, DichotomyParallelizationWorker worker, InterruptionService interruptionService) {
 
         this.dichotomyLogging = dichotomyLogging;
         this.outputService = outputService;
         this.worker = worker;
+        this.interruptionService = interruptionService;
     }
 
     public SweResponse launchDichotomy(SweData sweData, SweTaskParameters sweTaskParameters) {
@@ -46,6 +49,7 @@ public class DichotomyParallelization {
         boolean interrupted = executionResult.getResult().stream()
             .map(SweDichotomyResult::isInterrupted)
             .reduce(false, Boolean::logicalOr);
+        interruptionService.removeTaskToBeInterrupted(sweData.getId());
         return new SweResponse(sweData.getId(), ttcDocUrl, interrupted);
     }
 

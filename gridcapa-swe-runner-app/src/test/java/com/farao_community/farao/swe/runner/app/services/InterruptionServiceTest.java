@@ -36,13 +36,9 @@ class InterruptionServiceTest {
 
         interruptionService.softInterrupt().accept(taskId);
 
-        Mockito.verify(streamBridge, Mockito.times(4)).send("stop-rao", taskId);
+        Mockito.verify(streamBridge, Mockito.times(1)).send("stop-rao", taskId);
 
-        assertTrue(interruptionService.shouldTaskBeInterruptedSoftly(taskId)); // FR-ES
-        assertTrue(interruptionService.shouldTaskBeInterruptedSoftly(taskId)); // ES-FR
-        assertTrue(interruptionService.shouldTaskBeInterruptedSoftly(taskId)); // ES-PT
-        assertTrue(interruptionService.shouldTaskBeInterruptedSoftly(taskId)); // PT-ES
+        assertTrue(interruptionService.shouldTaskBeInterruptedSoftly(taskId));
 
-        assertFalse(interruptionService.shouldTaskBeInterruptedSoftly(taskId));
     }
 }
