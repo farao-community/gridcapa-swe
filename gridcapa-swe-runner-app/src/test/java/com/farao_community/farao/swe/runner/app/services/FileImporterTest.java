@@ -100,7 +100,7 @@ class FileImporterTest {
         assertEquals(2, raUsageLimits.getMaxTso());
         assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
         assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
-        assertEquals(5, raUsageLimits.getMaxRaPerTso().get("RTE"));
+        assertEquals(3, raUsageLimits.getMaxRaPerTso().get("RTE"));
     }
 
     @Test

@@ -6,7 +6,7 @@
       "max-ra": 10,
       "max-tso": 2,
       "max-ra-per-tso": {
-        "RTE": 5
+        "RTE": 3
       }
     }],
   "extensions": {
