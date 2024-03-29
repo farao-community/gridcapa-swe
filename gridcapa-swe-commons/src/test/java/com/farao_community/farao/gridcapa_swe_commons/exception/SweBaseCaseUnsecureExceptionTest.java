@@ -21,7 +21,6 @@ class SweBaseCaseUnsecureExceptionTest {
         assertEquals("Base case exception message", sweException.getMessage());
         assertEquals(500, sweException.getStatus());
         assertNotNull(sweException.getCode());
-
         Exception cause = new RuntimeException("Cause");
         AbstractSweException exception = new SweBaseCaseUnsecureException("Base case exception message", cause);
         assertEquals("Base case exception message", exception.getMessage());
