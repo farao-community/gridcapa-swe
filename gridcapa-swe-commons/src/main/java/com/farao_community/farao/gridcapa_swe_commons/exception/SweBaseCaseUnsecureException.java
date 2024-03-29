@@ -6,8 +6,9 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.exception;
 
+
 /**
- * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
+ * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public class SweBaseCaseUnsecureException extends AbstractSweException {
     private static final int STATUS = 500;
