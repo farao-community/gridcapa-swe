@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.powsybl.balances_adjustment.util.CountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.computation.local.LocalComputationManager;
@@ -60,7 +60,7 @@ public final class CountryBalanceComputation {
         LoadFlowResult result = LoadFlow.run(network, workingStateId, LocalComputationManager.getDefault(), loadFlowParameters);
         if (!result.isOk()) {
             LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
-            throw new SweInternalException(String.format("Loadflow computation diverged on network %s", network.getId()));
+            throw new SweBaseCaseUnsecureException(String.format("Loadflow computation diverged on network %s", network.getId()));
         }
     }
 
