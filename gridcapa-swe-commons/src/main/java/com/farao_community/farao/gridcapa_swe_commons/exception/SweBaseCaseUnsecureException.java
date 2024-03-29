@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.exception;
 
-
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
