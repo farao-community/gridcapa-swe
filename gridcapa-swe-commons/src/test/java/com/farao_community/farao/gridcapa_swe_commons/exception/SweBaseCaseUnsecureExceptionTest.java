@@ -27,5 +27,4 @@ class SweBaseCaseUnsecureExceptionTest {
         assertEquals("Base case exception message", exception.getMessage());
         assertEquals(cause, exception.getCause());
     }
-
 }
