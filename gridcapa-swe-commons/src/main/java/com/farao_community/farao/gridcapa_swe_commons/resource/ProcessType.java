@@ -12,7 +12,8 @@ package com.farao_community.farao.gridcapa_swe_commons.resource;
 public enum ProcessType {
     D2CC("2D"),
     IDCC("ID"),
-    IDCC_IDCF("IDCF");
+    IDCC_IDCF("IDCF"),
+    BTCC("BTCC");
 
     private final String code;
 
