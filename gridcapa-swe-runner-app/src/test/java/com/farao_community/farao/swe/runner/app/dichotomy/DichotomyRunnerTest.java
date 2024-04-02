@@ -67,7 +67,7 @@ class DichotomyRunnerTest {
     @Test
     void testBuildDichotomyEngine() {
         when(networkShifterProvider.get(any(SweData.class), any(DichotomyDirection.class), any(LoadFlowParameters.class))).thenReturn(networkShifter);
-        when(fileExporter.saveRaoParameters(eq(OffsetDateTime.now()), eq(ProcessType.D2CC), eq(DichotomyDirection.ES_FR)))
+        when(fileExporter.saveRaoParameters(eq(OffsetDateTime.now()), eq(ProcessType.D2CC), any(SweTaskParameters.class), eq(DichotomyDirection.ES_FR)))
             .thenReturn("raoParameters.json");
         DichotomyEngine<SweDichotomyValidationData> engine = dichotomyRunner.buildDichotomyEngine(sweData, DichotomyDirection.ES_FR, dichotomyParameters, loadFlowParameters);
         assertNotNull(engine);
