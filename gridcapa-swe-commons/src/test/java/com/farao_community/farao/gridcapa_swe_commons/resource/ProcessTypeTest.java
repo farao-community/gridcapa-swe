@@ -14,5 +14,7 @@ class ProcessTypeTest {
         assertEquals("2D", ProcessType.D2CC.getCode(), "D2CC should return '2D'");
         assertEquals("ID", ProcessType.IDCC.getCode(), "IDCC should return 'ID'");
         assertEquals("IDCF", ProcessType.IDCC_IDCF.getCode(), "IDCC_IDCF should return 'IDCF'");
+        assertEquals("BTCC", ProcessType.BTCC.getCode(), "BTCC should return 'BTCC'");
+
     }
 }

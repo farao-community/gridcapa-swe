@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
-    <version>1.16.2-SNAPSHOT</version>
+    <version>1.17.2-SNAPSHOT</version>
     <name>GridCapa SWE</name>
     <description>A full suite to perform capacity calculations on SWE zone</description>
     <packaging>pom</packaging>
@@ -58,11 +58,11 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <farao.dependencies.version>1.27.0-SNAPSHOT</farao.dependencies.version>
-        <farao.dichotomy.version>4.15.0-SNAPSHOT</farao.dichotomy.version>
-        <gridcapa.starter.minio.version>1.1.2-SNAPSHOT</gridcapa.starter.minio.version>
-        <gridcapa.rao.runner.version>1.21.0-SNAPSHOT</gridcapa.rao.runner.version>
-        <gridcapa.task-manager.version>1.26.1-SNAPSHOT</gridcapa.task-manager.version>
+        <farao.dependencies.version>1.28.0</farao.dependencies.version>
+        <farao.dichotomy.version>4.16.0</farao.dichotomy.version>
+        <gridcapa.starter.minio.version>1.1.2</gridcapa.starter.minio.version>
+        <gridcapa.rao.runner.version>1.22.0</gridcapa.rao.runner.version>
+        <gridcapa.task-manager.version>1.26.1</gridcapa.task-manager.version>
         <jackson.datatype.version>2.17.0</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
         <logstash.version>7.0.1</logstash.version>

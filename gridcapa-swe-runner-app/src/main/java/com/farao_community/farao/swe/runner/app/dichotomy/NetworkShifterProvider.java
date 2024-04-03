@@ -10,6 +10,7 @@ import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation;
 import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
@@ -45,22 +46,28 @@ public class NetworkShifterProvider {
     public NetworkShifter get(SweData sweData, DichotomyDirection direction, LoadFlowParameters loadFlowParameters) {
         ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
         Network network = NetworkService.getNetworkByDirection(sweData, direction);
-        Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, loadFlowParameters);
+        try {
+            Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, loadFlowParameters);
 
-        return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
-                zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
-                getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-                dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-                dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
-                initialNetPositions,
-                processConfiguration,
-                loadFlowParameters);
+            businessLogger.info("Base case loadflow is secure");
+            return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
+                    zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
+                    getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
+                    dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
+                    dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
+                    initialNetPositions,
+                    processConfiguration,
+                    loadFlowParameters);
+        } catch (SweBaseCaseUnsecureException baseCaseUnsecureException) {
+            businessLogger.error("Base case loadflow is unsecure, the calculation is stopped");
+            throw baseCaseUnsecureException;
+        }
     }
 
     ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
         return switch (processType) {
             case D2CC -> new SweD2ccShiftDispatcher(direction, initialNetPositions);
-            case IDCC, IDCC_IDCF -> new SweIdccShiftDispatcher(direction, initialNetPositions);
+            case IDCC, IDCC_IDCF, BTCC -> new SweIdccShiftDispatcher(direction, initialNetPositions);
         };
     }
 }
