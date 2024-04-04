@@ -115,6 +115,11 @@
                 <version>${logstash.version}</version>
                 <scope>runtime</scope>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <scope>runtime</scope>
+            </dependency>
             <!-- Test dependencies -->
             <dependency>
                 <groupId>org.awaitility</groupId>
