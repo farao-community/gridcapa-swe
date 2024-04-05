@@ -89,7 +89,7 @@ public class SweNetworkShifter implements NetworkShifter {
             Map<String, Double> bordersExchanges;
 
             int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
-            ScalingParameters scalingParameters = getScalingParameters();
+            ScalingParameters scalingParameters = SweGeneratorsShiftHelper.getScalingParameters();
 
             do {
                 // Step 1: Perform the scaling
@@ -171,16 +171,6 @@ public class SweNetworkShifter implements NetworkShifter {
             LOGGER.error("[{}] : {}", direction, sj);
             throw new GlskLimitationException(sj.toString());
         }
-    }
-
-    private static ScalingParameters getScalingParameters() {
-        ScalingParameters scalingParameters = new ScalingParameters();
-        // RESPECT_OF_VOLUME_ASKED: this parameter allows to do an iterative shift for proportional Glsk until achieving the asked value
-        // if in the first iteration some generators was limited by maximum value, the missing power will be distributed to others generators in the next iteration
-        scalingParameters.setPriority(ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED);
-        // allow scaling to reconnect generators that are initially disconnected
-        scalingParameters.setReconnect(true);
-        return scalingParameters;
     }
 
     public void updateScalingValuesWithMismatch(Map<String, Double> scalingValuesByCountry, double mismatchEsPt, double mismatchEsFr) {

@@ -3,6 +3,7 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
+import com.powsybl.iidm.modification.scalable.ScalingParameters;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 
@@ -39,6 +40,16 @@ public class SweGeneratorsShiftHelper {
     public void resetInitialPminPmax(Network network) {
         // here set working variant generators pmin and pmax values to initial values
         generatorLimitsHandler.resetInitialPminPmax(network);
+    }
+
+    public static ScalingParameters getScalingParameters() {
+        ScalingParameters scalingParameters = new ScalingParameters();
+        // RESPECT_OF_VOLUME_ASKED: this parameter allows to do an iterative shift for proportional Glsk until achieving the asked value
+        // if in the first iteration some generators was limited by maximum value, the missing power will be distributed to others generators in the next iteration
+        scalingParameters.setPriority(ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED);
+        // allow scaling to reconnect generators that are initially disconnected
+        scalingParameters.setReconnect(true);
+        return scalingParameters;
     }
 }
 
