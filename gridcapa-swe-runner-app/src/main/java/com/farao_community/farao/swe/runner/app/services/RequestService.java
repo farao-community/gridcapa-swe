@@ -72,7 +72,7 @@ public class RequestService {
 
     private byte[] sendSweResponse(SweResponse sweResponse) {
         if (sweResponse.isInterrupted()) {
-            businessLogger.info("SWE run has been interrupted");
+            businessLogger.warn("SWE run has been interrupted");
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.INTERRUPTED));
         } else {
             streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.SUCCESS));
