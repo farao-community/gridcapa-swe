@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+import com.farao_community.farao.dichotomy.api.exceptions.RaoInterruptionException;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
@@ -40,6 +41,7 @@ import java.time.OffsetDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -105,7 +107,7 @@ class RaoValidatorTest {
             assertNotNull(result);
             assertFalse(result.isFailed());
             assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.SECURE, result.getValidationData().getAngleMonitoringStatus());
-        } catch (ValidationException e) {
+        } catch (ValidationException | RaoInterruptionException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }
     }
@@ -133,7 +135,7 @@ class RaoValidatorTest {
             assertNotNull(result);
             assertFalse(result.isFailed());
             assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.NONE, result.getValidationData().getAngleMonitoringStatus());
-        } catch (ValidationException e) {
+        } catch (ValidationException | RaoInterruptionException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }
     }
@@ -163,7 +165,7 @@ class RaoValidatorTest {
             assertNotNull(result);
             assertFalse(result.isFailed());
             assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.SECURE, result.getValidationData().getAngleMonitoringStatus());
-        } catch (ValidationException e) {
+        } catch (ValidationException | RaoInterruptionException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }
     }
@@ -193,7 +195,7 @@ class RaoValidatorTest {
             assertFalse(result.isFailed());
             assertFalse(result.getRaoResult() instanceof RaoResultWithAngleMonitoring);
             assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.NONE, result.getValidationData().getAngleMonitoringStatus());
-        } catch (ValidationException e) {
+        } catch (ValidationException | RaoInterruptionException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }
     }
@@ -222,8 +224,36 @@ class RaoValidatorTest {
             assertFalse(result.isFailed());
             assertFalse(result.getRaoResult() instanceof RaoResultWithAngleMonitoring);
             assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.NONE, result.getValidationData().getAngleMonitoringStatus());
-        } catch (ValidationException e) {
+        } catch (ValidationException | RaoInterruptionException e) {
             fail("RaoValidator shouldn't throw exception here", e);
         }
+    }
+
+    @Test
+    void simpleTestSoftInterruption() {
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger);
+        when(network.getVariantManager()).thenReturn(variantManager);
+        when(network.getNameOrId()).thenReturn("network-id");
+        when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
+        when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
+        when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
+        when(raoResponse.isInterrupted()).thenReturn(true);
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+
+        assertThrows(RaoInterruptionException.class, () -> raoValidator.validateNetwork(network, null));
+    }
+
+    @Test
+    void simpleTestRunRaoThrowsException() {
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger);
+        when(network.getVariantManager()).thenReturn(variantManager);
+        when(network.getNameOrId()).thenReturn("network-id");
+        when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
+        when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
+        when(raoRunnerClient.runRao(any(RaoRequest.class))).thenThrow(new RuntimeException());
+        when(raoResponse.isInterrupted()).thenReturn(true);
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+
+        assertThrows(ValidationException.class, () -> raoValidator.validateNetwork(network, null));
     }
 }
