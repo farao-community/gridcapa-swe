@@ -58,8 +58,7 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <!--        TODO delete SNAPSHOT once released-->
-        <farao.dependencies.version>1.29.0-SNAPSHOT</farao.dependencies.version>
+        <farao.dependencies.version>1.29.0</farao.dependencies.version>
         <!--        TODO delete SNAPSHOT once released-->
         <farao.dichotomy.version>4.17.0-SNAPSHOT</farao.dichotomy.version>
         <gridcapa.starter.minio.version>1.1.2</gridcapa.starter.minio.version>
