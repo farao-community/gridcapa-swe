@@ -105,7 +105,7 @@ class FileImporterTest {
 
     @Test
     void testImportCracFromJson() {
-        Crac cracFromJson = fileImporter.importCracFromJson(Objects.requireNonNull(getClass().getResource(testDirectory + jsonCracFilename)).toString());
+        Crac cracFromJson = fileImporter.importCracFromJson(Objects.requireNonNull(getClass().getResource(testDirectory + jsonCracFilename)).toString(), network);
         assertNotNull(cracFromJson);
     }
 

@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage;
 
+import com.powsybl.contingency.Contingency;
 import com.powsybl.openrao.commons.Unit;
-import com.powsybl.openrao.data.cracapi.Contingency;
 import com.powsybl.openrao.data.cracapi.Instant;
 import com.powsybl.openrao.data.cracapi.InstantKind;
 import com.powsybl.openrao.data.cracapi.NetworkElement;

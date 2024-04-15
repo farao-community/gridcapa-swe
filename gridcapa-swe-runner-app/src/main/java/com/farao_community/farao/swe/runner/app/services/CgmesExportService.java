@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright (c) 2023, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -24,11 +25,11 @@ import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
 import com.powsybl.cgmes.extensions.CgmesControlArea;
 import com.powsybl.cgmes.extensions.CgmesControlAreas;
-import com.powsybl.cgmes.extensions.CgmesSshMetadata;
-import com.powsybl.cgmes.extensions.CgmesSvMetadata;
+import com.powsybl.cgmes.extensions.CgmesMetadataModels;
+import com.powsybl.cgmes.model.CgmesMetadataModel;
+import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.commons.datasource.MemDataSource;
-import com.powsybl.commons.reporter.Report;
-import com.powsybl.commons.reporter.ReporterModel;
+import com.powsybl.commons.report.ReportNode;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ExportersServiceLoader;
@@ -51,6 +52,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -175,13 +177,17 @@ public class CgmesExportService {
             updateControlAreasExtension(network);
             MemDataSource memDataSource = new MemDataSource();
             updateModelAuthorityParameter(tso);
-            ReporterModel reporterSsh = new ReporterModel("CgmesId", tso);
+            ReportNode reporterSsh = ReportNode
+                    .newRootReportNode()
+                    .withMessageTemplate("CgmesId", tso)
+                    .build();
             network.write(new ExportersServiceLoader(), "CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporterSsh);
             addCgmesIdToMap(tso, reporterSsh);
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
-            CgmesSshMetadata cgmesSshMetadata = network.getExtension(CgmesSshMetadata.class);
-            String sshVersionInFileName = cgmesSshMetadata != null ? getFormattedVersionString(cgmesSshMetadata.getSshVersion()) : DEFAULT_VERSION;
+            CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
+            String sshVersionInFileName = modelsExtension != null ?
+                    getFormattedVersionString(modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).orElseThrow().getVersion()) : DEFAULT_VERSION;
             String newFileName = buildCgmesFilename(sweData, tso, "SSH", sshVersionInFileName);
             return Map.of(newFileName, baos);
         }
@@ -191,7 +197,7 @@ public class CgmesExportService {
         return String.format("%03d", version + 1);
     }
 
-    private void addCgmesIdToMap(String tso, ReporterModel reporterSsh) {
+    private void addCgmesIdToMap(String tso, ReportNode reporterSsh) {
         Optional<CgmesFileType> optionalCgmesFileType = buildFileTypeForMap("SSH", tso);
         optionalCgmesFileType.ifPresent(cgmesFileType -> mapCgmesIds.put(cgmesFileType, getCgmesIdFromReporter(reporterSsh)));
     }
@@ -208,10 +214,10 @@ public class CgmesExportService {
         }
     }
 
-    private String getCgmesIdFromReporter(ReporterModel reporterSsh) {
-        for (Report report : reporterSsh.getReports()) {
-            if (report.getReportKey().equals("CgmesId")) {
-                return report.getDefaultMessage();
+    private String getCgmesIdFromReporter(ReportNode reporterSsh) {
+        for (ReportNode report : reporterSsh.getChildren()) {
+            if ("CgmesId".equals(report.getMessageKey())) {
+                return report.getMessageTemplate();
             }
         }
         return "no id";
@@ -278,11 +284,17 @@ public class CgmesExportService {
 
     private void buildSvDependencies(Network network) {
         Network subnetwork = (Network) network.getSubnetworks().toArray()[0];
-        CgmesSvMetadata cgmesSvMetadata = subnetwork.getExtension(CgmesSvMetadata.class);
-        List<String> initialSvDependantOn = copyListDependencies(cgmesSvMetadata);
-        removeInitialSshFromInitialDependencies(network, initialSvDependantOn);
-        for (String dependency : initialSvDependantOn) {
-            network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "TP_ID", network::hasProperty), dependency);
+        CgmesMetadataModels modelsExtension = subnetwork.getExtension(CgmesMetadataModels.class);
+        if (modelsExtension != null) {
+            modelsExtension.getModelForSubset(CgmesSubset.STATE_VARIABLES).ifPresent(
+                    svModel -> {
+                        List<String> initialSvDependantOn = copyListDependencies(svModel);
+                        removeInitialSshFromInitialDependencies(network, initialSvDependantOn);
+                        for (String dependency : initialSvDependantOn) {
+                            network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "TP_ID", network::hasProperty), dependency);
+                        }
+                    }
+            );
         }
         network.setProperty(Identifiables.getUniqueId(CGMES_PREFIX_ALIAS_PROPERTIES + "SSH_ID", network::hasProperty),
                 mapCgmesIds.getOrDefault(CgmesFileType.REN_SSH, ""));
@@ -293,18 +305,21 @@ public class CgmesExportService {
     }
 
     private static void removeInitialSshFromInitialDependencies(Network network, List<String> initialSvDependantOn) {
-        for (Network sub : network.getSubnetworks()) {
-            if (sub.getExtension(CgmesSshMetadata.class) != null) {
-                CgmesSshMetadata cgmesSshMetadata = sub.getExtension(CgmesSshMetadata.class);
-                initialSvDependantOn.remove(cgmesSshMetadata.getId());
-            }
-        }
+        network.getSubnetworks()
+                .stream()
+                .map(subNetwork -> subNetwork.getExtension(CgmesMetadataModels.class))
+                .filter(Objects::nonNull)
+                .map(modelsExtension -> ((CgmesMetadataModels) modelsExtension).getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(CgmesMetadataModel::getId)
+                .forEach(initialSvDependantOn::remove);
     }
 
     @NotNull
-    private static List<String> copyListDependencies(CgmesSvMetadata cgmesSvMetadata) {
-        if (cgmesSvMetadata != null && cgmesSvMetadata.getDependencies() != null) {
-            return new ArrayList<>(cgmesSvMetadata.getDependencies());
+    private static List<String> copyListDependencies(CgmesMetadataModel svModel) {
+        if (svModel != null) {
+            return new ArrayList<>(svModel.getDependentOn());
         }
         return new ArrayList<>();
     }
