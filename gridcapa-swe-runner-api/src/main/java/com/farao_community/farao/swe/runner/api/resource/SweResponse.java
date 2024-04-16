@@ -19,12 +19,15 @@ public class SweResponse {
     @Id
     private final String id;
     private final String ttcDocUrl;
+    private final boolean interrupted;
 
     @JsonCreator
     public SweResponse(@JsonProperty("id") String id,
-                       @JsonProperty("ttcDocUrl") String ttcDocUrl) {
+                       @JsonProperty("ttcDocUrl") String ttcDocUrl,
+                       @JsonProperty("interrupted") boolean interrupted) {
         this.id = id;
         this.ttcDocUrl = ttcDocUrl;
+        this.interrupted = interrupted;
     }
 
     public String getId() {
@@ -33,5 +36,9 @@ public class SweResponse {
 
     public String getTtcDocUrl() {
         return ttcDocUrl;
+    }
+
+    public boolean isInterrupted() {
+        return interrupted;
     }
 }

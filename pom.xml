@@ -108,7 +108,8 @@
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
             </dependency>
-<!--             Runtime dependencies-->
+
+            <!-- Runtime dependencies -->
             <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
@@ -120,6 +121,7 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <scope>runtime</scope>
             </dependency>
+
             <!-- Test dependencies -->
             <dependency>
                 <groupId>org.awaitility</groupId>
