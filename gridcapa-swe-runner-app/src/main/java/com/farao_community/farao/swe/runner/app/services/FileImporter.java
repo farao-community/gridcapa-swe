@@ -79,10 +79,10 @@ public class FileImporter {
                 cimCracCreationParameters);
     }
 
-    public Crac importCracFromJson(String cracUrl) {
+    public Crac importCracFromJson(String cracUrl, Network network) {
         LOGGER.info("Importing Crac from json file url");
         try (InputStream cracResultStream = urlValidationService.openUrlStream(cracUrl)) {
-            return CracImporters.importCrac(FilenameUtils.getName(new URL(cracUrl).getPath()), cracResultStream);
+            return CracImporters.importCrac(FilenameUtils.getName(new URL(cracUrl).getPath()), cracResultStream, network);
         } catch (IOException e) {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl), e);
         }

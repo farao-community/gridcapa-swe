@@ -11,13 +11,14 @@ import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.powsybl.cgmes.extensions.CgmesMetadataModelsAdder;
+import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -74,7 +75,25 @@ class CgmesExportServiceTest {
     void exportCgmesFilesTest() throws IOException {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        String  emptyXmlFile = "/export_cgmes/emptyXmlFile.xml";
+        network.getSubnetwork("urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103") //subnetwork of REE
+                .newExtension(CgmesMetadataModelsAdder.class)
+                .newModel()
+                .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
+                .setId("sshId")
+                .setVersion(5)
+                .addProfile("fakeProfile")
+                .setModelingAuthoritySet("fakeAuthority")
+                .add()
+                .newModel()
+                .setSubset(CgmesSubset.STATE_VARIABLES)
+                .setId("sshId")
+                .setVersion(5)
+                .addDependentOn("FAKE.TP_ID")
+                .addProfile("fakeProfile")
+                .setModelingAuthoritySet("fakeAuthority")
+                .add()
+                .add();
+        String emptyXmlFile = "/export_cgmes/emptyXmlFile.xml";
         Map<CgmesFileType, SweFileResource> cgmesInputFiles = new EnumMap<>(CgmesFileType.class);
         SweFileResource sweFileResource = new SweFileResource("test.xml", getClass().getResource(emptyXmlFile).toExternalForm());
         cgmesInputFiles.put(CgmesFileType.REE_EQ, sweFileResource);
@@ -96,12 +115,23 @@ class CgmesExportServiceTest {
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_EQ_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
+        assertEquals("FAKE.TP_ID", network.getProperty("CGMES.TP_ID"));
     }
 
     @Test
-    void exportCgmesSshTest() throws IOException, XMLStreamException {
+    void exportCgmesSshTest() throws IOException {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        network.getSubnetwork("urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103") //subnetwork of REE
+                .newExtension(CgmesMetadataModelsAdder.class)
+                .newModel()
+                .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
+                .setId("sshId")
+                .setVersion(5)
+                .addProfile("fakeProfile")
+                .setModelingAuthoritySet("fakeAuthority")
+                .add()
+                .add();
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData);
         assertEquals(3, sshFiles.size());

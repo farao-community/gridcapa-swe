@@ -91,7 +91,7 @@ class RaoValidatorTest {
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
         when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
-        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
         when(raoResult.isSecure()).thenReturn(true);
         when(raoResult.isSecure(PhysicalParameter.ANGLE)).thenReturn(true);
@@ -122,7 +122,7 @@ class RaoValidatorTest {
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
         when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
-        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
         when(raoResult.isSecure()).thenReturn(false);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
@@ -150,7 +150,7 @@ class RaoValidatorTest {
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
         when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
-        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
         when(raoResult.isSecure()).thenReturn(true);
         when(raoResult.isSecure(PhysicalParameter.ANGLE)).thenReturn(true);
@@ -181,7 +181,7 @@ class RaoValidatorTest {
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
         when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
-        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
         when(raoResult.getFunctionalCost(Mockito.any())).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
@@ -210,7 +210,7 @@ class RaoValidatorTest {
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
         when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
-        when(fileImporter.importCracFromJson(anyString())).thenReturn(crac);
+        when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
         when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
