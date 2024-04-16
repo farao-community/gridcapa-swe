@@ -72,7 +72,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             LOGGER.info("[{}] : RAO request sent: {}", direction, raoRequest);
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
-            if (raoResponse != null && raoResponse.isInterrupted()) {
+            if (raoResponse.isInterrupted()) {
                 throw new RaoInterruptionException("RAO computation stopped due to soft interruption request");
             }
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
