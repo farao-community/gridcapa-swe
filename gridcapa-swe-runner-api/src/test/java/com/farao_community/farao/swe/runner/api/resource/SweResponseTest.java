@@ -10,18 +10,18 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 class SweResponseTest {
-
     @Test
     void simpleRequestTest() {
-        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl");
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", true);
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertTrue(sweResponse.isInterrupted());
     }
-
 }

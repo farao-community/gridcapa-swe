@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
+import com.farao_community.farao.dichotomy.api.exceptions.RaoInterruptionException;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
@@ -62,7 +63,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     }
 
     @Override
-    public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(Network network, DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException {
+    public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(Network network, DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoInterruptionException {
         String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
         String scaledNetworkName = network.getNameOrId().replace(":", "") + ".xiidm";
         String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
@@ -71,6 +72,9 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             LOGGER.info("[{}] : RAO request sent: {}", direction, raoRequest);
             RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
+            if (raoResponse.isInterrupted()) {
+                throw new RaoInterruptionException("RAO computation stopped due to soft interruption request");
+            }
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl()));
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure()) {
                 Crac crac = sweData.getCracEsPt().getCrac();
