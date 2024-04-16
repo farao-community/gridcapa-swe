@@ -84,6 +84,14 @@ class CgmesExportServiceTest {
                 .addProfile("fakeProfile")
                 .setModelingAuthoritySet("fakeAuthority")
                 .add()
+                .newModel()
+                .setSubset(CgmesSubset.STATE_VARIABLES)
+                .setId("sshId")
+                .setVersion(5)
+                .addDependentOn("FAKE.TP_ID")
+                .addProfile("fakeProfile")
+                .setModelingAuthoritySet("fakeAuthority")
+                .add()
                 .add();
         String emptyXmlFile = "/export_cgmes/emptyXmlFile.xml";
         Map<CgmesFileType, SweFileResource> cgmesInputFiles = new EnumMap<>(CgmesFileType.class);
@@ -107,6 +115,7 @@ class CgmesExportServiceTest {
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_EQ_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001.xml"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
+        assertEquals("FAKE.TP_ID", network.getProperty("CGMES.TP_ID"));
     }
 
     @Test
