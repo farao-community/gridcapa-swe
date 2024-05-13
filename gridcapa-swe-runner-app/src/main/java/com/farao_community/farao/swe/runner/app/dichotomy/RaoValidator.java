@@ -78,8 +78,8 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure()) {
                 Crac crac = sweData.getCracEsPt().getCrac();
-                AngleMonitoring angleMonitoring = new AngleMonitoring(crac, network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()));
-                RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, sweData.getTimestamp());
+                AngleMonitoring angleMonitoring = new AngleMonitoring(crac, network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()), sweData.getTimestamp());
+                RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4);
                 if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
                     businessLogger.warn("Angle monitoring result is failure");
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
