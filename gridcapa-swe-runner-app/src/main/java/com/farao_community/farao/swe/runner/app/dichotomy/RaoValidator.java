@@ -65,7 +65,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     @Override
     public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(Network network, DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoInterruptionException {
         String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
-        String scaledNetworkName = network.getNameOrId().replace(":", "") + ".xiidm";
+        String scaledNetworkName = network.getVariantManager().getWorkingVariantId() + ".xiidm";
         String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
         RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, scaledNetworkDirPath);
         try {
