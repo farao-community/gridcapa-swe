@@ -130,10 +130,45 @@ public class CgmesExportService {
     Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws IOException {
         Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
         List<String> outputSshIds = new ArrayList<>();
-        mapCgmesFiles.putAll(createAllSshFiles(mergedNetwork, sweData, outputSshIds));
-        mapCgmesFiles.putAll(createCommonFile(mergedNetwork, sweData, outputSshIds));
+        mapCgmesFiles.putAll(createSshSvFiles(mergedNetwork, sweData, outputSshIds));
         mapCgmesFiles.putAll(retrieveEqAndTpFiles(sweData));
         return mapCgmesFiles;
+    }
+
+    private Map<String, ByteArrayOutputStream> createSshSvFiles(Network mergedNetwork, SweData sweData, List<String> outputSshIds) throws IOException {
+        LOGGER.info("Building SSH and SV files");
+        Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
+        mergedNetwork.getSubnetworks().forEach(this::updateControlAreasExtension);
+        Properties export_params = new Properties();
+        export_params.put(CgmesExport.PROFILES, List.of("SV", "SSH"));
+        export_params.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
+        export_params.put(CgmesExport.NAMING_STRATEGY, "cgmes");
+        export_params.put(CgmesExport.CGM_EXPORT, true);
+        export_params.put(CgmesExport.UPDATE_DEPENDENCIES, true);
+        export_params.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
+
+        MemDataSource memDataSource = new MemDataSource();
+        mergedNetwork.write("CGMES", export_params, memDataSource);
+        for (Map.Entry<Country, String> entry : TSO_BY_COUNTRY.entrySet()) {
+            Country country = entry.getKey();
+            String tso = entry.getValue();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                String filenameFromCgmesExport = mergedNetwork.getNameOrId() + "_" + country.toString() + "_SSH.xml";
+                baos.write(memDataSource.getData(filenameFromCgmesExport));
+                CgmesMetadataModels modelsExtension = mergedNetwork.getExtension(CgmesMetadataModels.class);
+                String sshVersionInFileName = modelsExtension != null ?
+                        getFormattedVersionString(modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).orElseThrow().getVersion()) : DEFAULT_VERSION;
+                String newFileName = buildCgmesFilename(sweData, tso, "SSH", sshVersionInFileName);  //todo version incorrecte
+                mapFiles.put(newFileName, baos);
+            }
+        }
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            String filenameFromCgmesExport = mergedNetwork.getNameOrId() + "_SV.xml";
+            os.write(memDataSource.getData(filenameFromCgmesExport));
+            String svFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", DEFAULT_VERSION); //todo version incorrecte
+            mapFiles.put(svFilename, os);
+        }
+        return mapFiles;
     }
 
     Map<String, ByteArrayOutputStream> createAllSshFiles(Network mergedNetwork, SweData sweData, List<String> outputSshIds) throws IOException {
