@@ -9,28 +9,21 @@ package com.farao_community.farao.swe.runner.app.configurations;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 @Configuration
 @ConfigurationProperties(prefix = "swe-runner.pst")
 public class PstConfiguration {
-    private String pst1Id;
-    private String pst2Id;
+    private List<String> pstIds;
 
-    public String getPst1Id() {
-        return pst1Id;
+    public List<String> getPstIds() {
+        return pstIds;
     }
 
-    public String getPst2Id() {
-        return pst2Id;
-    }
-
-    public void setPst1Id(String pst1Id) {
-        this.pst1Id = pst1Id;
-    }
-
-    public void setPst2Id(String pst2Id) {
-        this.pst2Id = pst2Id;
+    public void setPstIds(List<String> pstIds) {
+        this.pstIds = pstIds;
     }
 }

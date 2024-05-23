@@ -21,6 +21,7 @@ import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.TwoWindingsTransformer;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +91,7 @@ public class NetworkService {
 
     public void addHvdcAndPstToNetwork(Network network) {
         addhvdc(network);
-        addPst(network);
+        removePstRegulation(network);
     }
 
     private List<SweFileResource> getFiles(SweRequest sweRequest) {
@@ -129,14 +130,16 @@ public class NetworkService {
         sweHvdcPreprocessor.applyParametersToNetwork(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"), network);
     }
 
-    private void addPst(Network network) {
-        try {
-            network.getTwoWindingsTransformer(pstConfiguration.getPst1Id()).getPhaseTapChanger().setRegulating(false);
-            network.getTwoWindingsTransformer(pstConfiguration.getPst2Id()).getPhaseTapChanger().setRegulating(false);
-            businessLogger.info("Regulation mode of the PSTs modified");
-        } catch (NullPointerException e) {
-            businessLogger.warn("The PST mode could not be changed because it was not found");
-        }
+    private void removePstRegulation(Network network) {
+        pstConfiguration.getPstIds().forEach(id -> {
+            TwoWindingsTransformer twt = network.getTwoWindingsTransformer(id);
+            if (twt == null || twt.getPhaseTapChanger() == null) {
+                businessLogger.error("Element with ID {} does not correspond to an actual PST. Cannot be put in fixed setpoint", id);
+            } else {
+                twt.getPhaseTapChanger().setRegulating(false);
+                businessLogger.info("PST with id {} has been set to a fixed setpoint", id);
+            }
+        });
     }
 
     private String buildZipFromListOfFiles(List<SweFileResource> listFiles) {

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -23,7 +23,7 @@ class PstConfigurationTest {
 
     @Test
     void checkPstIds() {
-        assertEquals("_e071a1d4-fef5-1bd9-5278-d195c5597b6e", pstConfiguration.getPst1Id());
-        assertEquals("_7824bc48-fc86-51db-8f9c-01b44933839e", pstConfiguration.getPst2Id());
+        assertTrue(pstConfiguration.getPstIds().contains("_e071a1d4-fef5-1bd9-5278-d195c5597b6e"));
+        assertTrue(pstConfiguration.getPstIds().contains("_7824bc48-fc86-51db-8f9c-01b44933839e"));
     }
 }
