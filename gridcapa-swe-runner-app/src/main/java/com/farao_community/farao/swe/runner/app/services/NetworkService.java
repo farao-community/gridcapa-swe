@@ -132,12 +132,16 @@ public class NetworkService {
 
     private void removePstRegulation(Network network) {
         pstConfiguration.getPstIds().forEach(id -> {
-            TwoWindingsTransformer twt = network.getTwoWindingsTransformer(id);
-            if (twt == null || twt.getPhaseTapChanger() == null) {
-                businessLogger.error("Element with ID {} does not correspond to an actual PST. Cannot be put in fixed setpoint", id);
+            if (network.getIdentifiable(id) == null) {
+                businessLogger.warn("PST with ID {} is not available in network. Cannot be put in fixed setpoint", id);
             } else {
-                twt.getPhaseTapChanger().setRegulating(false);
-                businessLogger.info("PST with id {} has been set to a fixed setpoint", id);
+                TwoWindingsTransformer twt = network.getTwoWindingsTransformer(id);
+                if (twt == null || twt.getPhaseTapChanger() == null) {
+                    businessLogger.error("Element with ID {} does not correspond to an actual PST. Cannot be put in fixed setpoint", id);
+                } else {
+                    twt.getPhaseTapChanger().setRegulating(false);
+                    businessLogger.info("PST with ID {} has been set to a fixed setpoint", id);
+                }
             }
         });
     }

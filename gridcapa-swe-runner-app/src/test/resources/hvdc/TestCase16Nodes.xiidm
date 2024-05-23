@@ -83,6 +83,15 @@
             </iidm:phaseTapChanger>
             <iidm:currentLimits2 permanentLimit="2000.0"/>
         </iidm:twoWindingsTransformer>
+        <iidm:twoWindingsTransformer id="twt-test-regulation-id" name="twt_name" r="1.0" x="2.0" g="3.0" b="4.0" ratedU1="5.0" ratedU2="6.0" voltageLevelId1="BBE2AA1" connectableBus1="BBE3AA1 " voltageLevelId2="BBE2AA1" connectableBus2="BBE2AA1 ">
+            <iidm:phaseTapChanger regulating="true" lowTapPosition="0" tapPosition="1" targetDeadband="1.0" regulationMode="ACTIVE_POWER_CONTROL" regulationValue="10.0">
+                <iidm:terminalRef id="twt-test-regulation-id" side="ONE"/>
+                    <iidm:step r="1.0" x="2.0" g="3.0" b="4.0" rho="1.0" alpha="0.0"/>
+                    <iidm:step r="1.0" x="2.0" g="3.0" b="4.0" rho="6.0" alpha="5.0"/>
+                </iidm:phaseTapChanger>
+        </iidm:twoWindingsTransformer>
+        <iidm:twoWindingsTransformer id="twt-without-tap-changer-id" name="twt_name" r="1.0" x="2.0" g="3.0" b="4.0" ratedU1="5.0" ratedU2="6.0" voltageLevelId1="BBE2AA1" connectableBus1="BBE3AA1 " voltageLevelId2="BBE2AA1" connectableBus2="BBE2AA1 ">
+        </iidm:twoWindingsTransformer>
     </iidm:substation>
     <iidm:substation id="DDE1AA" country="DE">
         <iidm:voltageLevel id="DDE1AA1" nominalV="380.0" topologyKind="BUS_BREAKER">

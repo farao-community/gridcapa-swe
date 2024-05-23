@@ -23,7 +23,8 @@ class PstConfigurationTest {
 
     @Test
     void checkPstIds() {
-        assertTrue(pstConfiguration.getPstIds().contains("_e071a1d4-fef5-1bd9-5278-d195c5597b6e"));
-        assertTrue(pstConfiguration.getPstIds().contains("_7824bc48-fc86-51db-8f9c-01b44933839e"));
+        assertTrue(pstConfiguration.getPstIds().contains("twt-not-found-id"));
+        assertTrue(pstConfiguration.getPstIds().contains("twt-test-regulation-id"));
+        assertTrue(pstConfiguration.getPstIds().contains("twt-without-tap-changer-id"));
     }
 }

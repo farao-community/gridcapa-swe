@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -73,7 +75,10 @@ class NetworkServiceTest {
     @Test
     void addHvdcAndPstToNetwork() {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        assertTrue(network.getTwoWindingsTransformer("twt-test-regulation-id").getPhaseTapChanger().isRegulating());
+
         networkImporter.addHvdcAndPstToNetwork(network);
         assertEquals(2, network.getHvdcLineCount());
+        assertFalse(network.getTwoWindingsTransformer("twt-test-regulation-id").getPhaseTapChanger().isRegulating());
     }
 }

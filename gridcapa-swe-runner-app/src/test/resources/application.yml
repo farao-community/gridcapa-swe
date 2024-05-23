@@ -20,8 +20,9 @@ swe-runner:
     active: true
   pst:
     pst-ids:
-      - _e071a1d4-fef5-1bd9-5278-d195c5597b6e
-      - _7824bc48-fc86-51db-8f9c-01b44933839e
+      - twt-not-found-id
+      - twt-test-regulation-id
+      - twt-without-tap-changer-id
   dichotomy:
     parameters:
       ES_FR:
