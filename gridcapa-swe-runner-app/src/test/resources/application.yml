@@ -16,13 +16,13 @@ swe-commons:
     SV: "http://www.coreso.eu/OperationalPlanning"
 
 swe-runner:
-  unoptimized-cnecs-with-pst-es-fr:
-    active: true
   pst:
     pst-ids:
       - twt-not-found-id
       - twt-test-regulation-id
       - twt-without-tap-changer-id
+  unoptimized-cnecs-with-pst-es-fr:
+    active: true
   dichotomy:
     parameters:
       ES_FR:

@@ -91,7 +91,7 @@ public class NetworkService {
 
     public void addHvdcAndPstToNetwork(Network network) {
         addhvdc(network);
-        removePstRegulation(network);
+        disablePstRegulation(network);
     }
 
     private List<SweFileResource> getFiles(SweRequest sweRequest) {
@@ -130,7 +130,7 @@ public class NetworkService {
         sweHvdcPreprocessor.applyParametersToNetwork(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"), network);
     }
 
-    private void removePstRegulation(Network network) {
+    private void disablePstRegulation(Network network) {
         pstConfiguration.getPstIds().forEach(id -> {
             if (network.getIdentifiable(id) == null) {
                 businessLogger.warn("PST with ID {} is not available in network. Cannot be put in fixed setpoint", id);
