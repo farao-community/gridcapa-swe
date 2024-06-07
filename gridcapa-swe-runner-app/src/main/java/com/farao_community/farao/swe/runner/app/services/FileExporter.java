@@ -54,6 +54,7 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
+    private static final String ZIP = ".zip";
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
@@ -136,8 +137,15 @@ public class FileExporter {
     }
 
     public String zipTargetNameChangeExtension(String targetName, String extension) {
-        if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(".zip")) {
-            return targetName.replace(".ZIP", extension).replace(".zip", extension);
+        if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(ZIP)) {
+            return targetName.replace(".ZIP", extension).replace(ZIP, extension);
+        }
+        return targetName;
+    }
+
+    public String xmlTargetNameChangeExtensionToZip(final String targetName) {
+        if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(".xml")) {
+            return targetName.replace(".XML", ZIP).replace(".xml", ZIP);
         }
         return targetName;
     }
@@ -235,14 +243,8 @@ public class FileExporter {
              ZipOutputStream zipOs = new ZipOutputStream(baos)) {
 
             for (var entry : mapCgmesFiles.entrySet()) {
-                zipOs.putNextEntry(new ZipEntry(entry.getKey()));
-                byte[] bytes = new byte[1024];
-                int length;
-                InputStream is = new ByteArrayInputStream(entry.getValue().toByteArray());
-                while ((length = is.read(bytes)) >= 0) {
-                    zipOs.write(bytes, 0, length);
-                }
-                is.close();
+                zipOs.putNextEntry(new ZipEntry(xmlTargetNameChangeExtensionToZip(entry.getKey())));
+                zipOs.write(createInternalZip(entry.getValue().toByteArray(), entry.getKey()));
             }
             zipOs.close();
             baos.close();
@@ -254,6 +256,13 @@ public class FileExporter {
             }
         }
         return minioAdapter.generatePreSignedUrl(cgmesPath);
+    }
+
+    private byte[] createInternalZip(byte[] inputFile, String inputFileName) throws IOException {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            zipSingleFile(os, inputFile, inputFileName);
+            return os.toByteArray();
+        }
     }
 
     String getCgmZipFileName(OffsetDateTime offsetDateTime, DichotomyDirection direction) {
