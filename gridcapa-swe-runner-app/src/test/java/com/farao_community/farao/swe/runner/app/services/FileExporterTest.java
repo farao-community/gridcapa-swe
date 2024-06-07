@@ -10,6 +10,7 @@ import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import com.powsybl.openrao.data.cracapi.Crac;
@@ -24,12 +25,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -144,4 +149,21 @@ class FileExporterTest {
         String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR);
         assertEquals("20230101_0130_CGM_ESFR.zip", cgmFileName);
     }
+
+    @Test
+    void exportCgmesZipFileTest() {
+        SweData sweData = Mockito.mock(SweData.class);
+        Mockito.when(sweData.getTimestamp()).thenReturn(dateTime);
+        Mockito.when(minioAdapter.generatePreSignedUrl("2021/04/01/23_30/OUTPUTS/20210401_2330_CGM_PTES.zip")).thenReturn("SUCCESS");
+        Map<String, ByteArrayOutputStream> inputFiles = new HashMap<>();
+        inputFiles.put("firstFile.xml", new ByteArrayOutputStream());
+        inputFiles.put("secondFile.xml", new ByteArrayOutputStream());
+        inputFiles.put("thirdFile.xml", new ByteArrayOutputStream());
+        try {
+            assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
+        } catch(Exception e) {
+            fail("shouldn't have thrown exception", e);
+        }
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -143,7 +143,7 @@ public class FileExporter {
         return targetName;
     }
 
-    public String xmlTargetNameChangeExtensionToZip(final String targetName) {
+    private String xmlTargetNameChangeExtensionToZip(final String targetName) {
         if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(".xml")) {
             return targetName.replace(".XML", ZIP).replace(".xml", ZIP);
         }
@@ -243,8 +243,9 @@ public class FileExporter {
              ZipOutputStream zipOs = new ZipOutputStream(baos)) {
 
             for (var entry : mapCgmesFiles.entrySet()) {
-                zipOs.putNextEntry(new ZipEntry(xmlTargetNameChangeExtensionToZip(entry.getKey())));
-                zipOs.write(createInternalZip(entry.getValue().toByteArray(), entry.getKey()));
+                final String originalFileName = entry.getKey();
+                zipOs.putNextEntry(new ZipEntry(xmlTargetNameChangeExtensionToZip(originalFileName)));
+                zipOs.write(createInternalZip(entry.getValue().toByteArray(), originalFileName));
             }
             zipOs.close();
             baos.close();
