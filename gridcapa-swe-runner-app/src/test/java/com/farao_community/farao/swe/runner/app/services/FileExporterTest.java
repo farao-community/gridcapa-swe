@@ -161,7 +161,7 @@ class FileExporterTest {
         inputFiles.put("thirdFile.xml", new ByteArrayOutputStream());
         try {
             assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("shouldn't have thrown exception", e);
         }
     }
