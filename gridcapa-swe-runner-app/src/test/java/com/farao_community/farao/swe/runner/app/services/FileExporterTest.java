@@ -8,7 +8,6 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -27,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
