@@ -143,13 +143,6 @@ public class FileExporter {
         return targetName;
     }
 
-    private String xmlTargetNameChangeExtensionToZip(final String targetName) {
-        if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(".xml")) {
-            return targetName.replace(".XML", ZIP).replace(".xml", ZIP);
-        }
-        return targetName;
-    }
-
     public void zipSingleFile(OutputStream os, byte[] fileContent, String fileName) {
         try (ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileName));
@@ -244,8 +237,8 @@ public class FileExporter {
 
             for (var entry : mapCgmesFiles.entrySet()) {
                 final String originalFileName = entry.getKey();
-                zipOs.putNextEntry(new ZipEntry(xmlTargetNameChangeExtensionToZip(originalFileName)));
-                zipOs.write(createInternalZip(entry.getValue().toByteArray(), originalFileName));
+                zipOs.putNextEntry(new ZipEntry(originalFileName + ZIP));
+                zipOs.write(createInternalZip(entry.getValue().toByteArray(), originalFileName + ".xml"));
             }
             zipOs.close();
             baos.close();

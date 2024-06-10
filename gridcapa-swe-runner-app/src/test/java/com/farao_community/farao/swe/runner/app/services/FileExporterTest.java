@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -155,9 +155,9 @@ class FileExporterTest {
         Mockito.when(sweData.getTimestamp()).thenReturn(dateTime);
         Mockito.when(minioAdapter.generatePreSignedUrl("2021/04/01/23_30/OUTPUTS/20210401_2330_CGM_PTES.zip")).thenReturn("SUCCESS");
         Map<String, ByteArrayOutputStream> inputFiles = new HashMap<>();
-        inputFiles.put("firstFile.xml", new ByteArrayOutputStream());
-        inputFiles.put("secondFile.XML", new ByteArrayOutputStream());
-        inputFiles.put("thirdFile.toto", new ByteArrayOutputStream());
+        inputFiles.put("firstFile", new ByteArrayOutputStream());
+        inputFiles.put("secondFile", new ByteArrayOutputStream());
+        inputFiles.put("thirdFile", new ByteArrayOutputStream());
         try {
             assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
         } catch (Exception e) {
