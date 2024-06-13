@@ -10,7 +10,7 @@ spring:
       reply-timeout: 7200000
   cloud:
     function:
-      definition: request;softInterrupt
+      definition: request;softInterrupt;consumeTaskDtoUpdate
     stream:
       default:
         binder: rabbit
@@ -26,6 +26,17 @@ spring:
           destination: swe-d2cc-task-status-updated
         stop-rao:
           destination: stop-rao-runner
+        consumeTaskDtoUpdate-in-0:
+          destination: swe-d2cc-task-updated
+      rabbit:
+        default:
+          consumer:
+            auto-bind-dlq: true
+            max-attempts: 1
+        bindings:
+          consumeTaskDtoUpdate-in-0:
+            consumer:
+              binding-routing-key: status
 
 logback:
   amqp:
@@ -79,3 +90,18 @@ minio-adapter:
   access-key: gridcapa
   secret-key: gridcapa
   url: http://localhost:9000
+
+ftp:
+  host: localhost
+  port: 21
+  access-key: gridcapa
+  secret-key: gridcapa
+  remote-relative-destination-directory: swe/d2cc/outputs
+  retry-count: 3
+  retry-sleep: 5
+
+task-manager:
+  base-url: http://localhost/swe/d2cc/task-manager
+  fetch-task:
+    retries-number: 6
+    interval-in-seconds: 10

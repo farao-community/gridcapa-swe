@@ -46,4 +46,19 @@ minio-adapter:
   base-path: /SWE/D2CC
   access-key: gridcapa
   secret-key: gridcapa
-  url: http://localhost:9000
+  url: http://minio:9000
+
+ftp:
+  host: localhost
+  port: 21
+  access-key: gridcapa
+  secret-key: gridcapa
+  remote-relative-destination-directory: swe/d2cc/outputs
+  retry-count: 3
+  retry-sleep: 5
+
+task-manager:
+  base-url: http://localhost/swe/d2cc/task-manager
+  fetch-task:
+    retries-number: 6
+    interval-in-seconds: 10

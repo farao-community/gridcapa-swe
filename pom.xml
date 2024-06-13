@@ -57,6 +57,7 @@
     </developers>
 
     <properties>
+        <apache-common-net.version>3.9.0</apache-common-net.version>
         <awaitility.version>3.0.0</awaitility.version>
         <farao.dependencies.version>1.31.0</farao.dependencies.version>
         <farao.dichotomy.version>4.17.1</farao.dichotomy.version>
@@ -107,6 +108,11 @@
                 <groupId>com.github.jasminb</groupId>
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${apache-common-net.version}</version>
             </dependency>
 
             <!-- Runtime dependencies -->
