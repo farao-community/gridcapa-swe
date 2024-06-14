@@ -50,15 +50,15 @@ minio-adapter:
 
 ftp:
   host: localhost
-  port: 21
-  access-key: gridcapa
-  secret-key: gridcapa
+  port: 3030
+  access-key: user
+  secret-key: password
   remote-relative-destination-directory: swe/d2cc/outputs
   retry-count: 3
   retry-sleep: 5
 
 task-manager:
-  base-url: http://localhost/swe/d2cc/task-manager
+  base-url: http://localhost:8080/swe/d2cc/task-manager
   fetch-task:
     retries-number: 6
     interval-in-seconds: 10

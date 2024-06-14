@@ -69,6 +69,7 @@
         <logstash.version>7.0.1</logstash.version>
         <sonar.organization>farao-community</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <mock-ftp-server.version>2.7.1</mock-ftp-server.version>
     </properties>
 
     <dependencyManagement>
@@ -133,6 +134,12 @@
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${awaitility.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockftpserver</groupId>
+                <artifactId>MockFtpServer</artifactId>
+                <version>${mock-ftp-server.version}</version>
                 <scope>test</scope>
             </dependency>
 
