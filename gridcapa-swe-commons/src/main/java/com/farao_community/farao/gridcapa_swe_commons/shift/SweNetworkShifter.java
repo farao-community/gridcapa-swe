@@ -26,12 +26,9 @@ import com.powsybl.openrao.commons.EICode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -86,7 +83,6 @@ public class SweNetworkShifter implements NetworkShifter {
             String processedVariantId = initialVariantId + " PROCESSED COPY";
             String workingVariantCopyId = initialVariantId + " WORKING COPY";
             preProcessNetwork(network, scalableGeneratorConnector, generatorLimitsHandler, initialVariantId, processedVariantId, workingVariantCopyId);
-            List<String> limitingCountries = new ArrayList<>();
             Map<String, Double> bordersExchanges;
 
             int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
@@ -95,7 +91,7 @@ public class SweNetworkShifter implements NetworkShifter {
             do {
                 // Step 1: Perform the scaling
                 LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
-                shiftIteration(network, scalingValuesByCountry, scalingParameters, limitingCountries, scalableGeneratorConnector);
+                Map<String, Double> incompleteShiftCountries = shiftIteration(network, scalingValuesByCountry, scalingParameters, scalableGeneratorConnector);
 
                 // Step 2: Compute exchanges mismatch
                 LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), loadFlowParameters);
@@ -114,6 +110,7 @@ public class SweNetworkShifter implements NetworkShifter {
                     network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                     shiftSucceed = true;
                 } else {
+                    checkGlskLimitation(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
                     // Reset current variant with initial state for each iteration (keeping pre-processing)
                     network.getVariantManager().cloneVariant(processedVariantId, workingVariantCopyId, true);
                     updateScalingValuesWithMismatch(scalingValuesByCountry, mismatchEsPt, mismatchEsFr);
@@ -151,7 +148,8 @@ public class SweNetworkShifter implements NetworkShifter {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
-    private void shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, List<String> limitingCountries, ScalableGeneratorConnector scalableGeneratorConnector) throws GlskLimitationException {
+    private Map<String, Double> shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, ScalableGeneratorConnector scalableGeneratorConnector) throws GlskLimitationException {
+        Map<String, Double> incompleteShiftCountries = new HashMap<>();
         for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
             String zoneId = entry.getKey();
             double asked = entry.getValue();
@@ -159,21 +157,35 @@ public class SweNetworkShifter implements NetworkShifter {
             LOGGER.info(logApplyingVariationOnZone);
             double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
             if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
+                String logWarnIncompleteVariation = String.format("[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)",
                         direction, zoneId, asked, done);
                 LOGGER.warn(logWarnIncompleteVariation);
-                limitingCountries.add(zoneId);
+                incompleteShiftCountries.put(zoneId, done - asked);
             }
         }
         // During the shift some generators linked to the main network with a transformers are not connected correctly
         // Waiting for a fix in powsybl-core, we connect the transformers linked to these generators to be correctly connected to the main network component
         scalableGeneratorConnector.connectGeneratorsTransformers(network, PRE_PROCESSING_COUNTRIES);
+        return incompleteShiftCountries;
+    }
 
-        if (!limitingCountries.isEmpty()) {
-            StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
-            limitingCountries.forEach(sj::add);
-            LOGGER.error("[{}] : {}", direction, sj);
-            throw new GlskLimitationException(sj.toString());
+    private void checkGlskLimitation(Map<String, Double> incompleteShiftCountries, double mismatchEsPt, double mismatchEsFr) throws GlskLimitationException {
+        if (incompleteShiftCountries.containsKey(toEic("PT"))) {
+            checkGlskLimitationCountry("PT", incompleteShiftCountries.get(toEic("PT")), mismatchEsPt);
+        }
+        if (incompleteShiftCountries.containsKey(toEic("FR"))) {
+            checkGlskLimitationCountry("FR", incompleteShiftCountries.get(toEic("FR")), mismatchEsFr);
+        }
+        if (incompleteShiftCountries.containsKey(toEic("ES"))) {
+            checkGlskLimitationCountry("ES", incompleteShiftCountries.get(toEic("ES")), -(mismatchEsFr + mismatchEsPt));
+        }
+    }
+
+    private void checkGlskLimitationCountry(String country, double diffShift, double mismatch) throws GlskLimitationException {
+        // In case of asked > 0 : (done - asked) will be < 0, we have Glsk limitation if the next asked value increase (mismatch < 0),
+        // In case of asked < 0 : (done - asked) will be > 0, we have Glsk limitation if the next asked value decrease (mismatch > 0)
+        if (diffShift < 0 && mismatch < 0 || diffShift > 0 && mismatch > 0) {
+            throw new GlskLimitationException("Glsk limitation for country " + country);
         }
     }
 
