@@ -54,7 +54,8 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
-    private static final String ZIP = ".zip";
+    private static final String ZIP_EXT = ".zip";
+    public static final String XML_EXT = ".xml";
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
@@ -137,8 +138,8 @@ public class FileExporter {
     }
 
     public String zipTargetNameChangeExtension(String targetName, String extension) {
-        if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(ZIP)) {
-            return targetName.replace(".ZIP", extension).replace(ZIP, extension);
+        if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(ZIP_EXT)) {
+            return StringUtils.replaceIgnoreCase(targetName, ZIP_EXT, extension);
         }
         return targetName;
     }
@@ -237,8 +238,8 @@ public class FileExporter {
 
             for (var entry : mapCgmesFiles.entrySet()) {
                 final String originalFileName = entry.getKey();
-                zipOs.putNextEntry(new ZipEntry(originalFileName + ZIP));
-                zipOs.write(createInternalZip(entry.getValue().toByteArray(), originalFileName + ".xml"));
+                zipOs.putNextEntry(new ZipEntry(originalFileName + ZIP_EXT));
+                zipOs.write(createInternalZip(entry.getValue().toByteArray(), originalFileName + XML_EXT));
             }
             zipOs.close();
             baos.close();

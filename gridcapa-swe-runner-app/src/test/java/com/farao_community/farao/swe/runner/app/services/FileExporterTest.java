@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -150,7 +151,7 @@ class FileExporterTest {
     }
 
     @Test
-    void exportCgmesZipFileTest() {
+    void exportCgmesZipFileTest() throws IOException {
         SweData sweData = Mockito.mock(SweData.class);
         Mockito.when(sweData.getTimestamp()).thenReturn(dateTime);
         Mockito.when(minioAdapter.generatePreSignedUrl("2021/04/01/23_30/OUTPUTS/20210401_2330_CGM_PTES.zip")).thenReturn("SUCCESS");
@@ -158,10 +159,6 @@ class FileExporterTest {
         inputFiles.put("firstFile", new ByteArrayOutputStream());
         inputFiles.put("secondFile", new ByteArrayOutputStream());
         inputFiles.put("thirdFile", new ByteArrayOutputStream());
-        try {
-            assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
-        } catch (Exception e) {
-            fail("shouldn't have thrown exception", e);
-        }
+        assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
     }
 }
