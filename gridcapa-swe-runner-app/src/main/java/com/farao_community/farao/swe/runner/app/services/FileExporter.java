@@ -55,7 +55,7 @@ import java.util.zip.ZipOutputStream;
 public class FileExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
     private static final String ZIP_EXT = ".zip";
-    public static final String XML_EXT = ".xml";
+    private static final String XML_EXT = ".xml";
     private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
