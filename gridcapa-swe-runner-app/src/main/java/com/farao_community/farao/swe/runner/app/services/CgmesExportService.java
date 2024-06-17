@@ -1,6 +1,6 @@
 /*
 /*
- * Copyright (c) 2023, RTE (http://www.rte-france.com)
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -68,7 +68,7 @@ public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
     private static final double DEFAULT_P_TOLERANCE = 10;
     private static final String DEFAULT_VERSION = "001";
-    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_[version].xml'");
+    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_[version]'");
     public static final String MODELING_AUTHORITY_DEFAULT_VALUE = "https://farao-community.github.io/";
     private final Logger businessLogger;
     private final FileExporter fileExporter;
