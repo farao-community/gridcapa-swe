@@ -176,7 +176,7 @@ class SweNetworkShifterTest {
     }
 
     @Test
-    void shiftNetworWithGlskLimitation() {
+    void shiftNetworWithGlskLimitationEs() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
         Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
@@ -184,6 +184,64 @@ class SweNetworkShifterTest {
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(11000., network));
+    }
+
+    @Test
+    void shiftNetworSucceedWithIncompleteVariationEs() throws GlskLimitationException, ShiftingException {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+
+        sweNetworkShifter.shiftNetwork(10820, network); // incomplete shift for ES in the first iteration , but no Glsk limitation error
+
+        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        assertEquals(10820, shiftedExchanges.get("ES_FR"), 1.);
+        assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
+
+    }
+
+    @Test
+    void shiftNetworkSuccedWithIncompleteVariationFr() throws GlskLimitationException, ShiftingException {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+
+        sweNetworkShifter.shiftNetwork(4645, network); // incomplete shift for FR in the first iteration , but no Glsk limitation error
+
+        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        assertEquals(-4645, shiftedExchanges.get("ES_FR"), 1.);
+        assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
+
+    }
+
+    @Test
+    void shiftNetworkWithGlskLimitationForFr() {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+
+        assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(4646, network));
+
+    }
+
+    @Test
+    void shiftNetworWithGlskLimitationPt() {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_PT, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.ES_PT, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+        assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(3000., network));
     }
 
     @Test
@@ -200,7 +258,7 @@ class SweNetworkShifterTest {
     ZonalDataImpl<Scalable> getZonalWithMinMax() {
         Scalable scalableFR = Scalable.onGenerator("FFR1AA11_generator", -9100.0, 9100.0);
         Scalable scalableES = Scalable.onGenerator("EES1AA11_generator", -9100.0, 9100.0);
-        Scalable scalablePT = Scalable.onGenerator("PPT1AA11_generator", -9100.0, 9100.0);
+        Scalable scalablePT = Scalable.onGenerator("PPT1AA11_generator", 0., 9100.0);
 
         Map<String, Scalable> mapScalable = new HashMap<>();
         mapScalable.put("10YFR-RTE------C", scalableFR);

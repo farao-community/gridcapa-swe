@@ -174,7 +174,7 @@ public class SweNetworkShifter implements NetworkShifter {
             checkGlskLimitationCountry("PT", incompleteShiftCountries.get(toEic("PT")), mismatchEsPt);
         }
         if (incompleteShiftCountries.containsKey(toEic("FR"))) {
-            checkGlskLimitationCountry("FR", incompleteShiftCountries.get(toEic("FR")), mismatchEsFr);
+            checkGlskLimitationCountry("FR", incompleteShiftCountries.get(toEic("FR")), mismatchEsFr); //todo test
         }
         if (incompleteShiftCountries.containsKey(toEic("ES"))) {
             checkGlskLimitationCountry("ES", incompleteShiftCountries.get(toEic("ES")), -(mismatchEsFr + mismatchEsPt));
@@ -185,7 +185,9 @@ public class SweNetworkShifter implements NetworkShifter {
         // In case of asked > 0 : (done - asked) will be < 0, we have Glsk limitation if the next asked value increase (mismatch < 0),
         // In case of asked < 0 : (done - asked) will be > 0, we have Glsk limitation if the next asked value decrease (mismatch > 0)
         if (diffShift < 0 && mismatch < 0 || diffShift > 0 && mismatch > 0) {
-            throw new GlskLimitationException("Glsk limitation for country " + country);
+            String msg = "Glsk limitation occurred for country " + country;
+            businessLogger.error(msg);
+            throw new GlskLimitationException(msg);
         }
     }
 
