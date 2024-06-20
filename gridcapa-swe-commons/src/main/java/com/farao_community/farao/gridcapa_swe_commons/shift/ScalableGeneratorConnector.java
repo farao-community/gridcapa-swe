@@ -131,7 +131,7 @@ public class ScalableGeneratorConnector {
     /**
      * Stores info about the state of the generator and its eventual transformer in the network
      */
-    class GeneratorState {
+    static class GeneratorState {
         String generatorId;
         double targetP;
         boolean isTerminalConnected;
