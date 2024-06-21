@@ -10,6 +10,7 @@ import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher;
 import org.junit.jupiter.api.Test;
@@ -28,16 +29,16 @@ class NetworkShifterProviderTest {
 
     @Autowired
     private NetworkShifterProvider networkShifterProvider;
-    private final Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+    private final Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
 
     @Test
     void checkThatD2ccShiftDispatcherIsChosen() throws ShiftingException {
         ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.D2CC, DichotomyDirection.FR_ES, intialNetPositions);
         assertTrue(shiftDispatcher instanceof SweD2ccShiftDispatcher);
         Map<String, Double> shifts = shiftDispatcher.dispatch(1000);
-        assertEquals(900, shifts.get("10YFR-RTE------C"));
-        assertEquals(-150, shifts.get("10YPT-REN------W"));
-        assertEquals(-1050, shifts.get("10YES-REE------0"));
+        assertEquals(900, shifts.get(SweEICode.FR_EIC));
+        assertEquals(-150, shifts.get(SweEICode.PT_EIC));
+        assertEquals(-1050, shifts.get(SweEICode.ES_EIC));
     }
 
     @Test
@@ -45,9 +46,9 @@ class NetworkShifterProviderTest {
         ShiftDispatcher shiftDispatcher = networkShifterProvider.getShiftDispatcher(ProcessType.IDCC, DichotomyDirection.ES_PT, intialNetPositions);
         assertTrue(shiftDispatcher instanceof SweIdccShiftDispatcher);
         Map<String, Double> shifts = shiftDispatcher.dispatch(500);
-        assertEquals(-300.0, shifts.get("10YFR-RTE------C"));
-        assertEquals(-650, shifts.get("10YPT-REN------W"));
-        assertEquals(650, shifts.get("10YES-REE------0"));
+        assertEquals(-300.0, shifts.get(SweEICode.FR_EIC));
+        assertEquals(-650, shifts.get(SweEICode.PT_EIC));
+        assertEquals(650, shifts.get(SweEICode.ES_EIC));
     }
 
 }

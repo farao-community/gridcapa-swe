@@ -7,6 +7,7 @@
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
+import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.powsybl.balances_adjustment.util.CountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.computation.local.LocalComputationManager;
@@ -15,7 +16,6 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
-import com.powsybl.openrao.commons.EICode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +40,9 @@ public final class CountryBalanceComputation {
         Map<String, Double> countriesBalances = new HashMap<>();
         runLoadFlow(network, network.getVariantManager().getWorkingVariantId(), loadFlowParameters);
         Map<String, Double> bordersExchanges = computeSweBordersExchanges(network);
-        countriesBalances.put(toEic("PT"),  -bordersExchanges.get("ES_PT"));
-        countriesBalances.put(toEic("ES"), bordersExchanges.values().stream().reduce(0., Double::sum));
-        countriesBalances.put(toEic("FR"), -bordersExchanges.get("ES_FR"));
+        countriesBalances.put(SweEICode.PT_EIC,  -bordersExchanges.get("ES_PT"));
+        countriesBalances.put(SweEICode.ES_EIC, bordersExchanges.values().stream().reduce(0., Double::sum));
+        countriesBalances.put(SweEICode.FR_EIC, -bordersExchanges.get("ES_FR"));
 
         return countriesBalances;
     }
@@ -66,9 +66,5 @@ public final class CountryBalanceComputation {
 
     private static double getBorderExchange(Country fromCountry, Country toCountry, Map<Country, CountryArea> countryAreaPerCountry) {
         return countryAreaPerCountry.get(fromCountry).getLeavingFlowToCountry(countryAreaPerCountry.get(toCountry));
-    }
-
-    private static String toEic(String country) {
-        return new EICode(Country.valueOf(country)).getAreaCode();
     }
 }
