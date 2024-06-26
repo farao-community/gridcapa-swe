@@ -12,6 +12,7 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.commons.ZonalDataImpl;
@@ -52,9 +53,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(classes = ProcessConfiguration.class)
 class SweNetworkShifterTest {
 
-    private static final String EIC_FR = "10YFR-RTE------C";
-    private static final String EIC_ES = "10YES-REE------0";
-    private static final String EIC_PT = "10YPT-REN------W";
     private static final Double TARGET_P_TOLERANCE = 1e-3;
 
     @MockBean
@@ -72,15 +70,15 @@ class SweNetworkShifterTest {
         Scalable scalablePT = Scalable.onGenerator("PPT1AA11_generator");
 
         Map<String, Scalable> mapScalable = new HashMap<>();
-        mapScalable.put("10YFR-RTE------C", scalableFR);
-        mapScalable.put("10YES-REE------0", scalableES);
-        mapScalable.put("10YPT-REN------W", scalablePT);
+        mapScalable.put(SweEICode.FR_EIC, scalableFR);
+        mapScalable.put(SweEICode.ES_EIC, scalableES);
+        mapScalable.put(SweEICode.PT_EIC, scalablePT);
         zonalScalable = new ZonalDataImpl<>(mapScalable);
     }
 
     @Test
     void checkD2ccEsFrTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -90,7 +88,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccFrEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
                 DichotomyDirection.FR_ES, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -100,7 +98,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccPtEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
                 DichotomyDirection.PT_ES, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -110,7 +108,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccEsPtTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
                 DichotomyDirection.PT_ES, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -120,7 +118,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccEsFrTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
                 DichotomyDirection.ES_FR, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -130,7 +128,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccFrEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
                 DichotomyDirection.FR_ES, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -140,7 +138,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccEsPtTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
                 DichotomyDirection.ES_PT, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -150,7 +148,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccPtEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 50., "10YFR-RTE------C", 100., "10YPT-REN------W", 150.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
                 DichotomyDirection.PT_ES, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
@@ -161,7 +159,7 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworkSuccessTest() throws GlskLimitationException, ShiftingException {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
@@ -176,9 +174,9 @@ class SweNetworkShifterTest {
     }
 
     @Test
-    void shiftNetworWithGlskLimitation() {
+    void shiftNetworWithGlskLimitationEs() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
@@ -187,9 +185,67 @@ class SweNetworkShifterTest {
     }
 
     @Test
+    void shiftNetworSucceedWithIncompleteVariationEs() throws GlskLimitationException, ShiftingException {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+
+        sweNetworkShifter.shiftNetwork(10820, network); // incomplete shift for ES in the first iteration , but no Glsk limitation error
+
+        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        assertEquals(10820, shiftedExchanges.get("ES_FR"), 1.);
+        assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
+
+    }
+
+    @Test
+    void shiftNetworkSuccedWithIncompleteVariationFr() throws GlskLimitationException, ShiftingException {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+
+        sweNetworkShifter.shiftNetwork(4645, network); // incomplete shift for FR in the first iteration , but no Glsk limitation error
+
+        Map<String, Double> shiftedExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
+        assertEquals(-4645, shiftedExchanges.get("ES_FR"), 1.);
+        assertEquals(0., shiftedExchanges.get("ES_PT"), 1.);
+
+    }
+
+    @Test
+    void shiftNetworkWithGlskLimitationForFr() {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+
+        assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(4646, network));
+
+    }
+
+    @Test
+    void shiftNetworWithGlskLimitationPt() {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_PT, intialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                DichotomyDirection.ES_PT, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+        assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(3000., network));
+    }
+
+    @Test
     void shiftNetworWithShiftingException() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2317., "10YFR-RTE------C", -2317., "10YPT-REN------W", 0.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
@@ -200,19 +256,19 @@ class SweNetworkShifterTest {
     ZonalDataImpl<Scalable> getZonalWithMinMax() {
         Scalable scalableFR = Scalable.onGenerator("FFR1AA11_generator", -9100.0, 9100.0);
         Scalable scalableES = Scalable.onGenerator("EES1AA11_generator", -9100.0, 9100.0);
-        Scalable scalablePT = Scalable.onGenerator("PPT1AA11_generator", -9100.0, 9100.0);
+        Scalable scalablePT = Scalable.onGenerator("PPT1AA11_generator", 0., 9100.0);
 
         Map<String, Scalable> mapScalable = new HashMap<>();
-        mapScalable.put("10YFR-RTE------C", scalableFR);
-        mapScalable.put("10YES-REE------0", scalableES);
-        mapScalable.put("10YPT-REN------W", scalablePT);
+        mapScalable.put(SweEICode.FR_EIC, scalableFR);
+        mapScalable.put(SweEICode.ES_EIC, scalableES);
+        mapScalable.put(SweEICode.PT_EIC, scalablePT);
         return new ZonalDataImpl<>(mapScalable);
     }
 
     @Test
     void shiftNetworkSuccessWithChangePminPmaxFromGlskTest() throws GlskLimitationException, ShiftingException {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 2310., "10YFR-RTE------C", -2310., "10YPT-REN------W", 0.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2310., SweEICode.FR_EIC, -2310., SweEICode.PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
@@ -228,7 +284,7 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworWithGlskLimitationWithChangePminPmaxFromGlskTest() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of("10YES-REE------0", 231., "10YFR-RTE------C", -231., "10YPT-REN------W", 0.);
+        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 231., SweEICode.FR_EIC, -231., SweEICode.PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
                 DichotomyDirection.ES_FR, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
@@ -240,64 +296,64 @@ class SweNetworkShifterTest {
     void updateScalingValuesWithMismatchPtEsTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.PT_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load());
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-                Map.of(EIC_FR, 12.0,
-                        EIC_ES, 27.0,
-                        EIC_PT, 1515.0));
+                Map.of(SweEICode.FR_EIC, 12.0,
+                        SweEICode.ES_EIC, 27.0,
+                        SweEICode.PT_EIC, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-                .containsEntry(EIC_FR, 12.0)
-                .containsEntry(EIC_ES, 45.0)
-                .containsEntry(EIC_PT, 1510.0);
+                .containsEntry(SweEICode.FR_EIC, 12.0)
+                .containsEntry(SweEICode.ES_EIC, 45.0)
+                .containsEntry(SweEICode.PT_EIC, 1510.0);
     }
 
     @Test
     void updateScalingValuesWithMismatchEsPtTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_PT, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load());
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-                Map.of(EIC_FR, 12.0,
-                        EIC_ES, 27.0,
-                        EIC_PT, 1515.0));
+                Map.of(SweEICode.FR_EIC, 12.0,
+                        SweEICode.ES_EIC, 27.0,
+                        SweEICode.PT_EIC, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-                .containsEntry(EIC_FR, 12.0)
-                .containsEntry(EIC_ES, 45.0)
-                .containsEntry(EIC_PT, 1510.0);
+                .containsEntry(SweEICode.FR_EIC, 12.0)
+                .containsEntry(SweEICode.ES_EIC, 45.0)
+                .containsEntry(SweEICode.PT_EIC, 1510.0);
     }
 
     @Test
     void updateScalingValuesWithMismatchFrEsTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.FR_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load());
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-                Map.of(EIC_FR, 12.0,
-                        EIC_ES, 27.0,
-                        EIC_PT, 1515.0));
+                Map.of(SweEICode.FR_EIC, 12.0,
+                        SweEICode.ES_EIC, 27.0,
+                        SweEICode.PT_EIC, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-                .containsEntry(EIC_FR, -1.0)
-                .containsEntry(EIC_ES, 45.0)
-                .containsEntry(EIC_PT, 1515.0);
+                .containsEntry(SweEICode.FR_EIC, -1.0)
+                .containsEntry(SweEICode.ES_EIC, 45.0)
+                .containsEntry(SweEICode.PT_EIC, 1515.0);
     }
 
     @Test
     void updateScalingValuesWithMismatchEsFrTest() {
         SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_FR, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load());
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
-                Map.of(EIC_FR, 12.0,
-                        EIC_ES, 27.0,
-                        EIC_PT, 1515.0));
+                Map.of(SweEICode.FR_EIC, 12.0,
+                        SweEICode.ES_EIC, 27.0,
+                        SweEICode.PT_EIC, 1515.0));
 
         networkShifter.updateScalingValuesWithMismatch(scalingValuesByCountry, 5.0, 13.0);
 
         Assertions.assertThat(scalingValuesByCountry)
-                .containsEntry(EIC_FR, -1.0)
-                .containsEntry(EIC_ES, 45.0)
-                .containsEntry(EIC_PT, 1515.0);
+                .containsEntry(SweEICode.FR_EIC, -1.0)
+                .containsEntry(SweEICode.ES_EIC, 45.0)
+                .containsEntry(SweEICode.PT_EIC, 1515.0);
     }
 
     @Test

@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.diff_shift;
 
+import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.computation.local.LocalComputationManager;
@@ -32,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public class DiffShiftedNetworkTest {
-
-    private static final String EIC_FR = "10YFR-RTE------C";
-    private static final String EIC_ES = "10YES-REE------0";
-    private static final String EIC_PT = "10YPT-REN------W";
     private static String glskFileName;
     private static String networkFileName1;
     private static String networkFileName2;
@@ -60,7 +57,7 @@ public class DiffShiftedNetworkTest {
 
         GlskDocument glskDocument = new CimGlskDocumentImporter().importGlsk(getClass().getResourceAsStream(glskFileName));
 
-        List<ScalableInformation> scalableInformationsEs = getScalableInformation(glskDocument, EIC_ES, timestamp);
+        List<ScalableInformation> scalableInformationsEs = getScalableInformation(glskDocument, SweEICode.ES_EIC, timestamp);
         List<ScalableInformation> scalableInformationsUp =  scalableInformationsEs.stream().filter(scalableInformation -> scalableInformation.getFlowDirectionType().equals(ScalableInformation.FlowDirectionType.UP)).collect(Collectors.toList());
         assertEquals(12, scalableInformationsUp.size());
 
