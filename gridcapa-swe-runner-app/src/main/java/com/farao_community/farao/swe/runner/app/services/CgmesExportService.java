@@ -139,16 +139,16 @@ public class CgmesExportService {
         LOGGER.info("Building SSH and SV files");
         Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
         mergedNetwork.getSubnetworks().forEach(this::updateControlAreasExtension);
-        Properties export_params = new Properties();
-        export_params.put(CgmesExport.PROFILES, List.of("SV", "SSH"));
-        export_params.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-        export_params.put(CgmesExport.NAMING_STRATEGY, "cgmes");
-        export_params.put(CgmesExport.CGM_EXPORT, true);
-        export_params.put(CgmesExport.UPDATE_DEPENDENCIES, true);
-        export_params.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
+        Properties exportParams = new Properties();
+        exportParams.put(CgmesExport.PROFILES, List.of("SV", "SSH"));
+        exportParams.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
+        exportParams.put(CgmesExport.NAMING_STRATEGY, "cgmes");
+        exportParams.put(CgmesExport.CGM_EXPORT, true);
+        exportParams.put(CgmesExport.UPDATE_DEPENDENCIES, true);
+        exportParams.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
 
         MemDataSource memDataSource = new MemDataSource();
-        mergedNetwork.write("CGMES", export_params, memDataSource);
+        mergedNetwork.write("CGMES", exportParams, memDataSource);
         for (Map.Entry<Country, String> entry : TSO_BY_COUNTRY.entrySet()) {
             Country country = entry.getKey();
             String tso = entry.getValue();
@@ -158,14 +158,14 @@ public class CgmesExportService {
                 CgmesMetadataModels modelsExtension = mergedNetwork.getExtension(CgmesMetadataModels.class);
                 String sshVersionInFileName = modelsExtension != null ?
                         getFormattedVersionString(modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).orElseThrow().getVersion()) : DEFAULT_VERSION;
-                String newFileName = buildCgmesFilename(sweData, tso, "SSH", sshVersionInFileName);  //todo version incorrecte
+                String newFileName = buildCgmesFilename(sweData, tso, "SSH", sshVersionInFileName);
                 mapFiles.put(newFileName, baos);
             }
         }
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             String filenameFromCgmesExport = mergedNetwork.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
-            String svFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", DEFAULT_VERSION); //todo version incorrecte
+            String svFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", DEFAULT_VERSION);
             mapFiles.put(svFilename, os);
         }
         return mapFiles;
@@ -314,7 +314,7 @@ public class CgmesExportService {
                 .setId(svId.toString())
                 .setSubset(CgmesSubset.STATE_VARIABLES)
                 .setDescription("SV Model")
-                .setVersion(0)
+                .setVersion(0) //todo mettre la bonne version comme le nom du fichier
                 .addProfile("http://state-variables")
                 .setModelingAuthoritySet(svModelingAuthority)
                 .add()
