@@ -67,7 +67,7 @@ import static com.farao_community.farao.swe.runner.app.services.NetworkService.T
 public class CgmesExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesExportService.class);
     private static final double DEFAULT_P_TOLERANCE = 10;
-    private static final String DEFAULT_VERSION = "001";
+    private static final int DEFAULT_VERSION = 1;
     private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'_'[process]_[tso]_[type]_[version]'");
     public static final String MODELING_AUTHORITY_DEFAULT_VALUE = "https://farao-community.github.io/";
     private final Logger businessLogger;
@@ -175,27 +175,42 @@ public class CgmesExportService {
     private Map<String, ByteArrayOutputStream> createOneSsh(Network network, SweData sweData, String tso, List<String> outputSshIds) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             updateControlAreasExtension(network);
+            int sshVersion = incrementSshVersion(network);
             MemDataSource memDataSource = new MemDataSource();
             updateModelAuthorityParameter(tso);
+
             ReportNode reporterSsh = ReportNode
                     .newRootReportNode()
                     .withMessageTemplate("CgmesId", tso)
                     .build();
-            network.write(new ExportersServiceLoader(), "CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporterSsh);
+            network.write(new ExportersServiceLoader(), "CGMES", SSH_FILES_EXPORT_PARAMS, memDataSource, reporterSsh); //todo with 6.4r eporterSSH does not change the messageTemplate "tso"
             outputSshIds.add(getCgmesIdFromReporter(reporterSsh));
 
             String filenameFromCgmesExport = network.getNameOrId() + "_SSH.xml";
             baos.write(memDataSource.getData(filenameFromCgmesExport));
-            CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
-            String sshVersionInFileName = modelsExtension != null ?
-                    getFormattedVersionString(modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).orElseThrow().getVersion()) : DEFAULT_VERSION;
-            String newFileName = buildCgmesFilename(sweData, tso, "SSH", sshVersionInFileName);
+
+            String newFileName = buildCgmesFilename(sweData, tso, "SSH", getFormattedVersionString(sshVersion));
             return Map.of(newFileName, baos);
         }
     }
 
+    private int incrementSshVersion(Network network) {
+        // the version of ssh should be incremented from the initial version
+        // The verison in the output filename should be the same as in the "fullModel"
+        CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
+        if (modelsExtension != null) {
+            Optional<CgmesMetadataModel> modelForSsh = modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS);
+            if (modelForSsh.isPresent()) {
+                int initialVersion = modelForSsh.get().getVersion();
+                modelForSsh.get().setVersion(initialVersion + 1);
+                return initialVersion + 1;
+            }
+        }
+        return DEFAULT_VERSION;
+    }
+
     private static String getFormattedVersionString(int version) {
-        return String.format("%03d", version + 1);
+        return String.format("%03d", version);
     }
 
     private String getCgmesIdFromReporter(ReportNode reporterSsh) {
@@ -224,7 +239,7 @@ public class CgmesExportService {
         try (InputStream inputStream = getInputStreamFromData(sweData, cgmesFileType);
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             IOUtils.copy(inputStream, outputStream);
-            return Map.of(buildCgmesFilename(sweData, cgmesFileType.getTso(), cgmesFileType.getFileType(), DEFAULT_VERSION), outputStream);
+            return Map.of(buildCgmesFilename(sweData, cgmesFileType.getTso(), cgmesFileType.getFileType(), getFormattedVersionString(DEFAULT_VERSION)), outputStream);
         }
     }
 
@@ -261,7 +276,7 @@ public class CgmesExportService {
             network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
             String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
-            String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", DEFAULT_VERSION);
+            String outputFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", getFormattedVersionString(DEFAULT_VERSION));
             return Map.of(outputFilename, os);
         }
     }
@@ -279,8 +294,8 @@ public class CgmesExportService {
                 .setId(svId.toString())
                 .setSubset(CgmesSubset.STATE_VARIABLES)
                 .setDescription("SV Model")
-                .setVersion(0)
-                .addProfile("http://state-variables")
+                .setVersion(DEFAULT_VERSION)
+                .addProfile("http://entsoe.eu/CIM/StateVariables/4/1")
                 .setModelingAuthoritySet(svModelingAuthority)
                 .add()
                 .add();

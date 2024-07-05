@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, RTE (http://www.rte-france.com)
+ * Copyright (c) 2022, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -52,6 +52,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
+ * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 @SpringBootTest
 class CgmesExportServiceTest {
@@ -152,9 +153,11 @@ class CgmesExportServiceTest {
         assertNotNull(outputNetwork);
         Network subnetwork = (Network) outputNetwork.getSubnetworks().toArray()[0];
         CgmesMetadataModels modelsExtensionOutput = subnetwork.getExtension(CgmesMetadataModels.class);
-        assertNotNull(modelsExtension);
+        assertNotNull(modelsExtensionOutput);
         CgmesMetadataModel svModelOutput = modelsExtensionOutput.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
-        assertTrue(svModelOutput.getSupersedes().toArray()[0].toString().contains("sv-id-test1"));
+        assertEquals("http://entsoe.eu/CIM/StateVariables/4/1", svModelOutput.getProfiles().stream().findFirst().get());
+        assertEquals(1, svModelOutput.getVersion());
+        assertEquals("http://www.coreso.eu/OperationalPlanning", svModelOutput.getModelingAuthoritySet());
         assertEquals(4, svModelOutput.getDependentOn().size()); // Initial tp id + 3 new ssh ids generated during export
 
         Files.deleteIfExists(Paths.get(tmp));
