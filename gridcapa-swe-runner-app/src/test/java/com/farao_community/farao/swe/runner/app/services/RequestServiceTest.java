@@ -49,7 +49,7 @@ class RequestServiceTest {
     @Test
     void testRequestService() {
         String id = UUID.randomUUID().toString();
-        SweRequest cseRequest = new SweRequest(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         byte[] resp = jsonApiConverter.toJsonMessage(cseResponse, SweResponse.class);
@@ -68,7 +68,7 @@ class RequestServiceTest {
     @Test
     void testInterruptedRequestService() {
         String id = UUID.randomUUID().toString();
-        SweRequest cseRequest = new SweRequest(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         byte[] resp = jsonApiConverter.toJsonMessage(cseResponse, SweResponse.class);
@@ -88,7 +88,7 @@ class RequestServiceTest {
     void testErrorRequestService() {
         String id = UUID.randomUUID().toString();
         RuntimeException except = new RuntimeException("Mocked exception");
-        SweRequest cseRequest = new SweRequest(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any())).thenThrow(except);
         byte[] expectedResult = jsonApiConverter.toJsonMessage(new SweInternalException("SWE run failed", except));

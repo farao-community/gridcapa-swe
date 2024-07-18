@@ -20,6 +20,7 @@ import java.util.Map;
 public class SweData {
 
     private final String id;
+    private final String runId;
     private final OffsetDateTime timestamp;
     private final ProcessType processType;
     private final Network networkEsFr;
@@ -35,8 +36,9 @@ public class SweData {
     private final String raoParametersEsPtUrl;
     private final Map<CgmesFileType, SweFileResource> mapCgmesInputFiles;
 
-    public SweData(String id, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
+    public SweData(String id, String runId, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
         this.id = id;
+        this.runId = runId;
         this.timestamp = timestamp;
         this.processType = processType;
         this.networkEsFr = networkEsFr;
@@ -55,6 +57,10 @@ public class SweData {
 
     public String getId() {
         return id;
+    }
+
+    public String getRunId() {
+        return runId;
     }
 
     public OffsetDateTime getTimestamp() {
