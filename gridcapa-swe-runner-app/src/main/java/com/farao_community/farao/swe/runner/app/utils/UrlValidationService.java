@@ -8,7 +8,7 @@
 package com.farao_community.farao.swe.runner.app.utils;
 
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import com.farao_community.farao.swe.runner.app.configurations.UrlWhitelistConfiguration;
+import com.farao_community.farao.swe.runner.app.configurations.UrlConfiguration;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,16 +21,16 @@ import java.util.StringJoiner;
  */
 @Component
 public class UrlValidationService {
-    private final UrlWhitelistConfiguration urlWhitelistConfiguration;
+    private final UrlConfiguration urlConfiguration;
 
-    public UrlValidationService(UrlWhitelistConfiguration urlWhitelistConfiguration) {
-        this.urlWhitelistConfiguration = urlWhitelistConfiguration;
+    public UrlValidationService(UrlConfiguration urlConfiguration) {
+        this.urlConfiguration = urlConfiguration;
     }
 
     public InputStream openUrlStream(String urlString) {
-        if (urlWhitelistConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
+        if (urlConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
             StringJoiner sj = new StringJoiner(", ", "Whitelist: ", ".");
-            urlWhitelistConfiguration.getWhitelist().forEach(sj::add);
+            urlConfiguration.getWhitelist().forEach(sj::add);
             throw new SweInvalidDataException(String.format("URL '%s' is not part of application's whitelisted url's %s", urlString, sj));
         }
         try {

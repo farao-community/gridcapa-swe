@@ -41,7 +41,7 @@ class NetworkServiceTest {
 
     @BeforeAll
     void setUp() {
-        sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(),
+        sweRequest = new SweRequest("id", "currentRunId", ProcessType.D2CC, OffsetDateTime.now(),
                 new SweFileResource("CORESO_SV.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_SV.xml")).toExternalForm()),
                 new SweFileResource("REE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_EQ.xml")).toExternalForm()),
                 new SweFileResource("REE_SSH.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_SSH.xml")).toExternalForm()),

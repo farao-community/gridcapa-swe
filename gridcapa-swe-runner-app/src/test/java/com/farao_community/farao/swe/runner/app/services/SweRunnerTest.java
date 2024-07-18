@@ -18,11 +18,16 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -44,10 +49,17 @@ class SweRunnerTest {
     @MockBean
     private Logger businessLogger;
 
+    @MockBean
+    private RestTemplateBuilder restTemplateBuilder;
+
     @Test
     void run() {
         when(filesService.importFiles(any(SweRequest.class), any(SweTaskParameters.class))).thenReturn(mock(SweData.class));
         when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false));
+        RestTemplate restTemplate = mock(RestTemplate.class);
+        when(restTemplateBuilder.build()).thenReturn(restTemplate);
+        ResponseEntity<Boolean> responseEntity = mock(ResponseEntity.class);
+        when(restTemplate.getForEntity(anyString(), any(Class.class))).thenReturn(responseEntity);
         SweResponse sweResponse = sweRunner.run(mock(SweRequest.class));
         assertNotNull(sweResponse);
         assertEquals("ttcUrl", sweResponse.getTtcDocUrl());
@@ -59,6 +71,10 @@ class SweRunnerTest {
         when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false));
         SweRequest sweRequest = mock(SweRequest.class);
         Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("MAX_CRA", "INT", "35", "35")));
+        RestTemplate restTemplate = mock(RestTemplate.class);
+        when(restTemplateBuilder.build()).thenReturn(restTemplate);
+        ResponseEntity<Boolean> responseEntity = mock(ResponseEntity.class);
+        when(restTemplate.getForEntity(anyString(), any(Class.class))).thenReturn(responseEntity);
 
         sweRunner.run(sweRequest);
 
@@ -72,10 +88,27 @@ class SweRunnerTest {
         when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false));
         SweRequest sweRequest = mock(SweRequest.class);
         Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("MAX_CRA", "INT", "17", "35")));
+        RestTemplate restTemplate = mock(RestTemplate.class);
+        when(restTemplateBuilder.build()).thenReturn(restTemplate);
+        ResponseEntity<Boolean> responseEntity = mock(ResponseEntity.class);
+        when(restTemplate.getForEntity(anyString(), any(Class.class))).thenReturn(responseEntity);
 
         sweRunner.run(sweRequest);
 
         Mockito.verify(businessLogger, times(0)).info(anyString(), anyString());
         Mockito.verify(businessLogger, times(1)).warn(anyString(), anyString());
+    }
+
+    @Test
+    void interruptRun() {
+        RestTemplate restTemplate = mock(RestTemplate.class);
+        when(restTemplateBuilder.build()).thenReturn(restTemplate);
+        ResponseEntity<Boolean> responseEntity = mock(ResponseEntity.class);
+        when(restTemplate.getForEntity(anyString(), any(Class.class))).thenReturn(responseEntity);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(responseEntity.getBody()).thenReturn(Boolean.TRUE);
+        SweResponse sweResponse = sweRunner.run(mock(SweRequest.class));
+        assertNotNull(sweResponse);
+        assertTrue(sweResponse.isInterrupted());
     }
 }

@@ -116,6 +116,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         String raoParametersUrl = getMatchingRaoParametersUrl(direction);
         return new RaoRequest.RaoRequestBuilder()
                 .withId(sweData.getId())
+                .withRunId(sweData.getRunId())
                 .withNetworkFileUrl(networkPresignedUrl)
                 .withCracFileUrl(getMatchingCracPath(direction, sweData))
                 .withRaoParametersFileUrl(raoParametersUrl)

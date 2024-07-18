@@ -19,10 +19,19 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties("swe-runner")
-public class UrlWhitelistConfiguration {
+public class UrlConfiguration {
     private final List<String> whitelist = new ArrayList<>();
+    private String interruptServerUrl;
 
     public List<String> getWhitelist() {
         return whitelist;
+    }
+
+    public String getInterruptServerUrl() {
+        return interruptServerUrl;
+    }
+
+    public void setInterruptServerUrl(String interruptServerUrl) {
+        this.interruptServerUrl = interruptServerUrl;
     }
 }
