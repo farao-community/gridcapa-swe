@@ -23,6 +23,7 @@ import java.util.List;
 public class SweRequest {
     @Id
     private final String id;
+    private final String currentRunId;
     private final ProcessType processType;
     private final OffsetDateTime targetProcessDateTime;
     private final SweFileResource coresoSv;
@@ -43,6 +44,7 @@ public class SweRequest {
 
     @JsonCreator
     public SweRequest(@JsonProperty("id") String id,
+                      @JsonProperty("currentRunId") String currentRunId,
                       @JsonProperty("processType") ProcessType processType,
                       @JsonProperty("targetProcessDateTime") OffsetDateTime targetProcessDateTime,
                       @JsonProperty("coresoSv") SweFileResource coresoSv,
@@ -61,6 +63,7 @@ public class SweRequest {
                       @JsonProperty("glsk") SweFileResource glsk,
                       @JsonProperty("taskParameterList") List<TaskParameterDto> taskParameterList) {
         this.id = id;
+        this.currentRunId = currentRunId;
         this.processType = processType;
         this.targetProcessDateTime = targetProcessDateTime;
         this.coresoSv = coresoSv;
@@ -82,6 +85,10 @@ public class SweRequest {
 
     public String getId() {
         return id;
+    }
+
+    public String getCurrentRunId() {
+        return currentRunId;
     }
 
     public ProcessType getProcessType() {
