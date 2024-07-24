@@ -13,8 +13,6 @@ swe-commons:
     SV: "http://www.coreso.eu/OperationalPlanning"
 
 swe-runner:
-  unoptimized-cnecs-with-pst-es-fr:
-    active : false
   dichotomy:
     parameters:
       ES_FR:

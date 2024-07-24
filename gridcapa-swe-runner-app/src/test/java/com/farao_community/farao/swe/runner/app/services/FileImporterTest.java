@@ -19,9 +19,8 @@ import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.CracCreationContext;
 import com.powsybl.openrao.data.cracapi.RaUsageLimits;
-import com.powsybl.openrao.data.craccreation.creator.api.CracCreationContext;
-import com.powsybl.openrao.data.craccreation.creator.cim.CimCrac;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,13 +69,6 @@ class FileImporterTest {
     }
 
     @Test
-    void testImportCimCrac() {
-        SweRequest req = createEmptySweRequest();
-        CimCrac cimCrac = fileImporter.importCimCrac(req);
-        Assertions.assertNotNull(cimCrac);
-    }
-
-    @Test
     void testImportCimCracFromUrlWithNetwork() {
         Properties importParams = new Properties();
         importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
@@ -88,10 +80,10 @@ class FileImporterTest {
         );
         SweRequest req = createEmptySweRequest();
         SweTaskParameters sweTaskParametersFrEs = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "27", "12")));
-        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null, sweTaskParametersFrEs);
+        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(dateTime, network, null, sweTaskParametersFrEs);
         Assertions.assertNotNull(cracFrEs);
         SweTaskParameters sweTaskParametersEsPt = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "32", "12")));
-        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON, sweTaskParametersEsPt);
+        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON, sweTaskParametersEsPt);
         Assertions.assertNotNull(cracEsPt);
         Map<com.powsybl.openrao.data.cracapi.Instant, RaUsageLimits> raUsageLimitsPerInstant = cracEsPt.getCrac().getRaUsageLimitsPerInstant();
         assertEquals(1, raUsageLimitsPerInstant.size());

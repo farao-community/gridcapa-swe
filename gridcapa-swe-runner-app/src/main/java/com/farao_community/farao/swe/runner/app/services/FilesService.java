@@ -55,8 +55,8 @@ public class FilesService {
         Network networkPtEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
         String cracCreationParamFrEs = sweRequest.getProcessType().equals(ProcessType.D2CC) ? CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON : CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_IDCC_JSON;
         String cracCreationParamEsPt = sweRequest.getProcessType().equals(ProcessType.D2CC) ? CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_D2CC_JSON : CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON;
-        CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsFr, cracCreationParamFrEs, sweTaskParameters);
-        CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(sweRequest), targetProcessDateTime, networkEsPt, cracCreationParamEsPt, sweTaskParameters);
+        CimCracCreationContext cracCreationContextFrEs = fileImporter.importCracFromCimCracAndNetwork(targetProcessDateTime, networkEsFr, cracCreationParamFrEs, sweTaskParameters);
+        CimCracCreationContext cracCreationContextEsPt = fileImporter.importCracFromCimCracAndNetwork(targetProcessDateTime, networkEsPt, cracCreationParamEsPt, sweTaskParameters);
         Crac cracFrEs = cracCreationContextFrEs.getCrac();
         Crac cracEsPt = cracCreationContextEsPt.getCrac();
         String jsonCracPathFrEs = fileExporter.saveCracInJsonFormat(cracFrEs, "cracFrEs.json", targetProcessDateTime, sweRequest.getProcessType());

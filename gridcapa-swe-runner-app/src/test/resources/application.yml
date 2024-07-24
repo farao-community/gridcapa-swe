@@ -21,8 +21,6 @@ swe-runner:
       - twt-not-found-id
       - twt-test-regulation-id
       - twt-without-tap-changer-id
-  unoptimized-cnecs-with-pst-es-fr:
-    active: true
   dichotomy:
     parameters:
       ES_FR:
