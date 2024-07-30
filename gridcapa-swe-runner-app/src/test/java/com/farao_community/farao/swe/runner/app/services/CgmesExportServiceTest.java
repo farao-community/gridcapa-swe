@@ -141,7 +141,7 @@ class CgmesExportServiceTest {
         CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
         assertNotNull(modelsExtension);
         CgmesMetadataModel svModel = modelsExtension.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
-        assertEquals("sv-id-test1", svModel.getId());
+        assertEquals("sv-id-test1", svModel.getSupersedes().toArray()[0]);
         assertFalse(svModel.getDependentOn().contains("ssh-id-test1")); //initial ssh id removed from sv dependencies
         assertTrue(svModel.getDependentOn().contains("tp-id-test1")); // Initial tp id is kept
         assertEquals(4, svModel.getDependentOn().size()); // Initial tp id + 3 new ssh ids generated during export
@@ -178,7 +178,7 @@ class CgmesExportServiceTest {
                 .add()
                 .add();
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>());
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
         assertEquals(3, sshFiles.size());
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001"));
@@ -191,7 +191,7 @@ class CgmesExportServiceTest {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>());
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
         assertEquals(2, sshFiles.size());
         assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
