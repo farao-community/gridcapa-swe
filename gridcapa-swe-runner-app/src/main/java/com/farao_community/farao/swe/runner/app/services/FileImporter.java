@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
@@ -47,7 +48,7 @@ public class FileImporter {
         this.urlValidationService = urlValidationService;
     }
 
-    public CimCracCreationContext importCracFromCimCracAndNetwork(OffsetDateTime processDateTime, Network network, String cracCreationParams, SweTaskParameters sweTaskParameters) {
+    public CimCracCreationContext importCracFromCimCracAndNetwork(SweFileResource cracFile, OffsetDateTime processDateTime, Network network, String cracCreationParams, SweTaskParameters sweTaskParameters) {
         CracCreationParameters cimCracCreationParameters = getCimCracCreationParameters(cracCreationParams);
         RaUsageLimits raUsageLimits = cimCracCreationParameters.getRaUsageLimitsPerInstant().get("curative");
         if (raUsageLimits == null) {
@@ -57,6 +58,7 @@ public class FileImporter {
         raUsageLimits.setMaxRa(sweTaskParameters.getMaxCra());
 
         return importCrac(
+                cracFile,
                 processDateTime,
                 network,
                 cimCracCreationParameters);
@@ -71,10 +73,10 @@ public class FileImporter {
         }
     }
 
-    private CimCracCreationContext importCrac(OffsetDateTime targetProcessDateTime, Network network, CracCreationParameters params) {
+    private CimCracCreationContext importCrac(SweFileResource crac, OffsetDateTime targetProcessDateTime, Network network, CracCreationParameters params) {
         LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", targetProcessDateTime);
         try {
-            return (CimCracCreationContext) Crac.readWithContext("", InputStream.nullInputStream(), network, targetProcessDateTime, params);
+            return (CimCracCreationContext) Crac.readWithContext(crac.getFilename(), urlValidationService.openUrlStream(crac.getUrl()), network, targetProcessDateTime, params);
         } catch (IOException e) {
             throw new SweInvalidDataException(String.format("Cannot read crac with context for process date: %s", targetProcessDateTime), e);
         }

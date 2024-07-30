@@ -78,12 +78,13 @@ class FileImporterTest {
                 Suppliers.memoize(ImportConfig::load).get(),
                 importParams
         );
-        SweRequest req = createEmptySweRequest();
+        SweFileResource sweFileResource = new SweFileResource(
+                cimCracFilename, Objects.requireNonNull(getClass().getResource(testDirectory + cimCracFilename)).toString());
         SweTaskParameters sweTaskParametersFrEs = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "27", "12")));
-        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(dateTime, network, null, sweTaskParametersFrEs);
+        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(sweFileResource, dateTime, network, null, sweTaskParametersFrEs);
         Assertions.assertNotNull(cracFrEs);
         SweTaskParameters sweTaskParametersEsPt = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "32", "12")));
-        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON, sweTaskParametersEsPt);
+        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(sweFileResource, dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON, sweTaskParametersEsPt);
         Assertions.assertNotNull(cracEsPt);
         Map<com.powsybl.openrao.data.cracapi.Instant, RaUsageLimits> raUsageLimitsPerInstant = cracEsPt.getCrac().getRaUsageLimitsPerInstant();
         assertEquals(1, raUsageLimitsPerInstant.size());

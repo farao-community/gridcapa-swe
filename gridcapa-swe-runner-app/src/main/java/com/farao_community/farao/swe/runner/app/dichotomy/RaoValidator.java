@@ -85,7 +85,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
                             SweDichotomyValidationData.AngleMonitoringStatus.FAILURE),
                             false);
-                } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE)) {
+                } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE, PhysicalParameter.FLOW)) {
                     businessLogger.info("Angle monitoring result is secure");
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
                                     SweDichotomyValidationData.AngleMonitoringStatus.SECURE),
