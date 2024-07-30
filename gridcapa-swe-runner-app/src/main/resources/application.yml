@@ -1,40 +1,11 @@
 spring:
-  application:
-    name: swe-d2cc-runner
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: gridcapa
-    password: gridcapa
-    template:
-      reply-timeout: 7200000
   cloud:
     function:
       definition: request;softInterrupt
-    stream:
-      default:
-        binder: rabbit
-      bindings:
-        softInterrupt-in-0:
-          destination: swe-d2cc-stop-task
-        request-in-0:
-          destination: swe-d2cc-request
-          group: swe-d2cc-runner
-        request-out-0:
-          destination: swe-d2cc-response
-        task-status-update:
-          destination: swe-d2cc-task-status-updated
-        stop-rao:
-          destination: stop-rao-runner
-
-logback:
-  amqp:
-    exchange: swe-d2cc-task-manager-logs-exchange
-    routing-key: "#"
 
 swe-commons:
   zone-id: "Europe/Paris"
-  shift-max-iteration-number: 20
+  shift-max-iteration-number: 30
   modeling-authority-map:
     REE: "http://www.ree.es/OperationalPlanning"
     REN: "http://www.ren.pt/OperationalPlanning"
@@ -42,9 +13,6 @@ swe-commons:
     SV: "http://www.coreso.eu/OperationalPlanning"
 
 swe-runner:
-  pst:
-    pst1-id: _e071a1d4-fef5-1bd9-5278-d195c5597b6e
-    pst2-id: _7824bc48-fc86-51db-8f9c-01b44933839e
   unoptimized-cnecs-with-pst-es-fr:
     active : false
   dichotomy:
@@ -61,19 +29,3 @@ swe-runner:
       PT_ES:
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
-  whitelist:
-    - http://localhost:9000/
-    - http://minio:9000/
-    - file:/
-
-rao-runner-server:
-  amqp:
-    client-app-id: swe-runner
-    queue-name: rao-request-queue
-
-minio-adapter:
-  bucket: gridcapa
-  base-path: /SWE/D2CC
-  access-key: gridcapa
-  secret-key: gridcapa
-  url: http://localhost:9000

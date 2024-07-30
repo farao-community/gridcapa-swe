@@ -9,8 +9,7 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import com.powsybl.iidm.network.Country;
-import com.powsybl.openrao.commons.EICode;
+import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,32 +32,28 @@ public class SweD2ccShiftDispatcher implements ShiftDispatcher {
         Map<String, Double> factors = new TreeMap<>();
         switch (direction) {
             case ES_FR:
-                factors.put(toEic("PT"), 0.);
-                factors.put(toEic("ES"), 1.);
-                factors.put(toEic("FR"), -1.);
+                factors.put(SweEICode.PT_EIC, 0.);
+                factors.put(SweEICode.ES_EIC, 1.);
+                factors.put(SweEICode.FR_EIC, -1.);
                 break;
             case FR_ES:
-                factors.put(toEic("PT"), 0.);
-                factors.put(toEic("ES"), -1.);
-                factors.put(toEic("FR"), 1.);
+                factors.put(SweEICode.PT_EIC, 0.);
+                factors.put(SweEICode.ES_EIC, -1.);
+                factors.put(SweEICode.FR_EIC, 1.);
                 break;
             case ES_PT:
-                factors.put(toEic("PT"), -1.);
-                factors.put(toEic("ES"), 1.);
-                factors.put(toEic("FR"), 0.);
+                factors.put(SweEICode.PT_EIC, -1.);
+                factors.put(SweEICode.ES_EIC, 1.);
+                factors.put(SweEICode.FR_EIC, 0.);
                 break;
             case PT_ES:
-                factors.put(toEic("PT"), 1.);
-                factors.put(toEic("ES"), -1.);
-                factors.put(toEic("FR"), 0.);
+                factors.put(SweEICode.PT_EIC, 1.);
+                factors.put(SweEICode.ES_EIC, -1.);
+                factors.put(SweEICode.FR_EIC, 0.);
                 break;
             default:
                 throw new SweInvalidDataException(String.format("Unknown dichotomy direction for SWE: %s", direction));
         }
         return factors.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() * value - initialNetPositions.get(e.getKey())));
-    }
-
-    private String toEic(String country) {
-        return new EICode(Country.valueOf(country)).getAreaCode();
     }
 }

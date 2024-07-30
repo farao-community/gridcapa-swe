@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -67,15 +67,15 @@ class CgmesExportServiceTest {
 
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         String d2ccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "001");
-        assertions.assertThat(d2ccResult).isEqualTo("20221130T0000Z_2D_FR_ESFR_001.xml");
+        assertions.assertThat(d2ccResult).isEqualTo("20221130T0000Z_2D_FR_ESFR_001");
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC);
         String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
-        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_ID_FR_ESFR_002.xml");
+        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_ID_FR_ESFR_002");
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
         String idccIdcfResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "003");
-        assertions.assertThat(idccIdcfResult).isEqualTo("20221130T0000Z_IDCF_FR_ESFR_003.xml");
+        assertions.assertThat(idccIdcfResult).isEqualTo("20221130T0000Z_IDCF_FR_ESFR_003");
 
         assertions.assertAll();
     }
@@ -122,16 +122,16 @@ class CgmesExportServiceTest {
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
         Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
         assertEquals(10, cgmesFiles.size());
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_006.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_EQ_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001.xml"));
-        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001.xml"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_EQ_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_TP_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_SSH_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_EQ_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REN_TP_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_EQ_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001"));
+        assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001"));
 
         String tmp = Files.createTempDirectory("pref_").toAbsolutePath() + "/network_output.zip";
         exportCgmesZipFile(cgmesFiles, tmp);
@@ -177,9 +177,9 @@ class CgmesExportServiceTest {
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>());
         assertEquals(3, sshFiles.size());
-        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006.xml"));
-        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001.xml"));
-        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
     }
 
     @Test
@@ -190,8 +190,8 @@ class CgmesExportServiceTest {
         SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>());
         assertEquals(2, sshFiles.size());
-        assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001.xml"));
-        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001.xml"));
+        assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
     }
 
     private void exportCgmesZipFile(Map<String, ByteArrayOutputStream> mapCgmesFiles, String path) throws IOException {
@@ -199,7 +199,7 @@ class CgmesExportServiceTest {
              ZipOutputStream zipOs = new ZipOutputStream(baos)) {
 
             for (var entry : mapCgmesFiles.entrySet()) {
-                zipOs.putNextEntry(new ZipEntry(entry.getKey()));
+                zipOs.putNextEntry(new ZipEntry(entry.getKey() + ".xml"));
                 byte[] bytes = new byte[1024];
                 int length;
                 InputStream is = new ByteArrayInputStream(entry.getValue().toByteArray());

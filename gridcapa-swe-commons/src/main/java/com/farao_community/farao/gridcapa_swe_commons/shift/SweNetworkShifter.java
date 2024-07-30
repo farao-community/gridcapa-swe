@@ -13,6 +13,7 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
@@ -22,16 +23,12 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
-import com.powsybl.openrao.commons.EICode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -76,7 +73,7 @@ public class SweNetworkShifter implements NetworkShifter {
         GeneratorLimitsHandler generatorLimitsHandler = new GeneratorLimitsHandler(zonalScalable);
 
         try {
-            String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(toEic("ES")), scalingValuesByCountry.get(toEic("FR")), scalingValuesByCountry.get(toEic("PT")));
+            String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(SweEICode.ES_EIC), scalingValuesByCountry.get(SweEICode.FR_EIC), scalingValuesByCountry.get(SweEICode.PT_EIC));
             businessLogger.info(logTargetCountriesShift);
             Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
             int iterationCounter = 1;
@@ -86,7 +83,6 @@ public class SweNetworkShifter implements NetworkShifter {
             String processedVariantId = initialVariantId + " PROCESSED COPY";
             String workingVariantCopyId = initialVariantId + " WORKING COPY";
             preProcessNetwork(network, scalableGeneratorConnector, generatorLimitsHandler, initialVariantId, processedVariantId, workingVariantCopyId);
-            List<String> limitingCountries = new ArrayList<>();
             Map<String, Double> bordersExchanges;
 
             int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
@@ -95,7 +91,7 @@ public class SweNetworkShifter implements NetworkShifter {
             do {
                 // Step 1: Perform the scaling
                 LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
-                shiftIteration(network, scalingValuesByCountry, scalingParameters, limitingCountries, scalableGeneratorConnector);
+                Map<String, Double> incompleteShiftCountries = shiftIteration(network, scalingValuesByCountry, scalingParameters, scalableGeneratorConnector);
 
                 // Step 2: Compute exchanges mismatch
                 LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), loadFlowParameters);
@@ -114,6 +110,7 @@ public class SweNetworkShifter implements NetworkShifter {
                     network.getVariantManager().cloneVariant(workingVariantCopyId, initialVariantId, true);
                     shiftSucceed = true;
                 } else {
+                    checkGlskLimitation(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
                     // Reset current variant with initial state for each iteration (keeping pre-processing)
                     network.getVariantManager().cloneVariant(processedVariantId, workingVariantCopyId, true);
                     updateScalingValuesWithMismatch(scalingValuesByCountry, mismatchEsPt, mismatchEsFr);
@@ -151,7 +148,8 @@ public class SweNetworkShifter implements NetworkShifter {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
-    private void shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, List<String> limitingCountries, ScalableGeneratorConnector scalableGeneratorConnector) throws GlskLimitationException {
+    private Map<String, Double> shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, ScalableGeneratorConnector scalableGeneratorConnector) throws GlskLimitationException {
+        Map<String, Double> incompleteShiftCountries = new HashMap<>();
         for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
             String zoneId = entry.getKey();
             double asked = entry.getValue();
@@ -159,21 +157,37 @@ public class SweNetworkShifter implements NetworkShifter {
             LOGGER.info(logApplyingVariationOnZone);
             double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
             if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                String logWarnIncompleteVariation = String.format("[%s] : Incomplete variation on zone %s (target: %.2f, done: %.2f)",
+                String logWarnIncompleteVariation = String.format("[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)",
                         direction, zoneId, asked, done);
                 LOGGER.warn(logWarnIncompleteVariation);
-                limitingCountries.add(zoneId);
+                incompleteShiftCountries.put(zoneId, done - asked);
             }
         }
         // During the shift some generators linked to the main network with a transformers are not connected correctly
         // Waiting for a fix in powsybl-core, we connect the transformers linked to these generators to be correctly connected to the main network component
         scalableGeneratorConnector.connectGeneratorsTransformers(network, PRE_PROCESSING_COUNTRIES);
+        return incompleteShiftCountries;
+    }
 
-        if (!limitingCountries.isEmpty()) {
-            StringJoiner sj = new StringJoiner(", ", "There are Glsk limitation(s) in ", ".");
-            limitingCountries.forEach(sj::add);
-            LOGGER.error("[{}] : {}", direction, sj);
-            throw new GlskLimitationException(sj.toString());
+    private void checkGlskLimitation(Map<String, Double> incompleteShiftCountries, double mismatchEsPt, double mismatchEsFr) throws GlskLimitationException {
+        if (incompleteShiftCountries.containsKey(SweEICode.PT_EIC)) {
+            checkGlskLimitationCountry("PT", incompleteShiftCountries.get(SweEICode.PT_EIC), mismatchEsPt);
+        }
+        if (incompleteShiftCountries.containsKey(SweEICode.FR_EIC)) {
+            checkGlskLimitationCountry("FR", incompleteShiftCountries.get(SweEICode.FR_EIC), mismatchEsFr);
+        }
+        if (incompleteShiftCountries.containsKey(SweEICode.ES_EIC)) {
+            checkGlskLimitationCountry("ES", incompleteShiftCountries.get(SweEICode.ES_EIC), -(mismatchEsFr + mismatchEsPt));
+        }
+    }
+
+    private void checkGlskLimitationCountry(String country, double diffShift, double mismatch) throws GlskLimitationException {
+        // In case of asked > 0 : (done - asked) will be < 0, we have Glsk limitation if the next asked value increase (mismatch < 0),
+        // In case of asked < 0 : (done - asked) will be > 0, we have Glsk limitation if the next asked value decrease (mismatch > 0)
+        if (diffShift < 0 && mismatch < 0 || diffShift > 0 && mismatch > 0) {
+            String msg = "Glsk limitation occurred for country " + country;
+            businessLogger.error(msg);
+            throw new GlskLimitationException(msg);
         }
     }
 
@@ -202,16 +216,16 @@ public class SweNetworkShifter implements NetworkShifter {
         switch (direction) {
             case ES_FR:
             case FR_ES:
-                scalingValuesByCountry.put(toEic("FR"), scalingValuesByCountry.get(toEic("FR")) - mismatchEsFr);
+                scalingValuesByCountry.put(SweEICode.FR_EIC, scalingValuesByCountry.get(SweEICode.FR_EIC) - mismatchEsFr);
                 break;
 
             case ES_PT:
             case PT_ES:
-                scalingValuesByCountry.put(toEic("PT"), scalingValuesByCountry.get(toEic("PT")) - mismatchEsPt);
+                scalingValuesByCountry.put(SweEICode.PT_EIC, scalingValuesByCountry.get(SweEICode.PT_EIC) - mismatchEsPt);
                 break;
         }
 
-        scalingValuesByCountry.put(toEic("ES"), scalingValuesByCountry.get(toEic("ES")) + mismatchEsPt + mismatchEsFr);
+        scalingValuesByCountry.put(SweEICode.ES_EIC, scalingValuesByCountry.get(SweEICode.ES_EIC) + mismatchEsPt + mismatchEsFr);
     }
 
     public Map<String, Double> getTargetExchanges(double stepValue) {
@@ -221,17 +235,17 @@ public class SweNetworkShifter implements NetworkShifter {
     private Map<String, Double> getIdccTargetExchanges(double stepValue, Map<String, Double> initialNetPositions) {
         Map<String, Double> target = new HashMap<>();
         if (DichotomyDirection.ES_FR.equals(direction)) {
-            target.put(ES_PT, -initialNetPositions.get(toEic("PT")));
+            target.put(ES_PT, -initialNetPositions.get(SweEICode.PT_EIC));
             target.put(ES_FR, stepValue);
         } else if (DichotomyDirection.FR_ES.equals(direction)) {
-            target.put(ES_PT, -initialNetPositions.get(toEic("PT")));
+            target.put(ES_PT, -initialNetPositions.get(SweEICode.PT_EIC));
             target.put(ES_FR, -stepValue);
         } else if (DichotomyDirection.ES_PT.equals(direction)) {
             target.put(ES_PT, stepValue);
-            target.put(ES_FR, initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")));
+            target.put(ES_FR, initialNetPositions.get(SweEICode.ES_EIC) + initialNetPositions.get(SweEICode.PT_EIC));
         } else if (DichotomyDirection.PT_ES.equals(direction)) {
             target.put(ES_PT, -stepValue);
-            target.put(ES_FR, initialNetPositions.get(toEic("ES")) + initialNetPositions.get(toEic("PT")));
+            target.put(ES_FR, initialNetPositions.get(SweEICode.ES_EIC) + initialNetPositions.get(SweEICode.PT_EIC));
         }
         return target;
     }
@@ -254,7 +268,4 @@ public class SweNetworkShifter implements NetworkShifter {
         return target;
     }
 
-    private static String toEic(String country) {
-        return new EICode(Country.valueOf(country)).getAreaCode();
-    }
 }

@@ -17,34 +17,24 @@ swe-commons:
 
 swe-runner:
   pst:
-    pst1-id: _e071a1d4-fef5-1bd9-5278-d195c5597b6e
-    pst2-id: _7824bc48-fc86-51db-8f9c-01b44933839e
+    pst-ids:
+      - twt-not-found-id
+      - twt-test-regulation-id
+      - twt-without-tap-changer-id
   unoptimized-cnecs-with-pst-es-fr:
     active: true
   dichotomy:
     parameters:
       ES_FR:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 10
         tolerance-Es-Pt: 50
       FR_ES:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 10
         tolerance-Es-Pt: 50
       ES_PT:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
       PT_ES:
-        min-value: 0
-        max-value: 6400
-        precision: 50
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
   whitelist:
