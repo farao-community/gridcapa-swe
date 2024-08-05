@@ -21,6 +21,7 @@ import com.powsybl.openrao.data.cracapi.parameters.CracCreationParameters;
 import com.powsybl.openrao.data.cracapi.parameters.JsonCracCreationParameters;
 import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.data.raoresultjson.RaoResultJsonImporter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -114,7 +115,7 @@ public class FileImporter {
 
     public RaoResult importRaoResult(String raoResultUrl, Crac crac) {
         try (InputStream raoResultStream = urlValidationService.openUrlStream(raoResultUrl)) {
-            return RaoResult.read(raoResultStream, crac);
+            return new RaoResultJsonImporter().importData(raoResultStream, crac);
         } catch (IOException e) {
             throw new SweInvalidDataException("Cannot import rao result from url", e);
         }
