@@ -7,15 +7,12 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.craccreation.creator.api.CracCreationContext;
-import com.powsybl.openrao.data.craccreation.creator.api.parameters.CracCreationParameters;
-import com.powsybl.openrao.data.craccreation.creator.cim.CimCrac;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreator;
-import com.powsybl.openrao.data.craccreation.creator.cim.importer.CimCracImporter;
+
+import com.powsybl.openrao.data.cracapi.CracCreationContext;
+import com.powsybl.openrao.data.cracapi.parameters.CracCreationParameters;
 import com.powsybl.openrao.data.craccreation.creator.cim.parameters.CimCracCreationParameters;
 import com.powsybl.openrao.data.craccreation.creator.cim.parameters.RangeActionSpeed;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
-import com.powsybl.openrao.data.raoresultjson.RaoResultImporter;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -41,24 +39,20 @@ class DichotomyResultHelperTest {
     private RaoResult raoResult;
 
     @BeforeAll
-    void setUp() {
+    void setUp() throws IOException {
         Network network = Network.read("/dichotomy/TestCase16NodesWith2Hvdc.xiidm", getClass().getResourceAsStream("/dichotomy/TestCase16NodesWith2Hvdc.xiidm"));
         InputStream cracIs = getClass().getResourceAsStream("/dichotomy/CIM_CRAC.xml");
-        CimCracImporter cracImporter = new CimCracImporter();
-        CimCrac cimCrac = cracImporter.importNativeCrac(cracIs);
-        CimCracCreator cimCracCreator = new CimCracCreator();
 
         Set<RangeActionSpeed> rangeActionSpeeds = Set.of(new RangeActionSpeed("BBE2AA11 FFR3AA11 1", 1), new RangeActionSpeed("BBE2AA12 FFR3AA12 1", 2), new RangeActionSpeed("PRA_1", 3));
         CimCracCreationParameters cimCracCreationParameters = new CimCracCreationParameters();
         cimCracCreationParameters.setRemedialActionSpeed(rangeActionSpeeds);
         CracCreationParameters cracCreationParameters = new CracCreationParameters();
         cracCreationParameters.addExtension(CimCracCreationParameters.class, cimCracCreationParameters);
-
-        CracCreationContext cracCreationContext = cimCracCreator.createCrac(cimCrac, network, OffsetDateTime.of(2021, 4, 2, 12, 30, 0, 0, ZoneOffset.UTC), cracCreationParameters);
+        CracCreationContext cracCreationContext = Crac.readWithContext("CIM_CRAC.xml", cracIs, network, OffsetDateTime.of(2021, 4, 2, 12, 30, 0, 0, ZoneOffset.UTC), cracCreationParameters);
         crac = cracCreationContext.getCrac();
 
         InputStream raoResultIs = getClass().getResourceAsStream("/dichotomy/RaoResult.json");
-        raoResult = new RaoResultImporter().importRaoResult(raoResultIs, crac);
+        raoResult = RaoResult.read(raoResultIs, crac);
 
     }
 

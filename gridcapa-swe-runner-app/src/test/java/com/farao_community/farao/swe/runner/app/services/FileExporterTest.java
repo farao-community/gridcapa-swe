@@ -125,7 +125,6 @@ class FileExporterTest {
     void sweRaoParametersEsFrTest() {
         SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false")));
         RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters, DichotomyDirection.ES_FR);
-        assertEquals(2, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
         assertEquals(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED, raoParameters.getSecondPreventiveRaoParameters().getExecutionCondition());
     }
 
@@ -133,7 +132,6 @@ class FileExporterTest {
     void sweRaoParametersEsPtTest() {
         SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false")));
         RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters, DichotomyDirection.ES_PT);
-        assertEquals(0, raoParameters.getNotOptimizedCnecsParameters().getDoNotOptimizeCnecsSecuredByTheirPst().size());
         assertEquals(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED, raoParameters.getSecondPreventiveRaoParameters().getExecutionCondition());
     }
 

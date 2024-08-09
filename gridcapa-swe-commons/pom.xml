@@ -63,10 +63,6 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-crac-io-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.powsybl</groupId>
             <artifactId>powsybl-glsk-document-api</artifactId>
         </dependency>
         <dependency>
