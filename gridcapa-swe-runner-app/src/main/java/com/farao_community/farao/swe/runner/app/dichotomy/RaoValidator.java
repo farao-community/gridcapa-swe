@@ -76,7 +76,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                 throw new RaoInterruptionException("RAO computation stopped due to soft interruption request");
             }
             RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
-            if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure()) {
+            if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
                 Crac crac = sweData.getCracEsPt().getCrac();
                 AngleMonitoring angleMonitoring = new AngleMonitoring(crac, network, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()), sweData.getTimestamp());
                 RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) angleMonitoring.runAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4);
@@ -86,6 +86,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                             SweDichotomyValidationData.AngleMonitoringStatus.FAILURE),
                             false);
                 } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE, PhysicalParameter.FLOW)) {
+
                     businessLogger.info("Angle monitoring result is secure");
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
                                     SweDichotomyValidationData.AngleMonitoringStatus.SECURE),
