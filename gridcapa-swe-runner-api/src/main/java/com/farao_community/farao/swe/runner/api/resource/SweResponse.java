@@ -21,6 +21,15 @@ public class SweResponse {
     private final String ttcDocUrl;
     private final boolean interrupted;
 
+    @Override
+    public String toString() {
+        return "SweResponse{" +
+                "id='" + id + '\'' +
+                ", ttcDocUrl='" + ttcDocUrl + '\'' +
+                ", interrupted=" + interrupted +
+                '}';
+    }
+
     @JsonCreator
     public SweResponse(@JsonProperty("id") String id,
                        @JsonProperty("ttcDocUrl") String ttcDocUrl,
