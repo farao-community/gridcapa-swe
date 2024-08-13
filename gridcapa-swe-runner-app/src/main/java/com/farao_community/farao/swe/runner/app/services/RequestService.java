@@ -53,9 +53,9 @@ public class RequestService {
 
     protected void launchSweRequest(byte[] req) {
         SweRequest sweRequest = jsonApiConverter.fromJsonMessage(req, SweRequest.class);
+        final String sweRequestId = sweRequest.getId();
         // propagate in logs MDC the task id as an extra field to be able to match microservices logs with calculation tasks.
         // This should be done only once, as soon as the information to add in mdc is available.
-        final String sweRequestId = sweRequest.getId();
         MDC.put("gridcapa-task-id", sweRequestId);
         try {
             sendTaskStatusUpdate(sweRequestId, TaskStatus.RUNNING);
