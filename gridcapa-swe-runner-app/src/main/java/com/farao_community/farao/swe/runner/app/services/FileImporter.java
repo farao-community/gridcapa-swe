@@ -120,7 +120,7 @@ public class FileImporter {
                 return CimGlskDocument.importGlsk(glskResultStream);
             }
         } catch (IOException e) {
-            throw new SweInvalidDataException(String.format("Cannot import glsk from url : %s",glskUrl), e);
+            throw new SweInvalidDataException(String.format("Cannot import glsk from url : %s", glskUrl), e);
         }
     }
 
