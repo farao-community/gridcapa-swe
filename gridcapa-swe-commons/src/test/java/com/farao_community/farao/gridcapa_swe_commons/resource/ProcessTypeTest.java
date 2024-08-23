@@ -12,7 +12,7 @@ class ProcessTypeTest {
     @Test
     void testGetCode() {
         assertEquals("2D", ProcessType.D2CC.getCode(), "D2CC should return '2D'");
-        assertEquals("ID", ProcessType.IDCC.getCode(), "IDCC should return 'ID'");
+        assertEquals("1D", ProcessType.IDCC.getCode(), "IDCC should return '1D'");
         assertEquals("IDCF", ProcessType.IDCC_IDCF.getCode(), "IDCC_IDCF should return 'IDCF'");
         assertEquals("BTCC", ProcessType.BTCC.getCode(), "BTCC should return 'BTCC'");
 

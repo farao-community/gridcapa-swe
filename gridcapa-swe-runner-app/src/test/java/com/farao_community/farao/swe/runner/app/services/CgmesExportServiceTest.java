@@ -71,7 +71,7 @@ class CgmesExportServiceTest {
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC);
         String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
-        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_ID_FR_ESFR_002");
+        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_1D_FR_ESFR_002");
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
         String idccIdcfResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "003");
