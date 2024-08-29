@@ -116,8 +116,7 @@ public class FileImporter {
     public RaoResult importRaoResult(String raoResultUrl, Crac crac) {
         try (InputStream raoResultStream = urlValidationService.openUrlStream(raoResultUrl)) {
             LOGGER.info("Importing raoResult file from url : {} ", raoResultUrl);
-            RaoResult raoResult = new RaoResultJsonImporter().importData(raoResultStream, crac);
-            return raoResult;
+            return new RaoResultJsonImporter().importData(raoResultStream, crac);
         } catch (IOException e) {
             throw new SweInvalidDataException("Cannot import rao result from url", e);
         }

@@ -194,7 +194,7 @@ public class FileExporter {
     }
 
     public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
-        RaoParameters raoParameters = getSweRaoParameters(sweTaskParameters, direction);
+        RaoParameters raoParameters = getSweRaoParameters(sweTaskParameters);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonRaoParameters.write(raoParameters, baos);
         String raoParametersFileName = String.format(RAO_PARAMETERS_FILE_NAME, direction);
@@ -204,7 +204,7 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    RaoParameters getSweRaoParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+    RaoParameters getSweRaoParameters(SweTaskParameters sweTaskParameters) {
         RaoParameters raoParameters = RaoParameters.load();
         if (sweTaskParameters.isSecondPreventiveRaoDisabled()) {
             raoParameters.getSecondPreventiveRaoParameters().setExecutionCondition(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED);
