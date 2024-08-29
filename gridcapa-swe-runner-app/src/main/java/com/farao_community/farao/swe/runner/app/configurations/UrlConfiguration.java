@@ -7,8 +7,6 @@
 package com.farao_community.farao.swe.runner.app.configurations;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +14,15 @@ import java.util.List;
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
-@Configuration
-@EnableConfigurationProperties
 @ConfigurationProperties("swe-runner")
 public class UrlConfiguration {
-    private final List<String> whitelist = new ArrayList<>();
-    private String interruptServerUrl;
+    private final List<String> whitelist;
+    private final String interruptServerUrl;
+
+    public UrlConfiguration(List<String> whitelist, String interruptServerUrl) {
+        this.whitelist = whitelist == null ? new ArrayList<>() : whitelist;
+        this.interruptServerUrl = interruptServerUrl;
+    }
 
     public List<String> getWhitelist() {
         return whitelist;
@@ -29,9 +30,5 @@ public class UrlConfiguration {
 
     public String getInterruptServerUrl() {
         return interruptServerUrl;
-    }
-
-    public void setInterruptServerUrl(String interruptServerUrl) {
-        this.interruptServerUrl = interruptServerUrl;
     }
 }
