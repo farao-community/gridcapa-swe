@@ -191,25 +191,30 @@ public class CgmesExportService {
 
     private int updateSshMetadataModel(Network network, List<String> inputSshIds, List<String> outputSshIds) {
         // the version of ssh should be incremented from the initial version
-        // The verison in the output filename should be the same as in the "fullModel"
+        // The version in the output filename should be the same as in the "fullModel"
         CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
         String newSshId = "urn:uuid:" + CgmesExportUtil.getUniqueRandomId();
         if (modelsExtension != null && modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).isPresent()) {
             Optional<CgmesMetadataModel> modelForSsh = modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS);
-            int initialVersion = modelForSsh.get().getVersion();
-            Set<String> dependentOn = modelForSsh.get().getDependentOn();
-            String initialId = modelForSsh.get().getId();
-            inputSshIds.add(initialId);
+            if (modelForSsh.isPresent()) {
+                int initialVersion = modelForSsh.get().getVersion();
+                Set<String> dependentOn = modelForSsh.get().getDependentOn();
+                String initialId = modelForSsh.get().getId();
+                inputSshIds.add(initialId);
 
-            outputSshIds.add(newSshId);
-            int version = initialVersion + 1;
-            modelForSsh.get().clearDependencies().clearSupersedes().setVersion(version).setId(newSshId)
-                    .addDependentOn(dependentOn).addSupersedes(initialId);
+                outputSshIds.add(newSshId);
+                int version = initialVersion + 1;
+                modelForSsh.get().clearDependencies().clearSupersedes().setVersion(version).setId(newSshId)
+                        .addDependentOn(dependentOn).addSupersedes(initialId);
 
-            return version;
+                return version;
+            } else {
+                return 1;
+            }
+
         } else {
             network.newExtension(CgmesMetadataModelsAdder.class)
-                        .newModel()
+                    .newModel()
                         .setId(newSshId)
                         .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
                         .setDescription("SSH Model")
