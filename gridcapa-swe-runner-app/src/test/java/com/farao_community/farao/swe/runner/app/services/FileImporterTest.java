@@ -70,14 +70,6 @@ class FileImporterTest {
 
     @Test
     void testImportCimCracFromUrlWithNetwork() {
-        Properties importParams = new Properties();
-        importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
-        Network network = Network.read(
-                Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
-                LocalComputationManager.getDefault(),
-                Suppliers.memoize(ImportConfig::load).get(),
-                importParams
-        );
         SweFileResource sweFileResource = new SweFileResource(
                 cimCracFilename, Objects.requireNonNull(getClass().getResource(testDirectory + cimCracFilename)).toString());
         SweTaskParameters sweTaskParametersFrEs = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "27", "12")));
@@ -103,7 +95,7 @@ class FileImporterTest {
     }
 
     SweRequest createEmptySweRequest() {
-        return new SweRequest("id", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
+        return new SweRequest("id", "runId", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
                 new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null, null);
     }
 

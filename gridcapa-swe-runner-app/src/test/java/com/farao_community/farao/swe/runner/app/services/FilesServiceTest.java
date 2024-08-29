@@ -55,7 +55,7 @@ class FilesServiceTest {
         when(fileImporter.importCracFromCimCracAndNetwork(any(), any(OffsetDateTime.class), any(Network.class), anyString(), any(SweTaskParameters.class))).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");
         when(fileImporter.importCgmesFiles(anyString())).thenReturn(InputStream.nullInputStream());
-        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, new SweFileResource("name", "url"), new ArrayList<>());
+        SweRequest sweRequest = new SweRequest("id", "runId", ProcessType.D2CC, OffsetDateTime.now(), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, new SweFileResource("name", "url"), new ArrayList<>());
         SweData sweData = filesService.importFiles(sweRequest, SweTaskParametersTestUtil.getSweTaskParameters());
         assertNotNull(sweData);
     }

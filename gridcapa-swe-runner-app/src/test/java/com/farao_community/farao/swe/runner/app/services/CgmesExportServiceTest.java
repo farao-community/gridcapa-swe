@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, RTE (http://www.rte-france.com)
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -120,7 +120,7 @@ class CgmesExportServiceTest {
         cgmesInputFiles.put(CgmesFileType.REN_TP, new SweFileResource("REN_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_TP.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.RTE_EQ,  new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.RTE_TP, new SweFileResource("RTE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_TP.xml")).toExternalForm()));
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
         Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
         assertEquals(10, cgmesFiles.size());
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
@@ -177,7 +177,7 @@ class CgmesExportServiceTest {
                 .setModelingAuthoritySet("fakeAuthority")
                 .add()
                 .add();
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
         assertEquals(3, sshFiles.size());
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
@@ -190,7 +190,7 @@ class CgmesExportServiceTest {
         //In cas of subnetwork contains many countries it will not be exported
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
         Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllSshFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
         assertEquals(2, sshFiles.size());
         assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001"));
