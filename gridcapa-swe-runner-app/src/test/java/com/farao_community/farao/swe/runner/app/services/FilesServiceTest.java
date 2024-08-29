@@ -14,7 +14,6 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.craccreation.creator.cim.CimCrac;
 import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +52,10 @@ class FilesServiceTest {
     void simpleImport() {
         when(networkService.importMergedNetwork(any(SweRequest.class))).thenReturn(mock(Network.class));
         when(networkService.loadNetworkFromMinio(any(OffsetDateTime.class))).thenReturn(mock(Network.class));
-        when(fileImporter.importCimCrac(any(SweRequest.class))).thenReturn(mock(CimCrac.class));
-        when(fileImporter.importCracFromCimCracAndNetwork(any(CimCrac.class), any(OffsetDateTime.class), any(Network.class), anyString(), any(SweTaskParameters.class))).thenReturn(mock(CimCracCreationContext.class));
+        when(fileImporter.importCracFromCimCracAndNetwork(any(), any(OffsetDateTime.class), any(Network.class), anyString(), any(SweTaskParameters.class))).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");
         when(fileImporter.importCgmesFiles(anyString())).thenReturn(InputStream.nullInputStream());
-        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, null, new SweFileResource("name", "url"), new ArrayList<>());
+        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, OffsetDateTime.now(), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, new SweFileResource("name", "url"), new ArrayList<>());
         SweData sweData = filesService.importFiles(sweRequest, SweTaskParametersTestUtil.getSweTaskParameters());
         assertNotNull(sweData);
     }

@@ -13,7 +13,6 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataEx
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.GridcapaFileGroup;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.swe.runner.app.configurations.UnoptimizedCnecsPstConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper;
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracioapi.CracExporters;
 import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
@@ -64,19 +62,13 @@ public class FileExporter {
     public static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
     private final MinioAdapter minioAdapter;
     private final VoltageResultMapper voltageResultMapper;
-    private static final Map<String, String> UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS = Map.of(
-            "_0a3cbdb0-cd71-52b0-b93d-cb48c9fea3e2 + _6f6b15b3-9bcc-7864-7669-522e9f06e931", "_7824bc48-fc86-51db-8f9c-01b44933839e",
-            "_1d9c658e-1a01-c0ee-d127-a22e1270a242 + _2e81de07-4c22-5aa1-9683-5e51b054f7f8", "_e071a1d4-fef5-1bd9-5278-d195c5597b6e"
-    );
 
     private final ProcessConfiguration processConfiguration;
-    private final UnoptimizedCnecsPstConfiguration unoptimizedCnecsPstConfiguration;
 
-    public FileExporter(MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper, ProcessConfiguration processConfiguration, UnoptimizedCnecsPstConfiguration unoptimizedCnecsPstConfiguration) {
+    public FileExporter(MinioAdapter minioAdapter, VoltageResultMapper voltageResultMapper, ProcessConfiguration processConfiguration) {
         this.minioAdapter = minioAdapter;
         this.voltageResultMapper = voltageResultMapper;
         this.processConfiguration = processConfiguration;
-        this.unoptimizedCnecsPstConfiguration = unoptimizedCnecsPstConfiguration;
     }
 
     public void saveMergedNetworkWithHvdc(Network network, OffsetDateTime targetDateTime) {
@@ -97,7 +89,7 @@ public class FileExporter {
     public String saveCracInJsonFormat(Crac crac, String targetName, OffsetDateTime processTargetDateTime, ProcessType processType) {
         MemDataSource memDataSource = new MemDataSource();
         try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
-            CracExporters.exportCrac(crac, "Json", os);
+            crac.write("JSON", os);
         } catch (IOException e) {
             throw new SweInvalidDataException("Error while trying to save converted CRAC file.", e);
         }
@@ -202,7 +194,7 @@ public class FileExporter {
     }
 
     public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
-        RaoParameters raoParameters = getSweRaoParameters(sweTaskParameters, direction);
+        RaoParameters raoParameters = getSweRaoParameters(sweTaskParameters);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         JsonRaoParameters.write(raoParameters, baos);
         String raoParametersFileName = String.format(RAO_PARAMETERS_FILE_NAME, direction);
@@ -212,12 +204,8 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    RaoParameters getSweRaoParameters(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+    RaoParameters getSweRaoParameters(SweTaskParameters sweTaskParameters) {
         RaoParameters raoParameters = RaoParameters.load();
-        if ((direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) && unoptimizedCnecsPstConfiguration.isActive()) {
-            // The cnec in series with pst concern only ES/FR border
-            raoParameters.getNotOptimizedCnecsParameters().setDoNotOptimizeCnecsSecuredByTheirPst(UNOPTIMIZED_CNECS_IN_SERIES_WITH_PSTS);
-        }
         if (sweTaskParameters.isSecondPreventiveRaoDisabled()) {
             raoParameters.getSecondPreventiveRaoParameters().setExecutionCondition(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED);
         }
