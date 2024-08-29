@@ -69,7 +69,7 @@ public class FileImporter {
         try (InputStream cracResultStream = urlValidationService.openUrlStream(cracUrl)) {
             LOGGER.info("Importing Crac from JSON file: {}", cracUrl);
             return Crac.read(FilenameUtils.getName(new URL(cracUrl).getPath()), cracResultStream, network);
-              } catch (IOException e) {
+        } catch (IOException e) {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl), e);
         }
     }
