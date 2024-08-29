@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskStatus;
 import com.farao_community.farao.gridcapa.task_manager.api.TaskStatusUpdate;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.JsonApiConverter;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
@@ -22,7 +21,6 @@ import org.springframework.cloud.stream.function.StreamBridge;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -52,17 +50,14 @@ class RequestServiceTest {
         SweRequest cseRequest = new SweRequest(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
-        byte[] resp = jsonApiConverter.toJsonMessage(cseResponse, SweResponse.class);
         when(sweRunner.run(any())).thenReturn(cseResponse);
 
-        byte[] result = requestService.launchSweRequest(req);
+        requestService.launchSweRequest(req);
 
         ArgumentCaptor<TaskStatusUpdate> captor = ArgumentCaptor.forClass(TaskStatusUpdate.class);
         verify(streamBridge, times(2)).send(any(), captor.capture());
         assertEquals(TaskStatus.RUNNING, captor.getAllValues().get(0).getTaskStatus());
         assertEquals(TaskStatus.SUCCESS, captor.getAllValues().get(1).getTaskStatus());
-
-        assertArrayEquals(resp, result);
     }
 
     @Test
@@ -71,17 +66,14 @@ class RequestServiceTest {
         SweRequest cseRequest = new SweRequest(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
-        byte[] resp = jsonApiConverter.toJsonMessage(cseResponse, SweResponse.class);
         when(sweRunner.run(any())).thenReturn(cseResponse);
 
-        byte[] result = requestService.launchSweRequest(req);
+        requestService.launchSweRequest(req);
 
         ArgumentCaptor<TaskStatusUpdate> captor = ArgumentCaptor.forClass(TaskStatusUpdate.class);
         verify(streamBridge, times(2)).send(any(), captor.capture());
         assertEquals(TaskStatus.RUNNING, captor.getAllValues().get(0).getTaskStatus());
         assertEquals(TaskStatus.INTERRUPTED, captor.getAllValues().get(1).getTaskStatus());
-
-        assertArrayEquals(resp, result);
     }
 
     @Test
@@ -91,15 +83,12 @@ class RequestServiceTest {
         SweRequest cseRequest = new SweRequest(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any())).thenThrow(except);
-        byte[] expectedResult = jsonApiConverter.toJsonMessage(new SweInternalException("SWE run failed", except));
 
-        byte[] result = requestService.launchSweRequest(req);
+        requestService.launchSweRequest(req);
 
         ArgumentCaptor<TaskStatusUpdate> captor = ArgumentCaptor.forClass(TaskStatusUpdate.class);
         verify(streamBridge, times(2)).send(any(), captor.capture());
         assertEquals(TaskStatus.RUNNING, captor.getAllValues().get(0).getTaskStatus());
         assertEquals(TaskStatus.ERROR, captor.getAllValues().get(1).getTaskStatus());
-
-        assertArrayEquals(expectedResult, result);
     }
 }

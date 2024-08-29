@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -45,54 +45,48 @@ public class RequestService {
     }
 
     @Bean
-    public Function<Flux<byte[]>, Flux<byte[]>> request() {
+    public Consumer<Flux<byte[]>> request() {
         return sweRequestFlux -> sweRequestFlux
-            .map(this::launchSweRequest)
-            .log();
+                .doOnNext(this::launchSweRequest)
+                .subscribe();
     }
 
-    protected byte[] launchSweRequest(byte[] req) {
-        byte[] result;
+    protected void launchSweRequest(byte[] req) {
         SweRequest sweRequest = jsonApiConverter.fromJsonMessage(req, SweRequest.class);
+        final String sweRequestId = sweRequest.getId();
         // propagate in logs MDC the task id as an extra field to be able to match microservices logs with calculation tasks.
         // This should be done only once, as soon as the information to add in mdc is available.
-        final String sweRequestId = sweRequest.getId();
         MDC.put("gridcapa-task-id", sweRequestId);
         try {
-            streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweRequest.getId()), TaskStatus.RUNNING));
+            sendTaskStatusUpdate(sweRequestId, TaskStatus.RUNNING);
             LOGGER.info("Swe request received : {}", sweRequest);
             SweResponse sweResponse = sweRunner.run(sweRequest);
-            result = sendSweResponse(sweResponse);
+            sendSweResponse(sweResponse);
             LOGGER.info("Swe response sent: {}", sweResponse);
         } catch (Exception e) {
-            result = handleError(e, sweRequestId);
+            handleError(e, sweRequestId);
         }
-        return result;
     }
 
-    private byte[] sendSweResponse(SweResponse sweResponse) {
+    private void sendSweResponse(SweResponse sweResponse) {
         if (sweResponse.isInterrupted()) {
             businessLogger.warn("SWE run has been interrupted");
-            streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.INTERRUPTED));
+            sendTaskStatusUpdate(sweResponse.getId(), TaskStatus.INTERRUPTED);
         } else {
-            streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(sweResponse.getId()), TaskStatus.SUCCESS));
+            sendTaskStatusUpdate(sweResponse.getId(), TaskStatus.SUCCESS);
         }
-        return jsonApiConverter.toJsonMessage(sweResponse, SweResponse.class);
     }
 
-    private byte[] handleError(Exception e, String requestId) {
+    private void handleError(Exception e, String requestId) {
         AbstractSweException sweException = new SweInternalException("SWE run failed", e);
         LOGGER.error(sweException.getDetails(), sweException);
         businessLogger.error(sweException.getDetails());
-        return sendErrorResponse(requestId, sweException);
+        sendTaskStatusUpdate(requestId, TaskStatus.ERROR);
     }
 
-    private byte[] sendErrorResponse(String requestId, AbstractSweException exception) {
-        streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(requestId), TaskStatus.ERROR));
-        return exceptionToJsonMessage(exception);
+    private void sendTaskStatusUpdate(String requestId,
+                                      TaskStatus targetStatus) {
+        streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(requestId), targetStatus));
     }
 
-    private byte[] exceptionToJsonMessage(AbstractSweException e) {
-        return jsonApiConverter.toJsonMessage(e);
-    }
 }

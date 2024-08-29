@@ -66,10 +66,10 @@ public class FileImporter {
     }
 
     public Crac importCracFromJson(String cracUrl, Network network) {
-        LOGGER.info("Importing Crac from json file url");
         try (InputStream cracResultStream = urlValidationService.openUrlStream(cracUrl)) {
+            LOGGER.info("Importing Crac from JSON file: {}", cracUrl);
             return Crac.read(FilenameUtils.getName(new URL(cracUrl).getPath()), cracResultStream, network);
-        } catch (IOException e) {
+              } catch (IOException e) {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl), e);
         }
     }
@@ -94,29 +94,30 @@ public class FileImporter {
     public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
         try (InputStream glskResultStream = urlValidationService.openUrlStream(glskUrl)) {
             synchronized (LOCK_GLSK) {
-                LOGGER.info("Importing Glsk file : {}", glskUrl);
+                LOGGER.info("Importing Glsk file from url : {}", glskUrl);
                 return GlskDocumentImporters.importGlsk(glskResultStream).getZonalScalable(network, instant);
             }
         } catch (IOException e) {
-            throw new SweInvalidDataException("Cannot import glsk from url", e);
+            throw new SweInvalidDataException(String.format("Cannot import glsk from url : %s", glskUrl), e);
         }
     }
 
     public CimGlskDocument importCimGlskDocument(String glskUrl) {
         try (InputStream glskResultStream = urlValidationService.openUrlStream(glskUrl)) {
             synchronized (LOCK_GLSK) {
-                LOGGER.info("Importing Glsk file : {}", glskUrl);
+                LOGGER.info("Importing Glsk file from url : {}", glskUrl);
                 return CimGlskDocument.importGlsk(glskResultStream);
             }
         } catch (IOException e) {
-            throw new SweInvalidDataException("Cannot import glsk from url", e);
+            throw new SweInvalidDataException(String.format("Cannot import glsk from url : %s", glskUrl), e);
         }
     }
 
     public RaoResult importRaoResult(String raoResultUrl, Crac crac) {
         try (InputStream raoResultStream = urlValidationService.openUrlStream(raoResultUrl)) {
-            RaoResult raoResult =  new RaoResultJsonImporter().importData(raoResultStream, crac);
-            return  raoResult;
+            LOGGER.info("Importing raoResult file from url : {} ", raoResultUrl);
+            RaoResult raoResult = new RaoResultJsonImporter().importData(raoResultStream, crac);
+            return raoResult;
         } catch (IOException e) {
             throw new SweInvalidDataException("Cannot import rao result from url", e);
         }
