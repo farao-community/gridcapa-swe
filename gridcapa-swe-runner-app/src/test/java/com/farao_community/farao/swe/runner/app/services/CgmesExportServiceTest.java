@@ -35,7 +35,6 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -95,7 +94,7 @@ class CgmesExportServiceTest {
         assertEquals(expectedFilename, actualFilename);
 
         // Test that the absolute value is used and that it is no more than 23
-        mockTimestamp = OffsetDateTime.now(ZoneOffset.UTC).minusHours(30); // En UTC
+        mockTimestamp = OffsetDateTime.now().minusHours(30);
         when(sweData.getTimestamp()).thenReturn(mockTimestamp);
         expectedTime = "_23_";
         expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
