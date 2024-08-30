@@ -15,6 +15,7 @@ import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -46,7 +47,9 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -323,12 +326,20 @@ public class CgmesExportService {
         return new ArrayList<>();
     }
 
-    String buildCgmesFilename(SweData sweData, String tso, String type, String version) {
+    String buildCgmesFilename(final SweData sweData,
+                              final String tso,
+                              final String type,
+                              final String version) {
         return CGMES_FORMATTER.format(sweData.getTimestamp())
-                .replace("[process]", sweData.getProcessType().getCode())
+                .replace("[process]", ProcessType.IDCC_IDCF == sweData.getProcessType() ?
+                        computeTimeDifference(sweData.getTimestamp()) : sweData.getProcessType().getCode())
                 .replace("[tso]", tso)
                 .replace("[type]", type)
                 .replace("[version]", version);
+    }
+
+    private CharSequence computeTimeDifference(final OffsetDateTime timestamp) {
+        return String.valueOf(ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp));
     }
 
     String buildFileType(DichotomyDirection direction) {
