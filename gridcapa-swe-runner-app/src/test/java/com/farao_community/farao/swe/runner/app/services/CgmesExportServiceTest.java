@@ -74,19 +74,29 @@ class CgmesExportServiceTest {
         String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
         assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_1D_FR_ESFR_002");
 
-        final long nbHoursBetween = 5;
-        final OffsetDateTime mockTimestamp = OffsetDateTime.now().plusHours(nbHoursBetween).plusSeconds(1);
+        assertions.assertAll();
+    }
+
+    @Test
+    void buildCgmesFilenameTestIDCF() {
+        SweData sweData = mock(SweData.class);
+        OffsetDateTime mockTimestamp = OffsetDateTime.now().plusHours(5).plusSeconds(1);
         when(sweData.getTimestamp()).thenReturn(mockTimestamp);
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
         final String tso = "fakeTso";
         final String type = "fakeType";
         final String version = "fakeExample";
-        final String expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp)
-                + "_" + nbHoursBetween + "_" + tso + "_" + type + "_" + version;
-
-        final String actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        String expectedTime = "_05_";
+        String expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        String actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
         assertEquals(expectedFilename, actualFilename);
-        assertions.assertAll();
+        // use absolute value and cap to 99
+        mockTimestamp = OffsetDateTime.now().minusHours(120);
+        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        expectedTime = "_99_";
+        expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        assertEquals(expectedFilename, actualFilename);
     }
 
     @Test
