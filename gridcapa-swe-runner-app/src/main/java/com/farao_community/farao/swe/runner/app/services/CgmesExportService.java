@@ -339,10 +339,7 @@ public class CgmesExportService {
     }
 
     private CharSequence computeTimeDifference(final OffsetDateTime timestamp) {
-        long hoursDifference = Math.abs(ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp));
-        if (hoursDifference > 99) {
-            hoursDifference = 99;
-        }
+        final long hoursDifference = Math.min(23, Math.abs(ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp)));
         return String.format("%02d", hoursDifference);
     }
 
