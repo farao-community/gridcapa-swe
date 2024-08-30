@@ -35,6 +35,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
@@ -74,11 +75,32 @@ class CgmesExportServiceTest {
         String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
         assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_1D_FR_ESFR_002");
 
-        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
-        String idccIdcfResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "003");
-        assertions.assertThat(idccIdcfResult).isEqualTo("20221130T0000Z_IDCF_FR_ESFR_003");
-
         assertions.assertAll();
+    }
+
+    @Test
+    void buildCgmesFilenameTestIDCF() {
+        SweData sweData = mock(SweData.class);
+        OffsetDateTime mockTimestamp = OffsetDateTime.now().plusHours(5).plusSeconds(1);
+        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
+        final String tso = "fakeTso";
+        final String type = "fakeType";
+        final String version = "fakeExample";
+
+        // Expected time when difference is +5 hours
+        String expectedTime = "_05_";
+        String expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        String actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        assertEquals(expectedFilename, actualFilename);
+
+        // Test that the absolute value is used and that it is no more than 23
+        mockTimestamp = OffsetDateTime.now().minusHours(30);
+        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        expectedTime = "_23_";
+        expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        assertEquals(expectedFilename, actualFilename);
     }
 
     @Test
@@ -118,7 +140,7 @@ class CgmesExportServiceTest {
         cgmesInputFiles.put(CgmesFileType.REE_TP, new SweFileResource("REE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_TP.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.REN_EQ, new SweFileResource("REN_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_EQ.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.REN_TP, new SweFileResource("REN_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_TP.xml")).toExternalForm()));
-        cgmesInputFiles.put(CgmesFileType.RTE_EQ,  new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
+        cgmesInputFiles.put(CgmesFileType.RTE_EQ, new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.RTE_TP, new SweFileResource("RTE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_TP.xml")).toExternalForm()));
         SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
         Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
