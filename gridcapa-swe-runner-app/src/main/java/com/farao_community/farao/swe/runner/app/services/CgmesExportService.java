@@ -355,9 +355,9 @@ public class CgmesExportService {
     }
 
     private CharSequence computeTimeDifference(final OffsetDateTime timestamp) {
-        final long nbHoursDifference = ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp);
+        final long timeGap = ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp);
         // Value must be capped to 0 <=  n <= 23
-        final long hoursCappedAtMin = Math.min(23, nbHoursDifference);
+        final long hoursCappedAtMin = Math.min(23, timeGap);
         final long hoursCapped = Math.max(0, hoursCappedAtMin);
         return String.format("%02d", hoursCapped);
     }
