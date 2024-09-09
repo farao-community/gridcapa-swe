@@ -218,14 +218,14 @@ public class CgmesExportService {
         } else {
             network.newExtension(CgmesMetadataModelsAdder.class)
                     .newModel()
-                        .setId(newSshId)
-                        .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
-                        .setDescription("SSH Model")
-                        .setVersion(DEFAULT_VERSION)
-                        .addProfile("http://entsoe.eu/CIM/SteadyStateHypothesis/1/1")
-                        .setModelingAuthoritySet(MODELING_AUTHORITY_DEFAULT_VALUE)
-                        .add()
-                        .add();
+                    .setId(newSshId)
+                    .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
+                    .setDescription("SSH Model")
+                    .setVersion(DEFAULT_VERSION)
+                    .addProfile("http://entsoe.eu/CIM/SteadyStateHypothesis/1/1")
+                    .setModelingAuthoritySet(MODELING_AUTHORITY_DEFAULT_VALUE)
+                    .add()
+                    .add();
             outputSshIds.add(newSshId);
             return DEFAULT_VERSION;
         }
@@ -294,7 +294,7 @@ public class CgmesExportService {
         }
     }
 
-    private void addSvMetadataExtension(Network network,  List<String> inputSshIds, List<String> outputSshIds) {
+    private void addSvMetadataExtension(Network network, List<String> inputSshIds, List<String> outputSshIds) {
         // For the SV file, the dependentOn should contain TP and SSH ids
         // The ids of TP are present in the subnetwork SV dependentOn
         StringBuilder initialSvId = new StringBuilder();
@@ -355,8 +355,11 @@ public class CgmesExportService {
     }
 
     private CharSequence computeTimeDifference(final OffsetDateTime timestamp) {
-        final long hoursDifference = Math.min(23, Math.abs(ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp)));
-        return String.format("%02d", hoursDifference);
+        final long nbHoursDifference = ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp);
+        // Value must be capped to 0 <=  n <= 23
+        final long hoursCappedAtMin = Math.min(23, nbHoursDifference);
+        final long hoursCapped = Math.max(0, hoursCappedAtMin);
+        return String.format("%02d", hoursCapped);
     }
 
     String buildFileType(DichotomyDirection direction) {

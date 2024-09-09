@@ -88,14 +88,22 @@ class CgmesExportServiceTest {
         final String type = "fakeType";
         final String version = "fakeExample";
 
-        // Expected time when difference is +5 hours
+        // Expected time when difference is between 0 and 23 : +5 hours
         String expectedTime = "_05_";
         String expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
         String actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
         assertEquals(expectedFilename, actualFilename);
 
-        // Test that the absolute value is used and that it is no more than 23
+        // Test that the min value is 0 when value is <0
         mockTimestamp = OffsetDateTime.now().minusHours(30);
+        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        expectedTime = "_00_";
+        expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        assertEquals(expectedFilename, actualFilename);
+
+        // Test that the max value is 23 when value is >23
+        mockTimestamp = OffsetDateTime.now().plusHours(30);
         when(sweData.getTimestamp()).thenReturn(mockTimestamp);
         expectedTime = "_23_";
         expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
