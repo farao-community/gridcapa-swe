@@ -218,14 +218,14 @@ public class CgmesExportService {
         } else {
             network.newExtension(CgmesMetadataModelsAdder.class)
                     .newModel()
-                    .setId(newSshId)
-                    .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
-                    .setDescription("SSH Model")
-                    .setVersion(DEFAULT_VERSION)
-                    .addProfile("http://entsoe.eu/CIM/SteadyStateHypothesis/1/1")
-                    .setModelingAuthoritySet(MODELING_AUTHORITY_DEFAULT_VALUE)
-                    .add()
-                    .add();
+                        .setId(newSshId)
+                        .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
+                        .setDescription("SSH Model")
+                        .setVersion(DEFAULT_VERSION)
+                        .addProfile("http://entsoe.eu/CIM/SteadyStateHypothesis/1/1")
+                        .setModelingAuthoritySet(MODELING_AUTHORITY_DEFAULT_VALUE)
+                        .add()
+                        .add();
             outputSshIds.add(newSshId);
             return DEFAULT_VERSION;
         }
@@ -294,7 +294,7 @@ public class CgmesExportService {
         }
     }
 
-    private void addSvMetadataExtension(Network network, List<String> inputSshIds, List<String> outputSshIds) {
+    private void addSvMetadataExtension(Network network,  List<String> inputSshIds, List<String> outputSshIds) {
         // For the SV file, the dependentOn should contain TP and SSH ids
         // The ids of TP are present in the subnetwork SV dependentOn
         StringBuilder initialSvId = new StringBuilder();
