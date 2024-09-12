@@ -35,6 +35,8 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +53,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
+ * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 @SpringBootTest
 class CgmesExportServiceTest {
@@ -70,13 +73,42 @@ class CgmesExportServiceTest {
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC);
         String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
-        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_ID_FR_ESFR_002");
-
-        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
-        String idccIdcfResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "003");
-        assertions.assertThat(idccIdcfResult).isEqualTo("20221130T0000Z_IDCF_FR_ESFR_003");
+        assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_1D_FR_ESFR_002");
 
         assertions.assertAll();
+    }
+
+    @Test
+    void buildCgmesFilenameTestIDCF() {
+        SweData sweData = mock(SweData.class);
+        OffsetDateTime mockTimestamp = OffsetDateTime.now().plusHours(5).plusSeconds(1);
+        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
+        final String tso = "fakeTso";
+        final String type = "fakeType";
+        final String version = "fakeExample";
+
+        // Expected time when difference is between 0 and 23 : +5 hours
+        String expectedTime = "_05_";
+        String expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        String actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        assertEquals(expectedFilename, actualFilename);
+
+        // Test that the min value is 0 when value is <0
+        mockTimestamp = OffsetDateTime.now().minusHours(30);
+        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        expectedTime = "_00_";
+        expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        assertEquals(expectedFilename, actualFilename);
+
+        // Test that the max value is 23 when value is >23
+        mockTimestamp = OffsetDateTime.now().plusHours(30);
+        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        expectedTime = "_23_";
+        expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
+        actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        assertEquals(expectedFilename, actualFilename);
     }
 
     @Test
@@ -116,9 +148,9 @@ class CgmesExportServiceTest {
         cgmesInputFiles.put(CgmesFileType.REE_TP, new SweFileResource("REE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_TP.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.REN_EQ, new SweFileResource("REN_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_EQ.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.REN_TP, new SweFileResource("REN_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_TP.xml")).toExternalForm()));
-        cgmesInputFiles.put(CgmesFileType.RTE_EQ,  new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
+        cgmesInputFiles.put(CgmesFileType.RTE_EQ, new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.RTE_TP, new SweFileResource("RTE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_TP.xml")).toExternalForm()));
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
         Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
         assertEquals(10, cgmesFiles.size());
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
@@ -164,9 +196,9 @@ class CgmesExportServiceTest {
                 .setModelingAuthoritySet("fakeAuthority")
                 .add()
                 .add();
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData);
-        assertEquals(4, sshFiles.size());
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
+        assertEquals(3, sshFiles.size());
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_006"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_006"));
@@ -178,9 +210,9 @@ class CgmesExportServiceTest {
         //In cas of subnetwork contains many countries it will not be exported
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        SweData sweData = new SweData("id", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData);
-        assertEquals(3, sshFiles.size());
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
+        assertEquals(2, sshFiles.size());
         assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001"));

@@ -19,9 +19,8 @@ import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.CracCreationContext;
 import com.powsybl.openrao.data.cracapi.RaUsageLimits;
-import com.powsybl.openrao.data.craccreation.creator.api.CracCreationContext;
-import com.powsybl.openrao.data.craccreation.creator.cim.CimCrac;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,28 +69,14 @@ class FileImporterTest {
     }
 
     @Test
-    void testImportCimCrac() {
-        SweRequest req = createEmptySweRequest();
-        CimCrac cimCrac = fileImporter.importCimCrac(req);
-        Assertions.assertNotNull(cimCrac);
-    }
-
-    @Test
     void testImportCimCracFromUrlWithNetwork() {
-        Properties importParams = new Properties();
-        importParams.put("iidm.import.cgmes.source-for-iidm-id", "rdfID");
-        Network network = Network.read(
-                Paths.get(new File(getClass().getResource(testDirectory + networkFileName).getFile()).toString()),
-                LocalComputationManager.getDefault(),
-                Suppliers.memoize(ImportConfig::load).get(),
-                importParams
-        );
-        SweRequest req = createEmptySweRequest();
+        SweFileResource sweFileResource = new SweFileResource(
+                cimCracFilename, Objects.requireNonNull(getClass().getResource(testDirectory + cimCracFilename)).toString());
         SweTaskParameters sweTaskParametersFrEs = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "27", "12")));
-        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, null, sweTaskParametersFrEs);
+        CracCreationContext cracFrEs = fileImporter.importCracFromCimCracAndNetwork(sweFileResource, dateTime, network, null, sweTaskParametersFrEs);
         Assertions.assertNotNull(cracFrEs);
         SweTaskParameters sweTaskParametersEsPt = new SweTaskParameters(List.of(new TaskParameterDto("MAX_CRA", "INT", "32", "12")));
-        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(fileImporter.importCimCrac(req), dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON, sweTaskParametersEsPt);
+        CracCreationContext cracEsPt = fileImporter.importCracFromCimCracAndNetwork(sweFileResource, dateTime, network, FilesService.CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON, sweTaskParametersEsPt);
         Assertions.assertNotNull(cracEsPt);
         Map<com.powsybl.openrao.data.cracapi.Instant, RaUsageLimits> raUsageLimitsPerInstant = cracEsPt.getCrac().getRaUsageLimitsPerInstant();
         assertEquals(1, raUsageLimitsPerInstant.size());
@@ -110,7 +95,7 @@ class FileImporterTest {
     }
 
     SweRequest createEmptySweRequest() {
-        return new SweRequest("id", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
+        return new SweRequest("id", "runId", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
                 new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null, null);
     }
 

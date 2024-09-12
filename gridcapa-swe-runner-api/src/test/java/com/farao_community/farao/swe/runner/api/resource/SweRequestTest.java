@@ -25,7 +25,7 @@ class SweRequestTest {
     void simpleRequestTest() {
         OffsetDateTime now = OffsetDateTime.now();
         ArrayList<TaskParameterDto> taskParameterList = new ArrayList<>();
-        SweRequest sweRequest = new SweRequest("id", ProcessType.D2CC, now,
+        SweRequest sweRequest = new SweRequest("id", "currentRunId", ProcessType.D2CC, now,
                 new SweFileResource("CORESO_SV.xml", "/network/CORESO-CE_SV_000.xml"),
                 new SweFileResource("REE_EQ.xml", "/network/REE_EQ_001.xml"),
                 new SweFileResource("REE_SSH.xml", "/network/REE_SSH_000.xml"),

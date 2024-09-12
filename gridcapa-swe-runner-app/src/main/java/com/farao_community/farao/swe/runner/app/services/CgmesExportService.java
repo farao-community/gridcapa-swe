@@ -15,6 +15,7 @@ import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -23,17 +24,23 @@ import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
+import com.powsybl.cgmes.conversion.export.CgmesExportUtil;
 import com.powsybl.cgmes.extensions.CgmesControlArea;
 import com.powsybl.cgmes.extensions.CgmesControlAreas;
 import com.powsybl.cgmes.extensions.CgmesMetadataModels;
+import com.powsybl.cgmes.extensions.CgmesMetadataModelsAdder;
+import com.powsybl.cgmes.model.CgmesMetadataModel;
 import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.commons.datasource.MemDataSource;
+import com.powsybl.commons.report.ReportNode;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.ExportersServiceLoader;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,9 +49,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -240,10 +250,19 @@ public class CgmesExportService {
 
     String buildCgmesFilename(SweData sweData, String tso, String type, String version) {
         return CGMES_FORMATTER.format(sweData.getTimestamp())
-                .replace("[process]", sweData.getProcessType().getCode())
+                .replace("[process]", ProcessType.IDCC_IDCF == sweData.getProcessType() ?
+                        computeTimeDifference(sweData.getTimestamp()) : sweData.getProcessType().getCode())
                 .replace("[tso]", tso)
                 .replace("[type]", type)
                 .replace("[version]", version);
+    }
+
+    private CharSequence computeTimeDifference(final OffsetDateTime timestamp) {
+        final long timeGap = ChronoUnit.HOURS.between(OffsetDateTime.now(), timestamp);
+        // Value must be capped to 0 <=  n <= 23
+        final long hoursCappedAtMin = Math.min(23, timeGap);
+        final long hoursCapped = Math.max(0, hoursCappedAtMin);
+        return String.format("%02d", hoursCapped);
     }
 
     String buildFileType(DichotomyDirection direction) {
