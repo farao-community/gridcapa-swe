@@ -36,7 +36,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -177,8 +176,7 @@ class CgmesExportServiceTest {
         assertNotNull(modelsExtensionOutput);
         CgmesMetadataModel svModelOutput = modelsExtensionOutput.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
         assertEquals(6, svModelOutput.getVersion());
-        assertEquals(6, svModelOutput.getDependentOn().size()); // Initial 3 tp id + 3 new ssh ids generated during export todo check
-
+        assertEquals(9, svModelOutput.getDependentOn().size()); // Initial 3 tp id + 3 eq + 3 new ssh ids generated during export
         Files.deleteIfExists(Paths.get(tmp));
     }
 
@@ -197,8 +195,8 @@ class CgmesExportServiceTest {
                 .add()
                 .add();
         SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
-        assertEquals(3, sshFiles.size());
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData);
+        assertEquals(4, sshFiles.size());
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_006"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_006"));
@@ -211,8 +209,8 @@ class CgmesExportServiceTest {
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
         SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData, new ArrayList<>(), new ArrayList<>());
-        assertEquals(2, sshFiles.size());
+        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshSvFiles(network, sweData);
+        assertEquals(3, sshFiles.size());
         assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001"));
