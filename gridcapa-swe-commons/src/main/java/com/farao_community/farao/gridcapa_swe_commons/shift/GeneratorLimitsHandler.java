@@ -39,7 +39,7 @@ public class GeneratorLimitsHandler {
         this.zonalScalableData = zonalScalableData;
     }
 
-    void setPminPmaxToDefaultValue(Network network, Set<Country> countries) {
+    public void setPminPmaxToDefaultValue(Network network, Set<Country> countries) {
         initGenerators = new HashMap<>();
         countries.forEach(country -> {
             zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
@@ -70,7 +70,7 @@ public class GeneratorLimitsHandler {
         initGenerators.computeIfAbsent(genId, k -> initGeneratorLimits);
     }
 
-    void resetInitialPminPmax(Network network) {
+    public void resetInitialPminPmax(Network network) {
         // initGenerators contains the list of generators with Pmin/Pmax modifies in pre-processing step
         initGenerators.forEach((id, initValues) -> {
             Generator generator = network.getGenerator(id);
