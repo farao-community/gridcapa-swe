@@ -16,6 +16,8 @@ swe-commons:
     SV: "http://www.coreso.eu/OperationalPlanning"
 
 swe-runner:
+  data-fix:
+    fix-unrealistic-remote-voltage-target: true
   pst:
     pst-ids:
       - twt-not-found-id

@@ -13,6 +13,7 @@ import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
@@ -33,12 +34,14 @@ public class FilesService {
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON = "/crac/CimCracCreationParameters_FR-ES_D2CC.json";
 
     private final NetworkService networkService;
+    private final FixRemoteVoltageTargetService fixRemoteVoltageTargetService;
 
     private final FileImporter fileImporter;
     private final FileExporter fileExporter;
 
-    public FilesService(NetworkService networkImporter, FileImporter fileImporter, FileExporter fileExporter) {
+    public FilesService(NetworkService networkImporter, FixRemoteVoltageTargetService fixRemoteVoltageTargetService, FileImporter fileImporter, FileExporter fileExporter) {
         this.networkService = networkImporter;
+        this.fixRemoteVoltageTargetService = fixRemoteVoltageTargetService;
         this.fileImporter = fileImporter;
         this.fileExporter = fileExporter;
     }
@@ -47,6 +50,7 @@ public class FilesService {
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
         networkService.addHvdcAndPstToNetwork(mergedNetwork);
+        fixRemoteVoltageTargetService.fixUnrealisticRemoteTargetVoltages(mergedNetwork, OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters));
         fileExporter.saveMergedNetworkWithHvdc(mergedNetwork, targetProcessDateTime);
 
         Network networkEsFr = networkService.loadNetworkFromMinio(targetProcessDateTime);
