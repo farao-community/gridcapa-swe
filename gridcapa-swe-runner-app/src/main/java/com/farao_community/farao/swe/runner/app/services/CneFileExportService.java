@@ -170,22 +170,26 @@ public class CneFileExportService {
         outputStream.write(result.getBytes());
     }
 
-    private Reason getLimitingCauseErrorReason(LimitingCause limitingCause) {
+    private static Reason getLimitingCauseErrorReason(final LimitingCause limitingCause) {
         Reason reason = new Reason();
         switch (limitingCause) {
-            case GLSK_LIMITATION:
-                reason.setCode("B36");
-                reason.setText("GLSK limitation");
-                break;
-            case COMPUTATION_FAILURE:
-                reason.setCode("Z04");
-                reason.setText("Balancing adjustment out of tolerances");
-                break;
-            case CRITICAL_BRANCH:
-            case INDEX_EVALUATION_OR_MAX_ITERATION:
-            default:
+            case GLSK_LIMITATION ->
+                    reason = getReason("B36", "GLSK limitation");
+            case BALANCE_LOADFLOW_DIVERGENCE ->
+                    reason = getReason("B40", "Balance Load Flow divergence");
+            case COMPUTATION_FAILURE ->
+                    reason = getReason("B18", "Balancing adjustment out of tolerances");
+            default -> {
                 //TODO
+            }
         }
+        return reason;
+    }
+
+    private static Reason getReason(final String code, final String text) {
+        final Reason reason = new Reason();
+        reason.setCode(code);
+        reason.setText(text);
         return reason;
     }
 
