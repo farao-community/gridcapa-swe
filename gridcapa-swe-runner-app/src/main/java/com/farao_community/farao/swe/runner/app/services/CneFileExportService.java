@@ -177,6 +177,8 @@ public class CneFileExportService {
                     reason = getReason("B36", "GLSK limitation");
             case BALANCE_LOADFLOW_DIVERGENCE ->
                     reason = getReason("B40", "Balance Load Flow divergence");
+            case UNKNOWN_TERMINAL_BUS ->
+                    reason = getReason("B32", "Unknown terminal bus for balancing");
             case COMPUTATION_FAILURE ->
                     reason = getReason("B18", "Balancing adjustment out of tolerances");
             default -> {
