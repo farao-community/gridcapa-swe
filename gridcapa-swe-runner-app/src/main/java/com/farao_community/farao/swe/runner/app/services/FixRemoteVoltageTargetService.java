@@ -28,10 +28,12 @@ public class FixRemoteVoltageTargetService {
 
     private final DataFixConfiguration dataFixConfiguration;
     private final Logger businessLogger;
+    private final LoadFlow.Runner loadFlowRunner;
 
     public FixRemoteVoltageTargetService(DataFixConfiguration dataFixConfiguration, Logger businessLogger) {
         this.dataFixConfiguration = dataFixConfiguration;
         this.businessLogger = businessLogger;
+        this.loadFlowRunner = LoadFlow.find();
     }
 
     public void fixUnrealisticRemoteTargetVoltages(Network network, LoadFlowParameters loadFlowParameters) {
@@ -42,14 +44,16 @@ public class FixRemoteVoltageTargetService {
         if (openLoadFlowParameters == null) {
             return;
         }
-        businessLogger.info("Start fixing remote target voltages for improving loadflow divergence.");
-        openLoadFlowParameters.setVoltageRemoteControl(false);
-        LoadFlow.run(network, loadFlowParameters);
-        network.getGeneratorStream()
-                .filter(this::isRemoteVoltageRegulationOn)
-                .filter(this::isInFrance)
-                .filter(this::remoteVoltageTargetSeemsUnrealistic)
-                .forEach(this::fixRemoteVoltageTarget);
+        if (!loadFlowRunner.run(network, loadFlowParameters).isFullyConverged()) {
+            businessLogger.info("Basecase unsecure, trying to fix it by improving remote target voltages.");
+            openLoadFlowParameters.setVoltageRemoteControl(false);
+            loadFlowRunner.run(network, loadFlowParameters);
+            network.getGeneratorStream()
+                    .filter(this::isRemoteVoltageRegulationOn)
+                    .filter(this::isInFrance)
+                    .filter(this::remoteVoltageTargetSeemsUnrealistic)
+                    .forEach(this::fixRemoteVoltageTarget);
+        }
     }
 
     private void fixRemoteVoltageTarget(Generator generator) {

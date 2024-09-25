@@ -9,10 +9,15 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.powsybl.iidm.network.*;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowResult;
 import com.powsybl.openloadflow.OpenLoadFlowParameters;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,6 +35,7 @@ class FixRemoteVoltageTargetServiceTest {
         Network network = generateNetwork(390, 410);
         LoadFlowParameters parameters = new LoadFlowParameters();
         parameters.addExtension(OpenLoadFlowParameters.class, new OpenLoadFlowParameters());
+        ReflectionTestUtils.setField(fixRemoteVoltageTargetService, "loadFlowRunner", buildMockRunner());
 
         LoadFlow.run(network, parameters);
         assertEquals(390, network.getGenerator("Generator151").getTargetV(), 1e-3);
@@ -45,6 +51,7 @@ class FixRemoteVoltageTargetServiceTest {
         Network network = generateNetwork(396, 405);
         LoadFlowParameters parameters = new LoadFlowParameters();
         parameters.addExtension(OpenLoadFlowParameters.class, new OpenLoadFlowParameters());
+        ReflectionTestUtils.setField(fixRemoteVoltageTargetService, "loadFlowRunner", buildMockRunner());
 
         LoadFlow.run(network, parameters);
         assertEquals(396, network.getGenerator("Generator151").getTargetV(), 1e-3);
@@ -53,6 +60,50 @@ class FixRemoteVoltageTargetServiceTest {
         fixRemoteVoltageTargetService.fixUnrealisticRemoteTargetVoltages(network, parameters);
         assertEquals(396, network.getGenerator("Generator151").getTargetV(), 1e-3);
         assertEquals(405, network.getGenerator("Generator152").getTargetV(), 1e-3);
+    }
+
+    @Test
+    void testRemoteVoltageTargetFixButInitiallyConvergent() {
+        Network network = generateNetwork(390, 410);
+        LoadFlowParameters parameters = new LoadFlowParameters();
+        parameters.addExtension(OpenLoadFlowParameters.class, new OpenLoadFlowParameters());
+
+        LoadFlow.run(network, parameters);
+        assertEquals(390, network.getGenerator("Generator151").getTargetV(), 1e-3);
+        assertEquals(410, network.getGenerator("Generator152").getTargetV(), 1e-3);
+
+        fixRemoteVoltageTargetService.fixUnrealisticRemoteTargetVoltages(network, parameters);
+        assertEquals(390, network.getGenerator("Generator151").getTargetV(), 1e-3);
+        assertEquals(410, network.getGenerator("Generator152").getTargetV(), 1e-3);
+    }
+
+    private LoadFlow.Runner buildMockRunner() {
+        LoadFlow.Runner runner = Mockito.mock(LoadFlow.Runner.class);
+        Mockito.when(runner.run(Mockito.any(), Mockito.any()))
+                .thenReturn(new LoadFlowResult() {
+                    @Override
+                    public boolean isOk() {
+                        return false;
+                    }
+
+                    @Override
+                    public Status getStatus() {
+                        return Status.FAILED;
+                    }
+
+                    @Override
+                    public Map<String, String> getMetrics() {
+                        return Map.of();
+                    }
+
+                    @Override
+                    public String getLogs() {
+                        return "";
+                    }
+                })
+                .thenCallRealMethod()
+                .getMock();
+        return runner;
     }
 
     private static Network generateNetwork(double target1, double target2) {
