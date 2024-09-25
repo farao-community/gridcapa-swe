@@ -9,6 +9,7 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
+import com.farao_community.farao.dichotomy.api.results.ReasonInvalid;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
@@ -98,7 +99,7 @@ public class SweNetworkShifter implements NetworkShifter {
                 if (result.isFailed()) {
                     LOGGER.error("Loadflow computation diverged on network '{}' for direction {}", network.getId(), direction.getDashName());
                     businessLogger.error("Loadflow computation diverged on network during balancing adjustment");
-                    throw new ShiftingException("Loadflow computation diverged during balancing adjustment");
+                    throw new ShiftingException("Loadflow computation diverged during balancing adjustment", ReasonInvalid.BALANCE_LOADFLOW_DIVERGENCE);
                 }
                 bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
                 double mismatchEsPt = targetExchanges.get(ES_PT) - bordersExchanges.get(ES_PT);
