@@ -170,7 +170,7 @@ public class CneFileExportService {
         outputStream.write(result.getBytes());
     }
 
-    private static Reason getLimitingCauseErrorReason(final LimitingCause limitingCause) {
+    static Reason getLimitingCauseErrorReason(final LimitingCause limitingCause) {
         return switch (limitingCause) {
             case GLSK_LIMITATION ->
                     getReason("B36", "GLSK limitation");

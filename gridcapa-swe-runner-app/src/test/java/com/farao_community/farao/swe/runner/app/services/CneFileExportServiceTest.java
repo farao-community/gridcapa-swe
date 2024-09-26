@@ -20,8 +20,13 @@ import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.swecneexporter.xsd.Reason;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -221,5 +226,30 @@ class CneFileExportServiceTest {
         when(dichotomyResult.getLimitingCause()).thenReturn(LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
         assertNull(cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, DichotomyDirection.ES_PT));
+    }
+    
+    @ParameterizedTest
+    @CsvSource({
+        "GLSK_LIMITATION, B36, GLSK limitation",
+        "BALANCE_LOADFLOW_DIVERGENCE, B40, Balance Load Flow divergence",
+        "UNKNOWN_TERMINAL_BUS, B32, Unknown terminal bus for balancing",
+        "COMPUTATION_FAILURE, B18, Balancing adjustment out of tolerances"
+    })
+    void testLimitingCause(LimitingCause limitingCause, String code, String message) {
+        Reason reason = CneFileExportService.getLimitingCauseErrorReason(limitingCause);
+        Assertions.assertThat(reason)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", code)
+                .hasFieldOrPropertyWithValue("text", message);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = LimitingCause.class, names = {"CRITICAL_BRANCH", "INDEX_EVALUATION_OR_MAX_ITERATION"})
+    void testLimitingCauseDefault(LimitingCause limitingCause) {
+        Reason reason = CneFileExportService.getLimitingCauseErrorReason(limitingCause);
+        Assertions.assertThat(reason)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", null)
+                .hasFieldOrPropertyWithValue("text", null);
     }
 }
