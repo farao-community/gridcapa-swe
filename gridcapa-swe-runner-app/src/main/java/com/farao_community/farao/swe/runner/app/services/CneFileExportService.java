@@ -171,21 +171,17 @@ public class CneFileExportService {
     }
 
     private static Reason getLimitingCauseErrorReason(final LimitingCause limitingCause) {
-        Reason reason = new Reason();
-        switch (limitingCause) {
+        return switch (limitingCause) {
             case GLSK_LIMITATION ->
-                    reason = getReason("B36", "GLSK limitation");
+                    getReason("B36", "GLSK limitation");
             case BALANCE_LOADFLOW_DIVERGENCE ->
-                    reason = getReason("B40", "Balance Load Flow divergence");
+                    getReason("B40", "Balance Load Flow divergence");
             case UNKNOWN_TERMINAL_BUS ->
-                    reason = getReason("B32", "Unknown terminal bus for balancing");
+                    getReason("B32", "Unknown terminal bus for balancing");
             case COMPUTATION_FAILURE ->
-                    reason = getReason("B18", "Balancing adjustment out of tolerances");
-            default -> {
-                //TODO
-            }
-        }
-        return reason;
+                    getReason("B18", "Balancing adjustment out of tolerances");
+            default -> new Reason();
+        };
     }
 
     private static Reason getReason(final String code, final String text) {
@@ -217,10 +213,7 @@ public class CneFileExportService {
         OffsetDateTime timestampUtc = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC);
         OffsetDateTime timestampUtcPlusOneHour = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC).plusHours(1);
         DateTimeFormatter df = DateTimeFormatter.ofPattern(TIME_INTERVAL_REGEX);
-        StringBuilder buffer = new StringBuilder(df.format(timestampUtc));
-        buffer.append("/");
-        buffer.append(df.format(timestampUtcPlusOneHour));
-        return buffer.toString();
+        return df.format(timestampUtc) + "/" + df.format(timestampUtcPlusOneHour);
     }
 
     private String generateCneZipFileName(OffsetDateTime timestamp, boolean isHighestValid, DichotomyDirection direction) {
