@@ -21,6 +21,6 @@ class DataFixConfigurationTest {
 
     @Test
     void testDataFixConfigurationLoading() {
-        assertTrue(dataFixConfiguration.fixUnrealisticRemoteVoltageTarget());
+        assertTrue(dataFixConfiguration.removeRemoteVoltageRegulationInFrance());
     }
 }

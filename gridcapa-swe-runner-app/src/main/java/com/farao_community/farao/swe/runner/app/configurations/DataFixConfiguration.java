@@ -15,13 +15,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "swe-runner.data-fix")
 public class DataFixConfiguration {
-    private boolean fixUnrealisticRemoteVoltageTarget = false;
+    private boolean removeRemoteVoltageRegulationInFrance = false;
 
-    public boolean fixUnrealisticRemoteVoltageTarget() {
-        return fixUnrealisticRemoteVoltageTarget;
+    public boolean removeRemoteVoltageRegulationInFrance() {
+        return removeRemoteVoltageRegulationInFrance;
     }
 
-    public void setFixUnrealisticRemoteVoltageTarget(boolean fixUnrealisticRemoteVoltageTarget) {
-        this.fixUnrealisticRemoteVoltageTarget = fixUnrealisticRemoteVoltageTarget;
+    public void setRemoveRemoteVoltageRegulationInFrance(boolean removeRemoteVoltageRegulationInFrance) {
+        this.removeRemoteVoltageRegulationInFrance = removeRemoteVoltageRegulationInFrance;
     }
 }

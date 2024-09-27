@@ -14,7 +14,7 @@ swe-commons:
 
 swe-runner:
   data-fix:
-    fix-unrealistic-remote-voltage-target: false
+    remove-remote-voltage-regulation-in-france: false
   dichotomy:
     parameters:
       ES_FR:

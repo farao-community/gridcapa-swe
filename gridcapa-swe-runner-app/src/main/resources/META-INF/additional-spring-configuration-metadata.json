@@ -16,9 +16,9 @@
       "description": "Description for swe-commons.zone-id."
     },
     {
-      "name": "swe-commons.fix-unrealistic-remote-voltage-target",
+      "name": "swe-commons.remove-remote-voltage-regulation-in-france",
       "type": "java.lang.Boolean",
-      "description": "Description for fix-unrealistic-remote-voltage-target."
+      "description": "Description for remove-remote-voltage-regulation-in-france."
     }
   ]
 }

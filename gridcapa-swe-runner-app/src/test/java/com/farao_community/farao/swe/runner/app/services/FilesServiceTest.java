@@ -43,7 +43,7 @@ class FilesServiceTest {
     private NetworkService networkService;
 
     @MockBean
-    private FixRemoteVoltageTargetService fixRemoteVoltageTargetService;
+    private RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
     @MockBean
     private FileImporter fileImporter;

@@ -17,7 +17,7 @@ swe-commons:
 
 swe-runner:
   data-fix:
-    fix-unrealistic-remote-voltage-target: true
+    remove-remote-voltage-regulation-in-france: true
   pst:
     pst-ids:
       - twt-not-found-id
