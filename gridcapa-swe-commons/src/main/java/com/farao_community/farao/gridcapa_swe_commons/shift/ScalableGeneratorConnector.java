@@ -7,6 +7,7 @@
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
+import com.farao_community.farao.dichotomy.api.results.ReasonInvalid;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Bus;
@@ -140,7 +141,7 @@ public class ScalableGeneratorConnector {
         GeneratorState(Generator generator) throws ShiftingException {
             Bus genBus = getBus(generator.getTerminal());
             if (genBus == null) {
-                throw new ShiftingException(String.format("Unknown terminal bus for generator %s", generator.getId()));
+                throw new ShiftingException(String.format("Unknown terminal bus for generator %s", generator.getId()), ReasonInvalid.UNKNOWN_TERMINAL_BUS);
             }
             this.generatorId = generator.getId();
             this.targetP = generator.getTargetP();

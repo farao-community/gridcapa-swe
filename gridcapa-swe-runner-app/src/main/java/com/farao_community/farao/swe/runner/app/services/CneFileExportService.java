@@ -170,22 +170,24 @@ public class CneFileExportService {
         outputStream.write(result.getBytes());
     }
 
-    private Reason getLimitingCauseErrorReason(LimitingCause limitingCause) {
-        Reason reason = new Reason();
-        switch (limitingCause) {
-            case GLSK_LIMITATION:
-                reason.setCode("B36");
-                reason.setText("GLSK limitation");
-                break;
-            case COMPUTATION_FAILURE:
-                reason.setCode("Z04");
-                reason.setText("Balancing adjustment out of tolerances");
-                break;
-            case CRITICAL_BRANCH:
-            case INDEX_EVALUATION_OR_MAX_ITERATION:
-            default:
-                //TODO
-        }
+    static Reason getLimitingCauseErrorReason(final LimitingCause limitingCause) {
+        return switch (limitingCause) {
+            case GLSK_LIMITATION ->
+                    getReason("B36", "GLSK limitation");
+            case BALANCE_LOADFLOW_DIVERGENCE ->
+                    getReason("B40", "Balance Load Flow divergence");
+            case UNKNOWN_TERMINAL_BUS ->
+                    getReason("B32", "Unknown terminal bus for balancing");
+            case COMPUTATION_FAILURE ->
+                    getReason("B18", "Balancing adjustment out of tolerances");
+            default -> new Reason();
+        };
+    }
+
+    private static Reason getReason(final String code, final String text) {
+        final Reason reason = new Reason();
+        reason.setCode(code);
+        reason.setText(text);
         return reason;
     }
 
@@ -211,10 +213,7 @@ public class CneFileExportService {
         OffsetDateTime timestampUtc = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC);
         OffsetDateTime timestampUtcPlusOneHour = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC).plusHours(1);
         DateTimeFormatter df = DateTimeFormatter.ofPattern(TIME_INTERVAL_REGEX);
-        StringBuilder buffer = new StringBuilder(df.format(timestampUtc));
-        buffer.append("/");
-        buffer.append(df.format(timestampUtcPlusOneHour));
-        return buffer.toString();
+        return df.format(timestampUtc) + "/" + df.format(timestampUtcPlusOneHour);
     }
 
     private String generateCneZipFileName(OffsetDateTime timestamp, boolean isHighestValid, DichotomyDirection direction) {
