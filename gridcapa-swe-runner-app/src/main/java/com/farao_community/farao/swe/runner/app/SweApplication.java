@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app;
 
+import com.farao_community.farao.swe.runner.app.configurations.DataFixConfiguration;
 import com.farao_community.farao.swe.runner.app.configurations.UrlConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,7 +17,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
  */
 @SuppressWarnings("HideUtilityClassConstructor")
 @SpringBootApplication
-@EnableConfigurationProperties(UrlConfiguration.class)
+@EnableConfigurationProperties({UrlConfiguration.class, DataFixConfiguration.class})
 public class SweApplication {
     public static void main(String[] args) {
         SpringApplication.run(SweApplication.class, args);

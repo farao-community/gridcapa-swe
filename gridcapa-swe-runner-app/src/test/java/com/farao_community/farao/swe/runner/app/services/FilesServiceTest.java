@@ -43,6 +43,9 @@ class FilesServiceTest {
     private NetworkService networkService;
 
     @MockBean
+    private RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
+
+    @MockBean
     private FileImporter fileImporter;
 
     @MockBean

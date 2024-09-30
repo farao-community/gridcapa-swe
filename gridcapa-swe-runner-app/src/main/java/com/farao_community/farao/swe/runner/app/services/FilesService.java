@@ -33,12 +33,14 @@ public class FilesService {
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON = "/crac/CimCracCreationParameters_FR-ES_D2CC.json";
 
     private final NetworkService networkService;
+    private final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
     private final FileImporter fileImporter;
     private final FileExporter fileExporter;
 
-    public FilesService(NetworkService networkImporter, FileImporter fileImporter, FileExporter fileExporter) {
+    public FilesService(NetworkService networkImporter, RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService, FileImporter fileImporter, FileExporter fileExporter) {
         this.networkService = networkImporter;
+        this.removeRemoteVoltageRegulationInFranceService = removeRemoteVoltageRegulationInFranceService;
         this.fileImporter = fileImporter;
         this.fileExporter = fileExporter;
     }
@@ -47,6 +49,7 @@ public class FilesService {
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
         networkService.addHvdcAndPstToNetwork(mergedNetwork);
+        removeRemoteVoltageRegulationInFranceService.removeRemoteVoltageRegulationInFrance(mergedNetwork);
         fileExporter.saveMergedNetworkWithHvdc(mergedNetwork, targetProcessDateTime);
 
         Network networkEsFr = networkService.loadNetworkFromMinio(targetProcessDateTime);
