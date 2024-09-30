@@ -7,21 +7,10 @@
 package com.farao_community.farao.swe.runner.app.configurations;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Sebastien Murgey {@literal <sebastien.murgey at rte-france.com>}
  */
-@Configuration
 @ConfigurationProperties(prefix = "swe-runner.data-fix")
-public class DataFixConfiguration {
-    private boolean removeRemoteVoltageRegulationInFrance = false;
-
-    public boolean removeRemoteVoltageRegulationInFrance() {
-        return removeRemoteVoltageRegulationInFrance;
-    }
-
-    public void setRemoveRemoteVoltageRegulationInFrance(boolean removeRemoteVoltageRegulationInFrance) {
-        this.removeRemoteVoltageRegulationInFrance = removeRemoteVoltageRegulationInFrance;
-    }
+public record DataFixConfiguration(boolean removeRemoteVoltageRegulationInFrance) {
 }

@@ -36,8 +36,8 @@ public class RemoveRemoteVoltageRegulationInFranceService {
         }
         businessLogger.info("Removing remote voltage regulations in France.");
         network.getGeneratorStream()
-                .filter(this::isRemoteVoltageRegulationOn)
-                .filter(this::isInFrance)
+                .filter(RemoveRemoteVoltageRegulationInFranceService::isRemoteVoltageRegulationOn)
+                .filter(RemoveRemoteVoltageRegulationInFranceService::isInFrance)
                 .forEach(this::removeRemoteVoltageRegulation);
     }
 
@@ -46,10 +46,10 @@ public class RemoveRemoteVoltageRegulationInFranceService {
         double newVoltageTarget = oldVoltageTargetInPu * generator.getTerminal().getVoltageLevel().getNominalV();
         generator.setTargetV(newVoltageTarget);
         generator.setRegulatingTerminal(generator.getTerminal());
-        businessLogger.info(String.format("Deactivating remote voltage regulation of generator '%s' new local target set to %fkV", generator.getId(), newVoltageTarget));
+        businessLogger.info("Deactivating remote voltage regulation of generator '{}'. Local target set to {} kV", generator.getId(), newVoltageTarget);
     }
 
-    private boolean isInFrance(Generator generator) {
+    private static boolean isInFrance(Generator generator) {
         Optional<Substation> substation = generator.getTerminal().getVoltageLevel().getSubstation();
         if (substation.isEmpty()) {
             return false;
@@ -61,7 +61,7 @@ public class RemoveRemoteVoltageRegulationInFranceService {
         return country.get() == Country.FR;
     }
 
-    private boolean isRemoteVoltageRegulationOn(Generator generator) {
+    private static boolean isRemoteVoltageRegulationOn(Generator generator) {
         return generator.isVoltageRegulatorOn() && generator.getTerminal() != generator.getRegulatingTerminal();
     }
 }
