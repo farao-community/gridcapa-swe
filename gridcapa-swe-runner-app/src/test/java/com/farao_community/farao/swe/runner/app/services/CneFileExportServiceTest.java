@@ -227,7 +227,7 @@ class CneFileExportServiceTest {
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
         assertNull(cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, DichotomyDirection.ES_PT));
     }
-    
+
     @ParameterizedTest
     @CsvSource({
         "GLSK_LIMITATION, B36, GLSK limitation",
