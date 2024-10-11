@@ -10,6 +10,7 @@ import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.SweTaskParametersTestUtil;
+import com.farao_community.farao.swe.runner.app.configurations.NetworkExportConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.iidm.network.Network;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -46,6 +48,9 @@ class FilesServiceTest {
     private RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
     @MockBean
+    private NetworkExportConfiguration networkExportConfiguration;
+
+    @MockBean
     private FileImporter fileImporter;
 
     @MockBean
@@ -53,14 +58,29 @@ class FilesServiceTest {
 
     @Test
     void simpleImport() {
-        when(networkService.importMergedNetwork(any(SweRequest.class))).thenReturn(mock(Network.class));
+        //Given
+        final Network mergedNetwork = mock(Network.class);
+        when(networkService.importMergedNetwork(any(SweRequest.class))).thenReturn(mergedNetwork);
         when(networkService.loadNetworkFromMinio(any(OffsetDateTime.class))).thenReturn(mock(Network.class));
         when(fileImporter.importCracFromCimCracAndNetwork(any(), any(OffsetDateTime.class), any(Network.class), anyString(), any(SweTaskParameters.class))).thenReturn(mock(CimCracCreationContext.class));
         when(fileExporter.saveCracInJsonFormat(any(Crac.class), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("Crac");
         when(fileImporter.importCgmesFiles(anyString())).thenReturn(InputStream.nullInputStream());
-        SweRequest sweRequest = new SweRequest("id", "runId", ProcessType.D2CC, OffsetDateTime.now(), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, new SweFileResource("name", "url"), new ArrayList<>());
-        SweData sweData = filesService.importFiles(sweRequest, SweTaskParametersTestUtil.getSweTaskParameters());
+        //exporting merged network in xiidm
+        when(networkExportConfiguration.intermediateNetwork()).thenReturn(true);
+        when(fileExporter.makeDestinationMinioPath(any(), any())).thenReturn("fakePath/");
+        final OffsetDateTime now = OffsetDateTime.now();
+        final SweRequest sweRequest = new SweRequest("id", "runId", ProcessType.D2CC, now, new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), new SweFileResource("name", "url"), null, null, new SweFileResource("name", "url"), new ArrayList<>());
+
+        //When
+        final SweData sweData = filesService.importFiles(sweRequest, SweTaskParametersTestUtil.getSweTaskParameters());
+        verify(fileExporter).saveNetworkInArtifact(mergedNetwork,
+                "fakePath/merged-network-before-dichotomy.xiidm",
+                "",
+                now,
+                ProcessType.D2CC);
+        //Then
         assertNotNull(sweData);
+
     }
 
 }
