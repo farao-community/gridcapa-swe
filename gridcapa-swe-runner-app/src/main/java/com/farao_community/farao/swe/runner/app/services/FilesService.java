@@ -10,15 +10,12 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
-import com.farao_community.farao.swe.runner.app.configurations.NetworkExportConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -30,42 +27,30 @@ import java.util.EnumMap;
 @Service
 public class FilesService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON = "/crac/CimCracCreationParameters_PT-ES_IDCC.json";
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_D2CC_JSON = "/crac/CimCracCreationParameters_PT-ES_D2CC.json";
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_IDCC_JSON = "/crac/CimCracCreationParameters_FR-ES_IDCC.json";
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON = "/crac/CimCracCreationParameters_FR-ES_D2CC.json";
-    private static final String XIIDM_EXTENSION = "xiidm";
 
     private final NetworkService networkService;
     private final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
-    private final NetworkExportConfiguration networkExportConfiguration;
 
     private final FileImporter fileImporter;
     private final FileExporter fileExporter;
 
-    public FilesService(final NetworkService networkImporter,
-                        final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService,
-                        final NetworkExportConfiguration networkExportConfiguration,
-                        final FileImporter fileImporter,
-                        final FileExporter fileExporter) {
+    public FilesService(NetworkService networkImporter, RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService, FileImporter fileImporter, FileExporter fileExporter) {
         this.networkService = networkImporter;
         this.removeRemoteVoltageRegulationInFranceService = removeRemoteVoltageRegulationInFranceService;
-        this.networkExportConfiguration = networkExportConfiguration;
         this.fileImporter = fileImporter;
         this.fileExporter = fileExporter;
     }
 
-    public SweData importFiles(final SweRequest sweRequest,
-                               final SweTaskParameters sweTaskParameters) {
+    public SweData importFiles(SweRequest sweRequest, SweTaskParameters sweTaskParameters) {
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
         networkService.addHvdcAndPstToNetwork(mergedNetwork);
         removeRemoteVoltageRegulationInFranceService.removeRemoteVoltageRegulationInFrance(mergedNetwork);
         fileExporter.saveMergedNetworkWithHvdc(mergedNetwork, targetProcessDateTime);
-        if (networkExportConfiguration.intermediateNetwork()) {
-            exportXiidmNetwork(mergedNetwork, sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType());
-        }
 
         Network networkEsFr = networkService.loadNetworkFromMinio(targetProcessDateTime);
         Network networkFrEs = networkService.loadNetworkFromMinio(targetProcessDateTime);
@@ -83,18 +68,6 @@ public class FilesService {
         String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_PT);
         EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = fillMapCgmesInputFiles(sweRequest);
         return new SweData(sweRequest.getId(), sweRequest.getCurrentRunId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, mapCgmesInputFiles);
-    }
-
-    private void exportXiidmNetwork(final Network network,
-                                    final OffsetDateTime targetProcessDateTime, final ProcessType processType) {
-        final String destinationMinioPath = fileExporter.makeDestinationMinioPath(targetProcessDateTime, FileExporter.FileKind.ARTIFACTS);
-        final String scaledNetworkInXiidmFormatName = "merged-network-before-dichotomy." + XIIDM_EXTENSION;
-        LOGGER.info("Exporting intermediate network before dichotomy to path : {}", destinationMinioPath + scaledNetworkInXiidmFormatName);
-        fileExporter.saveNetworkInArtifact(network,
-                destinationMinioPath + scaledNetworkInXiidmFormatName,
-                "",
-                targetProcessDateTime,
-                processType);
     }
 
     private EnumMap<CgmesFileType, SweFileResource> fillMapCgmesInputFiles(SweRequest sweRequest) {
