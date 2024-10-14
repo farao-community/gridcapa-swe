@@ -86,8 +86,7 @@ public class FilesService {
     }
 
     private void exportXiidmNetwork(final Network network,
-                                    final OffsetDateTime targetProcessDateTime,
-                                    final ProcessType processType) {
+                                    final OffsetDateTime targetProcessDateTime, final ProcessType processType) {
         final String destinationMinioPath = fileExporter.makeDestinationMinioPath(targetProcessDateTime, FileExporter.FileKind.ARTIFACTS);
         final String scaledNetworkInXiidmFormatName = "merged-network-before-dichotomy." + XIIDM_EXTENSION;
         LOGGER.info("Exporting intermediate network before dichotomy to path : {}", destinationMinioPath + scaledNetworkInXiidmFormatName);
