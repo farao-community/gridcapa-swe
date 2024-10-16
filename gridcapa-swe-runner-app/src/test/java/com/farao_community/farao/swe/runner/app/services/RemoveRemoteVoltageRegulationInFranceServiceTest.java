@@ -6,10 +6,15 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.powsybl.commons.datasource.DataSource;
+import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,11 +35,23 @@ class RemoveRemoteVoltageRegulationInFranceServiceTest {
         assertEquals(410, network.getGenerator("GeneratorES").getTargetV(), 1e-3);
         assertEquals(network.getLoad("LoadES").getTerminal(), network.getGenerator("GeneratorES").getRegulatingTerminal());
 
-        removeRemoteVoltageRegulationInFranceService.removeRemoteVoltageRegulationInFrance(network);
+        Map<String, RemoveRemoteVoltageRegulationInFranceService.ReplacedVoltageRegulation> oldValues = removeRemoteVoltageRegulationInFranceService.removeRemoteVoltageRegulationInFrance(network);
+
         assertEquals(15.375, network.getGenerator("GeneratorFR").getTargetV(), 1e-3);
         assertEquals(network.getGenerator("GeneratorFR").getTerminal(), network.getGenerator("GeneratorFR").getRegulatingTerminal());
         assertEquals(410, network.getGenerator("GeneratorES").getTargetV(), 1e-3);
         assertEquals(network.getLoad("LoadES").getTerminal(), network.getGenerator("GeneratorES").getRegulatingTerminal());
+
+        DataSource dataSource = new MemDataSource();
+        network.write("XIIDM", new Properties(), dataSource);
+        Network networkCopy = Network.read(dataSource);
+
+        removeRemoteVoltageRegulationInFranceService.resetRemoteVoltageRegulationInFrance(networkCopy, oldValues);
+
+        assertEquals(410, networkCopy.getGenerator("GeneratorFR").getTargetV(), 1e-3);
+        assertEquals(networkCopy.getLoad("LoadFR").getTerminal(), networkCopy.getGenerator("GeneratorFR").getRegulatingTerminal());
+        assertEquals(410, networkCopy.getGenerator("GeneratorES").getTargetV(), 1e-3);
+        assertEquals(networkCopy.getLoad("LoadES").getTerminal(), networkCopy.getGenerator("GeneratorES").getRegulatingTerminal());
     }
 
     private static Network generateNetwork() {
