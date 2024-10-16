@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -49,7 +50,7 @@ public class FilesService {
         OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
         Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
         networkService.addHvdcAndPstToNetwork(mergedNetwork);
-        removeRemoteVoltageRegulationInFranceService.removeRemoteVoltageRegulationInFrance(mergedNetwork);
+        Map<String, RemoveRemoteVoltageRegulationInFranceService.ReplacedVoltageRegulation> replacedVoltageRegulations = removeRemoteVoltageRegulationInFranceService.removeRemoteVoltageRegulationInFrance(mergedNetwork);
         fileExporter.saveMergedNetworkWithHvdc(mergedNetwork, targetProcessDateTime);
 
         Network networkEsFr = networkService.loadNetworkFromMinio(targetProcessDateTime);
@@ -67,7 +68,7 @@ public class FilesService {
         String raoParametersEsFrUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_FR);
         String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_PT);
         EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = fillMapCgmesInputFiles(sweRequest);
-        return new SweData(sweRequest.getId(), sweRequest.getCurrentRunId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, mapCgmesInputFiles);
+        return new SweData(sweRequest.getId(), sweRequest.getCurrentRunId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, mapCgmesInputFiles, replacedVoltageRegulations);
     }
 
     private EnumMap<CgmesFileType, SweFileResource> fillMapCgmesInputFiles(SweRequest sweRequest) {
