@@ -10,7 +10,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.swe.runner.app.SweTaskParametersTestUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
@@ -92,7 +92,7 @@ class VoltageCheckServiceTest {
         DichotomyResult<SweDichotomyValidationData> dicho = Mockito.mock(DichotomyResult.class);
         DichotomyStepResult<SweDichotomyValidationData> step = Mockito.mock(DichotomyStepResult.class);
         SweDichotomyValidationData data = Mockito.mock(SweDichotomyValidationData.class);
-        RaoResponse raoResponse = Mockito.mock(RaoResponse.class);
+        RaoSuccessResponse raoResponse = Mockito.mock(RaoSuccessResponse.class);
         SweData sweData = Mockito.mock(SweData.class);
         CimCracCreationContext cimCracCreationContext = Mockito.mock(CimCracCreationContext.class);
         Crac crac = Mockito.mock(Crac.class);
@@ -114,7 +114,7 @@ class VoltageCheckServiceTest {
         DichotomyResult<SweDichotomyValidationData> dicho = Mockito.mock(DichotomyResult.class);
         DichotomyStepResult<SweDichotomyValidationData> step = Mockito.mock(DichotomyStepResult.class);
         SweDichotomyValidationData data = Mockito.mock(SweDichotomyValidationData.class);
-        RaoResponse raoResponse = Mockito.mock(RaoResponse.class);
+        RaoSuccessResponse raoResponse = Mockito.mock(RaoSuccessResponse.class);
         SweData sweData = Mockito.mock(SweData.class);
         CimCracCreationContext cimCracCreationContext = Mockito.mock(CimCracCreationContext.class);
         Crac crac = Mockito.mock(Crac.class);

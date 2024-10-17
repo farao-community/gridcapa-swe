@@ -7,13 +7,16 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.NetworkValidator;
+import com.farao_community.farao.dichotomy.api.exceptions.RaoFailureException;
 import com.farao_community.farao.dichotomy.api.exceptions.RaoInterruptionException;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.rao_runner.api.resource.AbstractRaoResponse;
+import com.farao_community.farao.rao_runner.api.resource.RaoFailureResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
@@ -64,15 +67,22 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     }
 
     @Override
-    public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(final Network network, final DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoInterruptionException {
+    public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(final Network network, final DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoFailureException, RaoInterruptionException {
         final String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
         final String scaledNetworkName = network.getVariantManager().getWorkingVariantId() + ".xiidm";
         final String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
         final RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, scaledNetworkDirPath);
         try {
             LOGGER.info("[{}] : RAO request sent: {}", direction, raoRequest);
-            final RaoResponse raoResponse = raoRunnerClient.runRao(raoRequest);
-            LOGGER.info("[{}] : RAO response received: {}", direction, raoResponse);
+            final AbstractRaoResponse abstractRaoResponse = raoRunnerClient.runRao(raoRequest);
+            LOGGER.info("[{}] : RAO response received: {}", direction, abstractRaoResponse);
+            if (abstractRaoResponse.isRaoFailed()) {
+                final RaoFailureResponse failureResponse = (RaoFailureResponse) abstractRaoResponse;
+                businessLogger.error("RAO computation failed: {}", failureResponse.getErrorMessage());
+                throw new RaoFailureException(failureResponse.getErrorMessage());
+            }
+
+            final RaoSuccessResponse raoResponse = (RaoSuccessResponse) abstractRaoResponse;
             if (raoResponse.isInterrupted()) {
                 throw new RaoInterruptionException("RAO computation stopped due to soft interruption request");
             }
@@ -84,10 +94,9 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                 if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
                     businessLogger.warn("Angle monitoring result is failure");
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
-                            SweDichotomyValidationData.AngleMonitoringStatus.FAILURE),
+                                    SweDichotomyValidationData.AngleMonitoringStatus.FAILURE),
                             false);
                 } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE, PhysicalParameter.FLOW)) {
-
                     businessLogger.info("Angle monitoring result is secure");
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
                                     SweDichotomyValidationData.AngleMonitoringStatus.SECURE),
