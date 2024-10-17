@@ -43,14 +43,13 @@ public class DichotomyParallelization {
     }
 
     public SweResponse launchDichotomy(SweData sweData, SweTaskParameters sweTaskParameters) {
-        ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters);
+        final ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters);
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
-        boolean interrupted = executionResult.getResult().stream()
-            .map(SweDichotomyResult::isInterrupted)
-            .reduce(false, Boolean::logicalOr);
+        final boolean interrupted = executionResult.getResult().stream().anyMatch(SweDichotomyResult::isInterrupted);
         interruptionService.removeTaskToBeInterrupted(sweData.getId());
-        return new SweResponse(sweData.getId(), ttcDocUrl, interrupted);
+        final boolean allRaoFailed = executionResult.getResult().stream().allMatch(SweDichotomyResult::isRaoFailed);
+        return new SweResponse(sweData.getId(), ttcDocUrl, interrupted, allRaoFailed);
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData, SweTaskParameters sweTaskParameters) {

@@ -11,7 +11,7 @@ import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.rao_runner.api.resource.AbstractRaoResponse;
 import com.farao_community.farao.swe.runner.app.SweTaskParametersTestUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
@@ -76,9 +76,9 @@ class DichotomyRunnerTest {
     @Test
     void runDichotomyEsFrTest() {
         Network network = Mockito.mock(Network.class);
-        DichotomyResult<RaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
+        DichotomyResult<AbstractRaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_FR)).thenReturn(network);
-        DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
+        DichotomyEngine<AbstractRaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
         ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
         ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
@@ -110,9 +110,9 @@ class DichotomyRunnerTest {
     @Test
     void runDichotomyFrEsTest() {
         Network network = Mockito.mock(Network.class);
-        DichotomyResult<RaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
+        DichotomyResult<AbstractRaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.FR_ES)).thenReturn(network);
-        DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
+        DichotomyEngine<AbstractRaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
         ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
         ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
@@ -143,9 +143,9 @@ class DichotomyRunnerTest {
     @Test
     void runDichotomyEsPtTest() {
         Network network = Mockito.mock(Network.class);
-        DichotomyResult<RaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
+        DichotomyResult<AbstractRaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.ES_PT)).thenReturn(network);
-        DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
+        DichotomyEngine<AbstractRaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
         ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
         ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
@@ -176,9 +176,9 @@ class DichotomyRunnerTest {
     @Test
     void runDichotomyPtEsTest() {
         Network network = Mockito.mock(Network.class);
-        DichotomyResult<RaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
+        DichotomyResult<AbstractRaoResponse> mockDichotomyResult = Mockito.mock(DichotomyResult.class);
         Mockito.when(NetworkService.getNetworkByDirection(sweData, DichotomyDirection.PT_ES)).thenReturn(network);
-        DichotomyEngine<RaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
+        DichotomyEngine<AbstractRaoResponse> mockEngine = Mockito.mock(DichotomyEngine.class);
         DichotomyRunner spyDichotomyRunner = Mockito.spy(dichotomyRunner);
         ArgumentCaptor<DichotomyParameters> dichotomyParametersCaptor = ArgumentCaptor.forClass(DichotomyParameters.class);
         ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);

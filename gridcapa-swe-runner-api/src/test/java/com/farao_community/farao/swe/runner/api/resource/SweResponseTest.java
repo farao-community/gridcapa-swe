@@ -9,6 +9,7 @@ package com.farao_community.farao.swe.runner.api.resource;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,10 +19,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SweResponseTest {
     @Test
     void simpleRequestTest() {
-        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", true);
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", true, false);
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertTrue(sweResponse.isInterrupted());
+        assertFalse(sweResponse.isAllRaoFailed());
+    }
+
+    @Test
+    void simpleRequestRaoFailedTest() {
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", false, true);
+        assertNotNull(sweResponse);
+        assertEquals("id", sweResponse.getId());
+        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertFalse(sweResponse.isInterrupted());
+        assertTrue(sweResponse.isAllRaoFailed());
     }
 }

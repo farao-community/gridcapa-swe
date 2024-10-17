@@ -55,7 +55,7 @@ class SweRunnerTest {
     @Test
     void run() {
         when(filesService.importFiles(any(SweRequest.class), any(SweTaskParameters.class))).thenReturn(mock(SweData.class));
-        when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false));
+        when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false, false));
         RestTemplate restTemplate = mock(RestTemplate.class);
         when(restTemplateBuilder.build()).thenReturn(restTemplate);
         ResponseEntity<Boolean> responseEntity = mock(ResponseEntity.class);
@@ -68,7 +68,7 @@ class SweRunnerTest {
     @Test
     void logNotModifiedParameters() {
         when(filesService.importFiles(any(SweRequest.class), any(SweTaskParameters.class))).thenReturn(mock(SweData.class));
-        when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false));
+        when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false, false));
         SweRequest sweRequest = mock(SweRequest.class);
         Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("MAX_CRA", "INT", "35", "35")));
         RestTemplate restTemplate = mock(RestTemplate.class);
@@ -85,7 +85,7 @@ class SweRunnerTest {
     @Test
     void logModifiedParameters() {
         when(filesService.importFiles(any(SweRequest.class), any(SweTaskParameters.class))).thenReturn(mock(SweData.class));
-        when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false));
+        when(dichotomyParallelization.launchDichotomy(any(SweData.class), any(SweTaskParameters.class))).thenReturn(new SweResponse("id", "ttcUrl", false, false));
         SweRequest sweRequest = mock(SweRequest.class);
         Mockito.when(sweRequest.getTaskParameterList()).thenReturn(List.of(new TaskParameterDto("MAX_CRA", "INT", "17", "35")));
         RestTemplate restTemplate = mock(RestTemplate.class);

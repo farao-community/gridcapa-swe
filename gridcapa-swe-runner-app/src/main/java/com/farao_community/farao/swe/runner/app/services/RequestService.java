@@ -69,7 +69,10 @@ public class RequestService {
     }
 
     private void sendSweResponse(SweResponse sweResponse) {
-        if (sweResponse.isInterrupted()) {
+        if (sweResponse.isAllRaoFailed()) {
+            businessLogger.warn("RAO failed for all computed directions");
+            sendTaskStatusUpdate(sweResponse.getId(), TaskStatus.ERROR);
+        } else if (sweResponse.isInterrupted()) {
             businessLogger.warn("SWE run has been interrupted");
             sendTaskStatusUpdate(sweResponse.getId(), TaskStatus.INTERRUPTED);
         } else {

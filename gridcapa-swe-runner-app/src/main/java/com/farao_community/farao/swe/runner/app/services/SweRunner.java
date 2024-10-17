@@ -47,7 +47,7 @@ public class SweRunner {
         if (checkIsInterrupted(sweRequest)) {
             businessLogger.warn("Computation has been interrupted for timestamp {}", sweRequest.getTargetProcessDateTime());
             LOGGER.info("Response sent for timestamp {} : run has been interrupted", sweRequest.getTargetProcessDateTime());
-            return new SweResponse(sweRequest.getId(), null, true);
+            return new SweResponse(sweRequest.getId(), null, true, false);
         }
         SweTaskParameters sweTaskParameters = new SweTaskParameters(sweRequest.getTaskParameterList());
         logSweParameters(sweRequest, sweTaskParameters);

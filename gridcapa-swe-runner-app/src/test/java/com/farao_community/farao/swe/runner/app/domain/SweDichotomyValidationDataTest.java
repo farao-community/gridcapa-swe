@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import org.junit.jupiter.api.Test;
 
 import static com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData.AngleMonitoringStatus.SECURE;
@@ -19,9 +19,8 @@ class SweDichotomyValidationDataTest {
 
     @Test
     void testConstructor() {
-        RaoResponse raoResponse = new RaoResponse.RaoResponseBuilder().build();
-        SweDichotomyValidationData.AngleMonitoringStatus status = SECURE;
-        SweDichotomyValidationData constructedData = new SweDichotomyValidationData(raoResponse, status);
+        final RaoSuccessResponse raoResponse = new RaoSuccessResponse.Builder().build();
+        final SweDichotomyValidationData constructedData = new SweDichotomyValidationData(raoResponse, SECURE);
         assertEquals(raoResponse, constructedData.getRaoResponse());
         assertEquals(SECURE, constructedData.getAngleMonitoringStatus());
     }
