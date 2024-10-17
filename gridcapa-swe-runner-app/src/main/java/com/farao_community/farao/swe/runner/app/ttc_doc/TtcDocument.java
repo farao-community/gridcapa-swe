@@ -29,7 +29,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,8 +60,9 @@ public class TtcDocument {
     }
 
     private void buildMapResult() {
-        List<SweDichotomyResult> listDichotomyResults = executionResult.getResult();
-        listDichotomyResults.forEach(r -> addValueToResultMap(r.getDichotomyDirection(), r.getDichotomyResult()));
+        executionResult.getResult().stream()
+                .filter(r -> !r.isRaoFailed())
+                .forEach(r -> addValueToResultMap(r.getDichotomyDirection(), r.getDichotomyResult()));
     }
 
     private void addValueToResultMap(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> result) {
@@ -110,16 +110,12 @@ public class TtcDocument {
     }
 
     private String getCountryNameFromInitial(String direction) {
-        switch (direction) {
-            case "ES":
-                return "SPAIN";
-            case "FR":
-                return "FRANCE";
-            case "PT":
-                return "PORTUGAL";
-            default:
-                throw new SweInvalidDataException("This direction does not exist in the enum");
-        }
+        return switch (direction) {
+            case "ES" -> "SPAIN";
+            case "FR" -> "FRANCE";
+            case "PT" -> "PORTUGAL";
+            default -> throw new SweInvalidDataException("This direction does not exist in the enum");
+        };
     }
 
     private void addValueElement(Element border, String value) {
