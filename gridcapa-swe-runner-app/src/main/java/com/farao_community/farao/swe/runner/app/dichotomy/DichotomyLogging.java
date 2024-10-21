@@ -14,7 +14,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationDat
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -49,12 +49,13 @@ public class DichotomyLogging {
             Voltage Check : {},
             Angle Check : {}.""";
 
-    public DichotomyLogging(Logger businessLogger, ProcessConfiguration processConfiguration) {
+    public DichotomyLogging(final Logger businessLogger,
+                            final ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
         this.zoneId = ZoneId.of(processConfiguration.getZoneId());
     }
 
-    public void logStartDichotomy(DichotomyParameters parameters) {
+    public void logStartDichotomy(final DichotomyParameters parameters) {
         businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
     }
 
@@ -66,19 +67,23 @@ public class DichotomyLogging {
         businessLogger.info("All - Dichotomies are done");
     }
 
-    public void generateSummaryEvents(DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult, SweTaskParameters sweTaskParameters) {
+    public void generateSummaryEvents(final DichotomyDirection direction,
+                                      final DichotomyResult<SweDichotomyValidationData> dichotomyResult,
+                                      final SweData sweData,
+                                      final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
+                                      final SweTaskParameters sweTaskParameters) {
         String limitingElement = NONE;
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
-        String timestamp = getTimestampLocalized(sweData.getTimestamp());
-        String currentTtc = String.valueOf((int) dichotomyResult.getHighestValidStepValue());
-        String previousTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
-        String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
+        final String timestamp = getTimestampLocalized(sweData.getTimestamp());
+        final String currentTtc = String.valueOf((int) dichotomyResult.getHighestValidStepValue());
+        final String previousTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
+        final String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
         String angleCheckStatus = NONE;
-        String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
-        Crac crac = (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) ? sweData.getCracFrEs().getCrac() : sweData.getCracEsPt().getCrac();
+        final String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
+        final Crac crac = (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) ? sweData.getCracFrEs().getCrac() : sweData.getCracEsPt().getCrac();
         if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getRaoResult() != null) {
-            RaoResult raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
+            final RaoResult raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
             limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
             printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
             printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
@@ -90,14 +95,16 @@ public class DichotomyLogging {
         businessLogger.info(SUMMARY_BD, timestamp, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
     }
 
-    private static String toString(Collection<String> c) {
+    private static String toString(final Collection<String> c) {
         return c.stream().map(Object::toString).collect(Collectors.joining(", "));
     }
 
-    private String getVoltageCheckResult(DichotomyDirection direction, Optional<VoltageMonitoringResult> voltageMonitoringResult, SweTaskParameters sweTaskParameters) {
+    private String getVoltageCheckResult(final DichotomyDirection direction,
+                                         final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
+                                         final SweTaskParameters sweTaskParameters) {
         if (sweTaskParameters.isRunVoltageCheck() && (direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR))) {
             if (voltageMonitoringResult.isPresent()) {
-                return String.valueOf(voltageMonitoringResult.get().getStatus());
+                return String.valueOf(voltageMonitoringResult.get().getComputationStatus());
             } else {
                 return FAILURE;
             }
@@ -105,8 +112,8 @@ public class DichotomyLogging {
         return NONE;
     }
 
-    private String getTimestampLocalized(OffsetDateTime timestamp) {
-        OffsetDateTime localOffsetDateTime = OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
+    private String getTimestampLocalized(final OffsetDateTime timestamp) {
+        final OffsetDateTime localOffsetDateTime = OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
         return DATE_TIME_FORMATTER.format(localOffsetDateTime);
     }
 }

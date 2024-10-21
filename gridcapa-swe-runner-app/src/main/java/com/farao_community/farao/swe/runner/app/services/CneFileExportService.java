@@ -10,7 +10,7 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.powsybl.openrao.commons.OpenRaoException;
 import com.powsybl.openrao.data.cneexportercommons.CneExporterParameters;
 import com.powsybl.openrao.data.cneexportercommons.CneUtil;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.powsybl.openrao.data.swecneexporter.SweCneClassCreator;
 import com.powsybl.openrao.data.swecneexporter.SweCneExporter;
@@ -121,7 +121,7 @@ public class CneFileExportService {
                 marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
             } else {
                 SweCneExporter sweCneExporter = new SweCneExporter();
-                sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkService.getNetworkByDirection(sweData, direction), cracCreationContext,
+                sweCneExporter.exportCne(cracCreationContext.getCrac(), cracCreationContext,
                         raoResult, RaoParameters.load(), cneExporterParameters, zipOs);
             }
             zipOs.closeEntry();

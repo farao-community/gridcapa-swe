@@ -8,19 +8,19 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.ttc_doc.TtcDocument;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.OffsetDateTime;
 import java.util.Optional;
 
 /**
@@ -35,32 +35,37 @@ public class OutputService {
     private final FileExporter fileExporter;
     private final ProcessConfiguration processConfiguration;
 
-    public OutputService(FileExporter fileExporter, ProcessConfiguration processConfiguration) {
+    public OutputService(final FileExporter fileExporter,
+                         final ProcessConfiguration processConfiguration) {
         this.fileExporter = fileExporter;
         this.processConfiguration = processConfiguration;
     }
 
-    public String buildAndExportTtcDocument(SweData sweData, ExecutionResult<SweDichotomyResult> result) {
-        TtcDocument ttcDoc = new TtcDocument(result);
-        InputStream inputStream = ttcDoc.buildTtcDocFile();
+    public String buildAndExportTtcDocument(final SweData sweData,
+                                            final ExecutionResult<SweDichotomyResult> result) {
+        final TtcDocument ttcDoc = new TtcDocument(result);
+        final InputStream inputStream = ttcDoc.buildTtcDocFile();
         return fileExporter.exportTtcDocument(sweData, inputStream, buildTtcDocName(sweData));
     }
 
-    private String buildTtcDocName(SweData sweData) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern(TTC_DOC_NAME_REGEX);
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+    private String buildTtcDocName(final SweData sweData) {
+        final DateTimeFormatter df = DateTimeFormatter.ofPattern(TTC_DOC_NAME_REGEX);
+        final OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.of(processConfiguration.getZoneId()));
         return df.format(localTime);
     }
 
-    public void buildAndExportVoltageDoc(DichotomyDirection direction, SweData sweData, Optional<VoltageMonitoringResult> voltageMonitoringResult, SweTaskParameters sweTaskParameters) {
+    public void buildAndExportVoltageDoc(final DichotomyDirection direction,
+                                         final SweData sweData,
+                                         final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
+                                         final SweTaskParameters sweTaskParameters) {
         if (sweTaskParameters.isRunVoltageCheck() && (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES))) {
-            OffsetDateTime timestamp = sweData.getTimestamp();
-            String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
-            OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-            DateTimeFormatter df = DateTimeFormatter.ofPattern(VOLTAGE_DOC_NAME_REGEX);
-            String zipName = df.format(localTime).replace("[direction]", directionString);
-            VoltageMonitoringResult voltageRes = voltageMonitoringResult.orElse(null);
-            fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, sweData.getProcessType(), "VOLTAGE_" + directionString);
+            final OffsetDateTime timestamp = sweData.getTimestamp();
+            final String directionString = direction == DichotomyDirection.FR_ES ? "FRES" : "ESFR";
+            final OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+            final DateTimeFormatter df = DateTimeFormatter.ofPattern(VOLTAGE_DOC_NAME_REGEX);
+            final String zipName = df.format(localTime).replace("[direction]", directionString);
+            final RaoResultWithVoltageMonitoring voltageRes = voltageMonitoringResult.orElse(null);
+            fileExporter.saveVoltageMonitoringResultInJsonZip(voltageRes, zipName, timestamp, sweData.getProcessType(), "VOLTAGE_" + directionString, sweData.getCracFrEs().getCrac());
         }
     }
 }

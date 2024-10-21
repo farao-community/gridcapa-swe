@@ -10,8 +10,8 @@ import com.powsybl.openrao.data.cracapi.Crac;
 
 import com.powsybl.openrao.data.cracapi.CracCreationContext;
 import com.powsybl.openrao.data.cracapi.parameters.CracCreationParameters;
-import com.powsybl.openrao.data.craccreation.creator.cim.parameters.CimCracCreationParameters;
-import com.powsybl.openrao.data.craccreation.creator.cim.parameters.RangeActionSpeed;
+import com.powsybl.openrao.data.cracio.cim.parameters.CimCracCreationParameters;
+import com.powsybl.openrao.data.cracio.cim.parameters.RangeActionSpeed;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.powsybl.iidm.network.Network;

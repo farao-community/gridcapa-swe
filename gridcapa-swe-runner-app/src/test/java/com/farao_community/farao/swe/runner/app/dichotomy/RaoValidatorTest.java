@@ -25,10 +25,10 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openrao.commons.PhysicalParameter;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.Instant;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
-import com.powsybl.openrao.monitoring.anglemonitoring.RaoResultWithAngleMonitoring;
+import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -161,7 +161,8 @@ class RaoValidatorTest {
         when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
         when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
         try {
-            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
+            DichotomyStepResult<SweDichotomyValidationData> lastStepMock = Mockito.mock(DichotomyStepResult.class);
+            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, lastStepMock);
             assertNotNull(result);
             assertFalse(result.isFailed());
             assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.SECURE, result.getValidationData().getAngleMonitoringStatus());

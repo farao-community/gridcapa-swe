@@ -48,15 +48,11 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-crac-creation-util</artifactId>
+            <artifactId>open-rao-crac-io-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-crac-creator-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-crac-creator-cim</artifactId>
+            <artifactId>open-rao-crac-io-cim</artifactId>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
@@ -80,11 +76,7 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-voltage-monitoring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-angle-monitoring</artifactId>
+            <artifactId>monitoring</artifactId>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>

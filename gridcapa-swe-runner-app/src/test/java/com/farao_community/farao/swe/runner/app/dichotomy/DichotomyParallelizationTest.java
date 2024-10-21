@@ -8,7 +8,7 @@ package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
@@ -197,7 +197,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
+        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
@@ -216,7 +216,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
+        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(future);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(future);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(future);

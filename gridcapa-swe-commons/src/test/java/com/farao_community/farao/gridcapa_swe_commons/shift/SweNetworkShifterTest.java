@@ -227,7 +227,7 @@ class SweNetworkShifterTest {
                 DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load());
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
 
-        assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(4646, network));
+        assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(4647, network));
 
     }
 
