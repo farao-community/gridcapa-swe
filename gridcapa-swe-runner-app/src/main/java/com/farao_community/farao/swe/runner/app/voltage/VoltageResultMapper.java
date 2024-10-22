@@ -43,6 +43,6 @@ public class VoltageResultMapper {
                             voltageCnec.getUpperBound(KILOVOLT).orElse(null));
                 })
                 .toList();
-        return new VoltageCheckResult(voltageMonitoringResult.isSecure(), constraintElements);
+        return new VoltageCheckResult(voltageMonitoringResult.getSecurityStatus(), constraintElements);
     }
 }

@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
+import com.powsybl.openrao.data.cracapi.cnec.Cnec;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -23,7 +24,7 @@ class VoltageCheckResultTest {
     @Test
     void testNullListParameter() {
         final NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckResult(true, null);
+            new VoltageCheckResult(Cnec.SecurityStatus.SECURE, null);
             fail("No is secure parameter");
         });
         assertEquals("The value of constraintElements cannot be null in VoltageCheckResult", npe.getMessage());
@@ -31,8 +32,8 @@ class VoltageCheckResultTest {
 
     @Test
     void testOk() {
-        final VoltageCheckResult result = new VoltageCheckResult(true, Collections.emptyList());
-        assertTrue(result.getIsSecure());
+        final VoltageCheckResult result = new VoltageCheckResult(Cnec.SecurityStatus.SECURE, Collections.emptyList());
+        assertEquals(Cnec.SecurityStatus.SECURE, result.getStatus());
         assertTrue(result.getConstraintElements().isEmpty());
     }
 }

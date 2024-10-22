@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
+import com.powsybl.openrao.data.cracapi.cnec.Cnec;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -14,19 +16,19 @@ import java.util.Objects;
  */
 public class VoltageCheckResult {
 
-    private final boolean isSecure;
+    private final Cnec.SecurityStatus status;
     private final List<VoltageCheckConstraintElement> constraintElements;
 
-    public VoltageCheckResult(boolean isSecure,
+    public VoltageCheckResult(Cnec.SecurityStatus status,
                               List<VoltageCheckConstraintElement> constraintElements) {
-        this.isSecure = Objects.requireNonNull(isSecure,
-                "The value of isSecure cannot be null in VoltageCheckResult");
+        this.status = Objects.requireNonNull(status,
+                "The value of status cannot be null in VoltageCheckResult");
         this.constraintElements = Objects.requireNonNull(constraintElements,
                 "The value of constraintElements cannot be null in VoltageCheckResult");
     }
 
-    public boolean getIsSecure() {
-        return isSecure;
+    public Cnec.SecurityStatus getStatus() {
+        return status;
     }
 
     public List<VoltageCheckConstraintElement> getConstraintElements() {

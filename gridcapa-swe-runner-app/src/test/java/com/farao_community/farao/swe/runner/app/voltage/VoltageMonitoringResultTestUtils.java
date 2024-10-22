@@ -12,6 +12,7 @@ import com.powsybl.openrao.data.cracapi.Instant;
 import com.powsybl.openrao.data.cracapi.InstantKind;
 import com.powsybl.openrao.data.cracapi.NetworkElement;
 import com.powsybl.openrao.data.cracapi.State;
+import com.powsybl.openrao.data.cracapi.cnec.Cnec;
 import com.powsybl.openrao.data.cracapi.cnec.VoltageCnec;
 import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
@@ -79,6 +80,8 @@ public final class VoltageMonitoringResultTestUtils {
         when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec1, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_1);
         when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec2, MIN, KILOVOLT)).thenReturn(EXPECTED_MIN_0);
         when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec2, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_0);
+        when(voltageMonitoringResult.getSecurityStatus()).thenReturn(Cnec.SecurityStatus.SECURE);
+
         return voltageMonitoringResult;
     }
 

@@ -13,6 +13,7 @@ import com.powsybl.openrao.data.cracapi.Instant;
 import com.powsybl.openrao.data.cracapi.InstantKind;
 import com.powsybl.openrao.data.cracapi.NetworkElement;
 import com.powsybl.openrao.data.cracapi.State;
+import com.powsybl.openrao.data.cracapi.cnec.Cnec;
 import com.powsybl.openrao.data.cracapi.cnec.VoltageCnec;
 import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
@@ -40,7 +41,6 @@ import static com.powsybl.openrao.commons.MinOrMax.MIN;
 import static com.powsybl.openrao.commons.Unit.KILOVOLT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,25 +52,6 @@ class VoltageResultMapperTest {
     private static final Instant PREVENTIVE_INSTANT = Mockito.mock(Instant.class);
     private static final Instant CURATIVE_INSTANT = Mockito.mock(Instant.class);
     private static final Set<VoltageCnec> VOLTAGE_CNEC_SET = new HashSet<>();
-
-    @Test
-    void mapVoltageResultTestCheckListAndState() {
-        assertNotNull(result);
-        assertEquals(1, result.getConstraintElements().size());
-        assertTrue(result.getIsSecure());
-    }
-
-    @Test
-    void mapVoltageResultTestCheckListElememnts() {
-        result.getConstraintElements().forEach(voltResult -> {
-            assertEquals(EXPECTED_LOWER_0, voltResult.getLowerBound(), VoltageMonitoringResultTestUtils.DELTA_BIG);
-            assertEquals(EXPECTED_UPPER_0, voltResult.getUpperBound(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
-            assertEquals(EXPECTED_MIN_0, voltResult.getMinVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
-            assertEquals(EXPECTED_MAX_0, voltResult.getMaxVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
-            assertEquals(NETWORK_2_ID, voltResult.getNetworkElementId());
-            assertEquals(CONTINGENCY_ID, voltResult.getContingencyId());
-        });
-    }
 
     @BeforeAll
     public static void getVoltageMonitoringResult() {
@@ -118,10 +99,29 @@ class VoltageResultMapperTest {
         when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec1, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_1);
         when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec2, MIN, KILOVOLT)).thenReturn(EXPECTED_MIN_0);
         when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec2, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_0);
-        when(voltageMonitoringResult.isSecure()).thenReturn(true);
+        when(voltageMonitoringResult.getSecurityStatus()).thenReturn(Cnec.SecurityStatus.HIGH_CONSTRAINT);
         // gather voltage cnecs as we will need to test their values
         VOLTAGE_CNEC_SET.add(voltageCnec1);
         VOLTAGE_CNEC_SET.add(voltageCnec2);
         return voltageMonitoringResult;
+    }
+
+    @Test
+    void mapVoltageResultTestCheckListAndState() {
+        assertNotNull(result);
+        assertEquals(1, result.getConstraintElements().size());
+        assertEquals(Cnec.SecurityStatus.HIGH_CONSTRAINT, result.getStatus());
+    }
+
+    @Test
+    void mapVoltageResultTestCheckListElememnts() {
+        result.getConstraintElements().forEach(voltResult -> {
+            assertEquals(EXPECTED_LOWER_0, voltResult.getLowerBound(), VoltageMonitoringResultTestUtils.DELTA_BIG);
+            assertEquals(EXPECTED_UPPER_0, voltResult.getUpperBound(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
+            assertEquals(EXPECTED_MIN_0, voltResult.getMinVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
+            assertEquals(EXPECTED_MAX_0, voltResult.getMaxVoltage(), VoltageMonitoringResultTestUtils.DELTA_SMALL);
+            assertEquals(NETWORK_2_ID, voltResult.getNetworkElementId());
+            assertEquals(CONTINGENCY_ID, voltResult.getContingencyId());
+        });
     }
 }
