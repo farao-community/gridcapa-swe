@@ -102,6 +102,7 @@ class CneFileExportServiceTest {
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
         when(dichotomyResult.hasValidStep()).thenReturn(true);
         when(dichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
@@ -117,6 +118,7 @@ class CneFileExportServiceTest {
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
@@ -134,6 +136,7 @@ class CneFileExportServiceTest {
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.hasValidStep()).thenReturn(true);
@@ -152,6 +155,7 @@ class CneFileExportServiceTest {
         when(sweData.getNetworkPtEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
