@@ -12,7 +12,6 @@ import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import com.farao_community.farao.gridcapa_swe_commons.shift.ZonalScalableProvider;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
@@ -80,8 +79,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             final RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
                 final Crac crac = sweData.getCracEsPt().getCrac();
-                final ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
-                final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, lastDichotomyStepResult.getRaoResult(), zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp())).build();
+                final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, lastDichotomyStepResult.getRaoResult(), fileImporter.importCimGlskDocument(sweData.getGlskUrl()).getZonalScalable(network)).build();
                 final RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) Monitoring.runAngleAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, input);
                 if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
                     businessLogger.warn("Angle monitoring result is failure");

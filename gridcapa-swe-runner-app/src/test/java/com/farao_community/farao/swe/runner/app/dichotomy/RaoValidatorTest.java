@@ -19,6 +19,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationDat
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.glsk.cim.CimGlskDocument;
+import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManager;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -99,11 +100,15 @@ class RaoValidatorTest {
         when(raoResult.getFunctionalCost(CURATIVE_INSTANT)).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
+        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
         when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
-        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+        ZonalData zonalDataMock = Mockito.mock(ZonalData.class);
+        when(cimGlskDocument.getZonalScalable(network)).thenReturn(zonalDataMock);
+        DichotomyStepResult<SweDichotomyValidationData> lastStepMock = Mockito.mock(DichotomyStepResult.class);
+        when(lastStepMock.getRaoResult()).thenReturn(raoResult);
         try {
-            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, null);
+            DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, lastStepMock);
             assertNotNull(result);
             assertFalse(result.isFailed());
             assertEquals(SweDichotomyValidationData.AngleMonitoringStatus.SECURE, result.getValidationData().getAngleMonitoringStatus());
@@ -160,8 +165,11 @@ class RaoValidatorTest {
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
         when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
         when(sweData.getTimestamp()).thenReturn(OffsetDateTime.now());
+        ZonalData zonalDataMock = Mockito.mock(ZonalData.class);
+        when(cimGlskDocument.getZonalScalable(network)).thenReturn(zonalDataMock);
+        DichotomyStepResult<SweDichotomyValidationData> lastStepMock = Mockito.mock(DichotomyStepResult.class);
+        when(lastStepMock.getRaoResult()).thenReturn(raoResult);
         try {
-            DichotomyStepResult<SweDichotomyValidationData> lastStepMock = Mockito.mock(DichotomyStepResult.class);
             DichotomyStepResult<SweDichotomyValidationData> result = raoValidator.validateNetwork(network, lastStepMock);
             assertNotNull(result);
             assertFalse(result.isFailed());
