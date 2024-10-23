@@ -104,7 +104,7 @@ public class DichotomyLogging {
                                          final SweTaskParameters sweTaskParameters) {
         if (sweTaskParameters.isRunVoltageCheck() && (direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR))) {
             if (voltageMonitoringResult.isPresent()) {
-                return String.valueOf(voltageMonitoringResult.get().getComputationStatus());
+                return String.valueOf(voltageMonitoringResult.get().getSecurityStatus());
             } else {
                 return FAILURE;
             }

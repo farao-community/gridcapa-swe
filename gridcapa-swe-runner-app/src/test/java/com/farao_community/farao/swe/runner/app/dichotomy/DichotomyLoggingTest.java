@@ -14,8 +14,8 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.cracapi.cnec.Cnec;
 import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.ComputationStatus;
 import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.junit.jupiter.api.Test;
@@ -43,8 +43,8 @@ class DichotomyLoggingTest {
         assertEquals("FAILURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.ES_FR, Optional.empty(), sweTaskParameters));
         assertEquals("NONE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.PT_ES, Optional.empty(), sweTaskParameters));
         final RaoResultWithVoltageMonitoring mockedVoltageMonitoringResults = Mockito.mock(RaoResultWithVoltageMonitoring.class);
-        Mockito.when(mockedVoltageMonitoringResults.getComputationStatus()).thenReturn(ComputationStatus.DEFAULT);
-        assertEquals("DEFAULT", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(mockedVoltageMonitoringResults), sweTaskParameters));
+        Mockito.when(mockedVoltageMonitoringResults.getSecurityStatus()).thenReturn(Cnec.SecurityStatus.SECURE);
+        assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(mockedVoltageMonitoringResults), sweTaskParameters));
     }
 
     @Test
