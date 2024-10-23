@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.powsybl.openrao.raoapi.parameters.SecondPreventiveRaoParameters;
@@ -103,14 +103,15 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(cracPath);
     }
 
-    public String saveVoltageMonitoringResultInJsonZip(VoltageMonitoringResult result,
+    public String saveVoltageMonitoringResultInJsonZip(RaoResultWithVoltageMonitoring result,
                                                        String targetName,
                                                        OffsetDateTime processTargetDateTime,
                                                        ProcessType processType,
-                                                       String fileType) {
+                                                       String fileType,
+                                                       Crac crac) {
         MemDataSource memDataSource = new MemDataSource();
         try (OutputStream os = memDataSource.newOutputStream(targetName, false)) {
-            Object resultToWrite = getVoltageMonitoringResult(result);
+            Object resultToWrite = getVoltageMonitoringResult(result, crac);
             ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
             zipSingleFile(os, objectWriter.writeValueAsBytes(resultToWrite), zipTargetNameChangeExtension(targetName, ".json"));
         } catch (IOException e) {
@@ -125,8 +126,8 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(voltageResultPath);
     }
 
-    private Object getVoltageMonitoringResult(VoltageMonitoringResult result) {
-        return result != null ? voltageResultMapper.mapVoltageResult(result) : new FailureVoltageCheckResult();
+    private Object getVoltageMonitoringResult(RaoResultWithVoltageMonitoring result, Crac crac) {
+        return result != null ? voltageResultMapper.mapVoltageResult(result, crac) : new FailureVoltageCheckResult();
     }
 
     public String zipTargetNameChangeExtension(String targetName, String extension) {

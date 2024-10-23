@@ -9,7 +9,7 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,12 +27,12 @@ class SweDichotomyResultTest {
 
     private static DichotomyResult<SweDichotomyValidationData> dichotomyResult;
 
-    private static VoltageMonitoringResult voltageMonitoringResult;
+    private static RaoResultWithVoltageMonitoring voltageMonitoringResult;
 
     @BeforeAll
     static void setup() {
         dichotomyResult = Mockito.mock(DichotomyResult.class);
-        voltageMonitoringResult = Mockito.mock(VoltageMonitoringResult.class);
+        voltageMonitoringResult = Mockito.mock(RaoResultWithVoltageMonitoring.class);
     }
 
     @Test
@@ -56,3 +56,4 @@ class SweDichotomyResultTest {
         assertEquals("lowestValidStepUrl", result.getLowestInvalidStepUrl());
     }
 }
+
