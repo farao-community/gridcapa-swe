@@ -79,7 +79,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             final RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
                 final Crac crac = sweData.getCracEsPt().getCrac();
-                final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, lastDichotomyStepResult.getRaoResult(), fileImporter.importCimGlskDocument(sweData.getGlskUrl()).getZonalScalable(network, sweData.getTimestamp().toInstant())).build();
+                final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()).getZonalScalable(network, sweData.getTimestamp().toInstant())).build();
                 final RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) Monitoring.runAngleAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, input);
                 if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
                     businessLogger.warn("Angle monitoring result is failure");
