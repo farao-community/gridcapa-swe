@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
+import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -14,20 +14,20 @@ import com.farao_community.farao.rao_runner.api.resource.RaoResponse;
 
 public class SweDichotomyValidationData {
 
-    private final RaoResponse raoResponse;
+    private final RaoSuccessResponse raoResponse;
     private final AngleMonitoringStatus angleMonitoringStatus;
 
     public enum AngleMonitoringStatus {
         SECURE, UNSECURE, FAILURE, NONE
     }
 
-    public SweDichotomyValidationData(RaoResponse raoResponse,
+    public SweDichotomyValidationData(RaoSuccessResponse raoResponse,
                                       AngleMonitoringStatus status) {
         this.raoResponse = raoResponse;
         this.angleMonitoringStatus = status;
     }
 
-    public RaoResponse getRaoResponse() {
+    public RaoSuccessResponse getRaoResponse() {
         return raoResponse;
     }
 
