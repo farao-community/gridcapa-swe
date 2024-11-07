@@ -48,7 +48,7 @@ class RequestServiceTest {
     void testRequestService() {
         String id = UUID.randomUUID().toString();
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false);
+        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any())).thenReturn(cseResponse);
 
@@ -64,7 +64,7 @@ class RequestServiceTest {
     void testInterruptedRequestService() {
         String id = UUID.randomUUID().toString();
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true);
+        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true, false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any())).thenReturn(cseResponse);
 
@@ -74,6 +74,22 @@ class RequestServiceTest {
         verify(streamBridge, times(2)).send(any(), captor.capture());
         assertEquals(TaskStatus.RUNNING, captor.getAllValues().get(0).getTaskStatus());
         assertEquals(TaskStatus.INTERRUPTED, captor.getAllValues().get(1).getTaskStatus());
+    }
+
+    @Test
+    void testRaoFailedRequestService() {
+        String id = UUID.randomUUID().toString();
+        SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, true);
+        byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
+        when(sweRunner.run(any())).thenReturn(cseResponse);
+
+        requestService.launchSweRequest(req);
+
+        ArgumentCaptor<TaskStatusUpdate> captor = ArgumentCaptor.forClass(TaskStatusUpdate.class);
+        verify(streamBridge, times(2)).send(any(), captor.capture());
+        assertEquals(TaskStatus.RUNNING, captor.getAllValues().get(0).getTaskStatus());
+        assertEquals(TaskStatus.ERROR, captor.getAllValues().get(1).getTaskStatus());
     }
 
     @Test
