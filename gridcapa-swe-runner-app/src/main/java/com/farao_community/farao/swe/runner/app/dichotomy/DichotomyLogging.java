@@ -82,9 +82,12 @@ public class DichotomyLogging {
         String angleCheckStatus = NONE;
         final String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
         final Crac crac = (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) ? sweData.getCracFrEs().getCrac() : sweData.getCracEsPt().getCrac();
+        if (dichotomyResult.getLowestInvalidStep() != null) {
+            final RaoResult raoResult = dichotomyResult.getLowestInvalidStep().getRaoResult();
+            limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
+        }
         if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getRaoResult() != null) {
             final RaoResult raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
-            limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
             printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
             printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
             if (dichotomyResult.getHighestValidStep().getValidationData() != null && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus() != null) {

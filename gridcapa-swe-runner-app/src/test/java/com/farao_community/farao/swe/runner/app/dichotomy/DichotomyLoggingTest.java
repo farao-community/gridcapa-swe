@@ -70,6 +70,10 @@ class DichotomyLoggingTest {
         DichotomyStepResult stepResult = Mockito.mock(DichotomyStepResult.class);
         Mockito.when(result.getHighestValidStep()).thenReturn(stepResult);
         RaoResult raoResult = Mockito.mock(RaoResult.class);
+        DichotomyStepResult invalidStepResult = Mockito.mock(DichotomyStepResult.class);
+        Mockito.when(result.getLowestInvalidStep()).thenReturn(invalidStepResult);
+        RaoResult raoResult1 = Mockito.mock(RaoResult.class);
+        Mockito.when(invalidStepResult.getRaoResult()).thenReturn(raoResult1);
         Mockito.when(stepResult.getRaoResult()).thenReturn(raoResult);
         SweDichotomyValidationData validationData = new SweDichotomyValidationData(null, SweDichotomyValidationData.AngleMonitoringStatus.SECURE);
         Mockito.when(stepResult.getValidationData()).thenReturn(validationData);
