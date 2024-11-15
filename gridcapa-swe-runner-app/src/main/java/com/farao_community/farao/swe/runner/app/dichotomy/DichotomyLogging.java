@@ -82,7 +82,7 @@ public class DichotomyLogging {
         String angleCheckStatus = NONE;
         final String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
         final Crac crac = (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) ? sweData.getCracFrEs().getCrac() : sweData.getCracEsPt().getCrac();
-        if (dichotomyResult.getLowestInvalidStep() != null) {
+        if (dichotomyResult.getLowestInvalidStep() != null && dichotomyResult.getLowestInvalidStep().getRaoResult() != null) {
             final RaoResult raoResult = dichotomyResult.getLowestInvalidStep().getRaoResult();
             limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
         }
