@@ -18,10 +18,10 @@ import java.util.Objects;
  */
 public class HvdcAcEquivalentModel {
     private Map<TwoSides, String> generatorIds;
-    private Map<TwoSides, String> loadIds;
+    private Map<TwoSides, Map<Integer, String>> loadIds;
     private String acLineId;
 
-    public HvdcAcEquivalentModel(Map<TwoSides, String> generatorIds, Map<TwoSides, String> loadIds, String acLineId) {
+    public HvdcAcEquivalentModel(Map<TwoSides, String> generatorIds, Map<TwoSides, Map<Integer, String>> loadIds, String acLineId) {
         Objects.requireNonNull(generatorIds);
         Objects.requireNonNull(generatorIds.get(TwoSides.ONE));
         Objects.requireNonNull(generatorIds.get(TwoSides.TWO));
@@ -39,7 +39,7 @@ public class HvdcAcEquivalentModel {
         return generatorIds.get(side);
     }
 
-    public String getLoadId(TwoSides side) {
+    public Map<Integer, String> getLoadIds(TwoSides side) {
         return loadIds.get(side);
     }
 
