@@ -255,6 +255,7 @@ public final class HvdcLinkProcessor {
             Optional<Load> load2 = Optional.ofNullable(network.getLoad(idsBypriority.get(2)));
 
             if (load2.isEmpty()) {
+                missingElementsMap.computeIfAbsent(NetworkElement.LOAD, k -> new HashSet<>()).add(idsBypriority.get(1));
                 missingElementsMap.computeIfAbsent(NetworkElement.LOAD, k -> new HashSet<>()).add(idsBypriority.get(2));
             }
             return load2;
