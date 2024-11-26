@@ -242,10 +242,15 @@ public final class HvdcLinkProcessor {
         return generator;
     }
 
+    /*****   this is a temporary treatment to follow up a coreso request ********
+     *  we have a special case for
+     * the load with  side1Id == _790749c6-e11e-5b1b-a98a-53bb8c6b6495  (or _5d432236-0b4a-5232-9208-69ad550c9742)
+     * which can have two  IDs for side1
+     *****/
     private static Optional<Load> getOptionalLoad(Network network, Map<Integer, String> idsBypriority, TwoSides side,
                                                   Map<NetworkElement, Collection<String>> missingElementsMap) {
         Optional<Load> load = Optional.ofNullable(network.getLoad(idsBypriority.get(1)));
-        // only side one can have two ids
+
         if (!load.isPresent() && side == TwoSides.ONE) {
             Optional<Load> load2 = Optional.ofNullable(network.getLoad(idsBypriority.get(2)));
 
