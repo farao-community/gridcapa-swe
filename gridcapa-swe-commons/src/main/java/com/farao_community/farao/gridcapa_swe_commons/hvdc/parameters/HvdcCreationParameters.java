@@ -48,8 +48,8 @@ public class HvdcCreationParameters {
         return hvdcAcEquivalentModel.getGeneratorId(side);
     }
 
-    public String getEquivalentLoadId(TwoSides side) {
-        return hvdcAcEquivalentModel.getLoadId(side);
+    public Map<Integer, String> getEquivalentLoadId(TwoSides side) {
+        return hvdcAcEquivalentModel.getLoadIds(side);
     }
 
     public String getEquivalentAcLineId() {

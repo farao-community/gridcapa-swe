@@ -30,6 +30,7 @@
       "hvdcAcEquivalentModel": {
         "side2LoadId": "HVDC1_LOAD2",
         "side1LoadID": "HVDC1_LOAD1",
+        "side1LoadIDOption2": "XXX1XX1 _load",
         "side1GeneratorId": "HVDC1_GEN1",
         "side2GeneratorId": "HVDC1_GEN2",
         "acLineId": "HVDC1_ACLINE"
@@ -66,6 +67,7 @@
         "acLineId": "HVDC2_ACLINE",
         "side1GeneratorId": "HVDC2_GEN1",
         "side1LoadID": "HVDC2_LOAD1",
+        "side1LoadIDOption2": "XXX2XX2 _load",
         "side2GeneratorId": "HVDC2_GEN2",
         "side2LoadId": "HVDC2_LOAD2",
         "mal": "val"

@@ -18,6 +18,7 @@ import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -175,16 +176,23 @@ public final class HvdcCreationParametersArrayDeserializer {
         }
     }
 
+    /*
+     following a coreso request temporarily the side 1 of the load can have 2 ids
+     if the first id SIDE_1_LOAD_ID does not exist in the network
+     we look for the second id SIDE_1_LOAD_ID_OPTION_2 in the network
+     */
     private static class HvdcAcEquivalentModelDeserializer {
         private static final String SIDE_1_GEN_ID = "side1GeneratorId";
         private static final String SIDE_2_GEN_ID = "side2GeneratorId";
         private static final String SIDE_1_LOAD_ID = "side1LoadID";
+        private static final String SIDE_1_LOAD_ID_OPTION_2 = "side1LoadIDOption2";
         private static final String SIDE_2_LOAD_ID = "side2LoadId";
         private static final String AC_LINE_ID = "acLineId";
 
         static HvdcAcEquivalentModel deserialize(JsonParser jsonParser) throws IOException, NoSuchFieldException {
             Map<TwoSides, String> generatorIds = new EnumMap<>(TwoSides.class);
-            Map<TwoSides, String> loadIds = new EnumMap<>(TwoSides.class);
+            Map<TwoSides, Map<Integer, String>> loadIds = new EnumMap<>(TwoSides.class);
+            Map<Integer, String> idsByPriority = new HashMap<>();
             String acLineId = null;
             while (!jsonParser.nextToken().isStructEnd()) {
                 switch (jsonParser.getCurrentName()) {
@@ -195,10 +203,13 @@ public final class HvdcCreationParametersArrayDeserializer {
                         generatorIds.put(TwoSides.TWO, jsonParser.nextTextValue());
                         break;
                     case SIDE_1_LOAD_ID:
-                        loadIds.put(TwoSides.ONE, jsonParser.nextTextValue());
+                        idsByPriority.put(1, jsonParser.nextTextValue());
+                        break;
+                    case SIDE_1_LOAD_ID_OPTION_2:
+                        idsByPriority.put(2, jsonParser.nextTextValue());
                         break;
                     case SIDE_2_LOAD_ID:
-                        loadIds.put(TwoSides.TWO, jsonParser.nextTextValue());
+                        loadIds.put(TwoSides.TWO, Map.of(1, jsonParser.nextTextValue()));
                         break;
                     case AC_LINE_ID:
                         acLineId = jsonParser.nextTextValue();
@@ -207,6 +218,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                         throw new NoSuchFieldException("Unexpected field in HvdcAcEquivalentModel: " + jsonParser.getCurrentName());
                 }
             }
+            loadIds.put(TwoSides.ONE, idsByPriority);
             return new HvdcAcEquivalentModel(generatorIds, loadIds, acLineId);
         }
     }

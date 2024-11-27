@@ -84,7 +84,7 @@ public final class HvdcLinkProcessor {
                                                    Map<NetworkElement, Collection<String>> missingElementsMap) {
         getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(side), missingElementsMap)
                 .ifPresent(gen -> gen.getTerminal().disconnect());
-        getOptionalLoad(network, creationParameters.getEquivalentLoadId(side), missingElementsMap)
+        getOptionalLoad(network, creationParameters.getEquivalentLoadId(side), side, missingElementsMap)
                 .ifPresent(load -> load.getTerminal().disconnect());
     }
 
@@ -194,9 +194,9 @@ public final class HvdcLinkProcessor {
                                                             HvdcLine hvdcLine,
                                                             Map<NetworkElement, Collection<String>> missingElementsMap) {
 
-        Optional<Load> optionalLoad1 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap);
+        Optional<Load> optionalLoad1 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), TwoSides.ONE, missingElementsMap);
         Optional<Generator> optionalGen1 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.ONE), missingElementsMap);
-        Optional<Load> optionalLoad2 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.TWO), missingElementsMap);
+        Optional<Load> optionalLoad2 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.TWO), TwoSides.TWO, missingElementsMap);
         Optional<Generator> optionalGen2 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO), missingElementsMap);
 
         if (optionalLoad1.isPresent() && optionalGen1.isPresent() && optionalLoad2.isPresent() && optionalGen2.isPresent()) {
@@ -242,11 +242,26 @@ public final class HvdcLinkProcessor {
         return generator;
     }
 
-    private static Optional<Load> getOptionalLoad(Network network, String id,
+    /*****   this is a temporary treatment to follow up a coreso request ********
+     *  we have a special case for
+     * the load with  side1Id == _790749c6-e11e-5b1b-a98a-53bb8c6b6495  (or _5d432236-0b4a-5232-9208-69ad550c9742)
+     * which can have two  IDs for side1
+     *****/
+    private static Optional<Load> getOptionalLoad(Network network, Map<Integer, String> idsBypriority, TwoSides side,
                                                   Map<NetworkElement, Collection<String>> missingElementsMap) {
-        Optional<Load> load = Optional.ofNullable(network.getLoad(id));
+        Optional<Load> load = Optional.ofNullable(network.getLoad(idsBypriority.get(1)));
+
+        if (!load.isPresent() && side == TwoSides.ONE) {
+            Optional<Load> load2 = Optional.ofNullable(network.getLoad(idsBypriority.get(2)));
+
+            if (load2.isEmpty()) {
+                missingElementsMap.computeIfAbsent(NetworkElement.LOAD, k -> new HashSet<>()).add(idsBypriority.get(1));
+                missingElementsMap.computeIfAbsent(NetworkElement.LOAD, k -> new HashSet<>()).add(idsBypriority.get(2));
+            }
+            return load2;
+        }
         if (load.isEmpty()) {
-            missingElementsMap.computeIfAbsent(NetworkElement.LOAD, k -> new HashSet<>()).add(id);
+            missingElementsMap.computeIfAbsent(NetworkElement.LOAD, k -> new HashSet<>()).add(idsBypriority.get(2));
         }
         return load;
     }
