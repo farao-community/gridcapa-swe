@@ -61,11 +61,30 @@ public class CneFileExportService {
     private static final String CORESO_CAPACITY_COORDINATOR_RECEIVER_ID = "22XCORESO------S";
     private static final String LAST_SECURE_STRING = "LAST_SECURE";
     private static final String FIRST_UNSECURE_STRING = "FIRST_UNSECURE";
-    private static final String PROPERTIES_PREFIX = "rao-result.export.swe-cne";
 
     private final FileExporter fileExporter;
     private final MinioAdapter minioAdapter;
     private final ProcessConfiguration processConfiguration;
+    private enum CNE_PROPERTIES {
+        DOCUMENT_ID("document-id"),
+        REVISION_NUMBER("revision-number"),
+        DOMAIN_ID("domain-id"),
+        PROCESS_TYPE("process-type"),
+        SENDER_ID("sender-id"),
+        SENDER_ROLE("sender-role"),
+        RECEIVER_ID("receiver-id"),
+        RECEIVER_ROLE("receiver-role"),
+        TIME_INTERVAL("time-interval");
+
+        private final String key;
+        CNE_PROPERTIES(final String key) {
+            this.key = key;
+        }
+
+        public String getPrefixedKey() {
+            return "rao-result.export.swe-cne." + key;
+        }
+    }
 
     public CneFileExportService(FileExporter fileExporter, MinioAdapter minioAdapter, ProcessConfiguration processConfiguration) {
         this.fileExporter = fileExporter;
@@ -149,16 +168,16 @@ public class CneFileExportService {
 
     private CriticalNetworkElementMarketDocument createErrorMarketDocumentAndInitializeHeader(SweData sweData, DichotomyDirection direction, Properties cneExporterProperties) {
         final CriticalNetworkElementMarketDocument marketDocument = new CriticalNetworkElementMarketDocument();
-        marketDocument.setMRID(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".document-id"));
-        marketDocument.setRevisionNumber(String.valueOf(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".revision-number")));
+        marketDocument.setMRID(cneExporterProperties.getProperty(CNE_PROPERTIES.DOCUMENT_ID.getPrefixedKey()));
+        marketDocument.setRevisionNumber(String.valueOf(cneExporterProperties.getProperty(CNE_PROPERTIES.REVISION_NUMBER.getPrefixedKey())));
         marketDocument.setType("B06");
-        marketDocument.setProcessProcessType(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".process-type"));
-        marketDocument.setSenderMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".sender-id")));
-        marketDocument.setSenderMarketParticipantMarketRoleType(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".sender-role"));
-        marketDocument.setReceiverMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".receiver-id")));
-        marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".receiver-role"));
+        marketDocument.setProcessProcessType(cneExporterProperties.getProperty(CNE_PROPERTIES.PROCESS_TYPE.getPrefixedKey()));
+        marketDocument.setSenderMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(CNE_PROPERTIES.SENDER_ID.getPrefixedKey())));
+        marketDocument.setSenderMarketParticipantMarketRoleType(cneExporterProperties.getProperty(CNE_PROPERTIES.SENDER_ROLE.getPrefixedKey()));
+        marketDocument.setReceiverMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(CNE_PROPERTIES.RECEIVER_ID.getPrefixedKey())));
+        marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterProperties.getProperty(CNE_PROPERTIES.RECEIVER_ROLE.getPrefixedKey()));
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".time-interval")));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterProperties.getProperty(CNE_PROPERTIES.TIME_INTERVAL.getPrefixedKey())));
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkService.getNetworkByDirection(sweData, direction).getCaseDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
@@ -209,15 +228,15 @@ public class CneFileExportService {
         // limit size to 35 characters, a UUID is 36 characters long
         final String mRid = UUID.randomUUID().toString().substring(1);
         final Properties properties = new Properties();
-        properties.setProperty(PROPERTIES_PREFIX + ".document-id", mRid);
-        properties.setProperty(PROPERTIES_PREFIX + ".revision-number", "1");
-        properties.setProperty(PROPERTIES_PREFIX + ".domain-id", "");
-        properties.setProperty(PROPERTIES_PREFIX + ".process-type", "Z01");
-        properties.setProperty(PROPERTIES_PREFIX + ".sender-id", RTE_SYSTEM_OPERATOR_SENDER_ID);
-        properties.setProperty(PROPERTIES_PREFIX + ".sender-role", "A04");
-        properties.setProperty(PROPERTIES_PREFIX + ".receiver-id", CORESO_CAPACITY_COORDINATOR_RECEIVER_ID);
-        properties.setProperty(PROPERTIES_PREFIX + ".receiver-role", "A36");
-        properties.setProperty(PROPERTIES_PREFIX + ".time-interval", extractTimeIntervalFileHeader(timestamp));
+        properties.setProperty(CNE_PROPERTIES.DOCUMENT_ID.getPrefixedKey(), mRid);
+        properties.setProperty(CNE_PROPERTIES.REVISION_NUMBER.getPrefixedKey(), "1");
+        properties.setProperty(CNE_PROPERTIES.DOMAIN_ID.getPrefixedKey(), "");
+        properties.setProperty(CNE_PROPERTIES.PROCESS_TYPE.getPrefixedKey(), "Z01");
+        properties.setProperty(CNE_PROPERTIES.SENDER_ID.getPrefixedKey(), RTE_SYSTEM_OPERATOR_SENDER_ID);
+        properties.setProperty(CNE_PROPERTIES.SENDER_ROLE.getPrefixedKey(), "A04");
+        properties.setProperty(CNE_PROPERTIES.RECEIVER_ID.getPrefixedKey(), CORESO_CAPACITY_COORDINATOR_RECEIVER_ID);
+        properties.setProperty(CNE_PROPERTIES.RECEIVER_ROLE.getPrefixedKey(), "A36");
+        properties.setProperty(CNE_PROPERTIES.TIME_INTERVAL.getPrefixedKey(), extractTimeIntervalFileHeader(timestamp));
         return properties;
     }
 
