@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>farao-parent-ws</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>1.9.0</version>
+        <artifactId>farao-parent-ws</artifactId>
+        <version>1.10.1</version>
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
