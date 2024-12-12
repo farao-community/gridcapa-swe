@@ -3,7 +3,7 @@ name: CI - commit
 on:
   push:
     branches-ignore:
-      - main
+      - master
 
 jobs:
   build:
