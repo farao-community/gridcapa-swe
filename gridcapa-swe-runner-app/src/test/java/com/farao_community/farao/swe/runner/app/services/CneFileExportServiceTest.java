@@ -8,9 +8,6 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
@@ -20,7 +17,10 @@ import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.swecneexporter.xsd.Reason;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Reason;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

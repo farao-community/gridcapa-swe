@@ -14,8 +14,8 @@ import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;

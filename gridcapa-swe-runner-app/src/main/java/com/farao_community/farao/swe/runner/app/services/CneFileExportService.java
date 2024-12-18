@@ -14,25 +14,26 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.swe.runner.app.CneProperties;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.openrao.commons.OpenRaoException;
-import com.powsybl.openrao.data.cneexportercommons.CneUtil;
-import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
-import com.powsybl.openrao.data.swecneexporter.SweCneClassCreator;
-import com.powsybl.openrao.data.swecneexporter.SweCneUtil;
-import com.powsybl.openrao.data.swecneexporter.xsd.CriticalNetworkElementMarketDocument;
-import com.powsybl.openrao.data.swecneexporter.xsd.Point;
-import com.powsybl.openrao.data.swecneexporter.xsd.Reason;
-import com.powsybl.openrao.data.swecneexporter.xsd.SeriesPeriod;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import com.powsybl.openrao.data.raoresult.io.cne.commons.CneUtil;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.SweCneClassCreator;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.SweCneUtil;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.CriticalNetworkElementMarketDocument;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Point;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Reason;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.SeriesPeriod;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -61,7 +62,6 @@ public class CneFileExportService {
     private static final String CORESO_CAPACITY_COORDINATOR_RECEIVER_ID = "22XCORESO------S";
     private static final String LAST_SECURE_STRING = "LAST_SECURE";
     private static final String FIRST_UNSECURE_STRING = "FIRST_UNSECURE";
-    private static final String PROPERTIES_PREFIX = "rao-result.export.swe-cne";
 
     private final FileExporter fileExporter;
     private final MinioAdapter minioAdapter;
@@ -145,16 +145,16 @@ public class CneFileExportService {
 
     private CriticalNetworkElementMarketDocument createErrorMarketDocumentAndInitializeHeader(SweData sweData, DichotomyDirection direction, Properties cneExporterProperties) {
         final CriticalNetworkElementMarketDocument marketDocument = new CriticalNetworkElementMarketDocument();
-        marketDocument.setMRID(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".document-id"));
-        marketDocument.setRevisionNumber(String.valueOf(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".revision-number")));
+        marketDocument.setMRID(cneExporterProperties.getProperty(CneProperties.DOCUMENT_ID.getPrefixedKey()));
+        marketDocument.setRevisionNumber(String.valueOf(cneExporterProperties.getProperty(CneProperties.REVISION_NUMBER.getPrefixedKey())));
         marketDocument.setType("B06");
-        marketDocument.setProcessProcessType(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".process-type"));
-        marketDocument.setSenderMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".sender-id")));
-        marketDocument.setSenderMarketParticipantMarketRoleType(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".sender-role"));
-        marketDocument.setReceiverMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".receiver-id")));
-        marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".receiver-role"));
+        marketDocument.setProcessProcessType(cneExporterProperties.getProperty(CneProperties.PROCESS_TYPE.getPrefixedKey()));
+        marketDocument.setSenderMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(CneProperties.SENDER_ID.getPrefixedKey())));
+        marketDocument.setSenderMarketParticipantMarketRoleType(cneExporterProperties.getProperty(CneProperties.SENDER_ROLE.getPrefixedKey()));
+        marketDocument.setReceiverMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(CneProperties.RECEIVER_ID.getPrefixedKey())));
+        marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterProperties.getProperty(CneProperties.RECEIVER_ROLE.getPrefixedKey()));
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterProperties.getProperty(PROPERTIES_PREFIX + ".time-interval")));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterProperties.getProperty(CneProperties.TIME_INTERVAL.getPrefixedKey())));
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkService.getNetworkByDirection(sweData, direction).getCaseDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
@@ -205,15 +205,15 @@ public class CneFileExportService {
         // limit size to 35 characters, a UUID is 36 characters long
         final String mRid = UUID.randomUUID().toString().substring(1);
         final Properties properties = new Properties();
-        properties.setProperty(PROPERTIES_PREFIX + ".document-id", mRid);
-        properties.setProperty(PROPERTIES_PREFIX + ".revision-number", "1");
-        properties.setProperty(PROPERTIES_PREFIX + ".domain-id", "");
-        properties.setProperty(PROPERTIES_PREFIX + ".process-type", "Z01");
-        properties.setProperty(PROPERTIES_PREFIX + ".sender-id", RTE_SYSTEM_OPERATOR_SENDER_ID);
-        properties.setProperty(PROPERTIES_PREFIX + ".sender-role", "A04");
-        properties.setProperty(PROPERTIES_PREFIX + ".receiver-id", CORESO_CAPACITY_COORDINATOR_RECEIVER_ID);
-        properties.setProperty(PROPERTIES_PREFIX + ".receiver-role", "A36");
-        properties.setProperty(PROPERTIES_PREFIX + ".time-interval", extractTimeIntervalFileHeader(timestamp));
+        properties.setProperty(CneProperties.DOCUMENT_ID.getPrefixedKey(), mRid);
+        properties.setProperty(CneProperties.REVISION_NUMBER.getPrefixedKey(), "1");
+        properties.setProperty(CneProperties.DOMAIN_ID.getPrefixedKey(), "");
+        properties.setProperty(CneProperties.PROCESS_TYPE.getPrefixedKey(), "Z01");
+        properties.setProperty(CneProperties.SENDER_ID.getPrefixedKey(), RTE_SYSTEM_OPERATOR_SENDER_ID);
+        properties.setProperty(CneProperties.SENDER_ROLE.getPrefixedKey(), "A04");
+        properties.setProperty(CneProperties.RECEIVER_ID.getPrefixedKey(), CORESO_CAPACITY_COORDINATOR_RECEIVER_ID);
+        properties.setProperty(CneProperties.RECEIVER_ROLE.getPrefixedKey(), "A36");
+        properties.setProperty(CneProperties.TIME_INTERVAL.getPrefixedKey(), extractTimeIntervalFileHeader(timestamp));
         return properties;
     }
 
