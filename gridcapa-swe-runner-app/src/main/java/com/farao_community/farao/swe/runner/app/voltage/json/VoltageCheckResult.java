@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
-import com.powsybl.openrao.data.cracapi.cnec.Cnec;
+import com.powsybl.openrao.data.crac.api.cnec.Cnec;
 
 import java.util.List;
 import java.util.Objects;

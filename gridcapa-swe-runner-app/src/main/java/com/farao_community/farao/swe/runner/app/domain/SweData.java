@@ -10,7 +10,7 @@ import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.services.RemoveRemoteVoltageRegulationInFranceService;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.cracio.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 
 import java.time.OffsetDateTime;
 import java.util.Map;

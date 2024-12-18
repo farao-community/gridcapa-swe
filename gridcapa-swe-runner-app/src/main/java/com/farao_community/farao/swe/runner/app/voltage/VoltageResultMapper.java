@@ -9,8 +9,8 @@ package com.farao_community.farao.swe.runner.app.voltage;
 import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckConstraintElement;
 import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
 import com.powsybl.openrao.commons.MinOrMax;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.Instant;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.Instant;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.springframework.stereotype.Component;
 
