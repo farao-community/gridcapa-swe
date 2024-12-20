@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNoDetailsException;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
@@ -22,11 +23,11 @@ import java.util.List;
 public class SweHvdcPreprocessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweHvdcPreprocessor.class);
 
-    public void applyParametersToNetwork(InputStream parameters, Network network) {
+    public void applyParametersToNetwork(InputStream parameters, Network network) throws SweInvalidDataNoDetailsException {
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(parameters);
         List<String> hvdcIds = params.getHvdcCreationParametersSet().stream().map(HvdcCreationParameters::getId).toList();
+        LOGGER.info("start adding HVDC {} to network", hvdcIds);
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
-        LOGGER.info("HVDC {} added to network", hvdcIds);
     }
 
 }
