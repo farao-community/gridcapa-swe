@@ -10,25 +10,25 @@ package com.farao_community.farao.gridcapa_swe_commons.hvdc;
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public class HvdcInformation {
-    private String id;
+    private final String id;
 
-    private Boolean isSide1GeneratorConnected;
-    private Double side1GeneratorTargetP;
+    private boolean isSide1GeneratorConnected;
+    private double side1GeneratorTargetP;
 
-    private Boolean isSide2GeneratorConnected;
-    private Double side2GeneratorTargetP;
+    private boolean isSide2GeneratorConnected;
+    private double side2GeneratorTargetP;
 
-    private Boolean isSide1LoadConnected;
-    private Double side1LoadP;
+    private boolean isSide1LoadConnected;
+    private double side1LoadP;
 
-    private Boolean isSide1Option2LoadConnected;
-    private Double side1option2LoadP;
+    private boolean isSide1Option2LoadConnected;
+    private double side1option2LoadP;
 
-    private Boolean isSide2LoadConnected;
-    private Double side2LoadP;
+    private boolean isSide2LoadConnected;
+    private double side2LoadP;
 
-    private Boolean isAcLineTerminal1Connected;
-    private Boolean isAcLineTerminal2Connected;
+    private boolean isAcLineTerminal1Connected;
+    private boolean isAcLineTerminal2Connected;
 
     public HvdcInformation(String id) {
         this.id = id;
@@ -38,99 +38,99 @@ public class HvdcInformation {
         return id;
     }
 
-    public Boolean isSide1GeneratorConnected() {
+    public boolean isSide1GeneratorConnected() {
         return isSide1GeneratorConnected;
     }
 
-    public Double getSide1GeneratorTargetP() {
+    public double getSide1GeneratorTargetP() {
         return side1GeneratorTargetP;
     }
 
-    public Boolean isSide2GeneratorConnected() {
+    public boolean isSide2GeneratorConnected() {
         return isSide2GeneratorConnected;
     }
 
-    public Double getSide2GeneratorTargetP() {
+    public double getSide2GeneratorTargetP() {
         return side2GeneratorTargetP;
     }
 
-    public Boolean isSide1LoadConnected() {
+    public boolean isSide1LoadConnected() {
         return isSide1LoadConnected;
     }
 
-    public Double getSide1LoadP() {
+    public double getSide1LoadP() {
         return side1LoadP;
     }
 
-    public Boolean isSide2LoadConnected() {
-        return isSide2LoadConnected;
-    }
-
-    public Double getSide2LoadP() {
-        return side2LoadP;
-    }
-
-    public Boolean isAcLineTerminal1Connected() {
-        return isAcLineTerminal1Connected;
-    }
-
-    public Boolean isAcLineTerminal2Connected() {
-        return isAcLineTerminal2Connected;
-    }
-
-    public void setSide1GeneratorConnected(Boolean side1GeneratorConnected) {
-        isSide1GeneratorConnected = side1GeneratorConnected;
-    }
-
-    public void setSide1GeneratorTargetP(Double side1GeneratorTargetP) {
-        this.side1GeneratorTargetP = side1GeneratorTargetP;
-    }
-
-    public void setSide2GeneratorConnected(Boolean side2GeneratorConnected) {
-        isSide2GeneratorConnected = side2GeneratorConnected;
-    }
-
-    public void setSide2GeneratorTargetP(Double side2GeneratorTargetP) {
-        this.side2GeneratorTargetP = side2GeneratorTargetP;
-    }
-
-    public void setSide1LoadConnected(Boolean side1LoadConnected) {
-        isSide1LoadConnected = side1LoadConnected;
-    }
-
-    public void setSide1LoadP(Double side1LoadP) {
-        this.side1LoadP = side1LoadP;
-    }
-
-    public void setSide2LoadConnected(Boolean side2LoadConnected) {
-        isSide2LoadConnected = side2LoadConnected;
-    }
-
-    public void setSide2LoadP(Double side2LoadP) {
-        this.side2LoadP = side2LoadP;
-    }
-
-    public void setAcLineTerminal1Connected(Boolean acLineTerminal1Connected) {
-        isAcLineTerminal1Connected = acLineTerminal1Connected;
-    }
-
-    public void setAcLineTerminal2Connected(Boolean acLineTerminal2Connected) {
-        isAcLineTerminal2Connected = acLineTerminal2Connected;
-    }
-
-    public Boolean setSide1Option2LoadConnected() {
+    public boolean isSide1Option2LoadConnected() {
         return isSide1Option2LoadConnected;
     }
 
-    public void setSide1Option2LoadConnected(Boolean side1Option2LoadConnected) {
-        isSide1Option2LoadConnected = side1Option2LoadConnected;
-    }
-
-    public Double getSide1option2LoadP() {
+    public double getSide1option2LoadP() {
         return side1option2LoadP;
     }
 
-    public void setSide1option2LoadP(Double side1option2LoadP) {
+    public boolean isSide2LoadConnected() {
+        return isSide2LoadConnected;
+    }
+
+    public double getSide2LoadP() {
+        return side2LoadP;
+    }
+
+    public boolean isAcLineTerminal1Connected() {
+        return isAcLineTerminal1Connected;
+    }
+
+    public boolean isAcLineTerminal2Connected() {
+        return isAcLineTerminal2Connected;
+    }
+
+    public void setSide1GeneratorConnected(final boolean side1GeneratorConnected) {
+        isSide1GeneratorConnected = side1GeneratorConnected;
+    }
+
+    public void setSide1GeneratorTargetP(final double side1GeneratorTargetP) {
+        this.side1GeneratorTargetP = side1GeneratorTargetP;
+    }
+
+    public void setSide2GeneratorConnected(final boolean side2GeneratorConnected) {
+        isSide2GeneratorConnected = side2GeneratorConnected;
+    }
+
+    public void setSide2GeneratorTargetP(final double side2GeneratorTargetP) {
+        this.side2GeneratorTargetP = side2GeneratorTargetP;
+    }
+
+    public void setSide1LoadConnected(final boolean side1LoadConnected) {
+        isSide1LoadConnected = side1LoadConnected;
+    }
+
+    public void setSide1LoadP(final double side1LoadP) {
+        this.side1LoadP = side1LoadP;
+    }
+
+    public void setSide1Option2LoadConnected(final boolean side1Option2LoadConnected) {
+        isSide1Option2LoadConnected = side1Option2LoadConnected;
+    }
+
+    public void setSide1option2LoadP(final double side1option2LoadP) {
         this.side1option2LoadP = side1option2LoadP;
+    }
+
+    public void setSide2LoadConnected(final boolean side2LoadConnected) {
+        isSide2LoadConnected = side2LoadConnected;
+    }
+
+    public void setSide2LoadP(final double side2LoadP) {
+        this.side2LoadP = side2LoadP;
+    }
+
+    public void setAcLineTerminal1Connected(final boolean acLineTerminal1Connected) {
+        isAcLineTerminal1Connected = acLineTerminal1Connected;
+    }
+
+    public void setAcLineTerminal2Connected(final boolean acLineTerminal2Connected) {
+        isAcLineTerminal2Connected = acLineTerminal2Connected;
     }
 }
