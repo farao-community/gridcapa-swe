@@ -30,7 +30,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 
@@ -68,8 +69,8 @@ public class FileImporter {
     public Crac importCracFromJson(String cracUrl, Network network) {
         try (InputStream cracResultStream = urlValidationService.openUrlStream(cracUrl)) {
             LOGGER.info("Importing Crac from JSON file: {}", cracUrl);
-            return Crac.read(FilenameUtils.getName(new URL(cracUrl).getPath()), cracResultStream, network);
-        } catch (IOException e) {
+            return Crac.read(FilenameUtils.getName(new URI(cracUrl).toURL().getPath()), cracResultStream, network);
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl), e);
         }
     }

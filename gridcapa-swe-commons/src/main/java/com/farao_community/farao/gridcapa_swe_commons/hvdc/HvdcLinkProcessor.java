@@ -71,18 +71,17 @@ public final class HvdcLinkProcessor {
                                                      Map<NetworkElement, Collection<String>> missingElementsMap) {
 
         getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap)
-                .ifPresentOrElse(load -> {
-                    load.getTerminal().disconnect();
-                }, () -> {
-                    getOptionalLoadWithSecondIdOption(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap);
-                });
+            .ifPresentOrElse(
+                load -> load.getTerminal().disconnect(),
+                () -> getOptionalLoadWithSecondIdOption(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap)
+            );
 
         getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.ONE), missingElementsMap)
-                .ifPresent(load -> load.getTerminal().disconnect());
+            .ifPresent(load -> load.getTerminal().disconnect());
         getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.TWO), missingElementsMap)
-                .ifPresent(load -> load.getTerminal().disconnect());
+            .ifPresent(load -> load.getTerminal().disconnect());
         getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO), missingElementsMap)
-                .ifPresent(load -> load.getTerminal().disconnect());
+            .ifPresent(load -> load.getTerminal().disconnect());
     }
 
     private static void replaceEquivalentModelByHvdc(Network network, HvdcCreationParameters creationParameters,
@@ -205,33 +204,11 @@ public final class HvdcLinkProcessor {
     }
 
     private static void copyInformationFromInitialNetwork(Optional<Load> optionalLoad1, Optional<Generator> optionalGen1, Optional<Load> optionalLoad2, Optional<Generator> optionalGen2, Optional<Line> optionalAcLine, HvdcInformation hvdcInformation) {
-        if (optionalLoad1.isPresent()) {
-            optionalLoad1.get().setP0(hvdcInformation.getSide1LoadP());
-            if (hvdcInformation.isSide1LoadConnected()) {
-                optionalLoad1.get().connect();
-            }
-        }
+        copyLoadInformation(optionalLoad1, hvdcInformation.getSide1LoadP(), hvdcInformation.isSide1LoadConnected());
+        copyLoadInformation(optionalLoad2, hvdcInformation.getSide2LoadP(), hvdcInformation.isSide2LoadConnected());
 
-        if (optionalLoad2.isPresent()) {
-            optionalLoad2.get().setP0(hvdcInformation.getSide2LoadP());
-            if (hvdcInformation.isSide2LoadConnected()) {
-                optionalLoad2.get().connect();
-            }
-        }
-
-        if (optionalGen1.isPresent()) {
-            optionalGen1.get().setTargetP(hvdcInformation.getSide1GeneratorTargetP());
-            if (hvdcInformation.isSide1GeneratorConnected()) {
-                optionalGen1.get().connect();
-            }
-        }
-
-        if (optionalGen2.isPresent()) {
-            optionalGen2.get().setTargetP(hvdcInformation.getSide2GeneratorTargetP());
-            if (hvdcInformation.isSide2GeneratorConnected()) {
-                optionalGen2.get().connect();
-            }
-        }
+        copyGeneratorInformation(optionalGen1, hvdcInformation.getSide1GeneratorTargetP(), hvdcInformation.isSide1GeneratorConnected());
+        copyGeneratorInformation(optionalGen2, hvdcInformation.getSide2GeneratorTargetP(), hvdcInformation.isSide2GeneratorConnected());
 
         if (optionalAcLine.isPresent()) {
             if (hvdcInformation.isAcLineTerminal1Connected()) {
@@ -241,7 +218,24 @@ public final class HvdcLinkProcessor {
                 optionalAcLine.get().getTerminal2().connect();
             }
         }
+    }
 
+    private static void copyLoadInformation(final Optional<Load> optionalLoad, final double sideLoadP, final boolean isSideConnected) {
+        if (optionalLoad.isPresent()) {
+            optionalLoad.get().setP0(sideLoadP);
+            if (isSideConnected) {
+                optionalLoad.get().connect();
+            }
+        }
+    }
+
+    private static void copyGeneratorInformation(final Optional<Generator> optionalGen1, final double hvdcInformation, final boolean hvdcInformation1) {
+        if (optionalGen1.isPresent()) {
+            optionalGen1.get().setTargetP(hvdcInformation);
+            if (hvdcInformation1) {
+                optionalGen1.get().connect();
+            }
+        }
     }
 
     private static void connectEquivalentAcLine(Optional<Line> optionalLine, HvdcLine hvdcLine) {

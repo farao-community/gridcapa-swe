@@ -110,9 +110,9 @@ class SweNetworkShifterTest {
     void checkD2ccEsPtTargetExchangesCalculatedCorrectly() {
         Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
-                DichotomyDirection.PT_ES, null, null, 0., 0., intialNetPositions, null, null);
+                DichotomyDirection.ES_PT, null, null, 0., 0., intialNetPositions, null, null);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
-        assertEquals(-1000., shifts.get("ES_PT"), 0.001);
+        assertEquals(1000., shifts.get("ES_PT"), 0.001);
         assertEquals(0., shifts.get("ES_FR"), 0.001);
     }
 
@@ -361,12 +361,12 @@ class SweNetworkShifterTest {
         Network network = Network.read("shift/TestCase_with_transformers.xiidm", getClass().getResourceAsStream("/shift/TestCase_with_transformers.xiidm"));
         CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("/shift/TestCase_with_transformers_glsk.xml"));
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
-        ZonalData<Scalable> zonalScalable = doc.getZonalScalable(network, instant);
-        zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
+        ZonalData<Scalable> customZonalScalable = doc.getZonalScalable(network, instant);
+        customZonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load());
+                DichotomyDirection.ES_FR, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load());
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 
@@ -415,12 +415,12 @@ class SweNetworkShifterTest {
 
         CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("/shift/TestCase_with_transformers_glsk.xml"));
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
-        ZonalData<Scalable> zonalScalable = doc.getZonalScalable(network, instant);
-        zonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
+        ZonalData<Scalable> customZonalScalable = doc.getZonalScalable(network, instant);
+        customZonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.PT_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.PT_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load());
+                DichotomyDirection.PT_ES, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load());
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 

@@ -60,6 +60,15 @@ class HvdcLinkProcessorTest {
         assertFalse(network.getLoad("FFR3AA1 _load").getTerminal().isConnected());
 
         // Check hvdc line 1 creation
+        checkHvdcLine1Creation(network);
+
+        // Check hvdc line 2 creation
+        checkHvdcLine2Creation(network);
+
+        TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs.xiidm", getClass());
+    }
+
+    private static void checkHvdcLine1Creation(final Network network) {
         assertEquals(2, network.getHvdcLineCount());
         HvdcLine hvdcLine1 = network.getHvdcLine("HVDC_FR4-DE1");
         assertEquals(1000.0, hvdcLine1.getMaxP());
@@ -71,8 +80,9 @@ class HvdcLinkProcessorTest {
         assertEquals(1.0, hvdcLine1.getConverterStation1().getLossFactor());
         assertEquals("HVDC_FR4-DE1_VSC2", hvdcLine1.getConverterStation2().getId());
         assertEquals(10.0, hvdcLine1.getConverterStation2().getLossFactor());
+    }
 
-        // Check hvdc line 2 creation
+    private static void checkHvdcLine2Creation(final Network network) {
         HvdcLine hvdcLine2 = network.getHvdcLine("HVDC_BE2-FR3");
         assertEquals(200.0, hvdcLine2.getMaxP());
         assertEquals(0.75, hvdcLine2.getR());
@@ -83,8 +93,6 @@ class HvdcLinkProcessorTest {
         assertEquals(2.0, hvdcLine2.getConverterStation1().getLossFactor());
         assertEquals("HVDC_BE2-FR3_VSC2", hvdcLine2.getConverterStation2().getId());
         assertEquals(15.0, hvdcLine2.getConverterStation2().getLossFactor());
-
-        TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs.xiidm", getClass());
     }
 
     @Test

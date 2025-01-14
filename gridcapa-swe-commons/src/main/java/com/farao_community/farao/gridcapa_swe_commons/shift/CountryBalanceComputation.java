@@ -58,7 +58,7 @@ public final class CountryBalanceComputation {
 
     private static void runLoadFlow(Network network, String workingStateId, LoadFlowParameters loadFlowParameters) {
         LoadFlowResult result = LoadFlow.run(network, workingStateId, LocalComputationManager.getDefault(), loadFlowParameters);
-        if (!result.isOk()) {
+        if (result.isFailed()) {
             LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
             throw new SweBaseCaseUnsecureException(String.format("Loadflow computation diverged on network %s", network.getId()));
         }
