@@ -25,14 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
-public class DiffShiftedNetworkTest {
+class DiffShiftedNetworkTest {
     private static String glskFileName;
     private static String networkFileName1;
     private static String networkFileName2;
@@ -58,10 +57,10 @@ public class DiffShiftedNetworkTest {
         GlskDocument glskDocument = new CimGlskDocumentImporter().importGlsk(getClass().getResourceAsStream(glskFileName));
 
         List<ScalableInformation> scalableInformationsEs = getScalableInformation(glskDocument, SweEICode.ES_EIC, timestamp);
-        List<ScalableInformation> scalableInformationsUp =  scalableInformationsEs.stream().filter(scalableInformation -> scalableInformation.getFlowDirectionType().equals(ScalableInformation.FlowDirectionType.UP)).collect(Collectors.toList());
+        List<ScalableInformation> scalableInformationsUp =  scalableInformationsEs.stream().filter(scalableInformation -> scalableInformation.getFlowDirectionType().equals(ScalableInformation.FlowDirectionType.UP)).toList();
         assertEquals(12, scalableInformationsUp.size());
 
-        List<DiffShiftedGenerator> diffShiftedGeneratorsEsUp = scalableInformationsUp.stream().map(scalableInformation -> new DiffShiftedGenerator(scalableInformation, scalableInformation.getGeneratorInformation(network1), scalableInformation.getGeneratorInformation(network2))).collect(Collectors.toList());
+        List<DiffShiftedGenerator> diffShiftedGeneratorsEsUp = scalableInformationsUp.stream().map(scalableInformation -> new DiffShiftedGenerator(scalableInformation, scalableInformation.getGeneratorInformation(network1), scalableInformation.getGeneratorInformation(network2))).toList();
         assertEquals(12, diffShiftedGeneratorsEsUp.size());
         System.out.println("List of all generators information in the scalable for SPAIN :");
         displayDiff(diffShiftedGeneratorsEsUp);

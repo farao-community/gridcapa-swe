@@ -189,8 +189,8 @@ class ScalableGeneratorConnectorTest {
 
     @Test
     void testScalingPt() {
-        ScalingParameters scalingParameters = new ScalingParameters().setReconnect(true);
-        double done = zonalScalable.getData(new EICode(Country.PT).getAreaCode()).scale(network, 2000, scalingParameters);
+        ScalingParameters customScalingParameters = new ScalingParameters().setReconnect(true);
+        double done = zonalScalable.getData(new EICode(Country.PT).getAreaCode()).scale(network, 2000, customScalingParameters);
         assertEquals(2000., done, 0.1);
         scalableGeneratorConnector.connectGeneratorsTransformers(network, Set.of(Country.ES, Country.PT));
         // These generators in merit order are linked to grid through a line that is disconnected: it should remain that way

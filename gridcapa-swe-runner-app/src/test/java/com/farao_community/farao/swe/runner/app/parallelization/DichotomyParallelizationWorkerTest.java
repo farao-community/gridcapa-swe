@@ -95,8 +95,8 @@ class DichotomyParallelizationWorkerTest {
     @Test
     void testRunDichotomyRaoFailure() {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
-        DichotomyResult<SweDichotomyValidationData> result = DichotomyResult.buildFromRaoFailure("failure");
-        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(result);
+        DichotomyResult<SweDichotomyValidationData> customResult = DichotomyResult.buildFromRaoFailure("failure");
+        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(customResult);
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
 
         Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction);

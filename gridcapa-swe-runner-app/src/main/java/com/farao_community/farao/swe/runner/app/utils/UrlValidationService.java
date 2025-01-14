@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.StringJoiner;
 
@@ -34,9 +36,9 @@ public class UrlValidationService {
             throw new SweInvalidDataException(String.format("URL '%s' is not part of application's whitelisted url's %s", urlString, sj));
         }
         try {
-            URL url = new URL(urlString);
+            URL url = new URI(urlString).toURL();
             return url.openStream();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
             throw new SweInvalidDataException(String.format("Cannot download FileResource file from URL '%s'", urlString), e);
         }
     }

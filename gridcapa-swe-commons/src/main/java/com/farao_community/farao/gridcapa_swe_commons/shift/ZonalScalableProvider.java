@@ -21,13 +21,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ZonalScalableProvider {
 
@@ -46,12 +46,12 @@ public class ZonalScalableProvider {
     }
 
     public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
-        try (InputStream glskResultStream = new URL(glskUrl).openStream()) {
+        try (InputStream glskResultStream = new URI(glskUrl).toURL().openStream()) {
             synchronized (LOCK_GLSK) {
                 LOGGER.info("Importing Glsk file : {}", glskUrl);
                 return GlskDocumentImporters.importGlsk(glskResultStream).getZonalScalable(network, instant);
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
             throw new SweInvalidDataException("Cannot import glsk from url", e);
         }
     }
@@ -63,7 +63,7 @@ public class ZonalScalableProvider {
         generators = network.getGeneratorStream()
                 .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
                 .filter(NetworkUtil::isCorrect)
-                .collect(Collectors.toList());
+                .toList();
         //calculate sum P of country's generators
         double totalCountryP = generators.stream().mapToDouble(NetworkUtil::pseudoTargetP).sum();
         //calculate factor of each generator
