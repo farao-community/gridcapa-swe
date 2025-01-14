@@ -203,7 +203,7 @@ public final class HvdcLinkProcessor {
         }
     }
 
-    private static void copyInformationFromInitialNetwork(Optional<Load> optionalLoad1, Optional<Generator> optionalGen1, Optional<Load> optionalLoad2, Optional<Generator> optionalGen2, Optional<Line> optionalAcLine, HvdcInformation hvdcInformation) {
+    static void copyInformationFromInitialNetwork(Optional<Load> optionalLoad1, Optional<Generator> optionalGen1, Optional<Load> optionalLoad2, Optional<Generator> optionalGen2, Optional<Line> optionalAcLine, HvdcInformation hvdcInformation) {
         copyLoadInformation(optionalLoad1, hvdcInformation.getSide1LoadP(), hvdcInformation.isSide1LoadConnected());
         copyLoadInformation(optionalLoad2, hvdcInformation.getSide2LoadP(), hvdcInformation.isSide2LoadConnected());
 
@@ -229,11 +229,11 @@ public final class HvdcLinkProcessor {
         }
     }
 
-    private static void copyGeneratorInformation(final Optional<Generator> optionalGen1, final double hvdcInformation, final boolean hvdcInformation1) {
-        if (optionalGen1.isPresent()) {
-            optionalGen1.get().setTargetP(hvdcInformation);
-            if (hvdcInformation1) {
-                optionalGen1.get().connect();
+    private static void copyGeneratorInformation(final Optional<Generator> optionalGenerator, final double sideTargetP, final boolean isSideConnected) {
+        if (optionalGenerator.isPresent()) {
+            optionalGenerator.get().setTargetP(sideTargetP);
+            if (isSideConnected) {
+                optionalGenerator.get().connect();
             }
         }
     }

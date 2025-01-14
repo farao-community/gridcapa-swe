@@ -166,14 +166,9 @@ public class FileExporter {
     String exportAndUploadNetwork(Network network, String format, GridcapaFileGroup fileGroup, String filePath, String fileType, OffsetDateTime offsetDateTime, ProcessType processType) {
         try (InputStream is = getNetworkInputStream(network, format)) {
             switch (fileGroup) {
-                case OUTPUT:
-                    minioAdapter.uploadOutputForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
-                    break;
-                case ARTIFACT:
-                    minioAdapter.uploadArtifactForTimestamp(filePath.replace(":", ""), is, adaptTargetProcessName(processType), fileType, offsetDateTime);
-                    break;
-                default:
-                    throw new UnsupportedOperationException(String.format("File group %s not supported", fileGroup));
+                case OUTPUT -> minioAdapter.uploadOutputForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
+                case ARTIFACT -> minioAdapter.uploadArtifactForTimestamp(filePath.replace(":", ""), is, adaptTargetProcessName(processType), fileType, offsetDateTime);
+                default -> throw new UnsupportedOperationException(String.format("File group %s not supported", fileGroup));
             }
         } catch (IOException e) {
             throw new SweInternalException("Error while trying to save network", e);

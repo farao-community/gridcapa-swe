@@ -11,14 +11,20 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNo
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
+import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.HvdcLine;
+import com.powsybl.iidm.network.Line;
+import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -175,5 +181,51 @@ class HvdcLinkProcessorTest {
         Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream(xiidm));
         Set<HvdcCreationParameters> params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json")).getHvdcCreationParametersSet();
         assertThrows(SweInvalidDataNoDetailsException.class, () -> HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params));
+    }
+
+    @Test
+    void testCopyInformationFromInitialNetwork() {
+        final Load load1 = Mockito.mock(Load.class);
+        final Load load2 = Mockito.mock(Load.class);
+        final Generator generator1 = Mockito.mock(Generator.class);
+        final Generator generator2 = Mockito.mock(Generator.class);
+        final Line line = Mockito.mock(Line.class);
+        final Terminal terminal1 = Mockito.mock(Terminal.class);
+        final Terminal terminal2 = Mockito.mock(Terminal.class);
+        final Optional<Load> optLoad1 = Optional.of(load1);
+        final Optional<Load> optLoad2 = Optional.of(load2);
+        final Optional<Generator> optGenerator1 = Optional.of(generator1);
+        final Optional<Generator> optGenerator2 = Optional.of(generator2);
+        final Optional<Line> optLine = Optional.of(line);
+        Mockito.when(line.getTerminal1()).thenReturn(terminal1);
+        Mockito.when(line.getTerminal2()).thenReturn(terminal2);
+        final HvdcInformation hvdcInformation = new HvdcInformation("testId");
+        hvdcInformation.setSide1LoadConnected(true);
+        hvdcInformation.setSide2LoadConnected(true);
+        hvdcInformation.setSide1GeneratorConnected(true);
+        hvdcInformation.setSide2GeneratorConnected(true);
+        hvdcInformation.setAcLineTerminal1Connected(true);
+        hvdcInformation.setAcLineTerminal2Connected(true);
+        final double load1P = 42.;
+        final double load2P = 27.;
+        final double generator1P = 12.;
+        final double generator2P = 314.;
+        hvdcInformation.setSide1LoadP(load1P);
+        hvdcInformation.setSide2LoadP(load2P);
+        hvdcInformation.setSide1GeneratorTargetP(generator1P);
+        hvdcInformation.setSide2GeneratorTargetP(generator2P);
+
+        HvdcLinkProcessor.copyInformationFromInitialNetwork(optLoad1, optGenerator1, optLoad2, optGenerator2, optLine, hvdcInformation);
+
+        Mockito.verify(load1, Mockito.times(1)).setP0(load1P);
+        Mockito.verify(load1, Mockito.times(1)).connect();
+        Mockito.verify(load2, Mockito.times(1)).setP0(load2P);
+        Mockito.verify(load2, Mockito.times(1)).connect();
+        Mockito.verify(generator1, Mockito.times(1)).setTargetP(generator1P);
+        Mockito.verify(generator1, Mockito.times(1)).connect();
+        Mockito.verify(generator2, Mockito.times(1)).setTargetP(generator2P);
+        Mockito.verify(generator2, Mockito.times(1)).connect();
+        Mockito.verify(terminal1, Mockito.times(1)).connect();
+        Mockito.verify(terminal2, Mockito.times(1)).connect();
     }
 }
