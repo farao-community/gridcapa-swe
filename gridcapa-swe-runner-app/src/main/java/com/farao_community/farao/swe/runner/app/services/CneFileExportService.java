@@ -109,32 +109,45 @@ public class CneFileExportService {
     }
 
     void exportAndZipCneFile(SweData sweData,
-                                     DichotomyDirection direction,
-                                     DichotomyResult<SweDichotomyValidationData> dichotomyResult,
-                                     Properties cneExporterProperties,
-                                     CimCracCreationContext cracCreationContext,
-                                     MemDataSource memDataSource,
-                                     String targetZipFileName,
-                                     boolean isHighestValid) {
+                             DichotomyDirection direction,
+                             DichotomyResult<SweDichotomyValidationData> dichotomyResult,
+                             Properties cneExporterProperties,
+                             CimCracCreationContext cracCreationContext,
+                             MemDataSource memDataSource,
+                             String targetZipFileName,
+                             boolean isHighestValid) {
         try (OutputStream os = memDataSource.newOutputStream(targetZipFileName, false);
-             ZipOutputStream zipOs = new ZipOutputStream(os)) {
+            ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
-            final RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
-            if (raoResult == null) {
-                final Reason reason = getLimitingCauseErrorReason(dichotomyResult.getLimitingCause());
-                final CriticalNetworkElementMarketDocument errorMarketDocument = createErrorMarketDocument(sweData, direction, cneExporterProperties, cracCreationContext, reason);
-                marshallMarketDocumentToXml(zipOs, errorMarketDocument);
-            } else if (raoResult.getExecutionDetails() != null && !isHighestValid) {
-                final Reason reason = getReason("B18", raoResult.getExecutionDetails());
-                final CriticalNetworkElementMarketDocument errorMarketDocument = createErrorMarketDocument(sweData, direction, cneExporterProperties, cracCreationContext, reason);
-                marshallMarketDocumentToXml(zipOs, errorMarketDocument);
+            if (!isHighestValid && dichotomyResult.isRaoFailed()) {
+                handleFirstUnsecureForFailedRao(sweData, direction, cneExporterProperties, cracCreationContext, zipOs);
             } else {
-                raoResult.write("SWE-CNE", cracCreationContext, cneExporterProperties, zipOs);
+                handleOtherResult(sweData, direction, dichotomyResult, cneExporterProperties, cracCreationContext, isHighestValid, zipOs);
             }
             zipOs.closeEntry();
         } catch (IOException | JAXBException | DatatypeConfigurationException | OpenRaoException e) {
             throw new SweInvalidDataException(String.format("Error while trying to save cne result file [%s].", targetZipFileName), e);
         }
+    }
+
+    private void handleFirstUnsecureForFailedRao(final SweData sweData, final DichotomyDirection direction, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final ZipOutputStream zipOs) throws DatatypeConfigurationException, JAXBException, IOException {
+        final Reason reason = getReason("B18", "RAO failed");
+        fillCneWithError(sweData, direction, cneExporterProperties, cracCreationContext, zipOs, reason);
+    }
+
+    private void handleOtherResult(final SweData sweData, final DichotomyDirection direction, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final boolean isHighestValid, final ZipOutputStream zipOs) throws DatatypeConfigurationException, JAXBException, IOException {
+        final RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
+        if (raoResult == null) {
+            final Reason reason = getLimitingCauseErrorReason(dichotomyResult.getLimitingCause());
+            fillCneWithError(sweData, direction, cneExporterProperties, cracCreationContext, zipOs, reason);
+        } else {
+            raoResult.write("SWE-CNE", cracCreationContext, cneExporterProperties, zipOs);
+        }
+    }
+
+    private void fillCneWithError(final SweData sweData, final DichotomyDirection direction, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final ZipOutputStream zipOs, final Reason reason) throws DatatypeConfigurationException, JAXBException, IOException {
+        final CriticalNetworkElementMarketDocument errorMarketDocument = createErrorMarketDocument(sweData, direction, cneExporterProperties, cracCreationContext, reason);
+        marshallMarketDocumentToXml(zipOs, errorMarketDocument);
     }
 
     private CriticalNetworkElementMarketDocument createErrorMarketDocument(final SweData sweData, final DichotomyDirection direction, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final Reason reason) throws DatatypeConfigurationException {
