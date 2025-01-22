@@ -108,7 +108,7 @@ public class CneFileExportService {
         return sweData.getCracFrEs();
     }
 
-    void exportAndZipCneFile(SweData sweData,
+    private void exportAndZipCneFile(SweData sweData,
                                      DichotomyDirection direction,
                                      DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                                      Properties cneExporterProperties,
@@ -122,10 +122,6 @@ public class CneFileExportService {
             final RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
             if (raoResult == null) {
                 final Reason reason = getLimitingCauseErrorReason(dichotomyResult.getLimitingCause());
-                final CriticalNetworkElementMarketDocument errorMarketDocument = createErrorMarketDocument(sweData, direction, cneExporterProperties, cracCreationContext, reason);
-                marshallMarketDocumentToXml(zipOs, errorMarketDocument);
-            } else if (raoResult.getExecutionDetails() != null && !isHighestValid) {
-                final Reason reason = getReason("B18", raoResult.getExecutionDetails());
                 final CriticalNetworkElementMarketDocument errorMarketDocument = createErrorMarketDocument(sweData, direction, cneExporterProperties, cracCreationContext, reason);
                 marshallMarketDocumentToXml(zipOs, errorMarketDocument);
             } else {
@@ -205,7 +201,7 @@ public class CneFileExportService {
         }
     }
 
-    Properties getCneExporterProperties(OffsetDateTime timestamp) {
+    private Properties getCneExporterProperties(OffsetDateTime timestamp) {
         // limit size to 35 characters, a UUID is 36 characters long
         final String mRid = UUID.randomUUID().toString().substring(1);
         final Properties properties = new Properties();

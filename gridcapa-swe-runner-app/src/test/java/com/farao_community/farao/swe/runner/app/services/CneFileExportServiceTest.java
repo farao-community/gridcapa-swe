@@ -14,22 +14,13 @@ import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.swe.runner.app.CriticalNetworkElementMarketDocumentXmlRoot;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
-import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
-import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.CriticalNetworkElementMarketDocument;
-import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Point;
 import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Reason;
-import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.SeriesPeriod;
-import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.TimeSeries;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,25 +34,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
-import java.util.Properties;
 import java.util.TimeZone;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -272,54 +255,5 @@ class CneFileExportServiceTest {
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("code", null)
                 .hasFieldOrPropertyWithValue("text", null);
-    }
-
-    @Test
-    void failureReasonExtractedFromRaoResultAndPutInXmlOutputFile() throws IOException, JAXBException {
-        final JAXBContext jaxbContext = JAXBContext.newInstance(CriticalNetworkElementMarketDocumentXmlRoot.class);
-        final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-        final Properties properties = cneFileExportService.getCneExporterProperties(offsetDateTime);
-        final MemDataSource memDataSource = mock(MemDataSource.class);
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        when(memDataSource.newOutputStream("targetZipFileName.xml", false)).thenReturn(baos);
-        when(dichotomyResult.getLowestInvalidStepValue()).thenReturn(42.);
-        when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
-        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
-        when(raoResult.getExecutionDetails()).thenReturn("test");
-        when(sweData.getNetworkPtEs()).thenReturn(network);
-        when(network.getCaseDate()).thenReturn(dateTime);
-        when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
-
-        cneFileExportService.exportAndZipCneFile(sweData, DichotomyDirection.PT_ES, dichotomyResult, properties, cracCreationContext, memDataSource, "targetZipFileName.xml", false);
-
-        final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(baos.toByteArray()));
-        final ZipEntry ze = zis.getNextEntry();
-        Assertions.assertThat(ze)
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("name", "targetZipFileName.xml");
-        final byte[] zipContent = zis.readAllBytes();
-        final Object criticalElementExt = unmarshaller.unmarshal(new ByteArrayInputStream(zipContent));
-        Assertions.assertThat(criticalElementExt)
-                .isInstanceOf(CriticalNetworkElementMarketDocument.class)
-                .extracting("timeSeries").asInstanceOf(LIST)
-                .hasSize(1)
-                .first()
-                .isInstanceOf(TimeSeries.class)
-                .extracting("period").asInstanceOf(LIST)
-                .hasSize(1)
-                .first()
-                .isInstanceOf(SeriesPeriod.class)
-                .extracting("point").asInstanceOf(LIST)
-                .hasSize(1)
-                .first()
-                .isInstanceOf(Point.class)
-                .extracting("reason").asInstanceOf(LIST)
-                .hasSize(1)
-                .first()
-                .isInstanceOf(Reason.class)
-                .hasFieldOrPropertyWithValue("code", "B18")
-                .hasFieldOrPropertyWithValue("text", "test");
     }
 }
