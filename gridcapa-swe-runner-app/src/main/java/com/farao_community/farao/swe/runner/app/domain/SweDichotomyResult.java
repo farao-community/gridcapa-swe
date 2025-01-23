@@ -43,8 +43,9 @@ public class SweDichotomyResult {
     }
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
-                              DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
-        this(dichotomyDirection, dichotomyResult, Optional.empty(), null, null, null);
+                              DichotomyResult<SweDichotomyValidationData> dichotomyResult,
+                              String lowestInvalidStepUrl) {
+        this(dichotomyDirection, dichotomyResult, Optional.empty(), null, null, lowestInvalidStepUrl);
     }
 
     public DichotomyDirection getDichotomyDirection() {
