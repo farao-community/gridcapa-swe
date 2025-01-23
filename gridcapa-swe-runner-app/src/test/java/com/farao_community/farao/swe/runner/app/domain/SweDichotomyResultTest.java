@@ -82,13 +82,13 @@ class SweDichotomyResultTest {
     @Test
     void simpleTestWithRaoFailure() {
         DichotomyResult<SweDichotomyValidationData> customDichotomyResult = DichotomyResult.buildFromRaoFailure("failure");
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, customDichotomyResult);
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, customDichotomyResult, "cneFirstUnsecureUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(customDichotomyResult, result.getDichotomyResult());
         assertFalse(result.isInterrupted());
         assertFalse(result.getVoltageMonitoringResult().isPresent());
         assertNull(result.getHighestValidStepUrl());
-        assertNull(result.getLowestInvalidStepUrl());
+        assertEquals("cneFirstUnsecureUrl", result.getLowestInvalidStepUrl());
         assertNull(result.getExportedCgmesUrl());
         assertEquals(customDichotomyResult, result.getDichotomyResult());
         assertTrue(result.isRaoFailed());

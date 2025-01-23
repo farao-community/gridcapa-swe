@@ -356,7 +356,7 @@ class DichotomyParallelizationTest {
     @Test
     void testParallelizationWithOneRaoFailure() {
         DichotomyResult<SweDichotomyValidationData> failedSweDichotomyResult = DichotomyResult.buildFromRaoFailure("My test failure");
-        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult);
+        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult, "cneFirstUnsecureUrl");
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
@@ -387,7 +387,7 @@ class DichotomyParallelizationTest {
     @Test
     void testParallelizationWithTwoDirectionsAllRaoFailure() {
         DichotomyResult<SweDichotomyValidationData> failedSweDichotomyResult = DichotomyResult.buildFromRaoFailure("My test failure");
-        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult);
+        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult, "cneFirstUnsecureUrl");
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
@@ -418,7 +418,7 @@ class DichotomyParallelizationTest {
     @Test
     void testParallelizationWithFourDirectionsAllRaoFailure() {
         DichotomyResult<SweDichotomyValidationData> failedSweDichotomyResult = DichotomyResult.buildFromRaoFailure("My test failure");
-        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult);
+        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult, "cneFirstUnsecureUrl");
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");

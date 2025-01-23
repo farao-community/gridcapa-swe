@@ -275,7 +275,7 @@ class CneFileExportServiceTest {
     }
 
     @Test
-    void failureReasonExtractedFromRaoResultAndPutInXmlOutputFile() throws IOException, JAXBException {
+    void exportCneFromFailedRaoResult() throws IOException, JAXBException {
         final JAXBContext jaxbContext = JAXBContext.newInstance(CriticalNetworkElementMarketDocumentXmlRoot.class);
         final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
@@ -284,10 +284,7 @@ class CneFileExportServiceTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         when(memDataSource.newOutputStream("targetZipFileName.xml", false)).thenReturn(baos);
-        when(dichotomyResult.getLowestInvalidStepValue()).thenReturn(42.);
-        when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
-        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
-        when(raoResult.getExecutionDetails()).thenReturn("test");
+        when(dichotomyResult.isRaoFailed()).thenReturn(true);
         when(sweData.getNetworkPtEs()).thenReturn(network);
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
@@ -320,6 +317,6 @@ class CneFileExportServiceTest {
                 .first()
                 .isInstanceOf(Reason.class)
                 .hasFieldOrPropertyWithValue("code", "B18")
-                .hasFieldOrPropertyWithValue("text", "test");
+                .hasFieldOrPropertyWithValue("text", "RAO failure");
     }
 }

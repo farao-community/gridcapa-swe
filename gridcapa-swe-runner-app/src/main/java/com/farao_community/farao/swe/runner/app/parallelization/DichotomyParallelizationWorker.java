@@ -67,7 +67,8 @@ public class DichotomyParallelizationWorker {
         dichotomyLogging.logEndOneDichotomy();
 
         if (dichotomyResult.isRaoFailed()) {
-            return new AsyncResult<>(new SweDichotomyResult(direction, dichotomyResult));
+            final String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
+            return new AsyncResult<>(new SweDichotomyResult(direction, dichotomyResult, lowestInvalidStepUrl));
         }
 
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
