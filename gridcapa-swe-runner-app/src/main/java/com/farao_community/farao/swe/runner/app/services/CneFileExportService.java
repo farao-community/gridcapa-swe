@@ -132,7 +132,7 @@ public class CneFileExportService {
     }
 
     private void handleFirstUnsecureForFailedRao(final SweData sweData, final DichotomyDirection direction, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final ZipOutputStream zipOs) throws DatatypeConfigurationException, JAXBException, IOException {
-        final Reason reason = getReason("B18", "RAO failed");
+        final Reason reason = getReason("B18", "RAO failure");
         fillCneWithError(sweData, direction, cneExporterProperties, cracCreationContext, zipOs, reason);
     }
 

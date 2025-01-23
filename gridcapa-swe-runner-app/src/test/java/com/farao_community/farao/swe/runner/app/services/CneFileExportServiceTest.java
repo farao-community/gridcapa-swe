@@ -317,6 +317,6 @@ class CneFileExportServiceTest {
                 .first()
                 .isInstanceOf(Reason.class)
                 .hasFieldOrPropertyWithValue("code", "B18")
-                .hasFieldOrPropertyWithValue("text", "RAO failed");
+                .hasFieldOrPropertyWithValue("text", "RAO failure");
     }
 }
