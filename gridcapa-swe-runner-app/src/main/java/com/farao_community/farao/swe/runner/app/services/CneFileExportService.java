@@ -120,6 +120,7 @@ public class CneFileExportService {
             ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
             if (!isHighestValid && dichotomyResult.isRaoFailed()) {
+                // The RAO failed and we want to generate a CNE First unsecure: generate the CNE file with B18 failure message
                 handleFirstUnsecureForFailedRao(sweData, direction, cneExporterProperties, cracCreationContext, zipOs);
             } else {
                 handleOtherResult(sweData, direction, dichotomyResult, cneExporterProperties, cracCreationContext, isHighestValid, zipOs);
@@ -138,9 +139,11 @@ public class CneFileExportService {
     private void handleOtherResult(final SweData sweData, final DichotomyDirection direction, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final boolean isHighestValid, final ZipOutputStream zipOs) throws DatatypeConfigurationException, JAXBException, IOException {
         final RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
         if (raoResult == null) {
+            // No RaoResult available for highest valid / lowest invalid step: generate a CNE file with limiting cause
             final Reason reason = getLimitingCauseErrorReason(dichotomyResult.getLimitingCause());
             fillCneWithError(sweData, direction, cneExporterProperties, cracCreationContext, zipOs, reason);
         } else {
+            // There is a RaoResult for highest valid / lowest invalid step, its data can be exported in CNE file
             raoResult.write("SWE-CNE", cracCreationContext, cneExporterProperties, zipOs);
         }
     }
