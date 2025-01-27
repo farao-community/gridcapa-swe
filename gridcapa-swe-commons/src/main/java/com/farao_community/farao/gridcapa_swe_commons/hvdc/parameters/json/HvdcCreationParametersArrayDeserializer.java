@@ -18,6 +18,7 @@ import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +53,7 @@ public final class HvdcCreationParametersArrayDeserializer {
             HvdcAcEquivalentModel hvdcAcEquivalentModel = null;
 
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case ID:
                         id = jsonParser.nextTextValue();
                         break;
@@ -84,7 +85,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                         hvdcAcEquivalentModel = HvdcAcEquivalentModelDeserializer.deserialize(jsonParser);
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in HvdcCreationParameters: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in HvdcCreationParameters: " + jsonParser.currentName());
                 }
             }
 
@@ -113,16 +114,14 @@ public final class HvdcCreationParametersArrayDeserializer {
             Double defaultVoltageSetpoint = null;
 
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case SIDE:
                         int sideInt = jsonParser.nextIntValue(0);
-                        if (sideInt == 1) {
-                            side = TwoSides.ONE;
-                        } else if (sideInt == 2) {
-                            side = TwoSides.TWO;
-                        } else {
-                            throw new IllegalArgumentException("VscStationCreationParameters Side must be 1 or 2");
-                        }
+                        side = switch (sideInt) {
+                            case 1 -> TwoSides.ONE;
+                            case 2 -> TwoSides.TWO;
+                            default -> throw new IllegalArgumentException("VscStationCreationParameters Side must be 1 or 2");
+                        };
                         break;
                     case ID:
                         id = jsonParser.nextTextValue();
@@ -143,7 +142,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                         defaultVoltageSetpoint = jsonParser.getDoubleValue();
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in VscStationCreationParameters: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in VscStationCreationParameters: " + jsonParser.currentName());
                 }
             }
             return Pair.create(side, new VscStationCreationParameters(id, reactivePowerSetpoint, lossFactor, voltageRegulatorOn, defaultVoltageSetpoint));
@@ -158,7 +157,7 @@ public final class HvdcCreationParametersArrayDeserializer {
             Float p0 = null;
             Float droop = null;
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case P0:
                         jsonParser.nextToken();
                         p0 = jsonParser.getFloatValue();
@@ -168,26 +167,33 @@ public final class HvdcCreationParametersArrayDeserializer {
                         droop = jsonParser.getFloatValue();
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in AngleDroopActivePowerControlParameters: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in AngleDroopActivePowerControlParameters: " + jsonParser.currentName());
                 }
             }
             return new AngleDroopActivePowerControlParameters(p0, droop);
         }
     }
 
+    /*
+     following a coreso request temporarily the side 1 of the load can have 2 ids
+     if the first id SIDE_1_LOAD_ID does not exist in the network
+     we look for the second id SIDE_1_LOAD_ID_OPTION_2 in the network
+     */
     private static class HvdcAcEquivalentModelDeserializer {
         private static final String SIDE_1_GEN_ID = "side1GeneratorId";
         private static final String SIDE_2_GEN_ID = "side2GeneratorId";
         private static final String SIDE_1_LOAD_ID = "side1LoadID";
+        private static final String SIDE_1_LOAD_ID_OPTION_2 = "side1LoadIDOption2";
         private static final String SIDE_2_LOAD_ID = "side2LoadId";
         private static final String AC_LINE_ID = "acLineId";
 
         static HvdcAcEquivalentModel deserialize(JsonParser jsonParser) throws IOException, NoSuchFieldException {
             Map<TwoSides, String> generatorIds = new EnumMap<>(TwoSides.class);
-            Map<TwoSides, String> loadIds = new EnumMap<>(TwoSides.class);
+            Map<TwoSides, Map<Integer, String>> loadIds = new EnumMap<>(TwoSides.class);
+            Map<Integer, String> idsByPriority = new HashMap<>();
             String acLineId = null;
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case SIDE_1_GEN_ID:
                         generatorIds.put(TwoSides.ONE, jsonParser.nextTextValue());
                         break;
@@ -195,18 +201,22 @@ public final class HvdcCreationParametersArrayDeserializer {
                         generatorIds.put(TwoSides.TWO, jsonParser.nextTextValue());
                         break;
                     case SIDE_1_LOAD_ID:
-                        loadIds.put(TwoSides.ONE, jsonParser.nextTextValue());
+                        idsByPriority.put(1, jsonParser.nextTextValue());
+                        break;
+                    case SIDE_1_LOAD_ID_OPTION_2:
+                        idsByPriority.put(2, jsonParser.nextTextValue());
                         break;
                     case SIDE_2_LOAD_ID:
-                        loadIds.put(TwoSides.TWO, jsonParser.nextTextValue());
+                        loadIds.put(TwoSides.TWO, Map.of(1, jsonParser.nextTextValue()));
                         break;
                     case AC_LINE_ID:
                         acLineId = jsonParser.nextTextValue();
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in HvdcAcEquivalentModel: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in HvdcAcEquivalentModel: " + jsonParser.currentName());
                 }
             }
+            loadIds.put(TwoSides.ONE, idsByPriority);
             return new HvdcAcEquivalentModel(generatorIds, loadIds, acLineId);
         }
     }

@@ -7,18 +7,6 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.powsybl.openrao.commons.OpenRaoException;
-import com.powsybl.openrao.data.cneexportercommons.CneExporterParameters;
-import com.powsybl.openrao.data.cneexportercommons.CneUtil;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
-import com.powsybl.openrao.data.swecneexporter.SweCneClassCreator;
-import com.powsybl.openrao.data.swecneexporter.SweCneExporter;
-import com.powsybl.openrao.data.swecneexporter.SweCneUtil;
-import com.powsybl.openrao.data.swecneexporter.xsd.CriticalNetworkElementMarketDocument;
-import com.powsybl.openrao.data.swecneexporter.xsd.Point;
-import com.powsybl.openrao.data.swecneexporter.xsd.Reason;
-import com.powsybl.openrao.data.swecneexporter.xsd.SeriesPeriod;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
@@ -26,16 +14,26 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import  com.powsybl.openrao.raoapi.parameters.RaoParameters;
+import com.farao_community.farao.swe.runner.app.CneProperties;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.powsybl.commons.datasource.MemDataSource;
+import com.powsybl.openrao.commons.OpenRaoException;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import com.powsybl.openrao.data.raoresult.io.cne.commons.CneUtil;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.SweCneClassCreator;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.SweCneUtil;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.CriticalNetworkElementMarketDocument;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Point;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Reason;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.SeriesPeriod;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -46,6 +44,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -57,12 +56,12 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class CneFileExportService {
 
-    public static final String FILENAME_TIMESTAMP_REGEX = "yyyyMMdd'_'HHmm'_CNE_[direction]_[secureType].zip'";
-    public static final String TIME_INTERVAL_REGEX = "yyyy'-'MM'-'dd'T'HH':00:00Z'";
-    public static final String RTE_SYSTEM_OPERATOR_SENDER_ID = "10XFR-RTE------Q";
-    public static final String CORESO_CAPACITY_COORDINATOR_RECEIVER_ID = "22XCORESO------S";
-    public static final String LAST_SECURE_STRING = "LAST_SECURE";
-    public static final String FIRST_UNSECURE_STRING = "FIRST_UNSECURE";
+    private static final String FILENAME_TIMESTAMP_REGEX = "yyyyMMdd'_'HHmm'_CNE_[direction]_[secureType].zip'";
+    private static final String TIME_INTERVAL_REGEX = "yyyy'-'MM'-'dd'T'HH':00:00Z'";
+    private static final String RTE_SYSTEM_OPERATOR_SENDER_ID = "10XFR-RTE------Q";
+    private static final String CORESO_CAPACITY_COORDINATOR_RECEIVER_ID = "22XCORESO------S";
+    private static final String LAST_SECURE_STRING = "LAST_SECURE";
+    private static final String FIRST_UNSECURE_STRING = "FIRST_UNSECURE";
 
     private final FileExporter fileExporter;
     private final MinioAdapter minioAdapter;
@@ -75,32 +74,29 @@ public class CneFileExportService {
     }
 
     public String exportCneUrl(SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid, DichotomyDirection direction) {
-
         //if base case unsecure, then is highest valid with limiting cause index evaluation, then we don't want an error file
         if (!dichotomyResult.hasValidStep() && isHighestValid && dichotomyResult.getLimitingCause() == LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION) {
             return null;
         }
-        OffsetDateTime timestamp = sweData.getTimestamp();
-        CneExporterParameters cneExporterParameters = getCneExporterParameters(timestamp);
-        CimCracCreationContext cracCreationContext = getCimCracCreationContext(sweData, direction);
-        MemDataSource memDataSource = new MemDataSource();
-        String targetZipFileName = generateCneZipFileName(timestamp, isHighestValid, direction);
-        exportAndZipCneFile(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext, memDataSource, targetZipFileName, isHighestValid);
-        String cneResultPath = fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
+        final OffsetDateTime timestamp = sweData.getTimestamp();
+        final Properties cneExporterProperties = getCneExporterProperties(timestamp);
+        final CimCracCreationContext cracCreationContext = getCimCracCreationContext(sweData, direction);
+        final MemDataSource memDataSource = new MemDataSource();
+        final String targetZipFileName = generateCneZipFileName(timestamp, isHighestValid, direction);
+        exportAndZipCneFile(sweData, direction, dichotomyResult, cneExporterProperties, cracCreationContext, memDataSource, targetZipFileName, isHighestValid);
+        final String cneResultPath = fileExporter.makeDestinationMinioPath(timestamp, FileExporter.FileKind.OUTPUTS) + targetZipFileName;
         uploadFileToMinio(isHighestValid, sweData.getProcessType(), direction, timestamp, memDataSource, targetZipFileName, cneResultPath);
         return minioAdapter.generatePreSignedUrl(cneResultPath);
     }
 
     private RaoResult extractRaoResult(DichotomyResult<SweDichotomyValidationData> dichotomyResult, boolean isHighestValid) {
         RaoResult raoResult = null;
-        if (isHighestValid) {
-            if (dichotomyResult.hasValidStep()) {
-                raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
-            }
-        } else {
-            if (!Double.isNaN(dichotomyResult.getLowestInvalidStepValue())) {
-                raoResult = dichotomyResult.getLowestInvalidStep().getRaoResult();
-            }
+        // Whether we want to extract the highest valid step or the lowest invalid step, we must ensure that such a step exists in the dichotomy result before extracting it
+        // If there is no step in the dichotomy result that matches what we want, then the returned value is null
+        if (isHighestValid && dichotomyResult.hasValidStep()) {
+            raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
+        } else if (!isHighestValid && !Double.isNaN(dichotomyResult.getLowestInvalidStepValue())) {
+            raoResult = dichotomyResult.getLowestInvalidStep().getRaoResult();
         }
         return raoResult;
     }
@@ -112,17 +108,22 @@ public class CneFileExportService {
         return sweData.getCracFrEs();
     }
 
-    private void exportAndZipCneFile(SweData sweData, DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext, MemDataSource memDataSource, String targetZipFileName, boolean isHighestValid) {
+    void exportAndZipCneFile(SweData sweData,
+                             DichotomyDirection direction,
+                             DichotomyResult<SweDichotomyValidationData> dichotomyResult,
+                             Properties cneExporterProperties,
+                             CimCracCreationContext cracCreationContext,
+                             MemDataSource memDataSource,
+                             String targetZipFileName,
+                             boolean isHighestValid) {
         try (OutputStream os = memDataSource.newOutputStream(targetZipFileName, false);
-             ZipOutputStream zipOs = new ZipOutputStream(os)) {
+            ZipOutputStream zipOs = new ZipOutputStream(os)) {
             zipOs.putNextEntry(new ZipEntry(fileExporter.zipTargetNameChangeExtension(targetZipFileName, ".xml")));
-            RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
-            if (raoResult == null) {
-                marshallMarketDocumentToXml(zipOs, createErrorMarketDocument(sweData, direction, dichotomyResult, cneExporterParameters, cracCreationContext));
+            if (!isHighestValid && dichotomyResult.isRaoFailed()) {
+                // The RAO failed and we want to generate a CNE First unsecure: generate the CNE file with B18 failure message
+                handleFirstUnsecureForFailedRao(sweData, direction, cneExporterProperties, cracCreationContext, zipOs);
             } else {
-                SweCneExporter sweCneExporter = new SweCneExporter();
-                sweCneExporter.exportCne(cracCreationContext.getCrac(), NetworkService.getNetworkByDirection(sweData, direction), cracCreationContext,
-                        raoResult, RaoParameters.load(), cneExporterParameters, zipOs);
+                handleOtherResult(sweData, direction, dichotomyResult, cneExporterProperties, cracCreationContext, isHighestValid, zipOs);
             }
             zipOs.closeEntry();
         } catch (IOException | JAXBException | DatatypeConfigurationException | OpenRaoException e) {
@@ -130,62 +131,85 @@ public class CneFileExportService {
         }
     }
 
-    private CriticalNetworkElementMarketDocument createErrorMarketDocument(SweData sweData, DichotomyDirection direction, DichotomyResult<SweDichotomyValidationData> dichotomyResult, CneExporterParameters cneExporterParameters, CimCracCreationContext cracCreationContext) throws DatatypeConfigurationException {
-        CriticalNetworkElementMarketDocument marketDocument = createErrorMarketDocumentAndInitializeHeader(sweData, direction, cneExporterParameters);
-        OffsetDateTime offsetDateTime = cracCreationContext.getTimeStamp().withMinute(0);
-        Point point = SweCneClassCreator.newPoint(1);
-        SeriesPeriod period = SweCneClassCreator.newPeriod(offsetDateTime, "PT60M", point);
-        Reason reason = getLimitingCauseErrorReason(dichotomyResult.getLimitingCause());
+    private void handleFirstUnsecureForFailedRao(final SweData sweData, final DichotomyDirection direction, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final ZipOutputStream zipOs) throws DatatypeConfigurationException, JAXBException, IOException {
+        final Reason reason = getReason("B18", "RAO failure");
+        fillCneWithError(sweData, direction, cneExporterProperties, cracCreationContext, zipOs, reason);
+    }
+
+    private void handleOtherResult(final SweData sweData, final DichotomyDirection direction, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final boolean isHighestValid, final ZipOutputStream zipOs) throws DatatypeConfigurationException, JAXBException, IOException {
+        final RaoResult raoResult = extractRaoResult(dichotomyResult, isHighestValid);
+        if (raoResult == null) {
+            // No RaoResult available for highest valid / lowest invalid step: generate a CNE file with limiting cause
+            final Reason reason = getLimitingCauseErrorReason(dichotomyResult.getLimitingCause());
+            fillCneWithError(sweData, direction, cneExporterProperties, cracCreationContext, zipOs, reason);
+        } else {
+            // There is a RaoResult for highest valid / lowest invalid step, its data can be exported in CNE file
+            raoResult.write("SWE-CNE", cracCreationContext, cneExporterProperties, zipOs);
+        }
+    }
+
+    private void fillCneWithError(final SweData sweData, final DichotomyDirection direction, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final ZipOutputStream zipOs, final Reason reason) throws DatatypeConfigurationException, JAXBException, IOException {
+        final CriticalNetworkElementMarketDocument errorMarketDocument = createErrorMarketDocument(sweData, direction, cneExporterProperties, cracCreationContext, reason);
+        marshallMarketDocumentToXml(zipOs, errorMarketDocument);
+    }
+
+    private CriticalNetworkElementMarketDocument createErrorMarketDocument(final SweData sweData, final DichotomyDirection direction, final Properties cneExporterProperties, final CimCracCreationContext cracCreationContext, final Reason reason) throws DatatypeConfigurationException {
+        final CriticalNetworkElementMarketDocument marketDocument = createErrorMarketDocumentAndInitializeHeader(sweData, direction, cneExporterProperties);
+        final OffsetDateTime offsetDateTime = cracCreationContext.getTimeStamp().withMinute(0);
+        final Point point = SweCneClassCreator.newPoint(1);
+        final SeriesPeriod period = SweCneClassCreator.newPeriod(offsetDateTime, "PT60M", point);
         point.getReason().add(reason);
         marketDocument.getTimeSeries().add(SweCneClassCreator.newTimeSeries("B54", "A01", period));
         return marketDocument;
     }
 
-    private CriticalNetworkElementMarketDocument createErrorMarketDocumentAndInitializeHeader(SweData sweData, DichotomyDirection direction, CneExporterParameters cneExporterParameters) {
-        CriticalNetworkElementMarketDocument marketDocument = new CriticalNetworkElementMarketDocument();
-        marketDocument.setMRID(cneExporterParameters.getDocumentId());
-        marketDocument.setRevisionNumber(String.valueOf(cneExporterParameters.getRevisionNumber()));
+    private CriticalNetworkElementMarketDocument createErrorMarketDocumentAndInitializeHeader(SweData sweData, DichotomyDirection direction, Properties cneExporterProperties) {
+        final CriticalNetworkElementMarketDocument marketDocument = new CriticalNetworkElementMarketDocument();
+        marketDocument.setMRID(cneExporterProperties.getProperty(CneProperties.DOCUMENT_ID.getPrefixedKey()));
+        marketDocument.setRevisionNumber(String.valueOf(cneExporterProperties.getProperty(CneProperties.REVISION_NUMBER.getPrefixedKey())));
         marketDocument.setType("B06");
-        marketDocument.setProcessProcessType(cneExporterParameters.getProcessType().getCode());
-        marketDocument.setSenderMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterParameters.getSenderId()));
-        marketDocument.setSenderMarketParticipantMarketRoleType(cneExporterParameters.getSenderRole().getCode());
-        marketDocument.setReceiverMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterParameters.getReceiverId()));
-        marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterParameters.getReceiverRole().getCode());
+        marketDocument.setProcessProcessType(cneExporterProperties.getProperty(CneProperties.PROCESS_TYPE.getPrefixedKey()));
+        marketDocument.setSenderMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(CneProperties.SENDER_ID.getPrefixedKey())));
+        marketDocument.setSenderMarketParticipantMarketRoleType(cneExporterProperties.getProperty(CneProperties.SENDER_ROLE.getPrefixedKey()));
+        marketDocument.setReceiverMarketParticipantMRID(SweCneUtil.createPartyIDString("A01", cneExporterProperties.getProperty(CneProperties.RECEIVER_ID.getPrefixedKey())));
+        marketDocument.setReceiverMarketParticipantMarketRoleType(cneExporterProperties.getProperty(CneProperties.RECEIVER_ROLE.getPrefixedKey()));
         marketDocument.setCreatedDateTime(CneUtil.createXMLGregorianCalendarNow());
-        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterParameters.getTimeInterval()));
+        marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeIntervalForWholeDay(cneExporterProperties.getProperty(CneProperties.TIME_INTERVAL.getPrefixedKey())));
         marketDocument.setTimePeriodTimeInterval(SweCneUtil.createEsmpDateTimeInterval(NetworkService.getNetworkByDirection(sweData, direction).getCaseDate().toInstant().atOffset(ZoneOffset.UTC)));
         return marketDocument;
     }
 
     private static void marshallMarketDocumentToXml(OutputStream outputStream, CriticalNetworkElementMarketDocument marketDocument) throws JAXBException, IOException {
-        StringWriter stringWriter = new StringWriter();
-        JAXBContext jaxbContext = JAXBContext.newInstance(CriticalNetworkElementMarketDocument.class);
-        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        final StringWriter stringWriter = new StringWriter();
+        final JAXBContext jaxbContext = JAXBContext.newInstance(CriticalNetworkElementMarketDocument.class);
+        final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
         jaxbMarshaller.setProperty("jaxb.formatted.output", true);
         jaxbMarshaller.setProperty("jaxb.schemaLocation", "iec62325-451-n-cne_v2_3.xsd");
-        QName qName = new QName("http://www.w3.org/2001/XMLSchema-instance", "CriticalNetworkElement_MarketDocument");
-        JAXBElement<CriticalNetworkElementMarketDocument> root = new JAXBElement<>(qName, CriticalNetworkElementMarketDocument.class, marketDocument);
+        final QName qName = new QName("http://www.w3.org/2001/XMLSchema-instance", "CriticalNetworkElement_MarketDocument");
+        final JAXBElement<CriticalNetworkElementMarketDocument> root = new JAXBElement<>(qName, CriticalNetworkElementMarketDocument.class, marketDocument);
         jaxbMarshaller.marshal(root, stringWriter);
-        String result = stringWriter.toString().replace("xsi:CriticalNetworkElement_MarketDocument", "CriticalNetworkElement_MarketDocument");
+        final String result = stringWriter.toString().replace("xsi:CriticalNetworkElement_MarketDocument", "CriticalNetworkElement_MarketDocument");
         outputStream.write(result.getBytes());
     }
 
-    private Reason getLimitingCauseErrorReason(LimitingCause limitingCause) {
-        Reason reason = new Reason();
-        switch (limitingCause) {
-            case GLSK_LIMITATION:
-                reason.setCode("B36");
-                reason.setText("GLSK limitation");
-                break;
-            case COMPUTATION_FAILURE:
-                reason.setCode("Z04");
-                reason.setText("Balancing adjustment out of tolerances");
-                break;
-            case CRITICAL_BRANCH:
-            case INDEX_EVALUATION_OR_MAX_ITERATION:
-            default:
-                //TODO
-        }
+    static Reason getLimitingCauseErrorReason(final LimitingCause limitingCause) {
+        return switch (limitingCause) {
+            case GLSK_LIMITATION ->
+                    getReason("B36", "GLSK limitation");
+            case BALANCE_LOADFLOW_DIVERGENCE ->
+                    getReason("B40", "Balance Load Flow divergence");
+            case UNKNOWN_TERMINAL_BUS ->
+                    getReason("B32", "Unknown terminal bus for balancing");
+            case COMPUTATION_FAILURE ->
+                    getReason("B18", "Balancing adjustment out of tolerances");
+            default -> new Reason();
+        };
+    }
+
+    private static Reason getReason(final String code, final String text) {
+        final Reason reason = new Reason();
+        reason.setCode(code);
+        reason.setText(text);
         return reason;
     }
 
@@ -197,29 +221,32 @@ public class CneFileExportService {
         }
     }
 
-    private CneExporterParameters getCneExporterParameters(OffsetDateTime timestamp) {
+    Properties getCneExporterProperties(OffsetDateTime timestamp) {
         // limit size to 35 characters, a UUID is 36 characters long
-        String mRid = UUID.randomUUID().toString().substring(1);
-        return new CneExporterParameters(
-                mRid, 1, "", CneExporterParameters.ProcessType.Z01,
-                RTE_SYSTEM_OPERATOR_SENDER_ID, CneExporterParameters.RoleType.SYSTEM_OPERATOR,
-                CORESO_CAPACITY_COORDINATOR_RECEIVER_ID, CneExporterParameters.RoleType.CAPACITY_COORDINATOR,
-                extractTimeIntervalFileHeader(timestamp));
+        final String mRid = UUID.randomUUID().toString().substring(1);
+        final Properties properties = new Properties();
+        properties.setProperty(CneProperties.DOCUMENT_ID.getPrefixedKey(), mRid);
+        properties.setProperty(CneProperties.REVISION_NUMBER.getPrefixedKey(), "1");
+        properties.setProperty(CneProperties.DOMAIN_ID.getPrefixedKey(), "");
+        properties.setProperty(CneProperties.PROCESS_TYPE.getPrefixedKey(), "Z01");
+        properties.setProperty(CneProperties.SENDER_ID.getPrefixedKey(), RTE_SYSTEM_OPERATOR_SENDER_ID);
+        properties.setProperty(CneProperties.SENDER_ROLE.getPrefixedKey(), "A04");
+        properties.setProperty(CneProperties.RECEIVER_ID.getPrefixedKey(), CORESO_CAPACITY_COORDINATOR_RECEIVER_ID);
+        properties.setProperty(CneProperties.RECEIVER_ROLE.getPrefixedKey(), "A36");
+        properties.setProperty(CneProperties.TIME_INTERVAL.getPrefixedKey(), extractTimeIntervalFileHeader(timestamp));
+        return properties;
     }
 
     private String extractTimeIntervalFileHeader(OffsetDateTime timestamp) {
-        OffsetDateTime timestampUtc = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC);
-        OffsetDateTime timestampUtcPlusOneHour = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC).plusHours(1);
-        DateTimeFormatter df = DateTimeFormatter.ofPattern(TIME_INTERVAL_REGEX);
-        StringBuilder buffer = new StringBuilder(df.format(timestampUtc));
-        buffer.append("/");
-        buffer.append(df.format(timestampUtcPlusOneHour));
-        return buffer.toString();
+        final OffsetDateTime timestampUtc = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC);
+        final OffsetDateTime timestampUtcPlusOneHour = OffsetDateTime.of(timestamp.toLocalDateTime(), ZoneOffset.UTC).plusHours(1);
+        final DateTimeFormatter df = DateTimeFormatter.ofPattern(TIME_INTERVAL_REGEX);
+        return df.format(timestampUtc) + "/" + df.format(timestampUtcPlusOneHour);
     }
 
     private String generateCneZipFileName(OffsetDateTime timestamp, boolean isHighestValid, DichotomyDirection direction) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern(FILENAME_TIMESTAMP_REGEX);
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+        final DateTimeFormatter df = DateTimeFormatter.ofPattern(FILENAME_TIMESTAMP_REGEX);
+        final OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
         return df.format(localTime).replace("[direction]", direction.getDashName().replace("-", ""))
                 .replace("[secureType]", isHighestValid ? LAST_SECURE_STRING : FIRST_UNSECURE_STRING);
 

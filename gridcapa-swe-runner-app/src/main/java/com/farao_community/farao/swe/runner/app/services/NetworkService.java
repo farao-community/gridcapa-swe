@@ -7,10 +7,15 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
-import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNoDetailsException;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
+import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.configurations.PstConfiguration;
@@ -19,24 +24,35 @@ import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.ImportConfig;
+import com.powsybl.iidm.network.Line;
+import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -44,6 +60,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
+ * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 @Service
 public class NetworkService {
@@ -127,7 +144,11 @@ public class NetworkService {
 
     private void addhvdc(Network network) {
         SweHvdcPreprocessor sweHvdcPreprocessor = new SweHvdcPreprocessor();
-        sweHvdcPreprocessor.applyParametersToNetwork(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"), network);
+        try {
+            sweHvdcPreprocessor.applyParametersToNetwork(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"), network);
+        } catch (SweInvalidDataNoDetailsException e) {
+            businessLogger.warn(e.getMessage());
+        }
     }
 
     private void disablePstRegulation(Network network) {
@@ -155,7 +176,7 @@ public class NetworkService {
             ZipOutputStream zos = new ZipOutputStream(fos);
 
             for (SweFileResource file : listFiles) {
-                InputStream inputStream = new URL(file.getUrl()).openStream();
+                InputStream inputStream = new URI(file.getUrl()).toURL().openStream();
                 File srcFile = new File(tmp.toAbsolutePath() + File.separator + file.getFilename());
                 FileUtils.copyInputStreamToFile(inputStream, srcFile);
                 FileInputStream fis = new FileInputStream(srcFile);
@@ -170,27 +191,69 @@ public class NetworkService {
             }
             zos.close();
             return zipPath;
-        } catch (IOException ioe) {
-            throw new SweInvalidDataException("Error creating network zip file", ioe);
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
+            throw new SweInvalidDataException("Error creating network zip file", e);
         }
     }
 
     public static Network getNetworkByDirection(SweData sweData, DichotomyDirection direction) {
-        Network network = null;
-        switch (direction) {
-            case ES_FR:
-                network = sweData.getNetworkEsFr();
-                break;
-            case ES_PT:
-                network =  sweData.getNetworkEsPt();
-                break;
-            case FR_ES:
-                network =  sweData.getNetworkFrEs();
-                break;
-            case PT_ES:
-                network =  sweData.getNetworkPtEs();
-                break;
+        return switch (direction) {
+            case ES_FR -> sweData.getNetworkEsFr();
+            case ES_PT -> sweData.getNetworkEsPt();
+            case FR_ES -> sweData.getNetworkFrEs();
+            case PT_ES -> sweData.getNetworkPtEs();
+        };
+    }
+
+    List<HvdcInformation> getHvdcInformationFromNetwork(Network network) {
+        List<HvdcInformation> hvdcInformationList = new ArrayList<>();
+        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
+
+        List<HvdcCreationParameters> sortedHvdcCreationParameters = params.getHvdcCreationParametersSet().stream()
+                .sorted(Comparator.comparing(HvdcCreationParameters::getId)).toList();
+
+        for (HvdcCreationParameters parameter : sortedHvdcCreationParameters) {
+            HvdcInformation hvdcInformation = new HvdcInformation(parameter.getId());
+            Optional<Line> line = Optional.ofNullable(network.getLine(parameter.getEquivalentAcLineId()));
+            Optional<Generator> genSide1 = Optional.ofNullable(network.getGenerator(parameter.getEquivalentGeneratorId(TwoSides.ONE)));
+            Optional<Generator> genSide2 = Optional.ofNullable(network.getGenerator(parameter.getEquivalentGeneratorId(TwoSides.TWO)));
+            Optional<Load> loadSide1 = Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.ONE).get(1)));
+            Optional<Load> loadSide2 = Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.TWO).get(1)));
+
+            line.ifPresent(line1 -> {
+                hvdcInformation.setAcLineTerminal1Connected(line1.getTerminal1().isConnected());
+                hvdcInformation.setAcLineTerminal2Connected(line1.getTerminal2().isConnected());
+            });
+
+            genSide1.ifPresent(generator -> {
+                hvdcInformation.setSide1GeneratorConnected(generator.getTerminal().isConnected());
+                hvdcInformation.setSide1GeneratorTargetP(generator.getTargetP());
+            });
+            genSide2.ifPresent(generator -> {
+                hvdcInformation.setSide2GeneratorConnected(generator.getTerminal().isConnected());
+                hvdcInformation.setSide2GeneratorTargetP(generator.getTargetP());
+            });
+
+            loadSide1.ifPresentOrElse(
+                load -> {
+                    hvdcInformation.setSide1LoadConnected(load.getTerminal().isConnected());
+                    hvdcInformation.setSide1LoadP(load.getP0());
+                },
+                () -> Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.ONE).get(2)))
+                    .ifPresent(loadWithSecondOptionId -> {
+                        hvdcInformation.setSide1option2LoadP(loadWithSecondOptionId.getP0());
+                        hvdcInformation.setSide1Option2LoadConnected(loadWithSecondOptionId.getTerminal().isConnected());
+                    })
+            );
+
+            loadSide2.ifPresent(load -> {
+                hvdcInformation.setSide2LoadConnected(load.getTerminal().isConnected());
+                hvdcInformation.setSide2LoadP(load.getP0());
+            });
+
+            hvdcInformationList.add(hvdcInformation);
         }
-        return network;
+
+        return hvdcInformationList;
     }
 }

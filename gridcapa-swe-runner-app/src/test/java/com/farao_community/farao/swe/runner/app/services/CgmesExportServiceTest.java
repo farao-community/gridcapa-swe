@@ -36,10 +36,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -149,7 +146,7 @@ class CgmesExportServiceTest {
         cgmesInputFiles.put(CgmesFileType.REN_TP, new SweFileResource("REN_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_TP.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.RTE_EQ, new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
         cgmesInputFiles.put(CgmesFileType.RTE_TP, new SweFileResource("RTE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_TP.xml")).toExternalForm()));
-        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", cgmesInputFiles);
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"), ProcessType.D2CC, null, null, null, null, null, null, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", Collections.EMPTY_LIST, cgmesInputFiles, Collections.emptyMap());
         Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData);
         assertEquals(10, cgmesFiles.size());
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
@@ -166,6 +163,15 @@ class CgmesExportServiceTest {
         String tmp = Files.createTempDirectory("pref_").toAbsolutePath() + "/network_output.zip";
         exportCgmesZipFile(cgmesFiles, tmp);
 
+        // Checking that extension was added to network
+        CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
+        assertNotNull(modelsExtension);
+        CgmesMetadataModel svModel = modelsExtension.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
+        assertEquals("sv-id-test1", svModel.getSupersedes().toArray()[0]);
+        assertFalse(svModel.getDependentOn().contains("ssh-id-test1")); //initial ssh id removed from sv dependencies
+        assertTrue(svModel.getDependentOn().contains("tp-id-test1")); // Initial tp id is kept
+        assertEquals(4, svModel.getDependentOn().size()); // Initial tp id + 3 new ssh ids generated during export
+
         // Checking that the extension was correctly exported in the SV
         Properties importParams = new Properties();
         importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
@@ -175,6 +181,10 @@ class CgmesExportServiceTest {
         CgmesMetadataModels modelsExtensionOutput = subnetwork.getExtension(CgmesMetadataModels.class);
         assertNotNull(modelsExtensionOutput);
         CgmesMetadataModel svModelOutput = modelsExtensionOutput.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
+        assertEquals("http://entsoe.eu/CIM/StateVariables/4/1", svModelOutput.getProfiles().stream().findFirst().get());
+        assertEquals(1, svModelOutput.getVersion());
+        assertEquals("http://www.coreso.eu/OperationalPlanning", svModelOutput.getModelingAuthoritySet());
+        assertEquals(4, svModelOutput.getDependentOn().size()); // Initial tp id + 3 new ssh ids generated during export
         assertEquals(6, svModelOutput.getVersion());
         assertEquals(9, svModelOutput.getDependentOn().size()); // Initial 3 tp id + 3 eq + 3 new ssh ids generated during export
         Files.deleteIfExists(Paths.get(tmp));

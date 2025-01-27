@@ -92,4 +92,22 @@ class DichotomyParallelizationWorkerTest {
         verify(dichotomyLogging, times(1)).generateSummaryEvents(any(DichotomyDirection.class), any(DichotomyResult.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class));
     }
 
+    @Test
+    void testRunDichotomyRaoFailure() {
+        DichotomyDirection direction = DichotomyDirection.ES_PT;
+        DichotomyResult<SweDichotomyValidationData> customResult = DichotomyResult.buildFromRaoFailure("failure");
+        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(customResult);
+        SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
+
+        Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction);
+
+        try {
+            SweDichotomyResult sweDichotomyResult = futurResult.get();
+            assertTrue(futurResult.isDone());
+            assertEquals(direction, sweDichotomyResult.getDichotomyDirection());
+            assertTrue(sweDichotomyResult.isRaoFailed());
+        } catch (InterruptedException | ExecutionException e) {
+            fail(e);
+        }
+    }
 }

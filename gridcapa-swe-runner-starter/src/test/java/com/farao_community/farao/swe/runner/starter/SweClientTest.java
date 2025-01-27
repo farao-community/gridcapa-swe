@@ -4,11 +4,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+package com.farao_community.farao.swe.runner.starter;
 
 import com.farao_community.farao.swe.runner.api.JsonApiConverter;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
-import com.farao_community.farao.swe.runner.starter.SweClient;
-import com.farao_community.farao.swe.runner.starter.SweClientProperties;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -31,7 +31,7 @@ class SweClientTest {
 
         Mockito.when(responseMessage.getBody()).thenReturn(getClass().getResourceAsStream("/sweResponseMessage.json").readAllBytes());
         Mockito.when(amqpTemplate.sendAndReceive(Mockito.same("my-exchange"), Mockito.same("#"), Mockito.any())).thenReturn(responseMessage);
-        sweClient.run(sweRequest, SweRequest.class);
+        Assertions.assertDoesNotThrow(() -> sweClient.run(sweRequest, SweRequest.class));
     }
 
     private SweClientProperties buildProperties() {

@@ -8,20 +8,34 @@
 
 package com.farao_community.farao.swe.runner.app.services;
 
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
+import com.farao_community.farao.swe.runner.app.CriticalNetworkElementMarketDocumentXmlRoot;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.CriticalNetworkElementMarketDocument;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Point;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.Reason;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.SeriesPeriod;
+import com.powsybl.openrao.data.raoresult.io.cne.swe.xsd.TimeSeries;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -29,17 +43,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.util.Properties;
 import java.util.TimeZone;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -97,6 +119,7 @@ class CneFileExportServiceTest {
         when(network.getCaseDate()).thenReturn(dateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
         when(dichotomyResult.hasValidStep()).thenReturn(true);
         when(dichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
@@ -112,6 +135,7 @@ class CneFileExportServiceTest {
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
@@ -129,6 +153,7 @@ class CneFileExportServiceTest {
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.hasValidStep()).thenReturn(true);
@@ -147,6 +172,7 @@ class CneFileExportServiceTest {
         when(sweData.getNetworkPtEs()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getNetworkCaseDate()).thenReturn(offsetDateTime);
         when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(dichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
@@ -221,5 +247,76 @@ class CneFileExportServiceTest {
         when(dichotomyResult.getLimitingCause()).thenReturn(LimitingCause.INDEX_EVALUATION_OR_MAX_ITERATION);
         when(minioAdapter.generatePreSignedUrl(anyString())).thenAnswer(i -> i.getArgument(0));
         assertNull(cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, DichotomyDirection.ES_PT));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "GLSK_LIMITATION, B36, GLSK limitation",
+        "BALANCE_LOADFLOW_DIVERGENCE, B40, Balance Load Flow divergence",
+        "UNKNOWN_TERMINAL_BUS, B32, Unknown terminal bus for balancing",
+        "COMPUTATION_FAILURE, B18, Balancing adjustment out of tolerances"
+    })
+    void testLimitingCause(LimitingCause limitingCause, String code, String message) {
+        Reason reason = CneFileExportService.getLimitingCauseErrorReason(limitingCause);
+        Assertions.assertThat(reason)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", code)
+                .hasFieldOrPropertyWithValue("text", message);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = LimitingCause.class, names = {"CRITICAL_BRANCH", "INDEX_EVALUATION_OR_MAX_ITERATION"})
+    void testLimitingCauseDefault(LimitingCause limitingCause) {
+        Reason reason = CneFileExportService.getLimitingCauseErrorReason(limitingCause);
+        Assertions.assertThat(reason)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", null)
+                .hasFieldOrPropertyWithValue("text", null);
+    }
+
+    @Test
+    void exportCneFromFailedRaoResult() throws IOException, JAXBException {
+        final JAXBContext jaxbContext = JAXBContext.newInstance(CriticalNetworkElementMarketDocumentXmlRoot.class);
+        final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+        final Properties properties = cneFileExportService.getCneExporterProperties(offsetDateTime);
+        final MemDataSource memDataSource = mock(MemDataSource.class);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        when(memDataSource.newOutputStream("targetZipFileName.xml", false)).thenReturn(baos);
+        when(dichotomyResult.isRaoFailed()).thenReturn(true);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
+        when(network.getCaseDate()).thenReturn(dateTime);
+        when(cracCreationContext.getTimeStamp()).thenReturn(offsetDateTime);
+
+        cneFileExportService.exportAndZipCneFile(sweData, DichotomyDirection.PT_ES, dichotomyResult, properties, cracCreationContext, memDataSource, "targetZipFileName.xml", false);
+
+        final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(baos.toByteArray()));
+        final ZipEntry ze = zis.getNextEntry();
+        Assertions.assertThat(ze)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("name", "targetZipFileName.xml");
+        final byte[] zipContent = zis.readAllBytes();
+        final Object criticalElementExt = unmarshaller.unmarshal(new ByteArrayInputStream(zipContent));
+        Assertions.assertThat(criticalElementExt)
+                .isInstanceOf(CriticalNetworkElementMarketDocument.class)
+                .extracting("timeSeries").asInstanceOf(LIST)
+                .hasSize(1)
+                .first()
+                .isInstanceOf(TimeSeries.class)
+                .extracting("period").asInstanceOf(LIST)
+                .hasSize(1)
+                .first()
+                .isInstanceOf(SeriesPeriod.class)
+                .extracting("point").asInstanceOf(LIST)
+                .hasSize(1)
+                .first()
+                .isInstanceOf(Point.class)
+                .extracting("reason").asInstanceOf(LIST)
+                .hasSize(1)
+                .first()
+                .isInstanceOf(Reason.class)
+                .hasFieldOrPropertyWithValue("code", "B18")
+                .hasFieldOrPropertyWithValue("text", "RAO failure");
     }
 }

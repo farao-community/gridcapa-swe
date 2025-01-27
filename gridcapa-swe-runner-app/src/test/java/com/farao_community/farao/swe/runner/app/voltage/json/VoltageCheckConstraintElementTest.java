@@ -4,15 +4,18 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
-import com.powsybl.openrao.data.cracapi.Instant;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
+import com.powsybl.openrao.data.crac.api.Instant;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -111,3 +114,4 @@ class VoltageCheckConstraintElementTest {
         }
     }
 }
+

@@ -14,15 +14,21 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 public enum CgmesFileType {
     CORESO_SV("CORESO", "SV"),
-    RTE_SSH("RTEFRANCE", "SSH"),
-    RTE_EQ("RTEFRANCE", "EQ"),
-    RTE_TP("RTEFRANCE", "TP"),
-    REE_SSH("REE", "SSH"),
-    REE_EQ("REE", "EQ"),
-    REE_TP("REE", "TP"),
-    REN_SSH("REN", "SSH"),
-    REN_EQ("REN", "EQ"),
-    REN_TP("REN", "TP");
+    RTE_SSH(Tso.RTE, "SSH"),
+    RTE_EQ(Tso.RTE, "EQ"),
+    RTE_TP(Tso.RTE, "TP"),
+    REE_SSH(Tso.REE, "SSH"),
+    REE_EQ(Tso.REE, "EQ"),
+    REE_TP(Tso.REE, "TP"),
+    REN_SSH(Tso.REN, "SSH"),
+    REN_EQ(Tso.REN, "EQ"),
+    REN_TP(Tso.REN, "TP");
+
+    private static class Tso {
+        private static final String RTE = "RTEFRANCE";
+        private static final String REE = "REE";
+        private static final String REN = "REN";
+    }
 
     private final String tso;
     private final String fileType;

@@ -4,6 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
@@ -13,9 +14,9 @@ import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracimpl.CracImpl;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.impl.CracImpl;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.powsybl.openrao.raoapi.parameters.SecondPreventiveRaoParameters;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,12 +30,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -71,9 +74,11 @@ class FileExporterTest {
 
     @Test
     void saveVoltageMonitoringResultInJson() {
-        VoltageMonitoringResult voltageResult = VoltageMonitoringResultTestUtils.getMonitoringResult();
+        RaoResultWithVoltageMonitoring voltageResult = VoltageMonitoringResultTestUtils.getMonitoringResult();
+        Crac crac = Mockito.mock(Crac.class);
+        Mockito.when(crac.getVoltageCnecs()).thenReturn(Collections.emptySet());
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("voltageResult");
-        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJsonZip(voltageResult, "voltageResult.json", dateTime, ProcessType.D2CC, "Voltage_ESFR");
+        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJsonZip(voltageResult, "voltageResult.json", dateTime, ProcessType.D2CC, "Voltage_ESFR", crac);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(
                 Mockito.anyString(),
                 Mockito.any(InputStream.class),
@@ -87,7 +92,9 @@ class FileExporterTest {
     @Test
     void saveFailureVoltageMonitoringResultInJson() {
         Mockito.when(minioAdapter.generatePreSignedUrl(Mockito.any())).thenReturn("voltageResult");
-        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJsonZip(null, "voltageResult.json", dateTime, ProcessType.D2CC, "Voltage_ESFR");
+        Crac crac = Mockito.mock(Crac.class);
+        Mockito.when(crac.getVoltageCnecs()).thenReturn(Collections.emptySet());
+        String voltageUrl = fileExporter.saveVoltageMonitoringResultInJsonZip(null, "voltageResult.json", dateTime, ProcessType.D2CC, "Voltage_ESFR", crac);
         Mockito.verify(minioAdapter, Mockito.times(1)).uploadOutputForTimestamp(
                 Mockito.anyString(),
                 Mockito.any(InputStream.class),
@@ -160,3 +167,4 @@ class FileExporterTest {
         assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
     }
 }
+

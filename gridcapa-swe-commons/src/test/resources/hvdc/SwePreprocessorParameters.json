@@ -31,6 +31,7 @@
         "side1GeneratorId": "FFR4AA1 _generator",
         "side2GeneratorId": "DDE1AA1 _generator",
         "side1LoadID": "FFR4AA1 _load",
+        "side1LoadIDOption2": "XXX1XX1 _load",
         "side2LoadId": "DDE1AA1 _load",
         "acLineId": "FFR4AA1  DDE1AA1  1"
       }
@@ -66,6 +67,7 @@
         "side1GeneratorId": "BBE2AA1 _generator",
         "side2GeneratorId": "FFR3AA1 _generator",
         "side1LoadID": "BBE2AA1 _load",
+        "side1LoadIDOption2": "XXX2XX2 _load",
         "side2LoadId": "FFR3AA1 _load",
         "acLineId": "BBE2AA1  FFR3AA1  1"
       }

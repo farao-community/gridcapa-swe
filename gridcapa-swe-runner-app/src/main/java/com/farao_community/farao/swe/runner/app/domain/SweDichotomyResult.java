@@ -8,7 +8,7 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 
 import java.util.Optional;
 
@@ -19,15 +19,16 @@ public class SweDichotomyResult {
 
     private final DichotomyDirection dichotomyDirection;
     private final DichotomyResult<SweDichotomyValidationData> dichotomyResult;
-    private final Optional<VoltageMonitoringResult> voltageMonitoringResult;
+    private final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult;
     private final String exportedCgmesUrl;
     private final String highestValidStepUrl;
     private final String lowestInvalidStepUrl;
-    private boolean interrupted;
+    private final boolean interrupted;
+    private final boolean raoFailed;
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<SweDichotomyValidationData> dichotomyResult,
-                              Optional<VoltageMonitoringResult> voltageMonitoringResult,
+                              Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
                               String exportedCgmesUrl,
                               String highestValidStepUrl,
                               String lowestInvalidStepUrl) {
@@ -38,6 +39,13 @@ public class SweDichotomyResult {
         this.highestValidStepUrl = highestValidStepUrl;
         this.lowestInvalidStepUrl = lowestInvalidStepUrl;
         this.interrupted = dichotomyResult.isInterrupted();
+        this.raoFailed = dichotomyResult.isRaoFailed();
+    }
+
+    public SweDichotomyResult(DichotomyDirection dichotomyDirection,
+                              DichotomyResult<SweDichotomyValidationData> dichotomyResult,
+                              String lowestInvalidStepUrl) {
+        this(dichotomyDirection, dichotomyResult, Optional.empty(), null, null, lowestInvalidStepUrl);
     }
 
     public DichotomyDirection getDichotomyDirection() {
@@ -48,7 +56,7 @@ public class SweDichotomyResult {
         return dichotomyResult;
     }
 
-    public Optional<VoltageMonitoringResult> getVoltageMonitoringResult() {
+    public Optional<RaoResultWithVoltageMonitoring> getVoltageMonitoringResult() {
         return voltageMonitoringResult;
     }
 
@@ -66,5 +74,9 @@ public class SweDichotomyResult {
 
     public boolean isInterrupted() {
         return interrupted;
+    }
+
+    public boolean isRaoFailed() {
+        return raoFailed;
     }
 }

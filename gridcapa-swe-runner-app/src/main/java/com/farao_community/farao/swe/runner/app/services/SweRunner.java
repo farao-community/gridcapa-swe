@@ -47,7 +47,7 @@ public class SweRunner {
         if (checkIsInterrupted(sweRequest)) {
             businessLogger.warn("Computation has been interrupted for timestamp {}", sweRequest.getTargetProcessDateTime());
             LOGGER.info("Response sent for timestamp {} : run has been interrupted", sweRequest.getTargetProcessDateTime());
-            return new SweResponse(sweRequest.getId(), null, true);
+            return new SweResponse(sweRequest.getId(), null, true, false);
         }
         SweTaskParameters sweTaskParameters = new SweTaskParameters(sweRequest.getTaskParameterList());
         logSweParameters(sweRequest, sweTaskParameters);
@@ -58,10 +58,11 @@ public class SweRunner {
     }
 
     private void logSweParameters(SweRequest sweRequest, SweTaskParameters sweTaskParameters) {
+        final String sweParametersString = sweTaskParameters.toJsonString();
         if (sweRequest.getTaskParameterList().stream().anyMatch(p -> !Objects.equals(p.getValue(), p.getDefaultValue()))) {
-            businessLogger.warn("SWE task parameters: {}", sweTaskParameters.toJsonString());
+            businessLogger.warn("SWE task parameters: {}", sweParametersString);
         } else {
-            businessLogger.info("SWE task parameters: {}", sweTaskParameters.toJsonString());
+            businessLogger.info("SWE task parameters: {}", sweParametersString);
         }
     }
 

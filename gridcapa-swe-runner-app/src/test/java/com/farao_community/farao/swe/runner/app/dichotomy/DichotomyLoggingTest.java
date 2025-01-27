@@ -13,10 +13,11 @@ import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirecti
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.cnec.Cnec;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -41,7 +42,9 @@ class DichotomyLoggingTest {
         Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(true);
         assertEquals("FAILURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.ES_FR, Optional.empty(), sweTaskParameters));
         assertEquals("NONE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.PT_ES, Optional.empty(), sweTaskParameters));
-        assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(new VoltageMonitoringResult(Collections.emptyMap(), Collections.emptyMap(), VoltageMonitoringResult.Status.SECURE)), sweTaskParameters));
+        final RaoResultWithVoltageMonitoring mockedVoltageMonitoringResults = Mockito.mock(RaoResultWithVoltageMonitoring.class);
+        Mockito.when(mockedVoltageMonitoringResults.getSecurityStatus()).thenReturn(Cnec.SecurityStatus.SECURE);
+        assertEquals("SECURE", ReflectionTestUtils.invokeMethod(businessLogger, "getVoltageCheckResult", DichotomyDirection.FR_ES, Optional.of(mockedVoltageMonitoringResults), sweTaskParameters));
     }
 
     @Test
@@ -67,6 +70,10 @@ class DichotomyLoggingTest {
         DichotomyStepResult stepResult = Mockito.mock(DichotomyStepResult.class);
         Mockito.when(result.getHighestValidStep()).thenReturn(stepResult);
         RaoResult raoResult = Mockito.mock(RaoResult.class);
+        DichotomyStepResult invalidStepResult = Mockito.mock(DichotomyStepResult.class);
+        Mockito.when(result.getLowestInvalidStep()).thenReturn(invalidStepResult);
+        RaoResult raoResult1 = Mockito.mock(RaoResult.class);
+        Mockito.when(invalidStepResult.getRaoResult()).thenReturn(raoResult1);
         Mockito.when(stepResult.getRaoResult()).thenReturn(raoResult);
         SweDichotomyValidationData validationData = new SweDichotomyValidationData(null, SweDichotomyValidationData.AngleMonitoringStatus.SECURE);
         Mockito.when(stepResult.getValidationData()).thenReturn(validationData);
@@ -87,11 +94,12 @@ class DichotomyLoggingTest {
         DichotomyLogging dichotomyLogging = new DichotomyLogging(logger, processConfiguration);
         dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty(), sweTaskParameters);
         //Then
-        String summary = "Summary :\n" +
-                "Limiting event : {},\n" +
-                "Limiting element : {},\n" +
-                "PRAs : {},\n" +
-                "CRAs : {}.";
+        String summary = """
+                Summary :
+                Limiting event : {},
+                Limiting element : {},
+                PRAs : {},
+                CRAs : {}.""";
         String summaryBd = """
                 Summary BD :  {}
                 Current TTC : {},

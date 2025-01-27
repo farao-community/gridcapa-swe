@@ -9,14 +9,16 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
-import org.junit.jupiter.api.BeforeAll;
+import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -25,14 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SweDichotomyResultTest {
 
-    private static DichotomyResult<SweDichotomyValidationData> dichotomyResult;
+    private DichotomyResult<SweDichotomyValidationData> dichotomyResult;
 
-    private static VoltageMonitoringResult voltageMonitoringResult;
+    private static RaoResultWithVoltageMonitoring voltageMonitoringResult;
 
-    @BeforeAll
-    static void setup() {
+    @BeforeEach
+    void setup() {
         dichotomyResult = Mockito.mock(DichotomyResult.class);
-        voltageMonitoringResult = Mockito.mock(VoltageMonitoringResult.class);
+        voltageMonitoringResult = Mockito.mock(RaoResultWithVoltageMonitoring.class);
     }
 
     @Test
@@ -40,9 +42,12 @@ class SweDichotomyResultTest {
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.empty(), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(dichotomyResult, result.getDichotomyResult());
+        assertFalse(result.isInterrupted());
         assertTrue(result.getVoltageMonitoringResult().isEmpty());
         assertEquals("highestValidStepUrl", result.getHighestValidStepUrl());
         assertEquals("lowestValidStepUrl", result.getLowestInvalidStepUrl());
+        assertEquals("exportedCgmesUrl", result.getExportedCgmesUrl());
+        assertFalse(result.isRaoFailed());
     }
 
     @Test
@@ -50,9 +55,43 @@ class SweDichotomyResultTest {
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(dichotomyResult, result.getDichotomyResult());
+        assertFalse(result.isInterrupted());
         assertTrue(result.getVoltageMonitoringResult().isPresent());
         assertEquals(voltageMonitoringResult, result.getVoltageMonitoringResult().get());
         assertEquals("highestValidStepUrl", result.getHighestValidStepUrl());
         assertEquals("lowestValidStepUrl", result.getLowestInvalidStepUrl());
+        assertEquals("exportedCgmesUrl", result.getExportedCgmesUrl());
+        assertFalse(result.isRaoFailed());
+    }
+
+    @Test
+    void simpleTestWithInterruption() {
+        Mockito.when(dichotomyResult.isInterrupted()).thenReturn(true);
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
+        assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
+        assertEquals(dichotomyResult, result.getDichotomyResult());
+        assertTrue(result.isInterrupted());
+        assertTrue(result.getVoltageMonitoringResult().isPresent());
+        assertEquals(voltageMonitoringResult, result.getVoltageMonitoringResult().get());
+        assertEquals("highestValidStepUrl", result.getHighestValidStepUrl());
+        assertEquals("lowestValidStepUrl", result.getLowestInvalidStepUrl());
+        assertEquals("exportedCgmesUrl", result.getExportedCgmesUrl());
+        assertFalse(result.isRaoFailed());
+    }
+
+    @Test
+    void simpleTestWithRaoFailure() {
+        DichotomyResult<SweDichotomyValidationData> customDichotomyResult = DichotomyResult.buildFromRaoFailure("failure");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, customDichotomyResult, "cneFirstUnsecureUrl");
+        assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
+        assertEquals(customDichotomyResult, result.getDichotomyResult());
+        assertFalse(result.isInterrupted());
+        assertFalse(result.getVoltageMonitoringResult().isPresent());
+        assertNull(result.getHighestValidStepUrl());
+        assertEquals("cneFirstUnsecureUrl", result.getLowestInvalidStepUrl());
+        assertNull(result.getExportedCgmesUrl());
+        assertEquals(customDichotomyResult, result.getDichotomyResult());
+        assertTrue(result.isRaoFailed());
     }
 }
+

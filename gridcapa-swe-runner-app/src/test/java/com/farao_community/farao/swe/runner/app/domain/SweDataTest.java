@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class SweDataTest {
 
     @Test
     void simpleD2ccTest() {
-        SweData sweData = new SweData("id", "runId", OffsetDateTime.now(), ProcessType.D2CC, network, network, network, network, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.now(), ProcessType.D2CC, network, network, network, network, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", Collections.emptyList(),  new EnumMap<>(CgmesFileType.class), Collections.emptyMap());
         assertEquals(ProcessType.D2CC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetworkEsFr());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());
@@ -51,7 +51,7 @@ class SweDataTest {
 
     @Test
     void simpleIdccTest() {
-        SweData sweData = new SweData("id", "runId", OffsetDateTime.now(), ProcessType.IDCC, network, network, network, network, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", new EnumMap<>(CgmesFileType.class));
+        SweData sweData = new SweData("id", "runId", OffsetDateTime.now(), ProcessType.IDCC, network, network, network, network, cracFrEs, cracEsPt, "glskUrl", "CracEsPt", "CracFrEs", "raoParametersEsFrUrl", "raoParametersEsPtUrl", Collections.emptyList(), new EnumMap<>(CgmesFileType.class), Collections.emptyMap());
         assertEquals(ProcessType.IDCC, sweData.getProcessType());
         assertEquals(this.network, sweData.getNetworkEsFr());
         assertEquals(this.cracEsPt, sweData.getCracEsPt());

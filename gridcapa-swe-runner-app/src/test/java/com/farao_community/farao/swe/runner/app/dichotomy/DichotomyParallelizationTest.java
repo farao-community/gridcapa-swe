@@ -6,10 +6,6 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.CracFactory;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
@@ -19,19 +15,22 @@ import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker;
-import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.CracFactory;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -109,7 +108,6 @@ class DichotomyParallelizationTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
         network = Network.read("network.xiidm", getClass().getResourceAsStream("/network/network.xiidm"));
         crac = CracFactory.findDefault().create("test-crac");
         defaultParameters = new TestParametersBuilder()
@@ -197,7 +195,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
+        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
@@ -216,7 +214,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
+        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(future);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(future);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(future);
@@ -353,5 +351,96 @@ class DichotomyParallelizationTest {
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertTrue(sweResponse.isInterrupted());
+    }
+
+    @Test
+    void testParallelizationWithOneRaoFailure() {
+        DichotomyResult<SweDichotomyValidationData> failedSweDichotomyResult = DichotomyResult.buildFromRaoFailure("My test failure");
+        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult, "cneFirstUnsecureUrl");
+
+        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
+        when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
+        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
+        when(highestValidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweDichotomyResult.hasValidStep()).thenReturn(true);
+        when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
+        when(sweData.getNetworkFrEs()).thenReturn(network);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(new AsyncResult<>(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(new AsyncResult<>(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(new AsyncResult<>(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(new AsyncResult<>(failedResult));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertFalse(sweResponse.isAllRaoFailed());
+    }
+
+    @Test
+    void testParallelizationWithTwoDirectionsAllRaoFailure() {
+        DichotomyResult<SweDichotomyValidationData> failedSweDichotomyResult = DichotomyResult.buildFromRaoFailure("My test failure");
+        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult, "cneFirstUnsecureUrl");
+
+        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
+        when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
+        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
+        when(highestValidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweDichotomyResult.hasValidStep()).thenReturn(true);
+        when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
+        final SweTaskParameters parameters = new TestParametersBuilder()
+                .withEsFr(true)
+                .withEsPt(true)
+                .withFrEs(false)
+                .withPtEs(false)
+                .build();
+        when(worker.runDichotomyForOneDirection(sweData, parameters, DichotomyDirection.ES_FR)).thenReturn(new AsyncResult<>(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, parameters, DichotomyDirection.ES_PT)).thenReturn(new AsyncResult<>(failedResult));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, parameters);
+        assertTrue(sweResponse.isAllRaoFailed());
+    }
+
+    @Test
+    void testParallelizationWithFourDirectionsAllRaoFailure() {
+        DichotomyResult<SweDichotomyValidationData> failedSweDichotomyResult = DichotomyResult.buildFromRaoFailure("My test failure");
+        SweDichotomyResult failedResult = new SweDichotomyResult(DichotomyDirection.ES_PT, failedSweDichotomyResult, "cneFirstUnsecureUrl");
+
+        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
+        when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
+        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
+        when(highestValidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweDichotomyResult.hasValidStep()).thenReturn(true);
+        when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
+        when(lowestInvalidStep.getRaoResult()).thenReturn(raoResult);
+        when(sweData.getCracFrEs()).thenReturn(cracCreationContext);
+        when(sweData.getCracEsPt()).thenReturn(cracCreationContext);
+        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        when(cracCreationContext.getCrac()).thenReturn(crac);
+        when(sweData.getNetworkEsFr()).thenReturn(network);
+        when(sweData.getNetworkEsPt()).thenReturn(network);
+        when(sweData.getNetworkFrEs()).thenReturn(network);
+        when(sweData.getNetworkPtEs()).thenReturn(network);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(new AsyncResult<>(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(new AsyncResult<>(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(new AsyncResult<>(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(new AsyncResult<>(failedResult));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        assertTrue(sweResponse.isAllRaoFailed());
     }
 }

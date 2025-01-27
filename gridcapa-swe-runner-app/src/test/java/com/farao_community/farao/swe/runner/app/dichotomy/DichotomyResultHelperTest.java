@@ -6,13 +6,13 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
-import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.crac.api.Crac;
 
-import com.powsybl.openrao.data.cracapi.CracCreationContext;
-import com.powsybl.openrao.data.cracapi.parameters.CracCreationParameters;
-import com.powsybl.openrao.data.craccreation.creator.cim.parameters.CimCracCreationParameters;
-import com.powsybl.openrao.data.craccreation.creator.cim.parameters.RangeActionSpeed;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.data.crac.api.CracCreationContext;
+import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
+import com.powsybl.openrao.data.crac.io.cim.parameters.CimCracCreationParameters;
+import com.powsybl.openrao.data.crac.io.cim.parameters.RangeActionSpeed;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.farao_community.farao.dichotomy.api.results.LimitingCause;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeAll;

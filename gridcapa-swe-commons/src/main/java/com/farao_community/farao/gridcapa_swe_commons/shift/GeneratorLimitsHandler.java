@@ -39,20 +39,19 @@ public class GeneratorLimitsHandler {
         this.zonalScalableData = zonalScalableData;
     }
 
-    void setPminPmaxToDefaultValue(Network network, Set<Country> countries) {
+    public void setPminPmaxToDefaultValue(Network network, Set<Country> countries) {
         initGenerators = new HashMap<>();
-        countries.forEach(country -> {
-            zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
-                    .stream()
-                    .filter(Generator.class::isInstance)
-                    .map(Generator.class::cast)
-                    .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
-                            && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country)))
-                    .forEach(generator -> {
-                        saveInitLimits(generator);
-                        setLimitsToDefault(generator);
-                    });
-        });
+        countries.forEach(
+            country -> zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
+                        .stream()
+                        .filter(Generator.class::isInstance)
+                        .map(Generator.class::cast)
+                        .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
+                                && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country)))
+                        .forEach(generator -> {
+                            saveInitLimits(generator);
+                            setLimitsToDefault(generator);
+                        }));
         LOGGER.info("Pmax and Pmin are set to default values for network {}", network.getNameOrId());
     }
 
@@ -70,7 +69,7 @@ public class GeneratorLimitsHandler {
         initGenerators.computeIfAbsent(genId, k -> initGeneratorLimits);
     }
 
-    void resetInitialPminPmax(Network network) {
+    public void resetInitialPminPmax(Network network) {
         // initGenerators contains the list of generators with Pmin/Pmax modifies in pre-processing step
         initGenerators.forEach((id, initValues) -> {
             Generator generator = network.getGenerator(id);

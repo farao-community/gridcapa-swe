@@ -11,6 +11,8 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNoDetailsException;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
@@ -71,6 +73,7 @@ public class CgmesExportService {
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
     private final ProcessConfiguration processConfiguration;
+    private final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
     private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
 
@@ -87,12 +90,13 @@ public class CgmesExportService {
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.UPDATE_DEPENDENCIES, false);
     }
 
-    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration) {
+    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration, RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService) {
         this.businessLogger = businessLogger;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
         this.processConfiguration = processConfiguration;
+        this.removeRemoteVoltageRegulationInFranceService = removeRemoteVoltageRegulationInFranceService;
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
     }
 
@@ -102,9 +106,10 @@ public class CgmesExportService {
             String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
             try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
                 Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
-                applyHvdcSetPointToAcEquivalentModel(networkWithPra);
+                applyHvdcSetPointToAcEquivalentModel(networkWithPra, sweData.getHvdcInformationList());
                 LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
                 LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), loadFlowParameters);
+                removeRemoteVoltageRegulationInFranceService.resetRemoteVoltageRegulationInFrance(networkWithPra, sweData.getReplacedVoltageRegulations());
                 Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
                 return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
             } catch (IOException e) {
@@ -116,10 +121,15 @@ public class CgmesExportService {
         }
     }
 
-    private void applyHvdcSetPointToAcEquivalentModel(Network networkWithPra) {
-        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
-        Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
-        HvdcLinkProcessor.replaceHvdcByEquivalentModel(networkWithPra, hvdcCreationParameters);
+    private void applyHvdcSetPointToAcEquivalentModel(Network networkWithPra, List<HvdcInformation> hvdcInformationList) {
+        try {
+            SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
+            Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
+            HvdcLinkProcessor.replaceHvdcByEquivalentModel(networkWithPra, hvdcCreationParameters, hvdcInformationList);
+        } catch (SweInvalidDataNoDetailsException e) {
+            businessLogger.warn(e.getMessage());
+        }
+
     }
 
     Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws IOException {

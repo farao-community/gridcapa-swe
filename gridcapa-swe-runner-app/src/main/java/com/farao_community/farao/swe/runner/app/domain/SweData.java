@@ -6,12 +6,15 @@
  */
 package com.farao_community.farao.swe.runner.app.domain;
 
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
+import com.farao_community.farao.swe.runner.app.services.RemoveRemoteVoltageRegulationInFranceService;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,9 +37,11 @@ public class SweData {
     private final String jsonCracPathFrEs;
     private final String raoParametersEsFrUrl;
     private final String raoParametersEsPtUrl;
+    private final List<HvdcInformation> hvdcInformationList;
     private final Map<CgmesFileType, SweFileResource> mapCgmesInputFiles;
+    private final Map<String, RemoveRemoteVoltageRegulationInFranceService.ReplacedVoltageRegulation> replacedVoltageRegulations;
 
-    public SweData(String id, String runId, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
+    public SweData(String id, String runId, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, List<HvdcInformation> hvdcInformationList, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles, Map<String, RemoveRemoteVoltageRegulationInFranceService.ReplacedVoltageRegulation> replacedVoltageRegulations) {
         this.id = id;
         this.runId = runId;
         this.timestamp = timestamp;
@@ -52,7 +57,9 @@ public class SweData {
         this.jsonCracPathFrEs = jsonCracPathFrEs;
         this.raoParametersEsFrUrl = raoParametersEsFrUrl;
         this.raoParametersEsPtUrl = raoParametersEsPtUrl;
+        this.hvdcInformationList = hvdcInformationList;
         this.mapCgmesInputFiles = mapCgmesInputFiles;
+        this.replacedVoltageRegulations = replacedVoltageRegulations;
     }
 
     public String getId() {
@@ -115,7 +122,15 @@ public class SweData {
         return raoParametersEsPtUrl;
     }
 
+    public List<HvdcInformation> getHvdcInformationList() {
+        return hvdcInformationList;
+    }
+
     public Map<CgmesFileType, SweFileResource> getMapCgmesInputFiles() {
         return mapCgmesInputFiles;
+    }
+
+    public Map<String, RemoveRemoteVoltageRegulationInFranceService.ReplacedVoltageRegulation> getReplacedVoltageRegulations() {
+        return replacedVoltageRegulations;
     }
 }

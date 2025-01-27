@@ -29,7 +29,7 @@ public class SwePreprocessorParametersDeserializer extends StdDeserializer<SwePr
     public SwePreprocessorParameters deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         Set<HvdcCreationParameters> hvdcCreationParametersSet = null;
         while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
-            if (jsonParser.getCurrentName().equals("hvdcCreationParameters")) {
+            if (jsonParser.currentName().equals("hvdcCreationParameters")) {
                 jsonParser.nextToken();
                 try {
                     hvdcCreationParametersSet = HvdcCreationParametersArrayDeserializer.deserialize(jsonParser);
@@ -37,7 +37,7 @@ public class SwePreprocessorParametersDeserializer extends StdDeserializer<SwePr
                     throw new IOException("Could not deserialize SwePreprocessorParameters", e);
                 }
             } else {
-                throw new IOException("Unexpected field in SwePreprocessorParameters: " + jsonParser.getCurrentName());
+                throw new IOException("Unexpected field in SwePreprocessorParameters: " + jsonParser.currentName());
             }
         }
         return new SwePreprocessorParameters(hvdcCreationParametersSet);

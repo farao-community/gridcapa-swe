@@ -6,13 +6,15 @@
  */
 package com.farao_community.farao.swe.runner.app.voltage.json;
 
-import com.powsybl.openrao.monitoring.voltagemonitoring.VoltageMonitoringResult;
+import com.powsybl.openrao.data.crac.api.cnec.Cnec;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -20,18 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class VoltageCheckResultTest {
 
     @Test
-    void testNullIsSecureParameter() {
-        NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            new VoltageCheckResult(null, null);
-            fail("No is secure parameter");
-        });
-        assertEquals("The value of isSecure cannot be null in VoltageCheckResult", npe.getMessage());
-    }
-
-    @Test
     void testNullListParameter() {
-        NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            VoltageCheckResult result = new VoltageCheckResult(VoltageMonitoringResult.Status.SECURE, null);
+        final NullPointerException npe = assertThrows(NullPointerException.class, () -> {
+            new VoltageCheckResult(Cnec.SecurityStatus.SECURE, null);
             fail("No is secure parameter");
         });
         assertEquals("The value of constraintElements cannot be null in VoltageCheckResult", npe.getMessage());
@@ -39,8 +32,8 @@ class VoltageCheckResultTest {
 
     @Test
     void testOk() {
-        VoltageCheckResult result = new VoltageCheckResult(VoltageMonitoringResult.Status.HIGH_AND_LOW_VOLTAGE_CONSTRAINTS, Collections.emptyList());
-        assertEquals(VoltageMonitoringResult.Status.HIGH_AND_LOW_VOLTAGE_CONSTRAINTS, result.getIsSecure());
-        assertEquals(Collections.emptyList(), result.getConstraintElements());
+        final VoltageCheckResult result = new VoltageCheckResult(Cnec.SecurityStatus.SECURE, Collections.emptyList());
+        assertEquals(Cnec.SecurityStatus.SECURE, result.getStatus());
+        assertTrue(result.getConstraintElements().isEmpty());
     }
 }

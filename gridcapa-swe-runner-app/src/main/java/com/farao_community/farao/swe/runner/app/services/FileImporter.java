@@ -15,13 +15,13 @@ import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.RaUsageLimits;
-import com.powsybl.openrao.data.cracapi.parameters.CracCreationParameters;
-import com.powsybl.openrao.data.cracapi.parameters.JsonCracCreationParameters;
-import com.powsybl.openrao.data.craccreation.creator.cim.craccreator.CimCracCreationContext;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
-import com.powsybl.openrao.data.raoresultjson.RaoResultJsonImporter;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.RaUsageLimits;
+import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
+import com.powsybl.openrao.data.crac.api.parameters.JsonCracCreationParameters;
+import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import com.powsybl.openrao.data.raoresult.io.json.RaoResultJsonImporter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,7 +30,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 
@@ -68,8 +69,8 @@ public class FileImporter {
     public Crac importCracFromJson(String cracUrl, Network network) {
         try (InputStream cracResultStream = urlValidationService.openUrlStream(cracUrl)) {
             LOGGER.info("Importing Crac from JSON file: {}", cracUrl);
-            return Crac.read(FilenameUtils.getName(new URL(cracUrl).getPath()), cracResultStream, network);
-        } catch (IOException e) {
+            return Crac.read(FilenameUtils.getName(new URI(cracUrl).toURL().getPath()), cracResultStream, network);
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
             throw new SweInvalidDataException(String.format("Cannot import crac from JSON : %s", cracUrl), e);
         }
     }

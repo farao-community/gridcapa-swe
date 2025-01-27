@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>farao-parent-ws</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>1.8.0</version>
+        <artifactId>farao-parent-ws</artifactId>
+        <version>1.11.0</version>
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
-    <version>1.25.0-SNAPSHOT</version>
+    <version>1.33.0-SNAPSHOT</version>
     <name>GridCapa SWE</name>
     <description>A full suite to perform capacity calculations on SWE zone</description>
     <packaging>pom</packaging>
@@ -58,14 +58,13 @@
 
     <properties>
         <awaitility.version>3.0.0</awaitility.version>
-        <farao.dependencies.version>1.34.0-SNAPSHOT</farao.dependencies.version>
-        <farao.dichotomy.version>4.18.1</farao.dichotomy.version>
-        <gridcapa.starter.minio.version>1.1.2</gridcapa.starter.minio.version>
-        <gridcapa.rao.runner.version>1.26.0</gridcapa.rao.runner.version>
-        <gridcapa.task-manager.version>1.31.0</gridcapa.task-manager.version>
+        <farao.dependencies.version>1.38.2</farao.dependencies.version>
+        <farao.dichotomy.version>4.24.0</farao.dichotomy.version>
+        <gridcapa.starter.minio.version>1.4.0</gridcapa.starter.minio.version>
+        <gridcapa.rao.runner.version>1.33.0</gridcapa.rao.runner.version>
+        <gridcapa.task-manager.version>1.34.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.17.0</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
-        <logstash.version>7.0.1</logstash.version>
         <sonar.organization>farao-community</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -107,19 +106,6 @@
                 <groupId>com.github.jasminb</groupId>
                 <artifactId>jsonapi-converter</artifactId>
                 <version>${jsonapi.converter.version}</version>
-            </dependency>
-
-            <!-- Runtime dependencies -->
-            <dependency>
-                <groupId>net.logstash.logback</groupId>
-                <artifactId>logstash-logback-encoder</artifactId>
-                <version>${logstash.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jaxb</groupId>
-                <artifactId>jaxb-runtime</artifactId>
-                <scope>runtime</scope>
             </dependency>
 
             <!-- Test dependencies -->
