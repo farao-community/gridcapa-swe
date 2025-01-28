@@ -29,6 +29,7 @@ import com.powsybl.cgmes.conversion.CgmesExport;
 import com.powsybl.cgmes.extensions.CgmesControlArea;
 import com.powsybl.cgmes.extensions.CgmesControlAreas;
 import com.powsybl.cgmes.extensions.CgmesMetadataModels;
+import com.powsybl.cgmes.model.CgmesMetadataModel;
 import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.computation.local.LocalComputationManager;
@@ -84,7 +85,12 @@ public class CgmesExportService {
         SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.UPDATE_DEPENDENCIES, true);
     }
 
-    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration, RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService) {
+    public CgmesExportService(final Logger businessLogger,
+                              final FileExporter fileExporter,
+                              final FileImporter fileImporter,
+                              final UrlValidationService urlValidationService,
+                              final ProcessConfiguration processConfiguration,
+                              final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService) {
         this.businessLogger = businessLogger;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
@@ -93,19 +99,19 @@ public class CgmesExportService {
         SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
     }
 
-    public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweTaskParameters sweTaskParameters) {
+    public String buildAndExportCgmesFiles(final DichotomyDirection direction, final SweData sweData, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final SweTaskParameters sweTaskParameters) {
         if (dichotomyResult.hasValidStep()) {
             businessLogger.info("Start export of the CGMES files");
-            String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
-            try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
-                Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
+            final String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
+            try (final InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
+                final Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
                 applyHvdcSetPointToAcEquivalentModel(networkWithPra, sweData.getHvdcInformationList());
-                LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
+                final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
                 LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), loadFlowParameters);
                 removeRemoteVoltageRegulationInFranceService.resetRemoteVoltageRegulationInFrance(networkWithPra, sweData.getReplacedVoltageRegulations());
-                Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
+                final Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
                 return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new SweInvalidDataException(String.format("Can not export cgmes file associated with direction %s", direction.getDashName()), e);
             }
         } else {
@@ -114,71 +120,79 @@ public class CgmesExportService {
         }
     }
 
-    private void applyHvdcSetPointToAcEquivalentModel(Network networkWithPra, List<HvdcInformation> hvdcInformationList) {
+    private void applyHvdcSetPointToAcEquivalentModel(final Network networkWithPra, final List<HvdcInformation> hvdcInformationList) {
         try {
-            SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
-            Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
+            final SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
+            final Set<HvdcCreationParameters> hvdcCreationParameters = params.getHvdcCreationParametersSet();
             HvdcLinkProcessor.replaceHvdcByEquivalentModel(networkWithPra, hvdcCreationParameters, hvdcInformationList);
-        } catch (SweInvalidDataNoDetailsException e) {
+        } catch (final SweInvalidDataNoDetailsException e) {
             businessLogger.warn(e.getMessage());
         }
 
     }
 
-    Map<String, ByteArrayOutputStream> generateCgmesFile(Network mergedNetwork, SweData sweData) throws IOException {
-        Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
+    Map<String, ByteArrayOutputStream> generateCgmesFile(final Network mergedNetwork, final SweData sweData) throws IOException {
+        final Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>();
         mapCgmesFiles.putAll(createSshSvFiles(mergedNetwork, sweData));
         mapCgmesFiles.putAll(retrieveEqAndTpFiles(sweData));
         return mapCgmesFiles;
     }
 
-    Map<String, ByteArrayOutputStream> createSshSvFiles(Network mergedNetwork, SweData sweData) throws IOException {
+    Map<String, ByteArrayOutputStream> createSshSvFiles(final Network mergedNetwork, final SweData sweData) throws IOException {
         LOGGER.info("Building SSH and SV files");
-        Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
+        final Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
         mergedNetwork.getSubnetworks().forEach(this::updateControlAreasExtension);
-        MemDataSource memDataSource = new MemDataSource();
+        final MemDataSource memDataSource = new MemDataSource();
         mergedNetwork.write("CGMES", SSH_SV_FILE_EXPORT_PARAMS, memDataSource);
-        String outputVersion = incrementInitialVersion(mergedNetwork);
-        for (Map.Entry<Country, String> entry : TSO_BY_COUNTRY.entrySet()) {
-            Country country = entry.getKey();
-            String tso = entry.getValue();
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                String filenameFromCgmesExport = mergedNetwork.getNameOrId() + "_" + country.toString() + "_SSH.xml";
+        final String outputVersion = getNextVersion(mergedNetwork);
+        for (final Map.Entry<Country, String> entry : TSO_BY_COUNTRY.entrySet()) {
+            final Country country = entry.getKey();
+            final String tso = entry.getValue();
+            try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                final String filenameFromCgmesExport = mergedNetwork.getNameOrId() + "_" + country.toString() + "_SSH.xml";
                 if (memDataSource.getData(filenameFromCgmesExport) != null) {
                     baos.write(memDataSource.getData(filenameFromCgmesExport));
-                    String newFileName = buildCgmesFilename(sweData, tso, "SSH", outputVersion);
+                    final String newFileName = buildCgmesFilename(sweData, tso, "SSH", outputVersion);
                     mapFiles.put(newFileName, baos);
                 }
             }
         }
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            String filenameFromCgmesExport = mergedNetwork.getNameOrId() + "_SV.xml";
+        try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            final String filenameFromCgmesExport = mergedNetwork.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
-            String svFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", outputVersion);
+            final String svFilename = buildCgmesFilename(sweData, "CGMSWE", "SV", outputVersion);
             mapFiles.put(svFilename, os);
         }
         return mapFiles;
     }
 
-    private String incrementInitialVersion(Network mergedNetwork) {
-        // the version of ssh should be incremented from the initial version
-        // The version in the output filename should be the same as in the "fullModel"
-        Optional<Network> subnetwork = mergedNetwork.getSubnetworks()
-                .stream()
-                .findFirst();
-        if (subnetwork.isPresent()) {
-            CgmesMetadataModels modelsExtension = subnetwork.get().getExtension(CgmesMetadataModels.class);
-            if (modelsExtension != null && modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).isPresent()) {
-                int initialVersion = modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).get().getVersion();
-                return getFormattedVersionString(initialVersion + 1);
-            }
+    /**
+     * Rule used in Powsybl CGMES Export : version number is the same for SSH & SV and is equal to the max + 1
+     *
+     * @param mergedNetwork
+     * @return
+     */
+    private String getNextVersion(final Network mergedNetwork) {
+        int maxCurrentVersion = getVersionNumber(mergedNetwork, CgmesSubset.STATE_VARIABLES);
+        for (final Network subnetwork : mergedNetwork.getSubnetworks()) {
+            maxCurrentVersion = Math.max(getVersionNumber(subnetwork, CgmesSubset.STEADY_STATE_HYPOTHESIS), maxCurrentVersion);
         }
-        return DEFAULT_VERSION;
+        return getFormattedVersionString(Math.max(maxCurrentVersion + 1, 2));
     }
 
-    private Map<String, ByteArrayOutputStream> retrieveEqAndTpFiles(SweData sweData) throws IOException {
+    private int getVersionNumber(final Network network, final CgmesSubset subset) {
+        // Retrieve model version
+        // In the case of a CGM export, the SSH subsets are updated and their version number is incremented
+        final CgmesMetadataModels networkModels = network.getExtension(CgmesMetadataModels.class);
+        final Optional<CgmesMetadataModel> networkSubsetModel = networkModels != null ?
+                networkModels.getModelForSubset(subset) :
+                Optional.empty();
+        return networkSubsetModel.map(CgmesMetadataModel::getVersion).orElse(-1);
+    }
+
+    private Map<String, ByteArrayOutputStream> retrieveEqAndTpFiles(final SweData sweData) throws IOException {
         LOGGER.info("Retrieving EQ & TP files");
-        Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
+        final Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
         mapFiles.putAll(createOneFile(sweData, CgmesFileType.RTE_TP));
         mapFiles.putAll(createOneFile(sweData, CgmesFileType.REE_TP));
         mapFiles.putAll(createOneFile(sweData, CgmesFileType.REN_TP));
@@ -188,20 +202,20 @@ public class CgmesExportService {
         return mapFiles;
     }
 
-    private static String getFormattedVersionString(int version) {
+    private static String getFormattedVersionString(final int version) {
         return String.format("%03d", version);
     }
 
-    private Map<String, ByteArrayOutputStream> createOneFile(SweData sweData, CgmesFileType cgmesFileType) throws IOException {
-        try (InputStream inputStream = getInputStreamFromData(sweData, cgmesFileType);
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+    private Map<String, ByteArrayOutputStream> createOneFile(final SweData sweData, final CgmesFileType cgmesFileType) throws IOException {
+        try (final InputStream inputStream = getInputStreamFromData(sweData, cgmesFileType);
+             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             IOUtils.copy(inputStream, outputStream);
             return Map.of(buildCgmesFilename(sweData, cgmesFileType.getTso(), cgmesFileType.getFileType(), DEFAULT_VERSION), outputStream);
         }
     }
 
-    private InputStream getInputStreamFromData(SweData sweData, CgmesFileType cgmesFileType) {
-        SweFileResource sweFileResource = sweData.getMapCgmesInputFiles().get(cgmesFileType);
+    private InputStream getInputStreamFromData(final SweData sweData, final CgmesFileType cgmesFileType) {
+        final SweFileResource sweFileResource = sweData.getMapCgmesInputFiles().get(cgmesFileType);
         if (sweFileResource != null) {
             return fileImporter.importCgmesFiles(sweFileResource.getUrl());
         } else {
@@ -209,11 +223,11 @@ public class CgmesExportService {
         }
     }
 
-    private void updateControlAreasExtension(Network network) {
-        CgmesControlAreas controlAreas = network.getExtension(CgmesControlAreas.class);
+    private void updateControlAreasExtension(final Network network) {
+        final CgmesControlAreas controlAreas = network.getExtension(CgmesControlAreas.class);
         if (controlAreas != null && controlAreas.getCgmesControlAreas().size() == 1) {
             // We use this method for each subnetwork, we should have only one ControlArea by subnetwork
-            Optional<CgmesControlArea> controlAreaOpt = controlAreas.getCgmesControlAreas().stream().findFirst();
+            final Optional<CgmesControlArea> controlAreaOpt = controlAreas.getCgmesControlAreas().stream().findFirst();
             controlAreaOpt.ifPresent(controlArea -> {
                 controlArea.setNetInterchange(computeNetInterchange(network));
                 controlArea.setPTolerance(DEFAULT_P_TOLERANCE);
@@ -221,11 +235,11 @@ public class CgmesExportService {
         }
     }
 
-    private double computeNetInterchange(Network network) {
+    private double computeNetInterchange(final Network network) {
         return network.getDanglingLineStream().filter(dl -> !Double.isNaN(dl.getBoundary().getP())).mapToDouble(dl -> dl.getBoundary().getP()).sum();
     }
 
-    String buildCgmesFilename(SweData sweData, String tso, String type, String version) {
+    String buildCgmesFilename(final SweData sweData, final String tso, final String type, final String version) {
         return CGMES_FORMATTER.format(sweData.getTimestamp())
                 .replace("[process]", ProcessType.IDCC_IDCF == sweData.getProcessType() ?
                         computeTimeDifference(sweData.getTimestamp()) : sweData.getProcessType().getCode())
@@ -242,7 +256,7 @@ public class CgmesExportService {
         return String.format("%02d", hoursCapped);
     }
 
-    String buildFileType(DichotomyDirection direction) {
+    String buildFileType(final DichotomyDirection direction) {
         return "CGM_" + direction.getShortName();
     }
 }
