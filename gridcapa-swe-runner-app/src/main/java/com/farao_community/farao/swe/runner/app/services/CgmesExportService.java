@@ -72,22 +72,16 @@ public class CgmesExportService {
 
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
-    private final ProcessConfiguration processConfiguration;
     private final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
-    private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
-
-    private static final Properties SV_FILE_EXPORT_PARAMS = new Properties();
+    private static final Properties SSH_SV_FILE_EXPORT_PARAMS = new Properties();
 
     static {
-        SSH_FILES_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SSH");
-        SSH_FILES_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-        SSH_FILES_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, "cgmes");
-
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SV");
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, "cgmes");
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.UPDATE_DEPENDENCIES, false);
+        SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.PROFILES, List.of("SV", "SSH"));
+        SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
+        SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, "cgmes");
+        SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.CGM_EXPORT, true);
+        SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.UPDATE_DEPENDENCIES, true);
     }
 
     public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration, RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService) {
@@ -95,9 +89,8 @@ public class CgmesExportService {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
-        this.processConfiguration = processConfiguration;
         this.removeRemoteVoltageRegulationInFranceService = removeRemoteVoltageRegulationInFranceService;
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
+        SSH_SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
     }
 
     public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweTaskParameters sweTaskParameters) {
@@ -143,16 +136,8 @@ public class CgmesExportService {
         LOGGER.info("Building SSH and SV files");
         Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
         mergedNetwork.getSubnetworks().forEach(this::updateControlAreasExtension);
-        Properties exportParams = new Properties();
-        exportParams.put(CgmesExport.PROFILES, List.of("SV", "SSH"));
-        exportParams.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-        exportParams.put(CgmesExport.NAMING_STRATEGY, "cgmes");
-        exportParams.put(CgmesExport.CGM_EXPORT, true);
-        exportParams.put(CgmesExport.UPDATE_DEPENDENCIES, true);
-        exportParams.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
-
         MemDataSource memDataSource = new MemDataSource();
-        mergedNetwork.write("CGMES", exportParams, memDataSource);
+        mergedNetwork.write("CGMES", SSH_SV_FILE_EXPORT_PARAMS, memDataSource);
         String outputVersion = incrementInitialVersion(mergedNetwork);
         for (Map.Entry<Country, String> entry : TSO_BY_COUNTRY.entrySet()) {
             Country country = entry.getKey();
@@ -177,13 +162,15 @@ public class CgmesExportService {
 
     private String incrementInitialVersion(Network mergedNetwork) {
         // the version of ssh should be incremented from the initial version
-        // The verison in the output filename should be the same as in the "fullModel"
-        Optional<Network> subnetwork = mergedNetwork.getSubnetworks().stream().findFirst(); //todo this work only if input SSH and SV have the same version
+        // The version in the output filename should be the same as in the "fullModel"
+        Optional<Network> subnetwork = mergedNetwork.getSubnetworks()
+                .stream()
+                .findFirst();
         if (subnetwork.isPresent()) {
             CgmesMetadataModels modelsExtension = subnetwork.get().getExtension(CgmesMetadataModels.class);
             if (modelsExtension != null && modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).isPresent()) {
                 int initialVersion = modelsExtension.getModelForSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS).get().getVersion();
-                return getFormattedVersionString(initialVersion + 1); //todo to confirm with powsybl: Currently there is the same version in SV and SSH
+                return getFormattedVersionString(initialVersion + 1);
             }
         }
         return DEFAULT_VERSION;
@@ -203,19 +190,6 @@ public class CgmesExportService {
 
     private static String getFormattedVersionString(int version) {
         return String.format("%03d", version);
-    }
-
-    private void updateModelAuthorityParameter(String tso) {
-        if (tso.equals(TSO_BY_COUNTRY.get(Country.FR))) {
-            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
-                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.FR), MODELING_AUTHORITY_DEFAULT_VALUE));
-        } else if (tso.equals(TSO_BY_COUNTRY.get(Country.ES))) {
-            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
-                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.ES), MODELING_AUTHORITY_DEFAULT_VALUE));
-        } else if (tso.equals(TSO_BY_COUNTRY.get(Country.PT))) {
-            SSH_FILES_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET,
-                    processConfiguration.getModelingAuthorityMap().getOrDefault(TSO_BY_COUNTRY.get(Country.PT), MODELING_AUTHORITY_DEFAULT_VALUE));
-        }
     }
 
     private Map<String, ByteArrayOutputStream> createOneFile(SweData sweData, CgmesFileType cgmesFileType) throws IOException {
