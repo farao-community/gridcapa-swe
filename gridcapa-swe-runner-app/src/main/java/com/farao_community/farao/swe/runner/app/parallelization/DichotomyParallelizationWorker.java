@@ -22,10 +22,10 @@ import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -68,7 +68,7 @@ public class DichotomyParallelizationWorker {
 
         if (dichotomyResult.isRaoFailed()) {
             final String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
-            return new AsyncResult<>(new SweDichotomyResult(direction, dichotomyResult, lowestInvalidStepUrl));
+            return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, lowestInvalidStepUrl));
         }
 
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
@@ -79,6 +79,6 @@ public class DichotomyParallelizationWorker {
         outputService.buildAndExportVoltageDoc(direction, sweData, voltageMonitoringResult, sweTaskParameters);
         dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult, sweTaskParameters);
         // fill response for one dichotomy
-        return new AsyncResult<>(new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl));
+        return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl));
     }
 }
