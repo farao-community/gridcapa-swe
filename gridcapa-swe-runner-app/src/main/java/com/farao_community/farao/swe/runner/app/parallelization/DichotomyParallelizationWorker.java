@@ -15,10 +15,12 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.post_processing.PstSeries;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
+import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
@@ -69,6 +71,17 @@ public class DichotomyParallelizationWorker {
         if (dichotomyResult.isRaoFailed()) {
             final String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
             return new AsyncResult<>(new SweDichotomyResult(direction, dichotomyResult, lowestInvalidStepUrl));
+        }
+
+        if (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) {
+            if (!Double.isNaN(dichotomyResult.getLowestInvalidStepValue())) {
+                final PstSeries pstSeries = new PstSeries(direction == DichotomyDirection.ES_FR ? sweData.getNetworkEsFr() : sweData.getNetworkFrEs(),
+                        // Check first unsecure for pst regulation
+                        dichotomyResult.getLowestInvalidStep().getRaoResult(),
+                        OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters),
+                        sweData.getCracFrEs().getCrac());
+                pstSeries.runRegulationLoadFLow();
+            }
         }
 
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
