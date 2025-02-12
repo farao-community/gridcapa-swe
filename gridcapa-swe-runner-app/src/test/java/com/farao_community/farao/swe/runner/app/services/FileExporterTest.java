@@ -18,7 +18,7 @@ import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.impl.CracImpl;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
-import com.powsybl.openrao.raoapi.parameters.SecondPreventiveRaoParameters;
+import com.powsybl.openrao.raoapi.parameters.extensions.SecondPreventiveRaoParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -129,24 +129,16 @@ class FileExporterTest {
     }
 
     @Test
-    void sweRaoParametersEsFrTest() {
+    void sweRaoParametersTest() {
         SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false")));
         RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters);
-        assertEquals(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED, raoParameters.getSecondPreventiveRaoParameters().getExecutionCondition());
-    }
-
-    @Test
-    void sweRaoParametersEsPtTest() {
-        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false")));
-        RaoParameters raoParameters = fileExporter.getSweRaoParameters(sweTaskParameters);
-        assertEquals(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED, raoParameters.getSecondPreventiveRaoParameters().getExecutionCondition());
+        assertEquals(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED, SecondPreventiveRaoParameters.getSecondPreventiveExecutionCondition(raoParameters));
     }
 
     @Test
     void adaptTargetProcessName() {
         assertEquals("SWE_D2CC", fileExporter.adaptTargetProcessName(ProcessType.D2CC));
         assertEquals("SWE_IDCC", fileExporter.adaptTargetProcessName(ProcessType.IDCC));
-
     }
 
     @Test
