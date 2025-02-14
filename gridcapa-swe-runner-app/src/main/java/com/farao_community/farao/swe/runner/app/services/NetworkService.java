@@ -227,16 +227,17 @@ public class NetworkService {
                 hvdcInformation.setSide2GeneratorTargetP(generator.getTargetP());
             });
 
-            loadSide1.ifPresentOrElse(load -> {
-                hvdcInformation.setSide1LoadConnected(load.getTerminal().isConnected());
-                hvdcInformation.setSide1LoadP(load.getP0());
-            }, () -> {
-                Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.ONE).get(2)))
-                        .ifPresent(loadWithSecondOptionId -> {
-                            hvdcInformation.setSide1option2LoadP(loadWithSecondOptionId.getP0());
-                            hvdcInformation.setSide1Option2LoadConnected(loadWithSecondOptionId.getTerminal().isConnected());
-                        });
-            });
+            loadSide1.ifPresentOrElse(
+                load -> {
+                    hvdcInformation.setSide1LoadConnected(load.getTerminal().isConnected());
+                    hvdcInformation.setSide1LoadP(load.getP0());
+                },
+                () -> Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.ONE).get(2)))
+                    .ifPresent(loadWithSecondOptionId -> {
+                        hvdcInformation.setSide1LoadConnected(loadWithSecondOptionId.getTerminal().isConnected());
+                        hvdcInformation.setSide1LoadP(loadWithSecondOptionId.getP0());
+                    })
+            );
 
             loadSide2.ifPresent(load -> {
                 hvdcInformation.setSide2LoadConnected(load.getTerminal().isConnected());

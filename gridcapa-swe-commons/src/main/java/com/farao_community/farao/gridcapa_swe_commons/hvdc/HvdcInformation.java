@@ -21,9 +21,6 @@ public class HvdcInformation {
     private boolean isSide1LoadConnected;
     private double side1LoadP;
 
-    private boolean isSide1Option2LoadConnected;
-    private double side1option2LoadP;
-
     private boolean isSide2LoadConnected;
     private double side2LoadP;
 
@@ -60,14 +57,6 @@ public class HvdcInformation {
 
     public double getSide1LoadP() {
         return side1LoadP;
-    }
-
-    public boolean isSide1Option2LoadConnected() {
-        return isSide1Option2LoadConnected;
-    }
-
-    public double getSide1option2LoadP() {
-        return side1option2LoadP;
     }
 
     public boolean isSide2LoadConnected() {
@@ -108,14 +97,6 @@ public class HvdcInformation {
 
     public void setSide1LoadP(final double side1LoadP) {
         this.side1LoadP = side1LoadP;
-    }
-
-    public void setSide1Option2LoadConnected(final boolean side1Option2LoadConnected) {
-        isSide1Option2LoadConnected = side1Option2LoadConnected;
-    }
-
-    public void setSide1option2LoadP(final double side1option2LoadP) {
-        this.side1option2LoadP = side1option2LoadP;
     }
 
     public void setSide2LoadConnected(final boolean side2LoadConnected) {
