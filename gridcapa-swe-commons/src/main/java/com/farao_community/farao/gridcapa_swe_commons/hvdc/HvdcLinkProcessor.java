@@ -18,6 +18,7 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.VoltageLevel;
+import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
 
@@ -34,6 +35,7 @@ import java.util.Set;
  * Replaces an HVDC line's equivalent AC model with an actual HVDC line, and vice-versa
  *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
+ * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public final class HvdcLinkProcessor {
     private HvdcLinkProcessor() {
@@ -67,37 +69,39 @@ public final class HvdcLinkProcessor {
         }
     }
 
-    private static void disconnectGeneratorsAndLoads(Network network, HvdcCreationParameters creationParameters,
-                                                     Map<NetworkElement, Collection<String>> missingElementsMap) {
+    private static void disconnectElement(Optional<? extends Injection> optionalElement) {
+        optionalElement.ifPresent(element -> element.getTerminal().disconnect());
+    }
 
-        getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap)
-            .ifPresentOrElse(
-                load -> load.getTerminal().disconnect(),
-                () -> getOptionalLoadWithSecondIdOption(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap)
-            );
-
-        getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.ONE), missingElementsMap)
-            .ifPresent(load -> load.getTerminal().disconnect());
-        getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.TWO), missingElementsMap)
-            .ifPresent(load -> load.getTerminal().disconnect());
-        getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO), missingElementsMap)
-            .ifPresent(load -> load.getTerminal().disconnect());
+    private static void disconnectGeneratorAndLoad(Optional<Load> optionalLoad1, Optional<Load> optionalLoad2,
+                                                   Optional<Generator> optionalGenerator1, Optional<Generator> optionalGenerator2) {
+        // Disconnect both loads and generators
+        disconnectElement(optionalLoad1);
+        disconnectElement(optionalLoad2);
+        disconnectElement(optionalGenerator1);
+        disconnectElement(optionalGenerator2);
     }
 
     private static void replaceEquivalentModelByHvdc(Network network, HvdcCreationParameters creationParameters,
                                                      Map<NetworkElement, Collection<String>> missingElementsMap) {
-        // Disconnect equivalent generators & loads on both sides
-        disconnectGeneratorsAndLoads(network, creationParameters, missingElementsMap);
-
+        // Search Load and Generator
+        Optional<Load> optionalLoad1 = getLoadWithFallback(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap);
+        Optional<Load> optionalLoad2 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.TWO), missingElementsMap);
+        Optional<Generator> optionalGenerator1 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.ONE), missingElementsMap);
+        Optional<Generator> optionalGenerator2 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO), missingElementsMap);
         Optional<Line> optionalLine = getOptionalLine(network, creationParameters.getEquivalentAcLineId(), missingElementsMap);
-        if (missingElementsMap.isEmpty()) {
+
+        // Disconnect Load and Generator if present
+        disconnectGeneratorAndLoad(optionalLoad1, optionalLoad2, optionalGenerator1, optionalGenerator2);
+
+        if (optionalGenerator1.isPresent() && optionalGenerator2.isPresent() && optionalLine.isPresent()) {
             // Create one VSC converter station on each side
             createVscStation(network, creationParameters, TwoSides.ONE, missingElementsMap);
             createVscStation(network, creationParameters, TwoSides.TWO, missingElementsMap);
-
             // Create the HVDC line
             createHvdcLine(optionalLine, network, creationParameters, missingElementsMap);
         }
+
         //Disconnect the Ac line
         optionalLine.ifPresent(line -> {
             line.getTerminal1().disconnect();
@@ -180,7 +184,7 @@ public final class HvdcLinkProcessor {
     private static void replaceHvdcByEquivalentModel(Network network, HvdcCreationParameters creationParameters,
                                                      Map<NetworkElement, Collection<String>> missingElementsMap, List<HvdcInformation> hvdcInformationList) {
 
-        Optional<Load> optionalLoad1 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap);
+        Optional<Load> optionalLoad1 = getLoadWithFallback(network, creationParameters.getEquivalentLoadId(TwoSides.ONE), missingElementsMap);
         Optional<Generator> optionalGen1 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.ONE), missingElementsMap);
         Optional<Load> optionalLoad2 = getOptionalLoad(network, creationParameters.getEquivalentLoadId(TwoSides.TWO), missingElementsMap);
         Optional<Generator> optionalGen2 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO), missingElementsMap);
@@ -188,7 +192,9 @@ public final class HvdcLinkProcessor {
 
         HvdcLine hvdcLine = network.getHvdcLine(creationParameters.getId());
         if (hvdcLine != null) {
-            connectEquivalentGeneratorsAndLoads(optionalLoad1, optionalGen1, optionalLoad2, optionalGen2, hvdcLine);
+            connectEquivalentGenerators(optionalGen1, optionalGen2, hvdcLine);
+            connectEquivalentLoad(optionalLoad1, hvdcLine, true);
+            connectEquivalentLoad(optionalLoad2, hvdcLine, false);
             connectEquivalentAcLine(optionalLine, hvdcLine);
 
             network.getHvdcLine(creationParameters.getId()).remove();
@@ -252,38 +258,46 @@ public final class HvdcLinkProcessor {
         });
     }
 
-    private static void connectEquivalentGeneratorsAndLoads(Optional<Load> optionalLoad1, Optional<Generator> optionalGen1, Optional<Load> optionalLoad2, Optional<Generator> optionalGen2,
-                                                            HvdcLine hvdcLine) {
-
-        if (optionalLoad1.isPresent() && optionalGen1.isPresent() && optionalLoad2.isPresent() && optionalGen2.isPresent()) {
-            Load load1 = optionalLoad1.get();
-            Load load2 = optionalLoad2.get();
+    private static void connectEquivalentGenerators(Optional<Generator> optionalGen1, Optional<Generator> optionalGen2,
+                                                    HvdcLine hvdcLine) {
+        if (optionalGen1.isPresent()  && optionalGen2.isPresent()) {
             Generator gen1 = optionalGen1.get();
             Generator gen2 = optionalGen2.get();
-            load1.getTerminal().connect();
             gen1.getTerminal().connect();
-            load2.getTerminal().connect();
             gen2.getTerminal().connect();
             HvdcAngleDroopActivePowerControl angleDroopActivePowerControl = hvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class);
             if (angleDroopActivePowerControl != null && angleDroopActivePowerControl.isEnabled()) {
-                load1.setP0(0);
                 gen1.setTargetP(0);
-                load2.setP0(0);
                 gen2.setTargetP(0);
             } else {
                 double setpoint = hvdcLine.getActivePowerSetpoint();
                 if (hvdcLine.getConvertersMode().equals(HvdcLine.ConvertersMode.SIDE_1_RECTIFIER_SIDE_2_INVERTER)) {
-                    // If power flow is from Side1 -> Side2 : set power on load1 & gen2
-                    load1.setP0(setpoint);
+                    // If power flow is from Side1 -> Side2 : set power on gen2
                     gen2.setTargetP(setpoint);
-                    load2.setP0(0);
                     gen1.setTargetP(0);
                 } else {
-                    // If power flow is from Side2 -> Side1 : set power on load2 & gen1
-                    load2.setP0(setpoint);
+                    // If power flow is from Side2 -> Side1 : set power on gen1
                     gen1.setTargetP(setpoint);
-                    load1.setP0(0);
                     gen2.setTargetP(0);
+                }
+            }
+        }
+    }
+
+    private static void connectEquivalentLoad(Optional<Load> optionalLoad, HvdcLine hvdcLine, boolean isSide1) {
+        if (optionalLoad.isPresent()) {
+            Load load = optionalLoad.get();
+            load.getTerminal().connect();
+
+            HvdcAngleDroopActivePowerControl angleDroopActivePowerControl = hvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class);
+            if (angleDroopActivePowerControl != null && angleDroopActivePowerControl.isEnabled()) {
+                load.setP0(0);
+            } else {
+                double setpoint = hvdcLine.getActivePowerSetpoint();
+                if (hvdcLine.getConvertersMode().equals(HvdcLine.ConvertersMode.SIDE_1_RECTIFIER_SIDE_2_INVERTER)) {
+                    load.setP0(isSide1 ? setpoint : 0);
+                } else {
+                    load.setP0(isSide1 ? 0 : setpoint);
                 }
             }
         }
@@ -316,6 +330,17 @@ public final class HvdcLinkProcessor {
         return load;
     }
 
+    // Utility method to get Load, falling back to the second ID option if needed
+    private static Optional<Load> getLoadWithFallback(Network network, Map<Integer, String> idsByPriority,
+                                                      Map<NetworkElement, Collection<String>> missingElementsMap) {
+        Optional<Load> load = getOptionalLoad(network, idsByPriority, missingElementsMap);
+        if (load.isEmpty()) {
+            // Fallback to second load ID if the first one is not present
+            load = getOptionalLoadWithSecondIdOption(network, idsByPriority, missingElementsMap);
+        }
+        return load;
+    }
+
     private static Optional<Line> getOptionalLine(Network network, String id,
                                                   Map<NetworkElement, Collection<String>> missingElementsMap) {
         Optional<Line> line = Optional.ofNullable(network.getLine(id));
@@ -327,7 +352,12 @@ public final class HvdcLinkProcessor {
 
     private static String buildExceptionMessage(Map<NetworkElement, Collection<String>> missingElementsMap) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("HVDC not created. Some network elements missing in input CGM prevent from creating HVDC devices needed by the process :");
+        if (missingElementsMap.containsKey(NetworkElement.GENERATOR) || missingElementsMap.containsKey(NetworkElement.LINE)) {
+            sb.append("HVDC not created. Some network elements missing in input CGM prevent from creating HVDC devices needed by the process: ");
+        } else {
+            sb.append("HVDC created even if Load is missing. Missing elements in input CGM: ");
+        }
+
         missingElementsMap.forEach((k, v) -> {
             sb.append("\n")
                     .append(k.message)

@@ -241,8 +241,8 @@ public class NetworkService {
                 },
                 () -> Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.ONE).get(2)))
                     .ifPresent(loadWithSecondOptionId -> {
-                        hvdcInformation.setSide1option2LoadP(loadWithSecondOptionId.getP0());
-                        hvdcInformation.setSide1Option2LoadConnected(loadWithSecondOptionId.getTerminal().isConnected());
+                        hvdcInformation.setSide1LoadConnected(loadWithSecondOptionId.getTerminal().isConnected());
+                        hvdcInformation.setSide1LoadP(loadWithSecondOptionId.getP0());
                     })
             );
 
