@@ -52,14 +52,15 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
+    private static final String XIIDM = "XIIDM";
     private static final String ZIP_EXT = ".zip";
     private static final String XML_EXT = ".xml";
-    private final DateTimeFormatter cgmesFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
-    private final DateTimeFormatter networkFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
-    public static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
+    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
+    private static final DateTimeFormatter NETWORK_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
+    private static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
     private final MinioAdapter minioAdapter;
     private final VoltageResultMapper voltageResultMapper;
 
@@ -73,14 +74,14 @@ public class FileExporter {
 
     public void saveMergedNetworkWithHvdc(Network network, OffsetDateTime targetDateTime) {
         MemDataSource memDataSource = new MemDataSource();
-        network.write("XIIDM", new Properties(), memDataSource);
+        network.write(XIIDM, new Properties(), memDataSource);
         InputStream xiidm;
         try {
             xiidm = memDataSource.newInputStream("", "xiidm");
         } catch (IOException e) {
             throw new SweInternalException("Could not export XIIDM file", e);
         }
-        minioAdapter.uploadArtifactForTimestamp("XIIDM/" + networkFormatter.format(targetDateTime), xiidm, "SWE", "", targetDateTime);
+        minioAdapter.uploadArtifactForTimestamp("XIIDM/" + NETWORK_FORMATTER.format(targetDateTime), xiidm, "SWE", "", targetDateTime);
     }
 
     /**
@@ -158,21 +159,16 @@ public class FileExporter {
     }
 
     public String saveNetworkInArtifact(Network network, String networkFilePath, String fileType, OffsetDateTime processTargetDateTime, ProcessType processType) {
-        exportAndUploadNetwork(network, "XIIDM", GridcapaFileGroup.ARTIFACT, networkFilePath, fileType, processTargetDateTime, processType);
+        exportAndUploadNetwork(network, XIIDM, GridcapaFileGroup.ARTIFACT, networkFilePath, fileType, processTargetDateTime, processType);
         return minioAdapter.generatePreSignedUrl(networkFilePath);
     }
 
     String exportAndUploadNetwork(Network network, String format, GridcapaFileGroup fileGroup, String filePath, String fileType, OffsetDateTime offsetDateTime, ProcessType processType) {
         try (InputStream is = getNetworkInputStream(network, format)) {
             switch (fileGroup) {
-                case OUTPUT:
-                    minioAdapter.uploadOutputForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
-                    break;
-                case ARTIFACT:
-                    minioAdapter.uploadArtifactForTimestamp(filePath.replace(":", ""), is, adaptTargetProcessName(processType), fileType, offsetDateTime);
-                    break;
-                default:
-                    throw new UnsupportedOperationException(String.format("File group %s not supported", fileGroup));
+                case OUTPUT -> minioAdapter.uploadOutputForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
+                case ARTIFACT -> minioAdapter.uploadArtifactForTimestamp(filePath.replace(":", ""), is, adaptTargetProcessName(processType), fileType, offsetDateTime);
+                default -> throw new UnsupportedOperationException(String.format("File group %s not supported", fileGroup));
             }
         } catch (IOException e) {
             throw new SweInternalException("Error while trying to save network", e);
@@ -182,16 +178,17 @@ public class FileExporter {
 
     private InputStream getNetworkInputStream(Network network, String format) throws IOException {
         MemDataSource memDataSource = new MemDataSource();
-        switch (format) {
-            case "UCTE":
+        return switch (format) {
+            case "UCTE" -> {
                 network.write("UCTE", new Properties(), memDataSource);
-                return memDataSource.newInputStream("", "uct");
-            case "XIIDM":
-                network.write("XIIDM", new Properties(), memDataSource);
-                return memDataSource.newInputStream("", "xiidm");
-            default:
-                throw new UnsupportedOperationException(String.format("Network format %s not supported", format));
-        }
+                yield memDataSource.newInputStream("", "uct");
+            }
+            case XIIDM -> {
+                network.write(XIIDM, new Properties(), memDataSource);
+                yield memDataSource.newInputStream("", "xiidm");
+            }
+            default -> throw new UnsupportedOperationException(String.format("Network format %s not supported", format));
+        };
     }
 
     public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
@@ -230,8 +227,8 @@ public class FileExporter {
                 zipOs.putNextEntry(new ZipEntry(originalFileName + ZIP_EXT));
                 zipOs.write(createInternalZip(entry.getValue().toByteArray(), originalFileName + XML_EXT));
             }
-            zipOs.close();
-            baos.close();
+            zipOs.close(); // NOSONAR because outputStreams must be closed before calling toByteArray() method
+            baos.close(); // NOSONAR because outputStreams must be closed before calling toByteArray() method
 
             try (InputStream is = new ByteArrayInputStream(baos.toByteArray())) {
                 minioAdapter.uploadOutputForTimestamp(cgmesPath, is, adaptTargetProcessName(sweData.getProcessType()), filetype, sweData.getTimestamp());
@@ -251,7 +248,7 @@ public class FileExporter {
 
     String getCgmZipFileName(OffsetDateTime offsetDateTime, DichotomyDirection direction) {
         OffsetDateTime localTime = OffsetDateTime.ofInstant(offsetDateTime.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-        return cgmesFormatter.format(localTime).replace("[direction]", direction.getDashName().replace("-", ""));
+        return CGMES_FORMATTER.format(localTime).replace("[direction]", direction.getDashName().replace("-", ""));
     }
 
     public String adaptTargetProcessName(ProcessType processType) {

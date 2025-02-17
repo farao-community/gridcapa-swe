@@ -94,11 +94,12 @@ class DichotomyLoggingTest {
         DichotomyLogging dichotomyLogging = new DichotomyLogging(logger, processConfiguration);
         dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty(), sweTaskParameters);
         //Then
-        String summary = "Summary :\n" +
-                "Limiting event : {},\n" +
-                "Limiting element : {},\n" +
-                "PRAs : {},\n" +
-                "CRAs : {}.";
+        String summary = """
+                Summary :
+                Limiting event : {},
+                Limiting element : {},
+                PRAs : {},
+                CRAs : {}.""";
         String summaryBd = """
                 Summary BD :  {}
                 Current TTC : {},

@@ -53,7 +53,7 @@ public final class HvdcCreationParametersArrayDeserializer {
             HvdcAcEquivalentModel hvdcAcEquivalentModel = null;
 
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case ID:
                         id = jsonParser.nextTextValue();
                         break;
@@ -85,7 +85,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                         hvdcAcEquivalentModel = HvdcAcEquivalentModelDeserializer.deserialize(jsonParser);
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in HvdcCreationParameters: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in HvdcCreationParameters: " + jsonParser.currentName());
                 }
             }
 
@@ -114,16 +114,14 @@ public final class HvdcCreationParametersArrayDeserializer {
             Double defaultVoltageSetpoint = null;
 
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case SIDE:
                         int sideInt = jsonParser.nextIntValue(0);
-                        if (sideInt == 1) {
-                            side = TwoSides.ONE;
-                        } else if (sideInt == 2) {
-                            side = TwoSides.TWO;
-                        } else {
-                            throw new IllegalArgumentException("VscStationCreationParameters Side must be 1 or 2");
-                        }
+                        side = switch (sideInt) {
+                            case 1 -> TwoSides.ONE;
+                            case 2 -> TwoSides.TWO;
+                            default -> throw new IllegalArgumentException("VscStationCreationParameters Side must be 1 or 2");
+                        };
                         break;
                     case ID:
                         id = jsonParser.nextTextValue();
@@ -144,7 +142,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                         defaultVoltageSetpoint = jsonParser.getDoubleValue();
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in VscStationCreationParameters: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in VscStationCreationParameters: " + jsonParser.currentName());
                 }
             }
             return Pair.create(side, new VscStationCreationParameters(id, reactivePowerSetpoint, lossFactor, voltageRegulatorOn, defaultVoltageSetpoint));
@@ -159,7 +157,7 @@ public final class HvdcCreationParametersArrayDeserializer {
             Float p0 = null;
             Float droop = null;
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case P0:
                         jsonParser.nextToken();
                         p0 = jsonParser.getFloatValue();
@@ -169,7 +167,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                         droop = jsonParser.getFloatValue();
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in AngleDroopActivePowerControlParameters: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in AngleDroopActivePowerControlParameters: " + jsonParser.currentName());
                 }
             }
             return new AngleDroopActivePowerControlParameters(p0, droop);
@@ -195,7 +193,7 @@ public final class HvdcCreationParametersArrayDeserializer {
             Map<Integer, String> idsByPriority = new HashMap<>();
             String acLineId = null;
             while (!jsonParser.nextToken().isStructEnd()) {
-                switch (jsonParser.getCurrentName()) {
+                switch (jsonParser.currentName()) {
                     case SIDE_1_GEN_ID:
                         generatorIds.put(TwoSides.ONE, jsonParser.nextTextValue());
                         break;
@@ -215,7 +213,7 @@ public final class HvdcCreationParametersArrayDeserializer {
                         acLineId = jsonParser.nextTextValue();
                         break;
                     default:
-                        throw new NoSuchFieldException("Unexpected field in HvdcAcEquivalentModel: " + jsonParser.getCurrentName());
+                        throw new NoSuchFieldException("Unexpected field in HvdcAcEquivalentModel: " + jsonParser.currentName());
                 }
             }
             loadIds.put(TwoSides.ONE, idsByPriority);

@@ -52,7 +52,7 @@ public class SweNetworkShifter implements NetworkShifter {
     private final ProcessConfiguration processConfiguration;
     private final LoadFlowParameters loadFlowParameters;
 
-    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration, LoadFlowParameters loadFlowParameters) {
+    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration, LoadFlowParameters loadFlowParameters) { // NOSONAR
         this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
@@ -149,7 +149,7 @@ public class SweNetworkShifter implements NetworkShifter {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
-    private Map<String, Double> shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, ScalableGeneratorConnector scalableGeneratorConnector) throws GlskLimitationException {
+    private Map<String, Double> shiftIteration(Network network, Map<String, Double> scalingValuesByCountry, ScalingParameters scalingParameters, ScalableGeneratorConnector scalableGeneratorConnector) {
         Map<String, Double> incompleteShiftCountries = new HashMap<>();
         for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
             String zoneId = entry.getKey();
@@ -214,16 +214,10 @@ public class SweNetworkShifter implements NetworkShifter {
     }
 
     public void updateScalingValuesWithMismatch(Map<String, Double> scalingValuesByCountry, double mismatchEsPt, double mismatchEsFr) {
-        switch (direction) {
-            case ES_FR:
-            case FR_ES:
-                scalingValuesByCountry.put(SweEICode.FR_EIC, scalingValuesByCountry.get(SweEICode.FR_EIC) - mismatchEsFr);
-                break;
-
-            case ES_PT:
-            case PT_ES:
-                scalingValuesByCountry.put(SweEICode.PT_EIC, scalingValuesByCountry.get(SweEICode.PT_EIC) - mismatchEsPt);
-                break;
+        if (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) {
+            scalingValuesByCountry.put(SweEICode.FR_EIC, scalingValuesByCountry.get(SweEICode.FR_EIC) - mismatchEsFr);
+        } else if (direction == DichotomyDirection.ES_PT || direction == DichotomyDirection.PT_ES) {
+            scalingValuesByCountry.put(SweEICode.PT_EIC, scalingValuesByCountry.get(SweEICode.PT_EIC) - mismatchEsPt);
         }
 
         scalingValuesByCountry.put(SweEICode.ES_EIC, scalingValuesByCountry.get(SweEICode.ES_EIC) + mismatchEsPt + mismatchEsFr);

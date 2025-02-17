@@ -69,12 +69,12 @@ class GeneratorLimitsHandlerTest {
     }
 
     private boolean isCountryGeneratorPminEquals(Country country, double expectedValue) {
-        return zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network).stream().map(injection -> (Generator) injection)
+        return zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network).stream().map(Generator.class::cast)
                 .allMatch(generator -> Precision.equals(generator.getMinP(), expectedValue));
     }
 
     private boolean isCountryGeneratorPmaxEquals(Country country, double expectedValue) {
-        return zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network).stream().map(injection -> (Generator) injection)
+        return zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network).stream().map(Generator.class::cast)
                 .allMatch(generator -> Precision.equals(generator.getMaxP(), expectedValue));
     }
 
@@ -86,10 +86,10 @@ class GeneratorLimitsHandlerTest {
         //If targetP > initial Pmax, the new Pmax should correspond to targetP
         assertEquals(9001., network.getGenerator("ESCTGU1 _generator").getMaxP(), 0.01);
         // All generators for ES "ESCTGU1 _generator" have initial Pmin, Pmax
-        assertTrue(zonalScalable.getData(new EICode(Country.ES).getAreaCode()).filterInjections(network).stream().map(injection -> (Generator) injection)
+        assertTrue(zonalScalable.getData(new EICode(Country.ES).getAreaCode()).filterInjections(network).stream().map(Generator.class::cast)
                 .filter(generator -> !"ESCTGU1 _generator".equals(generator.getId()))
                 .allMatch(generator -> Precision.equals(generator.getMinP(), INITIAL_PMIN)));
-        assertTrue(zonalScalable.getData(new EICode(Country.ES).getAreaCode()).filterInjections(network).stream().map(injection -> (Generator) injection)
+        assertTrue(zonalScalable.getData(new EICode(Country.ES).getAreaCode()).filterInjections(network).stream().map(Generator.class::cast)
                 .filter(generator -> !"ESCTGU1 _generator".equals(generator.getId()))
                 .allMatch(generator -> Precision.equals(generator.getMaxP(), INITIAL_PMAX)));
         // All generators for PT have initial Pmin, Pmax

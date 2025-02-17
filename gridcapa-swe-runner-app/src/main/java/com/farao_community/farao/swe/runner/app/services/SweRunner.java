@@ -58,10 +58,11 @@ public class SweRunner {
     }
 
     private void logSweParameters(SweRequest sweRequest, SweTaskParameters sweTaskParameters) {
+        final String sweParametersString = sweTaskParameters.toJsonString();
         if (sweRequest.getTaskParameterList().stream().anyMatch(p -> !Objects.equals(p.getValue(), p.getDefaultValue()))) {
-            businessLogger.warn("SWE task parameters: {}", sweTaskParameters.toJsonString());
+            businessLogger.warn("SWE task parameters: {}", sweParametersString);
         } else {
-            businessLogger.info("SWE task parameters: {}", sweTaskParameters.toJsonString());
+            businessLogger.info("SWE task parameters: {}", sweParametersString);
         }
     }
 

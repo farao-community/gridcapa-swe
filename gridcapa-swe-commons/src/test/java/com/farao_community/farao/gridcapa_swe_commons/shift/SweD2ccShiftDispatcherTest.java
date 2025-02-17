@@ -32,8 +32,8 @@ class SweD2ccShiftDispatcherTest {
 
     @Test
     void dispatchFrEsTest() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
-        SweD2ccShiftDispatcher sweD2ccShiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
+        Map<String, Double> customIntialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        SweD2ccShiftDispatcher sweD2ccShiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, customIntialNetPositions);
         Map<String, Double> shifts = sweD2ccShiftDispatcher.dispatch(1000);
         assertEquals(-1050, shifts.get(SweEICode.ES_EIC), 0.001);
         assertEquals(-150., shifts.get(SweEICode.PT_EIC), 0.001);

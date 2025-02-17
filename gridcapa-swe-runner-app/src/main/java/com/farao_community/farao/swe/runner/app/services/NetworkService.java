@@ -7,36 +7,53 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNoDetailsException;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.configurations.PstConfiguration;
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.computation.local.LocalComputationManager;
-import com.powsybl.iidm.network.*;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Generator;
+import com.powsybl.iidm.network.ImportConfig;
+import com.powsybl.iidm.network.Line;
+import com.powsybl.iidm.network.Load;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.TwoSides;
+import com.powsybl.iidm.network.TwoWindingsTransformer;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -159,7 +176,7 @@ public class NetworkService {
             ZipOutputStream zos = new ZipOutputStream(fos);
 
             for (SweFileResource file : listFiles) {
-                InputStream inputStream = new URL(file.getUrl()).openStream();
+                InputStream inputStream = new URI(file.getUrl()).toURL().openStream();
                 File srcFile = new File(tmp.toAbsolutePath() + File.separator + file.getFilename());
                 FileUtils.copyInputStreamToFile(inputStream, srcFile);
                 FileInputStream fis = new FileInputStream(srcFile);
@@ -174,28 +191,18 @@ public class NetworkService {
             }
             zos.close();
             return zipPath;
-        } catch (IOException ioe) {
-            throw new SweInvalidDataException("Error creating network zip file", ioe);
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
+            throw new SweInvalidDataException("Error creating network zip file", e);
         }
     }
 
     public static Network getNetworkByDirection(SweData sweData, DichotomyDirection direction) {
-        Network network = null;
-        switch (direction) {
-            case ES_FR:
-                network = sweData.getNetworkEsFr();
-                break;
-            case ES_PT:
-                network =  sweData.getNetworkEsPt();
-                break;
-            case FR_ES:
-                network =  sweData.getNetworkFrEs();
-                break;
-            case PT_ES:
-                network =  sweData.getNetworkPtEs();
-                break;
-        }
-        return network;
+        return switch (direction) {
+            case ES_FR -> sweData.getNetworkEsFr();
+            case ES_PT -> sweData.getNetworkEsPt();
+            case FR_ES -> sweData.getNetworkFrEs();
+            case PT_ES -> sweData.getNetworkPtEs();
+        };
     }
 
     List<HvdcInformation> getHvdcInformationFromNetwork(Network network) {

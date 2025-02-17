@@ -32,17 +32,12 @@ public final class DichotomyResultHelper {
 
     public static String limitingCauseToString(LimitingCause limitingCause) {
         // For the event, we don't use dichotomyResult.getLimitingFailureMessage() because it contains the exception message
-        switch (limitingCause) {
-            case CRITICAL_BRANCH:
-                return "Critical Branch";
-            case GLSK_LIMITATION:
-                return "GSK Limitation";
-            case COMPUTATION_FAILURE:
-                return "Computation Failure";
-            case INDEX_EVALUATION_OR_MAX_ITERATION:
-            default:
-                return "None";
-        }
+        return switch (limitingCause) {
+            case CRITICAL_BRANCH -> "Critical Branch";
+            case GLSK_LIMITATION -> "GSK Limitation";
+            case COMPUTATION_FAILURE -> "Computation Failure";
+            default -> "None";
+        };
     }
 
     public static String getLimitingElement(Crac crac, RaoResult raoResult) {
@@ -65,7 +60,7 @@ public final class DichotomyResultHelper {
 
     public static List<String> getActivatedActionInPreventive(Crac crac, RaoResult raoResult) {
         List<String> prasNames = raoResult.getActivatedNetworkActionsDuringState(crac.getPreventiveState()).stream().map(NetworkAction::getName).collect(Collectors.toList());
-        prasNames.addAll(raoResult.getActivatedRangeActionsDuringState(crac.getPreventiveState()).stream().map(RangeAction::getName).collect(Collectors.toList()));
+        prasNames.addAll(raoResult.getActivatedRangeActionsDuringState(crac.getPreventiveState()).stream().map(RangeAction::getName).toList());
         return prasNames;
     }
 

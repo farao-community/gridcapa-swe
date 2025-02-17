@@ -61,6 +61,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -299,19 +300,19 @@ class CneFileExportServiceTest {
         final Object criticalElementExt = unmarshaller.unmarshal(new ByteArrayInputStream(zipContent));
         Assertions.assertThat(criticalElementExt)
                 .isInstanceOf(CriticalNetworkElementMarketDocument.class)
-                .extracting("timeSeries").asList()
+                .extracting("timeSeries").asInstanceOf(LIST)
                 .hasSize(1)
                 .first()
                 .isInstanceOf(TimeSeries.class)
-                .extracting("period").asList()
+                .extracting("period").asInstanceOf(LIST)
                 .hasSize(1)
                 .first()
                 .isInstanceOf(SeriesPeriod.class)
-                .extracting("point").asList()
+                .extracting("point").asInstanceOf(LIST)
                 .hasSize(1)
                 .first()
                 .isInstanceOf(Point.class)
-                .extracting("reason").asList()
+                .extracting("reason").asInstanceOf(LIST)
                 .hasSize(1)
                 .first()
                 .isInstanceOf(Reason.class)
