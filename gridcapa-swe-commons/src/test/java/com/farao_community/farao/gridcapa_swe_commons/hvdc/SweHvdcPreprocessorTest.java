@@ -24,4 +24,14 @@ class SweHvdcPreprocessorTest {
         swePreprocessor.applyParametersToNetwork(parameters, network);
         TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs.xiidm", getClass());
     }
+
+    @Test
+    void testAddHvdcWhenGeneratorDisconnect() {
+        SweHvdcPreprocessor swePreprocessor = new SweHvdcPreprocessor();
+        InputStream parameters = getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json");
+        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        network.getGenerator("BBE2AA1 _generator").getTerminal().disconnect();
+        swePreprocessor.applyParametersToNetwork(parameters, network);
+        TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_2HVDCs_expected_after_disconnect_generator.xiidm", getClass());
+    }
 }
