@@ -42,7 +42,7 @@
             </iidm:generator>
             <iidm:load id="BBE2AA1 _load" loadType="UNDEFINED" p0="0.0" q0="0.0" connectableBus="BBE2AA1 "/>
             <iidm:load id="BBE3AA1 _load" loadType="UNDEFINED" p0="1500.0" q0="0.0" bus="BBE3AA1 " connectableBus="BBE3AA1 "/>
-            <iidm:vscConverterStation id="HVDC_BE2-FR3_VSC1" voltageRegulatorOn="false" lossFactor="2.0" voltageSetpoint="400.0" reactivePowerSetpoint="5.0" bus="BBE2AA1 " connectableBus="BBE2AA1 ">
+            <iidm:vscConverterStation id="HVDC_BE2-FR3_VSC1" voltageRegulatorOn="false" lossFactor="2.0" voltageSetpoint="100.0" reactivePowerSetpoint="5.0" bus="BBE2AA1 " connectableBus="BBE2AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-1.7976931348623157E308" maxQ="1.7976931348623157E308"/>
             </iidm:vscConverterStation>
         </iidm:voltageLevel>

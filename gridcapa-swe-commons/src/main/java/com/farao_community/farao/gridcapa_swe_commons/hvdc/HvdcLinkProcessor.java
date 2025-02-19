@@ -91,9 +91,6 @@ public final class HvdcLinkProcessor {
         Optional<Generator> optionalGenerator2 = getOptionalGenerator(network, creationParameters.getEquivalentGeneratorId(TwoSides.TWO), missingElementsMap);
         Optional<Line> optionalLine = getOptionalLine(network, creationParameters.getEquivalentAcLineId(), missingElementsMap);
 
-        // Disconnect Load and Generator if present
-        disconnectGeneratorAndLoad(optionalLoad1, optionalLoad2, optionalGenerator1, optionalGenerator2);
-
         if (optionalGenerator1.isPresent() && optionalGenerator2.isPresent() && optionalLine.isPresent()) {
             // Create one VSC converter station on each side
             createVscStation(network, creationParameters, TwoSides.ONE, missingElementsMap);
@@ -101,6 +98,9 @@ public final class HvdcLinkProcessor {
             // Create the HVDC line
             createHvdcLine(optionalLine, network, creationParameters, missingElementsMap);
         }
+
+        // Disconnect Load and Generator if present
+        disconnectGeneratorAndLoad(optionalLoad1, optionalLoad2, optionalGenerator1, optionalGenerator2);
 
         //Disconnect the Ac line
         optionalLine.ifPresent(line -> {
