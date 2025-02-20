@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
-    <version>1.33.0-SNAPSHOT</version>
+    <version>1.33.0</version>
     <name>GridCapa SWE</name>
     <description>A full suite to perform capacity calculations on SWE zone</description>
     <packaging>pom</packaging>
