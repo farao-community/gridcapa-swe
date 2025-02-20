@@ -25,7 +25,7 @@ import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
-import com.powsybl.openrao.raoapi.parameters.SecondPreventiveRaoParameters;
+import com.powsybl.openrao.raoapi.parameters.extensions.OpenRaoSearchTreeParameters;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import static com.powsybl.openrao.raoapi.parameters.extensions.SecondPreventiveRaoParameters.ExecutionCondition;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -166,9 +168,12 @@ public class FileExporter {
     String exportAndUploadNetwork(Network network, String format, GridcapaFileGroup fileGroup, String filePath, String fileType, OffsetDateTime offsetDateTime, ProcessType processType) {
         try (InputStream is = getNetworkInputStream(network, format)) {
             switch (fileGroup) {
-                case OUTPUT -> minioAdapter.uploadOutputForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
-                case ARTIFACT -> minioAdapter.uploadArtifactForTimestamp(filePath.replace(":", ""), is, adaptTargetProcessName(processType), fileType, offsetDateTime);
-                default -> throw new UnsupportedOperationException(String.format("File group %s not supported", fileGroup));
+                case OUTPUT ->
+                        minioAdapter.uploadOutputForTimestamp(filePath, is, adaptTargetProcessName(processType), fileType, offsetDateTime);
+                case ARTIFACT ->
+                        minioAdapter.uploadArtifactForTimestamp(filePath.replace(":", ""), is, adaptTargetProcessName(processType), fileType, offsetDateTime);
+                default ->
+                        throw new UnsupportedOperationException(String.format("File group %s not supported", fileGroup));
             }
         } catch (IOException e) {
             throw new SweInternalException("Error while trying to save network", e);
@@ -187,7 +192,8 @@ public class FileExporter {
                 network.write(XIIDM, new Properties(), memDataSource);
                 yield memDataSource.newInputStream("", "xiidm");
             }
-            default -> throw new UnsupportedOperationException(String.format("Network format %s not supported", format));
+            default ->
+                    throw new UnsupportedOperationException(String.format("Network format %s not supported", format));
         };
     }
 
@@ -202,10 +208,10 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    RaoParameters getSweRaoParameters(SweTaskParameters sweTaskParameters) {
-        RaoParameters raoParameters = RaoParameters.load();
-        if (sweTaskParameters.isSecondPreventiveRaoDisabled()) {
-            raoParameters.getSecondPreventiveRaoParameters().setExecutionCondition(SecondPreventiveRaoParameters.ExecutionCondition.DISABLED);
+    RaoParameters getSweRaoParameters(final SweTaskParameters sweTaskParameters) {
+        final RaoParameters raoParameters = RaoParameters.load();
+        if (sweTaskParameters.isSecondPreventiveRaoDisabled() && raoParameters.hasExtension(OpenRaoSearchTreeParameters.class)) {
+            raoParameters.getExtension(OpenRaoSearchTreeParameters.class).getSecondPreventiveRaoParameters().setExecutionCondition(ExecutionCondition.DISABLED);
         }
         return raoParameters;
     }
