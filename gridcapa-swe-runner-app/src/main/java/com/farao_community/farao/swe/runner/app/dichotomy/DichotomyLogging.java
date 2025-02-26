@@ -44,8 +44,8 @@ public class DichotomyLogging {
             CRAs : {}.""";
     private static final String SUMMARY_BD = """
             Summary BD :  {}
-            Current TTC : {},
-            Previous TTC : {},
+            Last secure TTC : {},
+            First unsecure TTC : {},
             Voltage Check : {},
             Angle Check : {}.""";
 
@@ -76,8 +76,8 @@ public class DichotomyLogging {
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
         final String timestamp = getTimestampLocalized(sweData.getTimestamp());
-        final String currentTtc = String.valueOf((int) dichotomyResult.getHighestValidStepValue());
-        final String previousTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
+        final String lastSecureTtc = String.valueOf((int) dichotomyResult.getHighestValidStepValue());
+        final String firstUnsecureTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
         final String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
         String angleCheckStatus = NONE;
         final String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
@@ -95,7 +95,7 @@ public class DichotomyLogging {
             }
         }
         businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
-        businessLogger.info(SUMMARY_BD, timestamp, currentTtc, previousTtc, voltageCheckStatus, angleCheckStatus);
+        businessLogger.info(SUMMARY_BD, timestamp, lastSecureTtc, firstUnsecureTtc, voltageCheckStatus, angleCheckStatus);
     }
 
     private static String toString(final Collection<String> c) {
