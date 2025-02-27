@@ -102,8 +102,8 @@ class DichotomyLoggingTest {
                 CRAs : {}.""";
         String summaryBd = """
                 Summary BD :  {}
-                Current TTC : {},
-                Previous TTC : {},
+                Last secure TTC : {},
+                First unsecure TTC : {},
                 Voltage Check : {},
                 Angle Check : {}.""";
         Mockito.verify(logger, Mockito.times(1)).info(summary, "NONE", "None", "", "");
