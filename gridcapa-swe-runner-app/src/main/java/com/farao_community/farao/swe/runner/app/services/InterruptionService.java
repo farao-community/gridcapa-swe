@@ -47,7 +47,7 @@ public class InterruptionService implements InterruptionStrategy {
     public boolean shouldRunBeInterruptedSoftly(final String runId) {
         final boolean runShouldBeInterrupted = runsToInterruptSoftly.contains(runId);
         if (runShouldBeInterrupted) {
-            businessLogger.warn("Soft interruption requested for run");
+            businessLogger.warn("Soft interruption requested.");
             LOGGER.info("Run {} should be interrupted softly", runId);
         } else {
             LOGGER.info("Run {} doesn't need to be interrupted softly", runId);
