@@ -9,6 +9,8 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.powsybl.cgmes.extensions.CgmesMetadataModels;
+import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -69,6 +71,11 @@ class NetworkServiceTest {
     void importMergedNetwork() {
         Network mergedNetwork = networkImporter.importMergedNetwork(sweRequest);
         assertNotNull(mergedNetwork);
+        assertTrue(mergedNetwork.getSubnetworks()
+                .stream()
+                .map(n -> (CgmesMetadataModels) n.getExtension(CgmesMetadataModels.class))
+                .allMatch(a -> a.getModelForSubset(CgmesSubset.EQUIPMENT_BOUNDARY).isPresent() &&
+                               a.getModelForSubset(CgmesSubset.TOPOLOGY_BOUNDARY).isPresent()));
         assertEquals(3, mergedNetwork.getSubnetworks().size());
     }
 
