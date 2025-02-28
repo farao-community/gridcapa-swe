@@ -35,27 +35,27 @@ class InterruptionServiceTest {
         interruptionService = new InterruptionService(businessLogger);
     }
 
-    private static final String TASK_ID = "tastkId";
+    private static final String RUN_ID = "runId";
 
     @Test
     void shouldMarkTaskForSoftInterruption() {
-        interruptionService.softInterrupt().accept(TASK_ID);
+        interruptionService.softInterrupt().accept(RUN_ID);
 
-        assertTrue(interruptionService.shouldRunBeInterruptedSoftly(TASK_ID));
-        verify(businessLogger).warn("Soft interruption requested");
+        assertTrue(interruptionService.shouldRunBeInterruptedSoftly(RUN_ID));
+        verify(businessLogger).warn("Soft interruption requested.");
     }
 
     @Test
     void shouldNotInterruptTaskThatWasNotMarked() {
-        assertFalse(interruptionService.shouldRunBeInterruptedSoftly(TASK_ID));
+        assertFalse(interruptionService.shouldRunBeInterruptedSoftly(RUN_ID));
     }
 
     @Test
     void shouldRemoveTaskFromInterruptionList() {
-        interruptionService.softInterrupt().accept(TASK_ID);
-        assertTrue(interruptionService.shouldRunBeInterruptedSoftly(TASK_ID));
+        interruptionService.softInterrupt().accept(RUN_ID);
+        assertTrue(interruptionService.shouldRunBeInterruptedSoftly(RUN_ID));
 
-        interruptionService.removeRunToBeInterrupted(TASK_ID);
-        assertFalse(interruptionService.shouldRunBeInterruptedSoftly(TASK_ID));
+        interruptionService.removeRunToBeInterrupted(RUN_ID);
+        assertFalse(interruptionService.shouldRunBeInterruptedSoftly(RUN_ID));
     }
 }
