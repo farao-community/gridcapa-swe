@@ -38,7 +38,7 @@ class InterruptionServiceTest {
     private static final String RUN_ID = "runId";
 
     @Test
-    void shouldMarkTaskForSoftInterruption() {
+    void shouldMarkRunForSoftInterruption() {
         interruptionService.softInterrupt().accept(RUN_ID);
 
         assertTrue(interruptionService.shouldRunBeInterruptedSoftly(RUN_ID));
@@ -46,12 +46,12 @@ class InterruptionServiceTest {
     }
 
     @Test
-    void shouldNotInterruptTaskThatWasNotMarked() {
+    void shouldNotInterruptRunThatWasNotMarked() {
         assertFalse(interruptionService.shouldRunBeInterruptedSoftly(RUN_ID));
     }
 
     @Test
-    void shouldRemoveTaskFromInterruptionList() {
+    void shouldRemoveRunFromInterruptionList() {
         interruptionService.softInterrupt().accept(RUN_ID);
         assertTrue(interruptionService.shouldRunBeInterruptedSoftly(RUN_ID));
 
