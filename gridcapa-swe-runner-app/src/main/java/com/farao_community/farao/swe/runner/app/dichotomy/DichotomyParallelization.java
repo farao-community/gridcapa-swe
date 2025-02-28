@@ -47,7 +47,7 @@ public class DichotomyParallelization {
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         final boolean interrupted = executionResult.getResult().stream().anyMatch(SweDichotomyResult::isInterrupted);
-        interruptionService.removeTaskToBeInterrupted(sweData.getId());
+        interruptionService.removeRunToBeInterrupted(sweData.getId());
         final boolean allRaoFailed = executionResult.getResult().stream().allMatch(SweDichotomyResult::isRaoFailed);
         return new SweResponse(sweData.getId(), ttcDocUrl, interrupted, allRaoFailed);
     }
