@@ -64,7 +64,7 @@ class RequestServiceTest {
     void testInterruptedRequestService() {
         String id = UUID.randomUUID().toString();
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true, false);
+        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true, true);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any())).thenReturn(cseResponse);
 
