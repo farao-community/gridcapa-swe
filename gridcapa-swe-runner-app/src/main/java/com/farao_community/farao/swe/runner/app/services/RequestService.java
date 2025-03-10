@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -59,8 +60,9 @@ public class RequestService {
         MDC.put("gridcapa-task-id", sweRequestId);
         try {
             sendTaskStatusUpdate(sweRequestId, TaskStatus.RUNNING);
+            final OffsetDateTime startTime = OffsetDateTime.now();
             LOGGER.info("Swe request received : {}", sweRequest);
-            SweResponse sweResponse = sweRunner.run(sweRequest);
+            SweResponse sweResponse = sweRunner.run(sweRequest, startTime);
             sendSweResponse(sweResponse);
             LOGGER.info("Swe response sent: {}", sweResponse);
         } catch (Exception e) {

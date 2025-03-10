@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
@@ -42,7 +43,8 @@ public class SweRunner {
         this.urlConfiguration = urlConfiguration;
     }
 
-    public SweResponse run(SweRequest sweRequest) {
+    public SweResponse run(final SweRequest sweRequest,
+                           final OffsetDateTime startTime) {
         LOGGER.info("Request received for timestamp {}", sweRequest.getTargetProcessDateTime());
         if (checkIsInterrupted(sweRequest)) {
             businessLogger.warn("Computation has been interrupted for timestamp {}", sweRequest.getTargetProcessDateTime());
@@ -52,7 +54,7 @@ public class SweRunner {
         SweTaskParameters sweTaskParameters = new SweTaskParameters(sweRequest.getTaskParameterList());
         logSweParameters(sweRequest, sweTaskParameters);
         SweData sweData = filesService.importFiles(sweRequest, sweTaskParameters);
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, sweTaskParameters);
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, sweTaskParameters, startTime);
         LOGGER.info("Response sent for timestamp {}", sweRequest.getTargetProcessDateTime());
         return sweResponse;
     }
