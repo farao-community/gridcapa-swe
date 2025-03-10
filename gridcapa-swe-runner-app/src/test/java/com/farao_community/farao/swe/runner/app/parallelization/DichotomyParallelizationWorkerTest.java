@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -65,6 +66,8 @@ class DichotomyParallelizationWorkerTest {
     @Mock
     private DichotomyResult<SweDichotomyValidationData> result;
 
+    private final OffsetDateTime startingTime = OffsetDateTime.now();
+
     @Test
     void testRunDichotomyForOneDirection() {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
@@ -76,7 +79,7 @@ class DichotomyParallelizationWorkerTest {
         Mockito.when(sweTaskParameters.getMinTtcEsPt()).thenReturn(0);
         Mockito.when(sweTaskParameters.getMaxTtcEsPt()).thenReturn(6400);
         Mockito.when(sweTaskParameters.getDichotomyPrecisionEsPt()).thenReturn(50);
-        Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction);
+        Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction, startingTime);
         try {
             SweDichotomyResult sweDichotomyResult = futurResult.get();
             assertTrue(futurResult.isDone());
@@ -89,7 +92,7 @@ class DichotomyParallelizationWorkerTest {
             fail(e);
         }
         verify(outputService, times(1)).buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class));
-        verify(dichotomyLogging, times(1)).generateSummaryEvents(any(DichotomyDirection.class), any(DichotomyResult.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class));
+        verify(dichotomyLogging, times(1)).generateSummaryEvents(any(DichotomyDirection.class), any(DichotomyResult.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class), any(OffsetDateTime.class));
     }
 
     @Test
@@ -99,7 +102,7 @@ class DichotomyParallelizationWorkerTest {
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(customResult);
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
 
-        Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction);
+        Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction, startingTime);
 
         try {
             SweDichotomyResult sweDichotomyResult = futurResult.get();

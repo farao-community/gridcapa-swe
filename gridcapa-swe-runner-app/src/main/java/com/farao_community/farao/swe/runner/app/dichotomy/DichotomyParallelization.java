@@ -18,6 +18,7 @@ import com.farao_community.farao.swe.runner.app.services.InterruptionService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -42,8 +43,10 @@ public class DichotomyParallelization {
         this.interruptionService = interruptionService;
     }
 
-    public SweResponse launchDichotomy(SweData sweData, SweTaskParameters sweTaskParameters) {
-        final ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters);
+    public SweResponse launchDichotomy(final SweData sweData,
+                                       final SweTaskParameters sweTaskParameters,
+                                       final OffsetDateTime startTime) {
+        final ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters, startTime);
         dichotomyLogging.logEndAllDichotomies();
         String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         final boolean interrupted = executionResult.getResult().stream().anyMatch(SweDichotomyResult::isInterrupted);
@@ -52,21 +55,23 @@ public class DichotomyParallelization {
         return new SweResponse(sweData.getId(), ttcDocUrl, interrupted, allRaoFailed);
     }
 
-    private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(SweData sweData, SweTaskParameters sweTaskParameters) {
+    private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(final SweData sweData,
+                                                                             final SweTaskParameters sweTaskParameters,
+                                                                             final OffsetDateTime startTime) {
         List<SweDichotomyResult> results = new ArrayList<>();
         List<Future<SweDichotomyResult>> futures = new ArrayList<>();
         try {
             if (sweTaskParameters.isRunDirectionEsFr()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_FR));
+                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_FR, startTime));
             }
             if (sweTaskParameters.isRunDirectionFrEs()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.FR_ES));
+                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.FR_ES, startTime));
             }
             if (sweTaskParameters.isRunDirectionEsPt()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_PT));
+                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_PT, startTime));
             }
             if (sweTaskParameters.isRunDirectionPtEs()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.PT_ES));
+                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.PT_ES, startTime));
             }
 
             for (Future<SweDichotomyResult> future : futures) {

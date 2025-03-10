@@ -24,6 +24,7 @@ import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -59,7 +60,8 @@ public class DichotomyParallelizationWorker {
     @Async("threadPoolTaskExecutor")
     public Future<SweDichotomyResult> runDichotomyForOneDirection(final SweData sweData,
                                                                   final SweTaskParameters sweTaskParameters,
-                                                                  final DichotomyDirection direction) {
+                                                                  final DichotomyDirection direction,
+                                                                  final OffsetDateTime startTime) {
         // propagate in logs MDC the task requestId as an extra field to be able to send logs with calculation tasks.
         MDC.put("gridcapa-task-id", sweData.getId());
         MDC.put("eventPrefix", direction.getDashName());
@@ -77,7 +79,7 @@ public class DichotomyParallelizationWorker {
         final String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
         final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, sweTaskParameters, direction);
         outputService.buildAndExportVoltageDoc(direction, sweData, voltageMonitoringResult, sweTaskParameters);
-        dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult, sweTaskParameters);
+        dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult, sweTaskParameters, startTime);
         // fill response for one dichotomy
         return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl));
     }

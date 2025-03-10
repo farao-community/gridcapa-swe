@@ -18,6 +18,7 @@ import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +48,8 @@ public class DichotomyLogging {
             Last secure TTC : {},
             First unsecure TTC : {},
             Voltage Check : {},
-            Angle Check : {}.""";
+            Angle Check : {},
+            Computation time: {}h {}min {}s since the task switched to RUNNING.""";
 
     public DichotomyLogging(final Logger businessLogger,
                             final ProcessConfiguration processConfiguration) {
@@ -71,7 +73,8 @@ public class DichotomyLogging {
                                       final DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                                       final SweData sweData,
                                       final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
-                                      final SweTaskParameters sweTaskParameters) {
+                                      final SweTaskParameters sweTaskParameters,
+                                      final OffsetDateTime startTime) {
         String limitingElement = NONE;
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
@@ -94,8 +97,9 @@ public class DichotomyLogging {
                 angleCheckStatus = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus().name();
             }
         }
+        final Duration difference = Duration.between(startTime, OffsetDateTime.now());
         businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
-        businessLogger.info(SUMMARY_BD, timestamp, lastSecureTtc, firstUnsecureTtc, voltageCheckStatus, angleCheckStatus);
+        businessLogger.info(SUMMARY_BD, timestamp, lastSecureTtc, firstUnsecureTtc, voltageCheckStatus, angleCheckStatus, difference.toHours(), difference.toMinutesPart(), difference.toSecondsPart());
     }
 
     private static String toString(final Collection<String> c) {

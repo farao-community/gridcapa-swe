@@ -90,9 +90,10 @@ class DichotomyLoggingTest {
         Logger logger = Mockito.mock(Logger.class);
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
         Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(false);
+        final OffsetDateTime startingTime = OffsetDateTime.now();
         //When
         DichotomyLogging dichotomyLogging = new DichotomyLogging(logger, processConfiguration);
-        dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty(), sweTaskParameters);
+        dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty(), sweTaskParameters, startingTime);
         //Then
         String summary = """
                 Summary :
