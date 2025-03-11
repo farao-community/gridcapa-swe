@@ -19,16 +19,20 @@ import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.Optional;
 
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 
 class DichotomyLoggingTest {
 
@@ -90,23 +94,29 @@ class DichotomyLoggingTest {
         Logger logger = Mockito.mock(Logger.class);
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
         Mockito.when(sweTaskParameters.isRunVoltageCheck()).thenReturn(false);
+        final OffsetDateTime startingTime = OffsetDateTime.of(2025, 3, 10, 15, 15, 0, 0, ZoneOffset.UTC);
         //When
-        DichotomyLogging dichotomyLogging = new DichotomyLogging(logger, processConfiguration);
-        dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty(), sweTaskParameters);
-        //Then
-        String summary = """
-                Summary :
-                Limiting event : {},
-                Limiting element : {},
-                PRAs : {},
-                CRAs : {}.""";
-        String summaryBd = """
-                Summary BD :  {}
-                Last secure TTC : {},
-                First unsecure TTC : {},
-                Voltage Check : {},
-                Angle Check : {}.""";
-        Mockito.verify(logger, Mockito.times(1)).info(summary, "NONE", "None", "", "");
-        Mockito.verify(logger, Mockito.times(1)).info(summaryBd, "2024-02-14 08:21", "2000", "1000", "NONE", "SECURE");
+        try (final MockedStatic<OffsetDateTime> mockedStatic = mockStatic(OffsetDateTime.class, CALLS_REAL_METHODS)) {
+            final OffsetDateTime now = startingTime.plusHours(1).plusMinutes(2).plusSeconds(3);
+            mockedStatic.when(OffsetDateTime::now).thenReturn(now);
+            DichotomyLogging dichotomyLogging = new DichotomyLogging(logger, processConfiguration);
+            dichotomyLogging.generateSummaryEvents(dichotomyDirection, result, sweData, Optional.empty(), sweTaskParameters, startingTime);
+            //Then
+            String summary = """
+                    Summary :
+                    Limiting event : {},
+                    Limiting element : {},
+                    PRAs : {},
+                    CRAs : {}.""";
+            String summaryBd = """
+                    Summary BD :  {}
+                    Last secure TTC : {},
+                    First unsecure TTC : {},
+                    Voltage Check : {},
+                    Angle Check : {},
+                    Computation time: {}h {}min {}s since the task switched to RUNNING.""";
+            Mockito.verify(logger, Mockito.times(1)).info(summary, "NONE", "None", "", "");
+            Mockito.verify(logger, Mockito.times(1)).info(summaryBd, "2024-02-14 08:21", "2000", "1000", "NONE", "SECURE", 1L, 2, 3);
+        }
     }
 }

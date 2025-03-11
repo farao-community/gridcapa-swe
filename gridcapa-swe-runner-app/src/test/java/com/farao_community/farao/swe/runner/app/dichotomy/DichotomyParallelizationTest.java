@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -104,15 +105,16 @@ class DichotomyParallelizationTest {
     private Network network;
     private Crac crac;
     private SweTaskParameters defaultParameters;
+    private final OffsetDateTime startingTime = OffsetDateTime.now();
 
     @BeforeEach
     public void setup() {
         network = Network.read("network.xiidm", getClass().getResourceAsStream("/network/network.xiidm"));
         crac = CracFactory.findDefault().create("test-crac");
         defaultParameters = new TestParametersBuilder()
-            .withEsFr(true).withFrEs(true)
-            .withEsPt(true).withPtEs(true)
-            .build();
+                .withEsFr(true).withFrEs(true)
+                .withEsPt(true).withPtEs(true)
+                .build();
     }
 
     @Test
@@ -134,11 +136,11 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getNetworkPtEs()).thenReturn(network);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertFalse(sweResponse.isInterrupted());
     }
@@ -155,11 +157,11 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrLowestInvalidStepUrl.zip");
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
     }
 
@@ -175,17 +177,17 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
     }
 
     @Test
     void testParallelizationWithNoResult2() {
-        when(dichotomyRunner.run(any(SweData.class),  any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
+        when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
         when(sweDichotomyResult.hasValidStep()).thenReturn(false);
         when(sweDichotomyResult.getLowestInvalidStep()).thenReturn(lowestInvalidStep);
@@ -195,11 +197,11 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
-        assertThrows(SweInternalException.class, () -> dichotomyParallelization.launchDichotomy(sweData, defaultParameters));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
+        assertThrows(SweInternalException.class, () -> dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime));
     }
 
     @Test
@@ -214,10 +216,10 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
         new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(future);
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(future);
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(future);
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(future);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(future);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(future);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(future);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(future);
         when(future.get()).thenThrow(InterruptedException.class);
         verify(future, Mockito.times(0)).cancel(true);
     }
@@ -225,9 +227,9 @@ class DichotomyParallelizationTest {
     @Test
     void testParallelizationWithFrAndEsOnly() {
         SweTaskParameters onlyFrParameters = new TestParametersBuilder()
-            .withEsFr(true).withFrEs(true)
-            .withEsPt(false).withPtEs(false)
-            .build();
+                .withEsFr(true).withFrEs(true)
+                .withEsPt(false).withPtEs(false)
+                .build();
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
@@ -243,22 +245,22 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
-        when(worker.runDichotomyForOneDirection(eq(sweData), eq(onlyFrParameters), any(DichotomyDirection.class))).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(eq(sweData), eq(onlyFrParameters), any(DichotomyDirection.class), any(OffsetDateTime.class))).thenReturn(CompletableFuture.completedFuture(result));
 
-        dichotomyParallelization.launchDichotomy(sweData, onlyFrParameters);
+        dichotomyParallelization.launchDichotomy(sweData, onlyFrParameters, startingTime);
 
-        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.FR_ES);
-        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_FR);
-        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.PT_ES);
-        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_PT);
+        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.FR_ES, startingTime);
+        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_FR, startingTime);
+        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.PT_ES, startingTime);
+        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_PT, startingTime);
     }
 
     @Test
     void testParallelizationWithPtAndEsOnly() {
         SweTaskParameters onlyFrParameters = new TestParametersBuilder()
-            .withEsFr(false).withFrEs(false)
-            .withEsPt(true).withPtEs(true)
-            .build();
+                .withEsFr(false).withFrEs(false)
+                .withEsPt(true).withPtEs(true)
+                .build();
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
@@ -274,14 +276,14 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
-        when(worker.runDichotomyForOneDirection(eq(sweData), eq(onlyFrParameters), any(DichotomyDirection.class))).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(eq(sweData), eq(onlyFrParameters), any(DichotomyDirection.class), any(OffsetDateTime.class))).thenReturn(CompletableFuture.completedFuture(result));
 
-        dichotomyParallelization.launchDichotomy(sweData, onlyFrParameters);
+        dichotomyParallelization.launchDichotomy(sweData, onlyFrParameters, startingTime);
 
-        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.FR_ES);
-        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_FR);
-        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.PT_ES);
-        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_PT);
+        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.FR_ES, startingTime);
+        verify(worker, Mockito.times(0)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_FR, startingTime);
+        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.PT_ES, startingTime);
+        verify(worker, Mockito.times(1)).runDichotomyForOneDirection(sweData, onlyFrParameters, DichotomyDirection.ES_PT, startingTime);
     }
 
     private static class TestParametersBuilder {
@@ -315,9 +317,9 @@ class DichotomyParallelizationTest {
     @Test
     void testParallelizationWithErrorInDichotomy() throws ExecutionException, InterruptedException {
         Future futureMock = mock(Future.class);
-        when(worker.runDichotomyForOneDirection(any(), any(), any())).thenReturn(futureMock);
+        when(worker.runDichotomyForOneDirection(any(), any(), any(), any())).thenReturn(futureMock);
         when(futureMock.get()).thenThrow(ExecutionException.class);
-        assertThrows(SweInternalException.class, () -> dichotomyParallelization.launchDichotomy(sweData, defaultParameters));
+        assertThrows(SweInternalException.class, () -> dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime));
     }
 
     @Test
@@ -343,11 +345,11 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkPtEs()).thenReturn(network);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
         SweDichotomyResult interruptedResult = new SweDichotomyResult(DichotomyDirection.ES_FR, interruptedSweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(interruptedResult));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(interruptedResult));
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(interruptedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(interruptedResult));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertTrue(sweResponse.isInterrupted());
     }
@@ -374,11 +376,11 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getNetworkPtEs()).thenReturn(network);
         SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(result));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertFalse(sweResponse.isAllRaoFailed());
     }
@@ -408,9 +410,9 @@ class DichotomyParallelizationTest {
                 .withFrEs(false)
                 .withPtEs(false)
                 .build();
-        when(worker.runDichotomyForOneDirection(sweData, parameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        when(worker.runDichotomyForOneDirection(sweData, parameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, parameters);
+        when(worker.runDichotomyForOneDirection(sweData, parameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, parameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, parameters, startingTime);
         assertTrue(sweResponse.isAllRaoFailed());
     }
 
@@ -435,11 +437,11 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getNetworkPtEs()).thenReturn(network);
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES)).thenReturn(CompletableFuture.completedFuture(failedResult));
-        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters);
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
+        SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
         assertTrue(sweResponse.isAllRaoFailed());
     }
 }

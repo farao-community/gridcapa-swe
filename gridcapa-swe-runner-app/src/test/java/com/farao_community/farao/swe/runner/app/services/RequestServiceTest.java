@@ -50,7 +50,7 @@ class RequestServiceTest {
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
-        when(sweRunner.run(any())).thenReturn(cseResponse);
+        when(sweRunner.run(any(), any())).thenReturn(cseResponse);
 
         requestService.launchSweRequest(req);
 
@@ -66,7 +66,7 @@ class RequestServiceTest {
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true, true);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
-        when(sweRunner.run(any())).thenReturn(cseResponse);
+        when(sweRunner.run(any(), any())).thenReturn(cseResponse);
 
         requestService.launchSweRequest(req);
 
@@ -82,7 +82,7 @@ class RequestServiceTest {
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, true);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
-        when(sweRunner.run(any())).thenReturn(cseResponse);
+        when(sweRunner.run(any(), any())).thenReturn(cseResponse);
 
         requestService.launchSweRequest(req);
 
@@ -98,7 +98,7 @@ class RequestServiceTest {
         RuntimeException except = new RuntimeException("Mocked exception");
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
-        when(sweRunner.run(any())).thenThrow(except);
+        when(sweRunner.run(any(), any())).thenThrow(except);
 
         requestService.launchSweRequest(req);
 
