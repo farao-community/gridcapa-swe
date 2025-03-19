@@ -27,14 +27,15 @@ import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
 import com.powsybl.cgmes.conversion.export.CgmesExportUtil;
-import com.powsybl.cgmes.extensions.CgmesControlArea;
-import com.powsybl.cgmes.extensions.CgmesControlAreas;
+import com.powsybl.cgmes.conversion.naming.NamingStrategyFactory;
 import com.powsybl.cgmes.extensions.CgmesMetadataModels;
 import com.powsybl.cgmes.extensions.CgmesMetadataModelsAdder;
 import com.powsybl.cgmes.model.CgmesMetadataModel;
+import com.powsybl.cgmes.model.CgmesNames;
 import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.computation.local.LocalComputationManager;
+import com.powsybl.iidm.network.Area;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ExportersServiceLoader;
 import com.powsybl.iidm.network.Network;
@@ -89,11 +90,11 @@ public class CgmesExportService {
     static {
         SSH_FILES_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SSH");
         SSH_FILES_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-        SSH_FILES_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, "cgmes");
+        SSH_FILES_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, NamingStrategyFactory.CGMES);
 
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.PROFILES, "SV");
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.EXPORT_BOUNDARY_POWER_FLOWS, true);
-        SV_FILE_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, "cgmes");
+        SV_FILE_EXPORT_PARAMS.put(CgmesExport.NAMING_STRATEGY, NamingStrategyFactory.CGMES);
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.UPDATE_DEPENDENCIES, false);
     }
 
@@ -228,14 +229,14 @@ public class CgmesExportService {
         } else {
             network.newExtension(CgmesMetadataModelsAdder.class)
                     .newModel()
-                        .setId(newSshId)
-                        .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
-                        .setDescription("SSH Model")
-                        .setVersion(DEFAULT_VERSION)
-                        .addProfile("http://entsoe.eu/CIM/SteadyStateHypothesis/1/1")
-                        .setModelingAuthoritySet(MODELING_AUTHORITY_DEFAULT_VALUE)
-                        .add()
-                        .add();
+                    .setId(newSshId)
+                    .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
+                    .setDescription("SSH Model")
+                    .setVersion(DEFAULT_VERSION)
+                    .addProfile("http://entsoe.eu/CIM/SteadyStateHypothesis/1/1")
+                    .setModelingAuthoritySet(MODELING_AUTHORITY_DEFAULT_VALUE)
+                    .add()
+                    .add();
             outputSshIds.add(newSshId);
             return DEFAULT_VERSION;
         }
@@ -275,16 +276,23 @@ public class CgmesExportService {
         }
     }
 
-    private void updateControlAreasExtension(Network network) {
-        CgmesControlAreas controlAreas = network.getExtension(CgmesControlAreas.class);
-        if (controlAreas != null && controlAreas.getCgmesControlAreas().size() == 1) {
-            // We use this method for each subnetwork, we should have only one ControlArea by subnetwork
-            Optional<CgmesControlArea> controlAreaOpt = controlAreas.getCgmesControlAreas().stream().findFirst();
-            controlAreaOpt.ifPresent(controlArea -> {
-                controlArea.setNetInterchange(computeNetInterchange(network));
-                controlArea.setPTolerance(DEFAULT_P_TOLERANCE);
-            });
+    private void updateControlAreasExtension(final Network network) {
+        final Optional<Area> existingInterchangeArea = getOptionalInterchangeArea(network);
+        final Area controlArea;
+        if (existingInterchangeArea.isPresent()) {
+            controlArea = existingInterchangeArea.get();
+        } else {
+            new CgmesExport().createDefaultControlAreaInterchange(network, SSH_FILES_EXPORT_PARAMS);
+            controlArea = getOptionalInterchangeArea(network).orElseThrow();
         }
+        controlArea.setInterchangeTarget(computeNetInterchange(network));
+        controlArea.setProperty(CgmesNames.P_TOLERANCE, String.valueOf(DEFAULT_P_TOLERANCE));
+    }
+
+    private static Optional<Area> getOptionalInterchangeArea(final Network network) {
+        return network.getAreaStream()
+                .filter(area -> CgmesNames.CONTROL_AREA_TYPE_KIND_INTERCHANGE.equalsIgnoreCase(area.getAreaType()))
+                .findFirst();
     }
 
     private double computeNetInterchange(Network network) {
@@ -304,7 +312,7 @@ public class CgmesExportService {
         }
     }
 
-    private void addSvMetadataExtension(Network network,  List<String> inputSshIds, List<String> outputSshIds) {
+    private void addSvMetadataExtension(Network network, List<String> inputSshIds, List<String> outputSshIds) {
         // For the SV file, the dependentOn should contain TP and SSH ids
         // The ids of TP are present in the subnetwork SV dependentOn
         StringBuilder initialSvId = new StringBuilder();
