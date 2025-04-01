@@ -1101,7 +1101,7 @@
     <cim:ControlArea rdf:ID="_965ea5b2-37ae-498a-a101-54aa8a6fc929">
         <cim:IdentifiedObject.mRID>965ea5b2-37ae-498a-a101-54aa8a6fc929</cim:IdentifiedObject.mRID>
         <cim:IdentifiedObject.name>Network</cim:IdentifiedObject.name>
-        <entsoe:IdentifiedObject.energyIdentCodeEic>Network--1</entsoe:IdentifiedObject.energyIdentCodeEic>
+        <entsoe:IdentifiedObject.energyIdentCodeEic>Network--3</entsoe:IdentifiedObject.energyIdentCodeEic>
         <cim:ControlArea.type rdf:resource="http://iec.ch/TC57/2013/CIM-schema-cim16#ControlAreaTypeKind.Interchange"/>
         <cim:ControlArea.EnergyArea rdf:resource="#_be67958e-5f79-417c-a777-1205d7166d53"/>
     </cim:ControlArea>

@@ -20,6 +20,7 @@ import com.powsybl.openrao.data.crac.api.RaUsageLimits;
 import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
 import com.powsybl.openrao.data.crac.api.parameters.JsonCracCreationParameters;
 import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import com.powsybl.openrao.data.crac.io.cim.parameters.CimCracCreationParameters;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.data.raoresult.io.json.RaoResultJsonImporter;
 import org.apache.commons.io.FilenameUtils;
@@ -58,10 +59,10 @@ public class FileImporter {
             cimCracCreationParameters.addRaUsageLimitsForInstant("curative", raUsageLimits);
         }
         raUsageLimits.setMaxRa(sweTaskParameters.getMaxCra());
-
+        cimCracCreationParameters.addExtension(CimCracCreationParameters.class, new CimCracCreationParameters());
+        cimCracCreationParameters.getExtension(CimCracCreationParameters.class).setTimestamp(processDateTime);
         return importCrac(
                 cracFile,
-                processDateTime,
                 network,
                 cimCracCreationParameters);
     }
@@ -75,12 +76,12 @@ public class FileImporter {
         }
     }
 
-    private CimCracCreationContext importCrac(SweFileResource crac, OffsetDateTime targetProcessDateTime, Network network, CracCreationParameters params) {
-        LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", targetProcessDateTime);
+    private CimCracCreationContext importCrac(SweFileResource crac, Network network, CracCreationParameters params) {
+        LOGGER.info("Importing native Crac from Cim Crac and Network");
         try {
-            return (CimCracCreationContext) Crac.readWithContext(crac.getFilename(), urlValidationService.openUrlStream(crac.getUrl()), network, targetProcessDateTime, params);
+            return (CimCracCreationContext) Crac.readWithContext(crac.getFilename(), urlValidationService.openUrlStream(crac.getUrl()), network, params);
         } catch (IOException e) {
-            throw new SweInvalidDataException(String.format("Cannot read crac with context for process date: %s", targetProcessDateTime), e);
+            throw new SweInvalidDataException("Cannot read crac with context", e);
         }
     }
 

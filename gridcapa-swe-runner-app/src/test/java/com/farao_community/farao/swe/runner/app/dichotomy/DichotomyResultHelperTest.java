@@ -46,9 +46,10 @@ class DichotomyResultHelperTest {
         Set<RangeActionSpeed> rangeActionSpeeds = Set.of(new RangeActionSpeed("BBE2AA11 FFR3AA11 1", 1), new RangeActionSpeed("BBE2AA12 FFR3AA12 1", 2), new RangeActionSpeed("PRA_1", 3));
         CimCracCreationParameters cimCracCreationParameters = new CimCracCreationParameters();
         cimCracCreationParameters.setRemedialActionSpeed(rangeActionSpeeds);
+        cimCracCreationParameters.setTimestamp(OffsetDateTime.of(2021, 4, 2, 12, 30, 0, 0, ZoneOffset.UTC));
         CracCreationParameters cracCreationParameters = new CracCreationParameters();
         cracCreationParameters.addExtension(CimCracCreationParameters.class, cimCracCreationParameters);
-        CracCreationContext cracCreationContext = Crac.readWithContext("CIM_CRAC.xml", cracIs, network, OffsetDateTime.of(2021, 4, 2, 12, 30, 0, 0, ZoneOffset.UTC), cracCreationParameters);
+        CracCreationContext cracCreationContext = Crac.readWithContext("CIM_CRAC.xml", cracIs, network, cracCreationParameters);
         crac = cracCreationContext.getCrac();
 
         InputStream raoResultIs = getClass().getResourceAsStream("/dichotomy/RaoResult.json");
