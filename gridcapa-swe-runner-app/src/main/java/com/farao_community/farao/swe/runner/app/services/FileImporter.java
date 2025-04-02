@@ -77,11 +77,12 @@ public class FileImporter {
     }
 
     private CimCracCreationContext importCrac(SweFileResource crac, Network network, CracCreationParameters params) {
-        LOGGER.info("Importing native Crac from Cim Crac and Network");
+        final OffsetDateTime timestmap = params.getExtension(CimCracCreationParameters.class).getTimestamp();
+        LOGGER.info("Importing native Crac from Cim Crac and Network for process date: {}", timestmap);
         try {
             return (CimCracCreationContext) Crac.readWithContext(crac.getFilename(), urlValidationService.openUrlStream(crac.getUrl()), network, params);
         } catch (IOException e) {
-            throw new SweInvalidDataException("Cannot read crac with context", e);
+            throw new SweInvalidDataException(String.format("Cannot read crac with context for process date: %s", timestmap), e);
         }
     }
 
