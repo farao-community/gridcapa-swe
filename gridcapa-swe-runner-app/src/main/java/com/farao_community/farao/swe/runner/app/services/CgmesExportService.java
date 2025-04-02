@@ -35,7 +35,6 @@ import com.powsybl.cgmes.model.CgmesNames;
 import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.computation.local.LocalComputationManager;
-import com.powsybl.iidm.network.Area;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ExportersServiceLoader;
 import com.powsybl.iidm.network.Network;
@@ -277,22 +276,13 @@ public class CgmesExportService {
     }
 
     private void updateControlAreasExtension(final Network network) {
-        final Optional<Area> existingInterchangeArea = getOptionalInterchangeArea(network);
-        final Area controlArea;
-        if (existingInterchangeArea.isPresent()) {
-            controlArea = existingInterchangeArea.get();
-        } else {
-            new CgmesExport().createDefaultControlAreaInterchange(network, SSH_FILES_EXPORT_PARAMS);
-            controlArea = getOptionalInterchangeArea(network).orElseThrow();
-        }
-        controlArea.setInterchangeTarget(computeNetInterchange(network));
-        controlArea.setProperty(CgmesNames.P_TOLERANCE, String.valueOf(DEFAULT_P_TOLERANCE));
-    }
-
-    private static Optional<Area> getOptionalInterchangeArea(final Network network) {
-        return network.getAreaStream()
+        network.getAreaStream()
                 .filter(area -> CgmesNames.CONTROL_AREA_TYPE_KIND_INTERCHANGE.equalsIgnoreCase(area.getAreaType()))
-                .findFirst();
+                .findFirst()
+                .ifPresent(controlArea -> {
+                    controlArea.setInterchangeTarget(computeNetInterchange(network));
+                    controlArea.setProperty(CgmesNames.P_TOLERANCE, String.valueOf(DEFAULT_P_TOLERANCE));
+                });
     }
 
     private double computeNetInterchange(Network network) {
