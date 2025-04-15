@@ -59,7 +59,9 @@ public class FileImporter {
             cimCracCreationParameters.addRaUsageLimitsForInstant("curative", raUsageLimits);
         }
         raUsageLimits.setMaxRa(sweTaskParameters.getMaxCra());
-        cimCracCreationParameters.addExtension(CimCracCreationParameters.class, new CimCracCreationParameters());
+        if (cimCracCreationParameters.getExtension(CimCracCreationParameters.class) == null) {
+            cimCracCreationParameters.addExtension(CimCracCreationParameters.class, new CimCracCreationParameters());
+        }
         cimCracCreationParameters.getExtension(CimCracCreationParameters.class).setTimestamp(processDateTime);
         return importCrac(
                 cracFile,
