@@ -23,6 +23,12 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          # Will write ${env.MAVEN_GPG_PASSPHRASE} in settings.xml, which will be defined in 'mvn deploy' stage
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: Change Maven version to release version
         run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${{ github.event.inputs.releaseVersion }}
@@ -49,16 +55,14 @@ jobs:
           tagging_message: v${{ github.event.inputs.releaseVersion }}
 
       - name: Release Maven package
-        uses: samuelmeuli/action-maven-publish@v1.4.0
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-          maven_profiles: default,release
+        run: mvn --batch-mode -Pdefault,release deploy -DskipTests
+        env:
+          MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Re-build with Maven to avoid multiple .jar achives
-        run: mvn --batch-mode -Pdefault,coverage clean install
+        run: mvn --batch-mode -Pdefault,coverage clean install -DskipTests
 
       - name: Build and publish Docker image
         uses: elgohr/Publish-Docker-Github-Action@v5
