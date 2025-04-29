@@ -99,7 +99,7 @@ public class VoltageCheckService {
                 });
                 voltageCnec.getUpperBound(Unit.KILOVOLT).ifPresent(upperBound -> {
                     final double maxVoltage = result.getMaxVoltage(instant, voltageCnec, MinOrMax.MAX, Unit.KILOVOLT);
-                    if (Double.compare(maxVoltage, upperBound) > 0) {
+                    if (!Double.isNaN(maxVoltage) && Double.compare(maxVoltage, upperBound) > 0) {
                         voltageConstraints.add(String.format(Locale.ENGLISH,
                                 "High voltage constraint reached - biggest violation on node \"%s\" - Maximum voltage of %f kV for a limit of %f kV",
                                 voltageCnec.getNetworkElement().getName(),
