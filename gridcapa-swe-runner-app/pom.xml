@@ -76,7 +76,7 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>monitoring</artifactId>
+            <artifactId>open-rao-monitoring</artifactId>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
