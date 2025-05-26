@@ -92,7 +92,7 @@ class RaoValidatorTest {
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
         when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
-        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("http://result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
@@ -127,7 +127,7 @@ class RaoValidatorTest {
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
         when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
-        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("http://result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
@@ -155,7 +155,7 @@ class RaoValidatorTest {
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
         when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
-        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("http://result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
@@ -190,7 +190,7 @@ class RaoValidatorTest {
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
         when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
-        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("http://result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
@@ -219,7 +219,7 @@ class RaoValidatorTest {
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
         when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
-        when(raoResponse.getRaoResultFileUrl()).thenReturn("result-file-url");
+        when(raoResponse.getRaoResultFileUrl()).thenReturn("http://result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
         when(fileImporter.importCracFromJson(anyString(), any())).thenReturn(crac);
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);

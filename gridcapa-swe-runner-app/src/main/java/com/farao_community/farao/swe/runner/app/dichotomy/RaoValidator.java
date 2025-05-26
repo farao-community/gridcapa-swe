@@ -22,6 +22,9 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -35,6 +38,13 @@ import com.powsybl.openrao.monitoring.MonitoringInput;
 import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -86,6 +96,9 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             if (raoResponse.isInterrupted()) {
                 throw new RaoInterruptionException("RAO computation stopped due to soft interruption request");
             }
+
+            logContingencies(raoResponse.getRaoResultFileUrl());
+
             final RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
                 final Crac crac = sweData.getCracEsPt().getCrac();
@@ -118,6 +131,27 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
         } catch (RuntimeException e) {
             throw new ValidationException("RAO run failed", e);
+        }
+    }
+
+    record ComputationStatusMapElement(String computationStatus, String instant, String contingency) {
+    }
+
+    private void logContingencies(String raoResultFileUrl) {
+        try (final InputStream inputStream = new URI(raoResultFileUrl).toURL().openStream()) {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            final JsonNode computationStatusMapJsonNode = objectMapper.readTree(inputStream).get("computationStatusMap");
+            final List<ComputationStatusMapElement> computationStatusMapList = objectMapper.readValue(computationStatusMapJsonNode.traverse(), new TypeReference<>() {
+            });
+            computationStatusMapList.stream()
+                    .filter(csme -> "FAILURE".equalsIgnoreCase(csme.computationStatus()))
+                    .collect(Collectors.groupingBy(ComputationStatusMapElement::instant))
+                    .forEach((instant, value) -> {
+                        final String contingencies = value.stream().map(ComputationStatusMapElement::contingency).collect(Collectors.joining(", "));
+                        businessLogger.warn("A sensitivity computation failure occurred after instant {} for contingencies: {}.", instant, contingencies);
+                    });
+        } catch (IOException | URISyntaxException e) {
+            // throw new UncheckedIOException(e);
         }
     }
 
