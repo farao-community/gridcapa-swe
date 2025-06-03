@@ -88,7 +88,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                 throw new RaoInterruptionException("RAO computation stopped due to soft interruption request");
             }
 
-            ContingenciesLoggerUtil.logContingencies(raoResponse.getRaoResultFileUrl());
+            ContingenciesLoggerUtil.logContingencies(raoResponse.getRaoResultFileUrl(), businessLogger);
 
             final RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
