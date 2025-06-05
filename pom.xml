@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.farao-community.farao</groupId>
         <artifactId>farao-parent-ws</artifactId>
-        <version>1.12.1</version>
+        <version>1.13.0</version>
     </parent>
 
     <artifactId>gridcapa-swe</artifactId>
