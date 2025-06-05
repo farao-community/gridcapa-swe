@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,16 +41,16 @@ class SweRunnerTest {
     @Autowired
     private SweRunner sweRunner;
 
-    @MockBean
+    @MockitoBean
     private DichotomyParallelization dichotomyParallelization;
 
-    @MockBean
+    @MockitoBean
     private FilesService filesService;
 
-    @MockBean
+    @MockitoBean
     private Logger businessLogger;
 
-    @MockBean
+    @MockitoBean
     private RestTemplateBuilder restTemplateBuilder;
 
     private final OffsetDateTime startingTime = OffsetDateTime.now();
