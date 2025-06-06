@@ -62,7 +62,7 @@
         <farao.dichotomy.version>4.29.0</farao.dichotomy.version>
         <gridcapa.starter.minio.version>1.5.0</gridcapa.starter.minio.version>
         <gridcapa.rao.runner.version>1.37.0</gridcapa.rao.runner.version>
-        <gridcapa.task-manager.version>1.35.0</gridcapa.task-manager.version>
+        <gridcapa.task-manager.version>1.36.0</gridcapa.task-manager.version>
         <jackson.datatype.version>2.17.0</jackson.datatype.version>
         <jsonapi.converter.version>0.11</jsonapi.converter.version>
         <sonar.organization>farao-community</sonar.organization>
