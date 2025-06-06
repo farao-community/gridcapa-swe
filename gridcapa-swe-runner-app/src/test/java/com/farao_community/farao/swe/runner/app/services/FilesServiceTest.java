@@ -18,7 +18,7 @@ import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.InputStream;
 import java.time.OffsetDateTime;
@@ -39,16 +39,16 @@ class FilesServiceTest {
     @Autowired
     private FilesService filesService;
 
-    @MockBean
+    @MockitoBean
     private NetworkService networkService;
 
-    @MockBean
+    @MockitoBean
     private RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
-    @MockBean
+    @MockitoBean
     private FileImporter fileImporter;
 
-    @MockBean
+    @MockitoBean
     private FileExporter fileExporter;
 
     @Test
