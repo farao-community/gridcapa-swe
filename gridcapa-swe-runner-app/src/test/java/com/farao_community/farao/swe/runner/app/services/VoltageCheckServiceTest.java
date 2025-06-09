@@ -10,11 +10,13 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.swe.runner.app.SweTaskParametersTestUtil;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.commons.Unit;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.Instant;
@@ -28,8 +30,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +53,9 @@ class VoltageCheckServiceTest {
 
     @Autowired
     private VoltageCheckService service;
+
+    @MockBean
+    private FileExporter fileExporter;
 
     private SweTaskParameters sweTaskParameters = SweTaskParametersTestUtil.getSweTaskParameters();
 
@@ -136,10 +143,11 @@ class VoltageCheckServiceTest {
         //Given
         RaoResultWithVoltageMonitoring result = Mockito.mock(RaoResultWithVoltageMonitoring.class);
         Crac crac = Mockito.mock(Crac.class);
+        Network network = Mockito.mock(Network.class);
         Mockito.when(crac.getVoltageCnecs()).thenReturn(Collections.emptySet());
 
         //Expect
-        assertTrue(service.generateHighAndLowVoltageConstraints(result, crac).isEmpty());
+        assertTrue(service.generateHighAndLowVoltageConstraints(result, crac, network, OffsetDateTime.now(), ProcessType.D2CC).isEmpty());
     }
 
     @Test
@@ -162,8 +170,10 @@ class VoltageCheckServiceTest {
         NetworkElement ne = Mockito.mock(NetworkElement.class);
         Mockito.when(vc.getNetworkElement()).thenReturn(ne);
         Mockito.when(ne.getName()).thenReturn("VL1");
+        Network network = Mockito.mock(Network.class);
+        Mockito.when(fileExporter.saveNetworkInArtifact(any(), any(), any(), any(), any())).thenReturn("filepath");
         //When
-        final List<String> constraints = service.generateHighAndLowVoltageConstraints(result, crac);
+        final List<String> constraints = service.generateHighAndLowVoltageConstraints(result, crac, network, OffsetDateTime.now(), ProcessType.IDCC);
         //Then
         assertEquals(2, constraints.size());
         assertEquals("Low Voltage constraint reached - biggest violation on node \"VL1\" - Minimum voltage of 0.000000 kV for a limit of 100.000000 kV", constraints.get(0));
@@ -187,8 +197,9 @@ class VoltageCheckServiceTest {
         Mockito.when(vc.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(700d));
         Mockito.when(result.getMinVoltage(any(), any(), any(), any())).thenReturn(200d);
         Mockito.when(vc.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(100d));
+        Network network = Mockito.mock(Network.class);
         //Expect
-        assertTrue(service.generateHighAndLowVoltageConstraints(result, crac).isEmpty());
+        assertTrue(service.generateHighAndLowVoltageConstraints(result, crac, network, OffsetDateTime.now(), ProcessType.IDCC).isEmpty());
     }
 
     @Test
@@ -208,7 +219,8 @@ class VoltageCheckServiceTest {
         Mockito.when(vc.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(600d));
         Mockito.when(result.getMinVoltage(any(), any(), any(), any())).thenReturn(100d);
         Mockito.when(vc.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(100d));
+        Network network = Mockito.mock(Network.class);
         //Expect
-        assertTrue(service.generateHighAndLowVoltageConstraints(result, crac).isEmpty());
+        assertTrue(service.generateHighAndLowVoltageConstraints(result, crac, network, OffsetDateTime.now(), ProcessType.IDCC).isEmpty());
     }
 }

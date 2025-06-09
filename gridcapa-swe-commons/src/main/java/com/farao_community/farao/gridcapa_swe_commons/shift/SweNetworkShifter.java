@@ -51,8 +51,9 @@ public class SweNetworkShifter implements NetworkShifter {
     private final Map<String, Double> initialNetPositions;
     private final ProcessConfiguration processConfiguration;
     private final LoadFlowParameters loadFlowParameters;
+    private final NetworkExporter networkExporter;
 
-    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration, LoadFlowParameters loadFlowParameters) { // NOSONAR
+    public SweNetworkShifter(Logger businessLogger, ProcessType processType, DichotomyDirection direction, ZonalData<Scalable> zonalScalable, ShiftDispatcher shiftDispatcher, double toleranceEsPt, double toleranceEsFr, Map<String, Double> initialNetPositions, ProcessConfiguration processConfiguration, LoadFlowParameters loadFlowParameters, NetworkExporter networkExporter) { // NOSONAR
         this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
@@ -63,6 +64,7 @@ public class SweNetworkShifter implements NetworkShifter {
         this.initialNetPositions = initialNetPositions;
         this.processConfiguration = processConfiguration;
         this.loadFlowParameters = loadFlowParameters;
+        this.networkExporter = networkExporter;
     }
 
     @Override
@@ -99,6 +101,7 @@ public class SweNetworkShifter implements NetworkShifter {
                 if (result.isFailed()) {
                     LOGGER.error("Loadflow computation diverged on network '{}' for direction {}", network.getId(), direction.getDashName());
                     businessLogger.error("Loadflow computation diverged on network during balancing adjustment");
+                    networkExporter.export(network);
                     throw new ShiftingException("Loadflow computation diverged during balancing adjustment", ReasonInvalid.BALANCE_LOADFLOW_DIVERGENCE);
                 }
                 bordersExchanges = CountryBalanceComputation.computeSweBordersExchanges(network);
