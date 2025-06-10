@@ -12,14 +12,13 @@ import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfi
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
-import com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation;
-import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
-import com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher;
-import com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter;
-import com.farao_community.farao.gridcapa_swe_commons.shift.ZonalScalableProvider;
+import com.farao_community.farao.gridcapa_swe_commons.shift.*;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
+import com.farao_community.farao.swe.runner.app.configurations.ExportNetworkConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.NetworkService;
+import com.farao_community.farao.swe.runner.app.services.SweNetworkExporter;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
@@ -36,11 +35,15 @@ public class NetworkShifterProvider {
     private final DichotomyConfiguration dichotomyConfiguration;
     private final Logger businessLogger;
     private final ProcessConfiguration processConfiguration;
+    private final ExportNetworkConfiguration exportNetworkConfiguration;
+    private final FileExporter fileExporter;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, Logger businessLogger, ProcessConfiguration processConfiguration) {
+    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, Logger businessLogger, ProcessConfiguration processConfiguration, ExportNetworkConfiguration exportNetworkConfiguration, FileExporter fileExporter) {
         this.dichotomyConfiguration = dichotomyConfiguration;
         this.businessLogger = businessLogger;
         this.processConfiguration = processConfiguration;
+        this.exportNetworkConfiguration = exportNetworkConfiguration;
+        this.fileExporter = fileExporter;
     }
 
     public NetworkShifter get(SweData sweData, DichotomyDirection direction, LoadFlowParameters loadFlowParameters) {
@@ -50,6 +53,7 @@ public class NetworkShifterProvider {
             Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, loadFlowParameters);
 
             businessLogger.info("Base case loadflow is secure");
+            SweNetworkExporter sweNetworkExporter = exportNetworkConfiguration.isExportFailedNetwork() ? new SweNetworkExporter(sweData, fileExporter) : null;
             return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                     zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                     getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
@@ -57,7 +61,7 @@ public class NetworkShifterProvider {
                     dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
                     initialNetPositions,
                     processConfiguration,
-                    loadFlowParameters);
+                    loadFlowParameters, sweNetworkExporter);
         } catch (SweBaseCaseUnsecureException baseCaseUnsecureException) {
             businessLogger.error("Base case loadflow is unsecure, the calculation is stopped");
             throw baseCaseUnsecureException;
