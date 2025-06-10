@@ -142,12 +142,16 @@ public class VoltageCheckService {
     private void exportXiidmNetwork(final Network network,
                                     final OffsetDateTime targetProcessDateTime,
                                     final ProcessType processType) {
-        final String destinationMinioPath = fileExporter.makeDestinationMinioPath(targetProcessDateTime, FileExporter.FileKind.ARTIFACTS);
-        final String scaledNetworkInXiidmFormatName = network.getNameOrId() + "-with-failed-voltage-check." + XIIDM_EXTENSION;
-        fileExporter.saveNetworkInArtifact(network,
-                destinationMinioPath + scaledNetworkInXiidmFormatName,
-                "",
-                targetProcessDateTime,
-                processType);
+        try {
+            final String destinationMinioPath = fileExporter.makeDestinationMinioPath(targetProcessDateTime, FileExporter.FileKind.ARTIFACTS);
+            final String scaledNetworkInXiidmFormatName = network.getNameOrId() + "-with-failed-voltage-check." + XIIDM_EXTENSION;
+            fileExporter.saveNetworkInArtifact(network,
+                    destinationMinioPath + scaledNetworkInXiidmFormatName,
+                    "",
+                    targetProcessDateTime,
+                    processType);
+        } catch (Exception e) {
+            businessLogger.warn("Failed to export network with voltage constraint violations: {}", e.getMessage());
+        }
     }
 }

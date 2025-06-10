@@ -8,7 +8,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.gridcapa_swe_commons.shift.NetworkExporter;
-import com.farao_community.farao.swe.runner.api.resource.SweRequest;
+import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.powsybl.iidm.network.Network;
 
 import java.time.OffsetDateTime;
@@ -19,18 +19,18 @@ import java.time.OffsetDateTime;
 public class SweNetworkExporter implements NetworkExporter {
     private static final String XIIDM_EXTENSION = "xiidm";
 
-    private final SweRequest sweRequest;
+    private final SweData sweData;
     private final FileExporter fileExporter;
 
-    public SweNetworkExporter(final SweRequest sweRequest, final FileExporter fileExporter) {
-        this.sweRequest = sweRequest;
+    public SweNetworkExporter(final SweData sweData, final FileExporter fileExporter) {
+        this.sweData = sweData;
         this.fileExporter = fileExporter;
     }
 
     @Override
     public void export(final Network network) {
-        final OffsetDateTime targetProcessDateTime = sweRequest.getTargetProcessDateTime();
-        final ProcessType processType = sweRequest.getProcessType();
+        final OffsetDateTime targetProcessDateTime = sweData.getTimestamp();
+        final ProcessType processType = sweData.getProcessType();
         final String destinationMinioPath = fileExporter.makeDestinationMinioPath(targetProcessDateTime, FileExporter.FileKind.ARTIFACTS);
         final String networkFilename = network.getNameOrId() + "-with-failed-balancing-adjustment." + XIIDM_EXTENSION;
         fileExporter.saveNetworkInArtifact(network,

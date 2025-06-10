@@ -53,7 +53,7 @@ public class NetworkShifterProvider {
             Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, loadFlowParameters);
 
             businessLogger.info("Base case loadflow is secure");
-            SweNetworkExporter sweNetworkExporter = exportNetworkConfiguration.isExportFailedNetwork() ? new SweNetworkExporter(null, fileExporter) : null;
+            SweNetworkExporter sweNetworkExporter = exportNetworkConfiguration.isExportFailedNetwork() ? new SweNetworkExporter(sweData, fileExporter) : null;
             return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
                     zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                     getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
