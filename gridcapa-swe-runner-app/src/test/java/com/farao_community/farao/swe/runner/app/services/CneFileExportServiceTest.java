@@ -105,7 +105,7 @@ class CneFileExportServiceTest {
     private final ZonedDateTime dateTime = ZonedDateTime.parse(DATE_STRING);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Paris"));
     }

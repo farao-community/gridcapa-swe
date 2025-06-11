@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DichotomyRunner {
-    private static final HalfRangeDivisionIndexStrategy HALF_INDEX_STRATEGY_CONFIGURATION = new HalfRangeDivisionIndexStrategy(false);
+    private static final HalfRangeDivisionIndexStrategy<SweDichotomyValidationData> HALF_INDEX_STRATEGY_CONFIGURATION = new HalfRangeDivisionIndexStrategy<>(false);
 
     private final DichotomyLogging dichotomyLogging;
     private final FileExporter fileExporter;
