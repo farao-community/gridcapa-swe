@@ -120,6 +120,6 @@ class OutputServiceTest {
         DichotomyResult<SweDichotomyValidationData> dichotomyResult1 = Mockito.mock(DichotomyResult.class);
         Mockito.when(dichotomyResult1.hasValidStep()).thenReturn(true);
         Mockito.when(dichotomyResult1.getHighestValidStepValue()).thenReturn(12345.90);
-        return new SweDichotomyResult(direction, dichotomyResult1, voltageMonitoringResult, "exportedCgmesUrl", "", "");
+        return new SweDichotomyResult(direction, dichotomyResult1, voltageMonitoringResult, "exportedLastSecureCgmesUrl", "exportedFirstUnsecureCgmesUrl", "", "");
     }
 }

@@ -20,7 +20,8 @@ public class SweDichotomyResult {
     private final DichotomyDirection dichotomyDirection;
     private final DichotomyResult<SweDichotomyValidationData> dichotomyResult;
     private final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult;
-    private final String exportedCgmesUrl;
+    private final String exportedLastSecureCgmesUrl;
+    private final String exportedFirstUnsecureCgmesUrl;
     private final String highestValidStepUrl;
     private final String lowestInvalidStepUrl;
     private final boolean interrupted;
@@ -29,13 +30,15 @@ public class SweDichotomyResult {
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                               Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
-                              String exportedCgmesUrl,
+                              String exportedLastSecureCgmesUrl,
+                              String exportedFirstUnsecureCgmesUrl,
                               String highestValidStepUrl,
                               String lowestInvalidStepUrl) {
         this.dichotomyDirection = dichotomyDirection;
         this.dichotomyResult = dichotomyResult;
         this.voltageMonitoringResult = voltageMonitoringResult;
-        this.exportedCgmesUrl = exportedCgmesUrl;
+        this.exportedLastSecureCgmesUrl = exportedLastSecureCgmesUrl;
+        this.exportedFirstUnsecureCgmesUrl = exportedFirstUnsecureCgmesUrl;
         this.highestValidStepUrl = highestValidStepUrl;
         this.lowestInvalidStepUrl = lowestInvalidStepUrl;
         this.interrupted = dichotomyResult.isInterrupted();
@@ -45,7 +48,7 @@ public class SweDichotomyResult {
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                               String lowestInvalidStepUrl) {
-        this(dichotomyDirection, dichotomyResult, Optional.empty(), null, null, lowestInvalidStepUrl);
+        this(dichotomyDirection, dichotomyResult, Optional.empty(), null, null, null, lowestInvalidStepUrl);
     }
 
     public DichotomyDirection getDichotomyDirection() {
@@ -60,8 +63,12 @@ public class SweDichotomyResult {
         return voltageMonitoringResult;
     }
 
-    public String getExportedCgmesUrl() {
-        return exportedCgmesUrl;
+    public String getExportedLastSecureCgmesUrl() {
+        return exportedLastSecureCgmesUrl;
+    }
+
+    public String getExportedFirstUnsecureCgmesUrl() {
+        return exportedFirstUnsecureCgmesUrl;
     }
 
     public String getHighestValidStepUrl() {

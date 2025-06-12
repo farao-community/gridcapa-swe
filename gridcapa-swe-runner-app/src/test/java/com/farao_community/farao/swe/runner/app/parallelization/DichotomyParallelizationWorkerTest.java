@@ -19,6 +19,8 @@ import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,17 +70,20 @@ class DichotomyParallelizationWorkerTest {
 
     private final OffsetDateTime startingTime = OffsetDateTime.now();
 
-    @Test
-    void testRunDichotomyForOneDirection() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testRunDichotomyForOneDirection(final boolean exportFirstUnsecureShiftedCgm) {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(result);
-        when(cgmesExportService.buildAndExportCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesZipFileUrl");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesLastSecureZipFileUrl");
+        when(cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesFirstUnsecureZipFileUrl");
         when(cneFileExportService.exportCneUrl(any(SweData.class), any(DichotomyResult.class), anyBoolean(), any(DichotomyDirection.class))).thenReturn("CneUrl");
         when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
         Mockito.when(sweTaskParameters.getMinTtcEsPt()).thenReturn(0);
         Mockito.when(sweTaskParameters.getMaxTtcEsPt()).thenReturn(6400);
         Mockito.when(sweTaskParameters.getDichotomyPrecisionEsPt()).thenReturn(50);
+        Mockito.when(sweTaskParameters.isExportFirstUnsecureShiftedCGM()).thenReturn(exportFirstUnsecureShiftedCgm);
         Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction, startingTime);
         try {
             SweDichotomyResult sweDichotomyResult = futurResult.get();
@@ -86,7 +91,9 @@ class DichotomyParallelizationWorkerTest {
             assertEquals(direction, sweDichotomyResult.getDichotomyDirection());
             assertEquals("CneUrl", sweDichotomyResult.getHighestValidStepUrl());
             assertEquals("CneUrl", sweDichotomyResult.getLowestInvalidStepUrl());
-            assertEquals("cgmesZipFileUrl", sweDichotomyResult.getExportedCgmesUrl());
+            assertEquals("cgmesLastSecureZipFileUrl", sweDichotomyResult.getExportedLastSecureCgmesUrl());
+            final String expectedValueForFirstUnsecureCgmesUrl = exportFirstUnsecureShiftedCgm ? "cgmesFirstUnsecureZipFileUrl" : null;
+            assertEquals(expectedValueForFirstUnsecureCgmesUrl, sweDichotomyResult.getExportedFirstUnsecureCgmesUrl());
             assertEquals(Optional.empty(), sweDichotomyResult.getVoltageMonitoringResult());
         } catch (InterruptedException | ExecutionException e) {
             fail(e);
