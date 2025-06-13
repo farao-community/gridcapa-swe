@@ -60,8 +60,7 @@ public class FileExporter {
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
-    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
-    private static final DateTimeFormatter CGMES_FIRST_UNSECURE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_FIRST_UNSECURE_CGM_[direction].zip'");
+    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction]_[first_last].zip'");
     private static final DateTimeFormatter NETWORK_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     private static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
     private final MinioAdapter minioAdapter;
@@ -259,8 +258,10 @@ public class FileExporter {
 
     String getCgmZipFileName(final OffsetDateTime offsetDateTime, final DichotomyDirection direction, final boolean isHighestValid) {
         final OffsetDateTime localTime = OffsetDateTime.ofInstant(offsetDateTime.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-        final DateTimeFormatter formatter = isHighestValid ? CGMES_FORMATTER : CGMES_FIRST_UNSECURE_FORMATTER;
-        return formatter.format(localTime).replace("[direction]", direction.getDashName().replace("-", ""));
+        final String firstLast = isHighestValid ? "LAST_SECURE" : "FIRST_UNSECURE";
+        return CGMES_FORMATTER.format(localTime)
+                .replace("[direction]", direction.getDashName().replace("-", ""))
+                .replace("[first_last]", firstLast);
     }
 
     public String adaptTargetProcessName(final ProcessType processType) {

@@ -144,25 +144,25 @@ class FileExporterTest {
     @Test
     void lastSecureCgmFileNameTest() {
         String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR, true);
-        assertEquals("20230101_0130_CGM_ESFR.zip", cgmFileName);
+        assertEquals("20230101_0130_CGM_ESFR_LAST_SECURE.zip", cgmFileName);
     }
 
     @Test
     void firstUnsecureCgmFileNameTest() {
         String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR, false);
-        assertEquals("20230101_0130_FIRST_UNSECURE_CGM_ESFR.zip", cgmFileName);
+        assertEquals("20230101_0130_CGM_ESFR_FIRST_UNSECURE.zip", cgmFileName);
     }
 
     @Test
     void exportCgmesZipFileTest() throws IOException {
         SweData sweData = Mockito.mock(SweData.class);
         Mockito.when(sweData.getTimestamp()).thenReturn(dateTime);
-        Mockito.when(minioAdapter.generatePreSignedUrl("2021/04/01/23_30/OUTPUTS/20210401_2330_CGM_PTES.zip")).thenReturn("SUCCESS");
+        Mockito.when(minioAdapter.generatePreSignedUrl("2021/04/01/23_30/OUTPUTS/20210401_2330_CGM_PTES_LAST_SECURE.zip")).thenReturn("SUCCESS");
         Map<String, ByteArrayOutputStream> inputFiles = new HashMap<>();
         inputFiles.put("firstFile", new ByteArrayOutputStream());
         inputFiles.put("secondFile", new ByteArrayOutputStream());
         inputFiles.put("thirdFile", new ByteArrayOutputStream());
-        assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES", true));
+        assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES_LAST_SECURE", true));
     }
 }
 
