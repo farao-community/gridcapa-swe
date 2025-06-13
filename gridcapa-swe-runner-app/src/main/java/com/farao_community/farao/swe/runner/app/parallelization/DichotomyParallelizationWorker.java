@@ -74,13 +74,17 @@ public class DichotomyParallelizationWorker {
         }
 
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
-        final String zippedCgmesUrl = cgmesExportService.buildAndExportCgmesFiles(direction, sweData, dichotomyResult, sweTaskParameters);
+        final String zippedLastSecureCgmesUrl = cgmesExportService.buildAndExportLastSecureCgmesFiles(direction, sweData, dichotomyResult, sweTaskParameters);
+        String zippedFirstUnsecureCgmesUrl = null;
+        if (sweTaskParameters.isExportFirstUnsecureShiftedCGM()) {
+            zippedFirstUnsecureCgmesUrl = cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(direction, sweData, dichotomyResult, sweTaskParameters);
+        }
         final String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, direction);
         final String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
         final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, sweTaskParameters, direction);
         outputService.buildAndExportVoltageDoc(direction, sweData, voltageMonitoringResult, sweTaskParameters);
         dichotomyLogging.generateSummaryEvents(direction, dichotomyResult, sweData, voltageMonitoringResult, sweTaskParameters, startTime);
         // fill response for one dichotomy
-        return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl));
+        return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, voltageMonitoringResult, zippedLastSecureCgmesUrl, zippedFirstUnsecureCgmesUrl, highestValidStepUrl, lowestInvalidStepUrl));
     }
 }

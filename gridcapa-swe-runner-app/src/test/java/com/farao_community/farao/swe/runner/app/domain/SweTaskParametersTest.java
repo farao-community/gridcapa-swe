@@ -38,7 +38,8 @@ class SweTaskParametersTest {
             new TaskParameterDto("RUN_VOLTAGE_CHECK", "BOOLEAN", "true", "true"),
             new TaskParameterDto("MAX_CRA", "INT", "72", "25"),
             new TaskParameterDto("MAX_NEWTON_RAPHSON_ITERATIONS", "INT", "38", "63"),
-            new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false")
+            new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false"),
+            new TaskParameterDto("EXPORT_FIRST_UNSECURE_SHIFTED_CGM", "BOOLEAN", "true", "false")
         );
 
         SweTaskParameters sweTaskParameters = new SweTaskParameters(parameters);
@@ -64,6 +65,7 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.getMaxCra()).isEqualTo(72);
         Assertions.assertThat(sweTaskParameters.getMaxNewtonRaphsonIterations()).isEqualTo(38);
         Assertions.assertThat(sweTaskParameters.isSecondPreventiveRaoDisabled()).isTrue();
+        Assertions.assertThat(sweTaskParameters.isExportFirstUnsecureShiftedCGM()).isTrue();
     }
 
     @Test
@@ -100,6 +102,8 @@ class SweTaskParametersTest {
         Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isFalse();
         Assertions.assertThat(sweTaskParameters.getMaxCra()).isZero();
         Assertions.assertThat(sweTaskParameters.getMaxNewtonRaphsonIterations()).isZero();
+        Assertions.assertThat(sweTaskParameters.isSecondPreventiveRaoDisabled()).isFalse();
+        Assertions.assertThat(sweTaskParameters.isExportFirstUnsecureShiftedCGM()).isFalse();
     }
 
     @Test

@@ -39,20 +39,21 @@ class SweDichotomyResultTest {
 
     @Test
     void simpleTestEmptyOptional() {
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.empty(), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.empty(), "exportedLastSecureCgmesUrl", "exportedFirstUnsecureCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(dichotomyResult, result.getDichotomyResult());
         assertFalse(result.isInterrupted());
         assertTrue(result.getVoltageMonitoringResult().isEmpty());
         assertEquals("highestValidStepUrl", result.getHighestValidStepUrl());
         assertEquals("lowestValidStepUrl", result.getLowestInvalidStepUrl());
-        assertEquals("exportedCgmesUrl", result.getExportedCgmesUrl());
+        assertEquals("exportedLastSecureCgmesUrl", result.getExportedLastSecureCgmesUrl());
+        assertEquals("exportedFirstUnsecureCgmesUrl", result.getExportedFirstUnsecureCgmesUrl());
         assertFalse(result.isRaoFailed());
     }
 
     @Test
     void simpleTestWithOptional() {
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "exportedLastSecureCgmesUrl", "exportedFirstUnsecureCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(dichotomyResult, result.getDichotomyResult());
         assertFalse(result.isInterrupted());
@@ -60,14 +61,15 @@ class SweDichotomyResultTest {
         assertEquals(voltageMonitoringResult, result.getVoltageMonitoringResult().get());
         assertEquals("highestValidStepUrl", result.getHighestValidStepUrl());
         assertEquals("lowestValidStepUrl", result.getLowestInvalidStepUrl());
-        assertEquals("exportedCgmesUrl", result.getExportedCgmesUrl());
+        assertEquals("exportedLastSecureCgmesUrl", result.getExportedLastSecureCgmesUrl());
+        assertEquals("exportedFirstUnsecureCgmesUrl", result.getExportedFirstUnsecureCgmesUrl());
         assertFalse(result.isRaoFailed());
     }
 
     @Test
     void simpleTestWithInterruption() {
         Mockito.when(dichotomyResult.isInterrupted()).thenReturn(true);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "exportedCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, dichotomyResult, Optional.of(voltageMonitoringResult), "exportedLastSecureCgmesUrl", "exportedFirstUnsecureCgmesUrl", "highestValidStepUrl", "lowestValidStepUrl");
         assertEquals(DichotomyDirection.ES_FR, result.getDichotomyDirection());
         assertEquals(dichotomyResult, result.getDichotomyResult());
         assertTrue(result.isInterrupted());
@@ -75,7 +77,8 @@ class SweDichotomyResultTest {
         assertEquals(voltageMonitoringResult, result.getVoltageMonitoringResult().get());
         assertEquals("highestValidStepUrl", result.getHighestValidStepUrl());
         assertEquals("lowestValidStepUrl", result.getLowestInvalidStepUrl());
-        assertEquals("exportedCgmesUrl", result.getExportedCgmesUrl());
+        assertEquals("exportedLastSecureCgmesUrl", result.getExportedLastSecureCgmesUrl());
+        assertEquals("exportedFirstUnsecureCgmesUrl", result.getExportedFirstUnsecureCgmesUrl());
         assertFalse(result.isRaoFailed());
     }
 
@@ -89,7 +92,7 @@ class SweDichotomyResultTest {
         assertFalse(result.getVoltageMonitoringResult().isPresent());
         assertNull(result.getHighestValidStepUrl());
         assertEquals("cneFirstUnsecureUrl", result.getLowestInvalidStepUrl());
-        assertNull(result.getExportedCgmesUrl());
+        assertNull(result.getExportedLastSecureCgmesUrl());
         assertEquals(customDichotomyResult, result.getDichotomyResult());
         assertTrue(result.isRaoFailed());
     }

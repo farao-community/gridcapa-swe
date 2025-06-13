@@ -8,6 +8,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
@@ -107,24 +108,52 @@ public class CgmesExportService {
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
     }
 
-    public String buildAndExportCgmesFiles(DichotomyDirection direction, SweData sweData, DichotomyResult<SweDichotomyValidationData> dichotomyResult, SweTaskParameters sweTaskParameters) {
+    public String buildAndExportLastSecureCgmesFiles(final DichotomyDirection direction,
+                                                     final SweData sweData,
+                                                     final DichotomyResult<SweDichotomyValidationData> dichotomyResult,
+                                                     final SweTaskParameters sweTaskParameters) {
         if (dichotomyResult.hasValidStep()) {
-            businessLogger.info("Start export of the CGMES files");
-            String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
-            try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
-                Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
-                applyHvdcSetPointToAcEquivalentModel(networkWithPra, sweData.getHvdcInformationList());
-                LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
-                LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), loadFlowParameters);
-                removeRemoteVoltageRegulationInFranceService.resetRemoteVoltageRegulationInFrance(networkWithPra, sweData.getReplacedVoltageRegulations());
-                Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
-                return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction));
-            } catch (IOException e) {
-                throw new SweInvalidDataException(String.format("Can not export cgmes file associated with direction %s", direction.getDashName()), e);
-            }
+            businessLogger.info("Start export of the Last Secure CGMES files");
+            final DichotomyStepResult<SweDichotomyValidationData> highestValidStep = dichotomyResult.getHighestValidStep();
+            return buildAndExportCgmesFiles(direction, sweData, sweTaskParameters, highestValidStep, true);
         } else {
-            businessLogger.error("Dichotomy does not have a valid step, CGMES files won't be exported");
+            businessLogger.error("Dichotomy does not have a valid step, Last Secure CGMES files won't be exported");
             return null;
+        }
+    }
+
+    public String buildAndExportFirstUnsecureCgmesFiles(final DichotomyDirection direction,
+                                                        final SweData sweData,
+                                                        final DichotomyResult<SweDichotomyValidationData> dichotomyResult,
+                                                        final SweTaskParameters sweTaskParameters) {
+        final DichotomyStepResult<SweDichotomyValidationData> lowestInvalidStep = dichotomyResult.getLowestInvalidStep();
+
+        if (lowestInvalidStep == null) {
+            businessLogger.error("Dichotomy does not have an invalid step, First Unsecure Shifted CGMES files won't be exported");
+            return null;
+        }
+
+        businessLogger.info("Start export of the First Unsecure CGMES files");
+        return buildAndExportCgmesFiles(direction, sweData, sweTaskParameters, lowestInvalidStep, false);
+    }
+
+    String buildAndExportCgmesFiles(final DichotomyDirection direction,
+                                    final SweData sweData,
+                                    final SweTaskParameters sweTaskParameters,
+                                    final DichotomyStepResult<SweDichotomyValidationData> stepResult,
+                                    final boolean isHighestValid) {
+        final String networkWithPraUrl = stepResult.getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
+
+        try (final InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
+            final Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
+            applyHvdcSetPointToAcEquivalentModel(networkWithPra, sweData.getHvdcInformationList());
+            final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
+            LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), loadFlowParameters);
+            removeRemoteVoltageRegulationInFranceService.resetRemoteVoltageRegulationInFrance(networkWithPra, sweData.getReplacedVoltageRegulations());
+            final Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
+            return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction, isHighestValid), isHighestValid);
+        } catch (final IOException e) {
+            throw new SweInvalidDataException(String.format("Can not export cgmes file associated with direction %s", direction.getDashName()), e);
         }
     }
 
@@ -370,7 +399,9 @@ public class CgmesExportService {
         return String.format("%02d", hoursCapped);
     }
 
-    String buildFileType(DichotomyDirection direction) {
-        return "CGM_" + direction.getShortName();
+    String buildFileType(final DichotomyDirection direction, final boolean isHighestValid) {
+        final String fileTypeFormat = "CGM_%s_%s";
+        final String fileTypeEnd = isHighestValid ? "LAST_SECURE" : "FIRST_UNSECURE";
+        return String.format(fileTypeFormat, direction.getShortName(), fileTypeEnd);
     }
 }

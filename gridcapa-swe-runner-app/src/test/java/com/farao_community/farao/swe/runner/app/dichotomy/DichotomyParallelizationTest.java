@@ -121,7 +121,7 @@ class DichotomyParallelizationTest {
     void testParallelization() {
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -135,7 +135,7 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getNetworkPtEs()).thenReturn(network);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
@@ -156,7 +156,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, null, "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
@@ -176,7 +176,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
@@ -196,7 +196,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
+        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
@@ -215,7 +215,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null);
+        new SweDichotomyResult(DichotomyDirection.ES_FR, mock(DichotomyResult.class), null, null, null, null, null);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(future);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(future);
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(future);
@@ -233,7 +233,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -244,7 +244,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(eq(sweData), eq(onlyFrParameters), any(DichotomyDirection.class), any(OffsetDateTime.class))).thenReturn(CompletableFuture.completedFuture(result));
 
         dichotomyParallelization.launchDichotomy(sweData, onlyFrParameters, startingTime);
@@ -264,7 +264,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -275,7 +275,7 @@ class DichotomyParallelizationTest {
         when(cracCreationContext.getCrac()).thenReturn(crac);
         when(sweData.getNetworkEsFr()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(eq(sweData), eq(onlyFrParameters), any(DichotomyDirection.class), any(OffsetDateTime.class))).thenReturn(CompletableFuture.completedFuture(result));
 
         dichotomyParallelization.launchDichotomy(sweData, onlyFrParameters, startingTime);
@@ -329,7 +329,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -343,8 +343,8 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getNetworkPtEs()).thenReturn(network);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
-        SweDichotomyResult interruptedResult = new SweDichotomyResult(DichotomyDirection.ES_FR, interruptedSweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult interruptedResult = new SweDichotomyResult(DichotomyDirection.ES_FR, interruptedSweDichotomyResult, Optional.empty(), null, null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(interruptedResult));
@@ -361,7 +361,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -375,7 +375,7 @@ class DichotomyParallelizationTest {
         when(sweData.getNetworkEsPt()).thenReturn(network);
         when(sweData.getNetworkFrEs()).thenReturn(network);
         when(sweData.getNetworkPtEs()).thenReturn(network);
-        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
+        SweDichotomyResult result = new SweDichotomyResult(DichotomyDirection.ES_FR, sweDichotomyResult, Optional.empty(), null, null, "esFrHighestValidStepUrl.zip", "esFrLowestInvalidStepUrl.zip");
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_FR, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(result));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(failedResult));
@@ -392,7 +392,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -423,7 +423,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
