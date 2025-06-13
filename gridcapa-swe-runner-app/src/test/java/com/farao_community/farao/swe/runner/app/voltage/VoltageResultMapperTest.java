@@ -54,7 +54,7 @@ class VoltageResultMapperTest {
     private static final Set<VoltageCnec> VOLTAGE_CNEC_SET = new HashSet<>();
 
     @BeforeAll
-    public static void getVoltageMonitoringResult() {
+    static void getVoltageMonitoringResult() {
         final RaoResultWithVoltageMonitoring voltageMonitoringResult = getMonitoringResult();
         final Crac crac = Mockito.mock(Crac.class);
         Mockito.when(crac.getVoltageCnecs()).thenReturn(VOLTAGE_CNEC_SET);

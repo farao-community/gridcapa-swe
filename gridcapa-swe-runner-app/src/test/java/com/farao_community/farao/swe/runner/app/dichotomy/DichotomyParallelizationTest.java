@@ -108,7 +108,7 @@ class DichotomyParallelizationTest {
     private final OffsetDateTime startingTime = OffsetDateTime.now();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         network = Network.read("network.xiidm", getClass().getResourceAsStream("/network/network.xiidm"));
         crac = CracFactory.findDefault().create("test-crac");
         defaultParameters = new TestParametersBuilder()

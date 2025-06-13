@@ -44,7 +44,6 @@ class OutputServiceTest {
 
     private static OutputService outputService;
     private static FileExporter fileExporter;
-    private static ProcessConfiguration processConfiguration;
     private SweData sweData;
     private static ExecutionResult<SweDichotomyResult> executionResult;
 
@@ -53,8 +52,7 @@ class OutputServiceTest {
     @BeforeAll
     static void init() {
         fileExporter = Mockito.mock(FileExporter.class);
-        processConfiguration = Mockito.mock(ProcessConfiguration.class);
-        Crac crac = Mockito.mock(Crac.class);
+        ProcessConfiguration processConfiguration = Mockito.mock(ProcessConfiguration.class);
         Mockito.when(fileExporter.saveVoltageMonitoringResultInJsonZip(any(), any(), any(), any(), Mockito.anyString(), any()))
                 .thenReturn(VOLTAGE_DOCUMENT_URL_STRING);
         Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Paris");
@@ -122,7 +120,6 @@ class OutputServiceTest {
         DichotomyResult<SweDichotomyValidationData> dichotomyResult1 = Mockito.mock(DichotomyResult.class);
         Mockito.when(dichotomyResult1.hasValidStep()).thenReturn(true);
         Mockito.when(dichotomyResult1.getHighestValidStepValue()).thenReturn(12345.90);
-        SweDichotomyResult sweDichotomyResult1 = new SweDichotomyResult(direction, dichotomyResult1, voltageMonitoringResult, "exportedCgmesUrl", "", "");
-        return sweDichotomyResult1;
+        return new SweDichotomyResult(direction, dichotomyResult1, voltageMonitoringResult, "exportedCgmesUrl", "", "");
     }
 }
