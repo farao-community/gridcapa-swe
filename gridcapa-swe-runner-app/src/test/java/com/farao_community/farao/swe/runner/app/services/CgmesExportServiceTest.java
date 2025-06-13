@@ -123,10 +123,14 @@ class CgmesExportServiceTest {
 
     @Test
     void buildFileTypeTest() {
-        assertEquals("CGM_ESFR", cgmesExportService.buildFileType(DichotomyDirection.ES_FR));
-        assertEquals("CGM_FRES", cgmesExportService.buildFileType(DichotomyDirection.FR_ES));
-        assertEquals("CGM_ESPT", cgmesExportService.buildFileType(DichotomyDirection.ES_PT));
-        assertEquals("CGM_PTES", cgmesExportService.buildFileType(DichotomyDirection.PT_ES));
+        assertEquals("CGM_ESFR_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_FR, true));
+        assertEquals("CGM_FRES_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.FR_ES, true));
+        assertEquals("CGM_ESPT_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_PT, true));
+        assertEquals("CGM_PTES_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.PT_ES, true));
+        assertEquals("CGM_ESFR_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_FR, false));
+        assertEquals("CGM_FRES_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.FR_ES, false));
+        assertEquals("CGM_ESPT_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_PT, false));
+        assertEquals("CGM_PTES_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.PT_ES, false));
     }
 
     @Test

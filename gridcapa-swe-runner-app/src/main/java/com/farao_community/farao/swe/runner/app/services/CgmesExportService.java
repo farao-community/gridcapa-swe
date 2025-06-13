@@ -117,7 +117,7 @@ public class CgmesExportService {
             final DichotomyStepResult<SweDichotomyValidationData> highestValidStep = dichotomyResult.getHighestValidStep();
             return buildAndExportCgmesFiles(direction, sweData, sweTaskParameters, highestValidStep, true);
         } else {
-            businessLogger.error("Dichotomy does not have a valid step, CGMES files won't be exported");
+            businessLogger.error("Dichotomy does not have a valid step, Last Secure CGMES files won't be exported");
             return null;
         }
     }
@@ -144,15 +144,15 @@ public class CgmesExportService {
                                     final boolean isHighestValid) {
         final String networkWithPraUrl = stepResult.getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
 
-        try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
+        try (final InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
             final Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
             applyHvdcSetPointToAcEquivalentModel(networkWithPra, sweData.getHvdcInformationList());
             final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
             LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), loadFlowParameters);
             removeRemoteVoltageRegulationInFranceService.resetRemoteVoltageRegulationInFrance(networkWithPra, sweData.getReplacedVoltageRegulations());
             final Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
-            return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction), isHighestValid);
-        } catch (IOException e) {
+            return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction, isHighestValid), isHighestValid);
+        } catch (final IOException e) {
             throw new SweInvalidDataException(String.format("Can not export cgmes file associated with direction %s", direction.getDashName()), e);
         }
     }
@@ -399,7 +399,9 @@ public class CgmesExportService {
         return String.format("%02d", hoursCapped);
     }
 
-    String buildFileType(DichotomyDirection direction) {
-        return "CGM_" + direction.getShortName();
+    String buildFileType(final DichotomyDirection direction, final boolean isHighestValid) {
+        final String fileTypeFormat = "CGM_%s_%s";
+        final String fileTypeEnd = isHighestValid ? "LAST_SECURE" : "FIRST_UNSECURE";
+        return String.format(fileTypeFormat, direction.getShortName(), fileTypeEnd);
     }
 }
