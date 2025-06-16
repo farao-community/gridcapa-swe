@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.times;
@@ -72,7 +71,7 @@ class DichotomyParallelizationWorkerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void testRunDichotomyForOneDirection(final boolean exportFirstUnsecureShiftedCgm) {
+    void testRunDichotomyForOneDirection(final boolean exportFirstUnsecureShiftedCgm) throws ExecutionException, InterruptedException {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(result);
         when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesLastSecureZipFileUrl");
@@ -85,25 +84,26 @@ class DichotomyParallelizationWorkerTest {
         Mockito.when(sweTaskParameters.getDichotomyPrecisionEsPt()).thenReturn(50);
         Mockito.when(sweTaskParameters.isExportFirstUnsecureShiftedCGM()).thenReturn(exportFirstUnsecureShiftedCgm);
         Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction, startingTime);
-        try {
-            SweDichotomyResult sweDichotomyResult = futurResult.get();
-            assertTrue(futurResult.isDone());
-            assertEquals(direction, sweDichotomyResult.getDichotomyDirection());
-            assertEquals("CneUrl", sweDichotomyResult.getHighestValidStepUrl());
-            assertEquals("CneUrl", sweDichotomyResult.getLowestInvalidStepUrl());
-            assertEquals("cgmesLastSecureZipFileUrl", sweDichotomyResult.getExportedLastSecureCgmesUrl());
-            final String expectedValueForFirstUnsecureCgmesUrl = exportFirstUnsecureShiftedCgm ? "cgmesFirstUnsecureZipFileUrl" : null;
-            assertEquals(expectedValueForFirstUnsecureCgmesUrl, sweDichotomyResult.getExportedFirstUnsecureCgmesUrl());
-            assertEquals(Optional.empty(), sweDichotomyResult.getVoltageMonitoringResult());
-        } catch (InterruptedException | ExecutionException e) {
-            fail(e);
-        }
+
+        SweDichotomyResult sweDichotomyResult = futurResult.get();
+
+        assertTrue(futurResult.isDone());
+        assertEquals(direction, sweDichotomyResult.getDichotomyDirection());
+        assertEquals("CneUrl", sweDichotomyResult.getHighestValidStepUrl());
+        assertEquals("CneUrl", sweDichotomyResult.getLowestInvalidStepUrl());
+        assertEquals("cgmesLastSecureZipFileUrl", sweDichotomyResult.getExportedLastSecureCgmesUrl());
+        final String expectedValueForFirstUnsecureCgmesUrl = exportFirstUnsecureShiftedCgm ? "cgmesFirstUnsecureZipFileUrl" : null;
+        assertEquals(expectedValueForFirstUnsecureCgmesUrl, sweDichotomyResult.getExportedFirstUnsecureCgmesUrl());
+        assertEquals(Optional.empty(), sweDichotomyResult.getVoltageMonitoringResult());
+
         verify(outputService, times(1)).buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class));
         verify(dichotomyLogging, times(1)).generateSummaryEvents(any(DichotomyDirection.class), any(DichotomyResult.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class), any(OffsetDateTime.class));
+        final int wantedNumberOfInvocations = exportFirstUnsecureShiftedCgm ? 1 : 0;
+        verify(cgmesExportService, times(wantedNumberOfInvocations)).buildAndExportFirstUnsecureCgmesFiles(any(), any(), any(), any());
     }
 
     @Test
-    void testRunDichotomyRaoFailure() {
+    void testRunDichotomyRaoFailure() throws ExecutionException, InterruptedException {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
         DichotomyResult<SweDichotomyValidationData> customResult = DichotomyResult.buildFromRaoFailure("failure");
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(customResult);
@@ -111,13 +111,9 @@ class DichotomyParallelizationWorkerTest {
 
         Future<SweDichotomyResult> futurResult = dichotomyParallelizationWorker.runDichotomyForOneDirection(sweData, sweTaskParameters, direction, startingTime);
 
-        try {
-            SweDichotomyResult sweDichotomyResult = futurResult.get();
-            assertTrue(futurResult.isDone());
-            assertEquals(direction, sweDichotomyResult.getDichotomyDirection());
-            assertTrue(sweDichotomyResult.isRaoFailed());
-        } catch (InterruptedException | ExecutionException e) {
-            fail(e);
-        }
+        SweDichotomyResult sweDichotomyResult = futurResult.get();
+        assertTrue(futurResult.isDone());
+        assertEquals(direction, sweDichotomyResult.getDichotomyDirection());
+        assertTrue(sweDichotomyResult.isRaoFailed());
     }
 }
