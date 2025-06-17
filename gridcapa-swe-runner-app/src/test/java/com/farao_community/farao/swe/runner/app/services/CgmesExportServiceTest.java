@@ -6,11 +6,15 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.cgmes.extensions.CgmesMetadataModels;
@@ -36,15 +40,25 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -109,10 +123,49 @@ class CgmesExportServiceTest {
 
     @Test
     void buildFileTypeTest() {
-        assertEquals("CGM_ESFR", cgmesExportService.buildFileType(DichotomyDirection.ES_FR));
-        assertEquals("CGM_FRES", cgmesExportService.buildFileType(DichotomyDirection.FR_ES));
-        assertEquals("CGM_ESPT", cgmesExportService.buildFileType(DichotomyDirection.ES_PT));
-        assertEquals("CGM_PTES", cgmesExportService.buildFileType(DichotomyDirection.PT_ES));
+        assertEquals("CGM_ESFR_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_FR, true));
+        assertEquals("CGM_FRES_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.FR_ES, true));
+        assertEquals("CGM_ESPT_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_PT, true));
+        assertEquals("CGM_PTES_LAST_SECURE", cgmesExportService.buildFileType(DichotomyDirection.PT_ES, true));
+        assertEquals("CGM_ESFR_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_FR, false));
+        assertEquals("CGM_FRES_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.FR_ES, false));
+        assertEquals("CGM_ESPT_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.ES_PT, false));
+        assertEquals("CGM_PTES_FIRST_UNSECURE", cgmesExportService.buildFileType(DichotomyDirection.PT_ES, false));
+    }
+
+    @Test
+    void buildLastSecureCgmesNoValidStep() {
+        final DichotomyResult<SweDichotomyValidationData> dichotomyResult = DichotomyResult.buildFromRaoFailure("test");
+        final String result = cgmesExportService.buildAndExportLastSecureCgmesFiles(DichotomyDirection.ES_FR, mock(SweData.class), dichotomyResult, mock(SweTaskParameters.class));
+        assertNull(result);
+    }
+
+    @Test
+    void buildLastSecureCgmesValidStep() {
+        final CgmesExportService spyCgmesExportService = spy(cgmesExportService);
+        doReturn("Test").when(spyCgmesExportService).buildAndExportCgmesFiles(any(), any(), any(), any(), eq(true));
+        final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
+        when(dichotomyResult.hasValidStep()).thenReturn(true);
+        final String result = spyCgmesExportService.buildAndExportLastSecureCgmesFiles(DichotomyDirection.ES_FR, mock(SweData.class), dichotomyResult, mock(SweTaskParameters.class));
+        assertEquals("Test", result);
+    }
+
+    @Test
+    void buildFirstUnsecureCgmesNoInvalidStep() {
+        final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
+        when(dichotomyResult.getLowestInvalidStep()).thenReturn(null);
+        final String result = cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(DichotomyDirection.ES_FR, mock(SweData.class), dichotomyResult, mock(SweTaskParameters.class));
+        assertNull(result);
+    }
+
+    @Test
+    void buildFirstUnsecureCgmesInvalidStep() {
+        final CgmesExportService spyCgmesExportService = spy(cgmesExportService);
+        doReturn("Test").when(spyCgmesExportService).buildAndExportCgmesFiles(any(), any(), any(), any(), eq(false));
+        final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
+        when(dichotomyResult.getLowestInvalidStep()).thenReturn(mock(DichotomyStepResult.class));
+        final String result = spyCgmesExportService.buildAndExportFirstUnsecureCgmesFiles(DichotomyDirection.ES_FR, mock(SweData.class), dichotomyResult, mock(SweTaskParameters.class));
+        assertEquals("Test", result);
     }
 
     @Test

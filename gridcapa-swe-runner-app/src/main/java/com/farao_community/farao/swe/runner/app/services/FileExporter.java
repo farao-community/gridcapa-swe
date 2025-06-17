@@ -60,7 +60,7 @@ public class FileExporter {
     private static final String MINIO_SEPARATOR = "/";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters%s.json";
     private static final String PROCESS_TYPE_PREFIX = "SWE_";
-    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction].zip'");
+    private static final DateTimeFormatter CGMES_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmm'_CGM_[direction][first_unsecure].zip'");
     private static final DateTimeFormatter NETWORK_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");
     private static final String MINIO_DESTINATION_PATH_REGEX = "yyyy'/'MM'/'dd'/'HH'_30/[filekind]/'";
     private final MinioAdapter minioAdapter;
@@ -222,9 +222,13 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(filePath);
     }
 
-    public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction, String filetype) throws IOException {
-        String cgmesFilename = getCgmZipFileName(sweData.getTimestamp(), direction);
-        String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
+    public String exportCgmesZipFile(final SweData sweData,
+                                     final Map<String, ByteArrayOutputStream> mapCgmesFiles,
+                                     final DichotomyDirection direction,
+                                     final String filetype,
+                                     final boolean isHighestValid) throws IOException {
+        final String cgmesFilename = getCgmZipFileName(sweData.getTimestamp(), direction, isHighestValid);
+        final String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ZipOutputStream zipOs = new ZipOutputStream(baos)) {
 
@@ -252,12 +256,15 @@ public class FileExporter {
         }
     }
 
-    String getCgmZipFileName(OffsetDateTime offsetDateTime, DichotomyDirection direction) {
-        OffsetDateTime localTime = OffsetDateTime.ofInstant(offsetDateTime.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
-        return CGMES_FORMATTER.format(localTime).replace("[direction]", direction.getDashName().replace("-", ""));
+    String getCgmZipFileName(final OffsetDateTime offsetDateTime, final DichotomyDirection direction, final boolean isHighestValid) {
+        final OffsetDateTime localTime = OffsetDateTime.ofInstant(offsetDateTime.toInstant(), ZoneId.of(processConfiguration.getZoneId()));
+        final String firstUnsecure = isHighestValid ? "" : "_FIRST_UNSECURE";
+        return CGMES_FORMATTER.format(localTime)
+                .replace("[direction]", direction.getDashName().replace("-", ""))
+                .replace("[first_unsecure]", firstUnsecure);
     }
 
-    public String adaptTargetProcessName(ProcessType processType) {
+    public String adaptTargetProcessName(final ProcessType processType) {
         return PROCESS_TYPE_PREFIX + processType;
     }
 

@@ -142,9 +142,15 @@ class FileExporterTest {
     }
 
     @Test
-    void cgmFileNameTest() {
-        String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR);
+    void lastSecureCgmFileNameTest() {
+        String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR, true);
         assertEquals("20230101_0130_CGM_ESFR.zip", cgmFileName);
+    }
+
+    @Test
+    void firstUnsecureCgmFileNameTest() {
+        String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR, false);
+        assertEquals("20230101_0130_CGM_ESFR_FIRST_UNSECURE.zip", cgmFileName);
     }
 
     @Test
@@ -156,7 +162,7 @@ class FileExporterTest {
         inputFiles.put("firstFile", new ByteArrayOutputStream());
         inputFiles.put("secondFile", new ByteArrayOutputStream());
         inputFiles.put("thirdFile", new ByteArrayOutputStream());
-        assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
+        assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES", true));
     }
 }
 
