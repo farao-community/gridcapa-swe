@@ -48,8 +48,8 @@ public class DichotomyParallelization {
                                        final OffsetDateTime startTime) {
         final ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters, startTime);
         dichotomyLogging.logEndAllDichotomies();
-        String ttcDocUrl = outputService.buildAndExportTtcDocument(sweData, executionResult);
         final boolean interrupted = executionResult.getResult().stream().anyMatch(SweDichotomyResult::isInterrupted);
+        String ttcDocUrl = !interrupted ? outputService.buildAndExportTtcDocument(sweData, executionResult) : "";
         interruptionService.removeRunToBeInterrupted(sweData.getId());
         final boolean allRaoFailed = executionResult.getResult().stream().allMatch(SweDichotomyResult::isRaoFailed);
         return new SweResponse(sweData.getId(), ttcDocUrl, interrupted, allRaoFailed);

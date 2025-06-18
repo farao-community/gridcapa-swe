@@ -72,6 +72,9 @@ public class DichotomyParallelizationWorker {
             final String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
             return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, lowestInvalidStepUrl));
         }
+        if (dichotomyResult.isInterrupted()) {
+            return CompletableFuture.completedFuture(new SweDichotomyResult(direction, dichotomyResult, ""));
+        }
 
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
         final String zippedLastSecureCgmesUrl = cgmesExportService.buildAndExportLastSecureCgmesFiles(direction, sweData, dichotomyResult, sweTaskParameters);
