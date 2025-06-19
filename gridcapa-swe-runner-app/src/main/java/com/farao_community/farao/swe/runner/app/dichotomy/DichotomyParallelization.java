@@ -49,7 +49,7 @@ public class DichotomyParallelization {
         final ExecutionResult<SweDichotomyResult> executionResult = runAndGetSweDichotomyResults(sweData, sweTaskParameters, startTime);
         dichotomyLogging.logEndAllDichotomies();
         final boolean interrupted = executionResult.getResult().stream().anyMatch(SweDichotomyResult::isInterrupted);
-        String ttcDocUrl = !interrupted ? outputService.buildAndExportTtcDocument(sweData, executionResult) : "";
+        final String ttcDocUrl = interrupted ? "" : outputService.buildAndExportTtcDocument(sweData, executionResult);
         interruptionService.removeRunToBeInterrupted(sweData.getId());
         final boolean allRaoFailed = executionResult.getResult().stream().allMatch(SweDichotomyResult::isRaoFailed);
         return new SweResponse(sweData.getId(), ttcDocUrl, interrupted, allRaoFailed);
