@@ -328,7 +328,6 @@ class DichotomyParallelizationTest {
         when(interruptedSweDichotomyResult.isInterrupted()).thenReturn(true);
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
-        when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
         when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
@@ -350,7 +349,7 @@ class DichotomyParallelizationTest {
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.completedFuture(interruptedResult));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.completedFuture(interruptedResult));
         SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
-        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertEquals("", sweResponse.getTtcDocUrl());
         assertTrue(sweResponse.isInterrupted());
     }
 
