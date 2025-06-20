@@ -68,13 +68,14 @@ public class DichotomyRunner {
     }
 
     DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(SweData sweData, DichotomyDirection direction, DichotomyParameters parameters, LoadFlowParameters loadFlowParameters) {
-        return new DichotomyEngine<>(
-                new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()),
-                HALF_INDEX_STRATEGY_CONFIGURATION,
-                interruptionService,
-                networkShifterProvider.get(sweData, direction, loadFlowParameters),
-                getNetworkValidator(sweData, direction, parameters.isRunAngleCheck(), loadFlowParameters),
-                sweData.getId());
+        return DichotomyEngine.<SweDichotomyValidationData>builder()
+                .withIndex(new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()))
+                .withIndexStrategy(HALF_INDEX_STRATEGY_CONFIGURATION)
+                .withInterruptionStrategy(interruptionService)
+                .withNetworkShifter(networkShifterProvider.get(sweData, direction, loadFlowParameters))
+                .withNetworkValidator(getNetworkValidator(sweData, direction, parameters.isRunAngleCheck(), loadFlowParameters))
+                .withRunId(sweData.getId())
+                .build();
     }
 
     private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters) {
