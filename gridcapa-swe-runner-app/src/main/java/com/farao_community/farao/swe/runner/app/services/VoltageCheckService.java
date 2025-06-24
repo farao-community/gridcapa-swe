@@ -15,6 +15,7 @@ import com.farao_community.farao.swe.runner.app.configurations.ExportNetworkConf
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.utils.FaillingNetworkExportUtils;
 import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.iidm.network.Network;
@@ -45,7 +46,6 @@ import java.util.Optional;
 
 @Service
 public class VoltageCheckService {
-    private static final String XIIDM_EXTENSION = "xiidm";
     private final Logger businessLogger;
     private final UrlValidationService urlValidationService;
     private final ExportNetworkConfiguration exportNetworkConfiguration;
@@ -53,7 +53,7 @@ public class VoltageCheckService {
 
     public VoltageCheckService(final Logger businessLogger,
                                final UrlValidationService urlValidationService,
-                               ExportNetworkConfiguration exportNetworkConfiguration,
+                               final ExportNetworkConfiguration exportNetworkConfiguration,
                                final FileExporter fileExporter) {
         this.businessLogger = businessLogger;
         this.urlValidationService = urlValidationService;
@@ -143,13 +143,7 @@ public class VoltageCheckService {
                                     final OffsetDateTime targetProcessDateTime,
                                     final ProcessType processType) {
         try {
-            final String destinationMinioPath = fileExporter.makeDestinationMinioPath(targetProcessDateTime, FileExporter.FileKind.ARTIFACTS);
-            final String scaledNetworkInXiidmFormatName = network.getNameOrId() + "-with-failed-voltage-check." + XIIDM_EXTENSION;
-            fileExporter.saveNetworkInArtifact(network,
-                    destinationMinioPath + scaledNetworkInXiidmFormatName,
-                    "",
-                    targetProcessDateTime,
-                    processType);
+            FaillingNetworkExportUtils.exportNetwork(network, targetProcessDateTime, processType, fileExporter, "-with-failed-voltage-check");
         } catch (Exception e) {
             businessLogger.warn("Failed to export network with voltage constraint violations: {}", e.getMessage());
         }
