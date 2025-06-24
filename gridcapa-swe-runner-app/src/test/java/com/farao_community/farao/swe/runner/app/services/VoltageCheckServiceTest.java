@@ -57,7 +57,7 @@ class VoltageCheckServiceTest {
     @MockBean
     private FileExporter fileExporter;
 
-    private SweTaskParameters sweTaskParameters = SweTaskParametersTestUtil.getSweTaskParameters();
+    private final SweTaskParameters sweTaskParameters = SweTaskParametersTestUtil.getSweTaskParameters();
 
     @Test
     void checkDoesntReturnVoltageCheckIfNotFrESBorder() {
@@ -69,8 +69,8 @@ class VoltageCheckServiceTest {
 
     @Test
     void checkDoesntReturnVoltageCheckIfParameterDisabled() {
-        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of(new TaskParameterDto("RUN_VOLTAGE_CHECK", "BOOLEAN", "false", "true")));
-        Optional<RaoResultWithVoltageMonitoring> result = service.runVoltageCheck(null, null, sweTaskParameters, DichotomyDirection.ES_FR);
+        SweTaskParameters parameters = new SweTaskParameters(List.of(new TaskParameterDto("RUN_VOLTAGE_CHECK", "BOOLEAN", "false", "true")));
+        Optional<RaoResultWithVoltageMonitoring> result = service.runVoltageCheck(null, null, parameters, DichotomyDirection.ES_FR);
         assertTrue(result.isEmpty());
     }
 

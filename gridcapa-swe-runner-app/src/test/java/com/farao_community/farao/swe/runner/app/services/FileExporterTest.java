@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,7 +47,7 @@ class FileExporterTest {
 
     @Autowired
     private FileExporter fileExporter;
-    @MockBean
+    @MockitoBean
     private MinioAdapter minioAdapter;
 
     private final OffsetDateTime dateTime = OffsetDateTime.parse("2021-04-01T21:30Z");
@@ -142,9 +142,15 @@ class FileExporterTest {
     }
 
     @Test
-    void cgmFileNameTest() {
-        String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR);
+    void lastSecureCgmFileNameTest() {
+        String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR, true);
         assertEquals("20230101_0130_CGM_ESFR.zip", cgmFileName);
+    }
+
+    @Test
+    void firstUnsecureCgmFileNameTest() {
+        String cgmFileName = fileExporter.getCgmZipFileName(OffsetDateTime.parse("2023-01-01T00:30Z"), DichotomyDirection.ES_FR, false);
+        assertEquals("20230101_0130_CGM_ESFR_FIRST_UNSECURE.zip", cgmFileName);
     }
 
     @Test
@@ -156,7 +162,7 @@ class FileExporterTest {
         inputFiles.put("firstFile", new ByteArrayOutputStream());
         inputFiles.put("secondFile", new ByteArrayOutputStream());
         inputFiles.put("thirdFile", new ByteArrayOutputStream());
-        assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES"));
+        assertEquals("SUCCESS", fileExporter.exportCgmesZipFile(sweData, inputFiles, DichotomyDirection.PT_ES, "CGM_PTES", true));
     }
 }
 

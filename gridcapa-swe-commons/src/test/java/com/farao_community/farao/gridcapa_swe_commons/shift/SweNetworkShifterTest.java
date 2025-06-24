@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -55,10 +55,10 @@ class SweNetworkShifterTest {
 
     private static final Double TARGET_P_TOLERANCE = 1e-3;
 
-    @MockBean
+    @MockitoBean
     ProcessConfiguration processConfiguration;
 
-    @MockBean
+    @MockitoBean
     private Logger businessLogger;
     private final String networkFileName = "/shift/TestCase_with_swe_countries.xiidm";
     private static ZonalDataImpl<Scalable> zonalScalable;

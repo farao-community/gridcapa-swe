@@ -11,6 +11,7 @@ import com.farao_community.farao.dichotomy.api.exceptions.RaoFailureException;
 import com.farao_community.farao.dichotomy.api.exceptions.RaoInterruptionException;
 import com.farao_community.farao.dichotomy.api.exceptions.ValidationException;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
+import com.farao_community.farao.dichotomy.api.utils.ContingenciesLoggerUtil;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.rao_runner.api.resource.AbstractRaoResponse;
@@ -86,6 +87,9 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             if (raoResponse.isInterrupted()) {
                 throw new RaoInterruptionException("RAO computation stopped due to soft interruption request");
             }
+
+            ContingenciesLoggerUtil.logContingencies(raoResponse.getRaoResultFileUrl(), businessLogger);
+
             final RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
                 final Crac crac = sweData.getCracEsPt().getCrac();
