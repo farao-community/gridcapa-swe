@@ -29,3 +29,4 @@ swe-runner:
       PT_ES:
         tolerance-Es-Fr: 50
         tolerance-Es-Pt: 10
+  export-failed-network: false

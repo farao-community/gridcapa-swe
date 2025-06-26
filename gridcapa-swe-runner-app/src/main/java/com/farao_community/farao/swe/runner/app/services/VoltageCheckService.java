@@ -9,9 +9,13 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
+import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+
+import com.farao_community.farao.swe.runner.app.configurations.ExportNetworkConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.utils.FaillingNetworkExportUtils;
 import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.iidm.network.Network;
@@ -30,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,11 +48,17 @@ import java.util.Optional;
 public class VoltageCheckService {
     private final Logger businessLogger;
     private final UrlValidationService urlValidationService;
+    private final ExportNetworkConfiguration exportNetworkConfiguration;
+    private final FileExporter fileExporter;
 
     public VoltageCheckService(final Logger businessLogger,
-                               final UrlValidationService urlValidationService) {
+                               final UrlValidationService urlValidationService,
+                               final ExportNetworkConfiguration exportNetworkConfiguration,
+                               final FileExporter fileExporter) {
         this.businessLogger = businessLogger;
         this.urlValidationService = urlValidationService;
+        this.exportNetworkConfiguration = exportNetworkConfiguration;
+        this.fileExporter = fileExporter;
     }
 
     public Optional<RaoResultWithVoltageMonitoring> runVoltageCheck(final SweData sweData,
@@ -73,7 +84,7 @@ public class VoltageCheckService {
             final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
             final MonitoringInput input = MonitoringInput.buildWithVoltage(network, crac, dichotomyResult.getHighestValidStep().getRaoResult()).build();
             final RaoResultWithVoltageMonitoring result = (RaoResultWithVoltageMonitoring) Monitoring.runVoltageAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, input);
-            generateHighAndLowVoltageConstraints(result, crac).forEach(businessLogger::warn);
+            generateHighAndLowVoltageConstraints(result, crac, network, sweData.getTimestamp(), sweData.getProcessType()).forEach(businessLogger::warn);
             return Optional.of(result);
         } catch (final Exception e) {
             businessLogger.error("Exception during voltage check : {}", e.getMessage());
@@ -82,7 +93,8 @@ public class VoltageCheckService {
     }
 
     protected List<String> generateHighAndLowVoltageConstraints(final RaoResultWithVoltageMonitoring result,
-                                                                final Crac crac) {
+                                                                final Crac crac, final Network network,
+                                                                final OffsetDateTime targetProcessDateTime, final ProcessType processType) {
         final List<String> voltageConstraints = new ArrayList<>();
         for (final VoltageCnec voltageCnec : crac.getVoltageCnecs()) {
             final Instant instant = voltageCnec.getState().getInstant();
@@ -90,6 +102,9 @@ public class VoltageCheckService {
                 voltageCnec.getLowerBound(Unit.KILOVOLT).ifPresent(lowerBound -> {
                     final double minVoltage = result.getMinVoltage(instant, voltageCnec, MinOrMax.MIN, Unit.KILOVOLT);
                     if (!Double.isNaN(minVoltage) && Double.compare(lowerBound, minVoltage) > 0) {
+                        if (exportNetworkConfiguration.isExportFailedNetwork()) {
+                            exportXiidmNetwork(network, targetProcessDateTime, processType);
+                        }
                         voltageConstraints.add(String.format(Locale.ENGLISH,
                                 "Low Voltage constraint reached - biggest violation on node \"%s\" - Minimum voltage of %f kV for a limit of %f kV",
                                 voltageCnec.getNetworkElement().getName(),
@@ -100,6 +115,9 @@ public class VoltageCheckService {
                 voltageCnec.getUpperBound(Unit.KILOVOLT).ifPresent(upperBound -> {
                     final double maxVoltage = result.getMaxVoltage(instant, voltageCnec, MinOrMax.MAX, Unit.KILOVOLT);
                     if (!Double.isNaN(maxVoltage) && Double.compare(maxVoltage, upperBound) > 0) {
+                        if (exportNetworkConfiguration.isExportFailedNetwork()) {
+                            exportXiidmNetwork(network, targetProcessDateTime, processType);
+                        }
                         voltageConstraints.add(String.format(Locale.ENGLISH,
                                 "High voltage constraint reached - biggest violation on node \"%s\" - Maximum voltage of %f kV for a limit of %f kV",
                                 voltageCnec.getNetworkElement().getName(),
@@ -118,6 +136,16 @@ public class VoltageCheckService {
             return Network.read("networkWithPra.xiidm", networkIs);
         } catch (final IOException e) {
             throw new SweInternalException("Could not read network with PRA from RAO response during voltage check", e);
+        }
+    }
+
+    private void exportXiidmNetwork(final Network network,
+                                    final OffsetDateTime targetProcessDateTime,
+                                    final ProcessType processType) {
+        try {
+            FaillingNetworkExportUtils.exportNetwork(network, targetProcessDateTime, processType, fileExporter, "-with-failed-voltage-check");
+        } catch (Exception e) {
+            businessLogger.warn("Failed to export network with voltage constraint violations: {}", e.getMessage());
         }
     }
 }
