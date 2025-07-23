@@ -49,7 +49,7 @@
         <iidm:twoWindingsTransformer id="BBE2AA1  BBE3AA1  1" r="0.0" x="10.0" g="0.0" b="0.0" ratedU1="400.0" ratedU2="400.0" voltageLevelId1="BBE2AA1" bus1="BBE3AA1 " connectableBus1="BBE3AA1 " voltageLevelId2="BBE2AA1" bus2="BBE2AA1 " connectableBus2="BBE2AA1 " selectedOperationalLimitsGroupId2="DEFAULT">
             <iidm:property name="nomimalPower" value="1000.0"/>
             <iidm:property name="elementName" value="PST"/>
-            <iidm:phaseTapChanger lowTapPosition="-16" tapPosition="0" regulationMode="FIXED_TAP">
+            <iidm:phaseTapChanger regulating="false" lowTapPosition="-16" tapPosition="0" loadTapChangingCapabilities="true" regulationMode="CURRENT_LIMITER">
                 <iidm:step r="0.0" x="0.0" g="0.0" b="0.0" rho="1.0" alpha="-6.2276423729910535"/>
                 <iidm:step r="0.0" x="0.0" g="0.0" b="0.0" rho="1.0" alpha="-5.839110508104064"/>
                 <iidm:step r="0.0" x="0.0" g="0.0" b="0.0" rho="1.0" alpha="-5.4504442277066305"/>
@@ -180,7 +180,7 @@
         <iidm:twoWindingsTransformer id="FFR2AA1  FFR4AA1  1" r="0.0" x="10.0" g="0.0" b="0.0" ratedU1="400.0" ratedU2="400.0" voltageLevelId1="FFR2AA1" bus1="FFR4AA1 " connectableBus1="FFR4AA1 " voltageLevelId2="FFR2AA1" bus2="FFR2AA1 " connectableBus2="FFR2AA1 " selectedOperationalLimitsGroupId2="DEFAULT">
             <iidm:property name="nomimalPower" value="1000.0"/>
             <iidm:property name="elementName" value="PST"/>
-            <iidm:phaseTapChanger lowTapPosition="-16" tapPosition="5" regulationMode="FIXED_TAP">
+            <iidm:phaseTapChanger regulating="false" lowTapPosition="-16" tapPosition="5" loadTapChangingCapabilities="true" regulationMode="CURRENT_LIMITER">
                 <iidm:step r="0.0" x="0.0" g="0.0" b="0.0" rho="1.0" alpha="-6.2276423729910535"/>
                 <iidm:step r="0.0" x="0.0" g="0.0" b="0.0" rho="1.0" alpha="-5.839110508104064"/>
                 <iidm:step r="0.0" x="0.0" g="0.0" b="0.0" rho="1.0" alpha="-5.4504442277066305"/>
