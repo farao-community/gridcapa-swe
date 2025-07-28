@@ -36,7 +36,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-javaagent:${org.mockito:mockito-core:jar}</argLine>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
                     <classpathDependencyExcludes>
                         <!-- in test classpath, exclude classic powsybl config, so we can use test config -->
                         <classpathDependencyExclude>com.powsybl:powsybl-config-classic</classpathDependencyExclude>
