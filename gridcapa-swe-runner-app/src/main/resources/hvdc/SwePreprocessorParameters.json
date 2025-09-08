@@ -71,6 +71,78 @@
         "side2LoadId": "_9f43d1b1-8fef-8b90-7630-3efba0b9a7cc",
         "acLineId": "_525c2acc-0749-29e4-de26-65063db189f1"
       }
+    },
+    {
+      "id": "CUGA1",
+      "maxP": 1000.0,
+      "r": 2.6,
+      "nominalV": 400,
+      "vscCreationParameters": [
+        {
+          "side": 1,
+          "id": "CUGA1_VSC1",
+          "reactivePowerSetpoint": 0.0,
+          "lossFactor": 1.1,
+          "voltageRegulatorOn": true,
+          "defaultVoltageSetpoint": 400.0
+        },
+        {
+          "side": 2,
+          "id": "CUGA1_VSC2",
+          "reactivePowerSetpoint": 0.0,
+          "lossFactor": 1.1,
+          "voltageRegulatorOn": true,
+          "defaultVoltageSetpoint": 400.0
+        }
+      ],
+      "angleDroopActivePowerControlParameters": {
+        "p0": 0.0,
+        "droop": 100.0
+      },
+      "hvdcAcEquivalentModel": {
+        "side1GeneratorId": "CUBNE_VSC_1_G",
+        "side2GeneratorId": "GATICA_VSC_1_G",
+        "side1LoadID": "CUBNE_VSC_1_P",
+        "side1LoadIDOption2": "undef_fallback_load_1",
+        "side2LoadId": "GATICA_VSC_1_P",
+        "acLineId": "ECCUBNE_ECGATICA_1_400"
+      }
+    },
+    {
+      "id": "CUGA2",
+      "maxP": 1000.0,
+      "r": 2.6,
+      "nominalV": 400,
+      "vscCreationParameters": [
+        {
+          "side": 1,
+          "id": "CUGA2_VSC1",
+          "reactivePowerSetpoint": 0.0,
+          "lossFactor": 1.1,
+          "voltageRegulatorOn": true,
+          "defaultVoltageSetpoint": 400.0
+        },
+        {
+          "side": 2,
+          "id": "CUGA2_VSC2",
+          "reactivePowerSetpoint": 0.0,
+          "lossFactor": 1.1,
+          "voltageRegulatorOn": true,
+          "defaultVoltageSetpoint": 400.0
+        }
+      ],
+      "angleDroopActivePowerControlParameters": {
+        "p0": 0.0,
+        "droop": 100.0
+      },
+      "hvdcAcEquivalentModel": {
+        "side1GeneratorId": "CUBNE_VSC_2_G",
+        "side2GeneratorId": "GATICA_VSC_2_G",
+        "side1LoadID": "CUBNE_VSC_2_P",
+        "side1LoadIDOption2": "undef_fallback_load_2",
+        "side2LoadId": "GATICA_VSC_2_P",
+        "acLineId": "ECCUBNE_ECGATICA_2_400"
+      }
     }
   ]
 }
