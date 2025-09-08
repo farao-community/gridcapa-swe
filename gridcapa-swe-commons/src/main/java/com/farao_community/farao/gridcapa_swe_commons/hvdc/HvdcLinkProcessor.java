@@ -10,15 +10,7 @@ package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNoDetailsException;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.VscStationCreationParameters;
-import com.powsybl.iidm.network.Generator;
-import com.powsybl.iidm.network.HvdcLine;
-import com.powsybl.iidm.network.Line;
-import com.powsybl.iidm.network.Load;
-import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.Terminal;
-import com.powsybl.iidm.network.TwoSides;
-import com.powsybl.iidm.network.VoltageLevel;
-import com.powsybl.iidm.network.Injection;
+import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
 
@@ -119,18 +111,26 @@ public final class HvdcLinkProcessor {
                     VscStationCreationParameters vscStationCreationParameters = creationParameters.getVscCreationParameters(side);
                     double voltageSetpoint = terminal.isConnected() ? gen.getTargetV() : vscStationCreationParameters.getDefaultVoltageSetpoint();
                     VoltageLevel voltageLevel = terminal.getVoltageLevel();
-                    voltageLevel.newVscConverterStation()
+                    VscConverterStationAdder adder = voltageLevel.newVscConverterStation()
                             .setId(vscStationCreationParameters.getId())
                             .setReactivePowerSetpoint(vscStationCreationParameters.getReactivePowerSetpoint())
                             .setLossFactor(vscStationCreationParameters.getLossFactor())
                             .setVoltageRegulatorOn(vscStationCreationParameters.isVoltageRegulatorOn())
                             .setVoltageSetpoint(voltageSetpoint)
-                            .setConnectableBus(terminal.getBusBreakerView().getConnectableBus().getId())
                             .setFictitious(false)
-                            .setEnsureIdUnicity(true)
-                            .add();
+                            .setEnsureIdUnicity(true);
+                    configureTopology(adder, voltageLevel, terminal);
+                    adder.add();
 
                 });
+    }
+
+    private static void configureTopology(VscConverterStationAdder adder, VoltageLevel voltageLevel, Terminal terminal) {
+        switch (voltageLevel.getTopologyKind()) {
+            case NODE_BREAKER -> adder.setNode(terminal.getNodeBreakerView().getNode());
+            case BUS_BREAKER -> adder.setConnectableBus(terminal.getBusBreakerView().getConnectableBus().getId());
+            default -> throw new IllegalArgumentException("Unsupported topology kind: " + voltageLevel.getTopologyKind());
+        }
     }
 
     private static void createHvdcLine(Optional<Line> optionalLine, Network network, HvdcCreationParameters creationParameters,
