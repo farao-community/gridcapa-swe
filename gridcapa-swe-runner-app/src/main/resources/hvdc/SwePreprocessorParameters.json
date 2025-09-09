@@ -100,12 +100,12 @@
         "droop": 100.0
       },
       "hvdcAcEquivalentModel": {
-        "side1GeneratorId": "CUBNE_VSC_1_G",
-        "side2GeneratorId": "GATICA_VSC_1_G",
-        "side1LoadID": "CUBNE_VSC_1_P",
+        "side1GeneratorId": "_CUBNE_VSC_1_G",
+        "side2GeneratorId": "_GATICA_VSC_1_G",
+        "side1LoadID": "_CUBNE_VSC_1_P",
         "side1LoadIDOption2": "undef_fallback_load_1",
-        "side2LoadId": "GATICA_VSC_1_P",
-        "acLineId": "ECCUBNE_ECGATICA_1_400"
+        "side2LoadId": "_GATICA_VSC_1_P",
+        "acLineId": "_ECCUBNE_ECGATICA_1_400"
       }
     },
     {
@@ -136,12 +136,12 @@
         "droop": 100.0
       },
       "hvdcAcEquivalentModel": {
-        "side1GeneratorId": "CUBNE_VSC_2_G",
-        "side2GeneratorId": "GATICA_VSC_2_G",
-        "side1LoadID": "CUBNE_VSC_2_P",
+        "side1GeneratorId": "_CUBNE_VSC_2_G",
+        "side2GeneratorId": "_GATICA_VSC_2_G",
+        "side1LoadID": "_CUBNE_VSC_2_P",
         "side1LoadIDOption2": "undef_fallback_load_2",
-        "side2LoadId": "GATICA_VSC_2_P",
-        "acLineId": "ECCUBNE_ECGATICA_2_400"
+        "side2LoadId": "_GATICA_VSC_2_P",
+        "acLineId": "_ECCUBNE_ECGATICA_2_400"
       }
     }
   ]
