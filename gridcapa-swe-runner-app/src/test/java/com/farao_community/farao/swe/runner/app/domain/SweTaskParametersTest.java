@@ -9,7 +9,6 @@ package com.farao_community.farao.swe.runner.app.domain;
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.List;
 class SweTaskParametersTest {
 
     @Test
-    @Disabled
     void nominalTest() {
         List<TaskParameterDto> parameters = List.of(
             new TaskParameterDto("RUN_ES-FR", "BOOLEAN", "true", "true"),
@@ -153,7 +151,6 @@ class SweTaskParametersTest {
     }
 
     @Test
-    @Disabled
     void crossValidationFailureTest() {
         List<TaskParameterDto> parameters = List.of(
             new TaskParameterDto("RUN_ES-FR", "BOOLEAN", "true", "true"),

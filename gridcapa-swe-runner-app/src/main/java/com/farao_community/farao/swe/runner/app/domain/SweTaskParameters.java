@@ -71,8 +71,8 @@ public class SweTaskParameters {
             switch (parameter.getId()) {
                 case RUN_ES_FR -> runDirectionEsFr = validateIsBooleanAndGet(parameter, errors);
                 case RUN_FR_ES -> runDirectionFrEs = validateIsBooleanAndGet(parameter, errors);
-                case RUN_ES_PT -> runDirectionEsPt = false;
-                case RUN_PT_ES -> runDirectionPtEs = false;
+                case RUN_ES_PT -> runDirectionEsPt = validateIsBooleanAndGet(parameter, errors);
+                case RUN_PT_ES -> runDirectionPtEs = validateIsBooleanAndGet(parameter, errors);
                 case MAX_TTC_ES_FR -> maxTtcEsFr = validateIsPositiveIntegerAndGet(parameter, errors);
                 case MAX_TTC_FR_ES -> maxTtcFrEs = validateIsPositiveIntegerAndGet(parameter, errors);
                 case MAX_TTC_ES_PT -> maxTtcEsPt = validateIsPositiveIntegerAndGet(parameter, errors);

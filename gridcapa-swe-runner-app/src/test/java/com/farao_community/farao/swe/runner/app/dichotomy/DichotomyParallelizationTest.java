@@ -28,7 +28,6 @@ import com.powsybl.openrao.data.crac.api.CracFactory;
 import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -257,7 +256,6 @@ class DichotomyParallelizationTest {
     }
 
     @Test
-    @Disabled
     void testParallelizationWithPtAndEsOnly() {
         SweTaskParameters onlyFrParameters = new TestParametersBuilder()
                 .withEsFr(false).withFrEs(false)
@@ -325,7 +323,6 @@ class DichotomyParallelizationTest {
     }
 
     @Test
-    @Disabled
     void testParallelizationWithInterruption() {
         DichotomyResult<SweDichotomyValidationData> interruptedSweDichotomyResult = mock(DichotomyResult.class);
         when(interruptedSweDichotomyResult.isInterrupted()).thenReturn(true);
