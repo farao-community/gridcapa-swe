@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -36,14 +35,12 @@ public class FilesService {
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_FR_ES_D2CC_JSON = "/crac/CimCracCreationParameters_FR-ES_D2CC.json";
 
     private final NetworkService networkService;
-    private final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
     private final FileImporter fileImporter;
     private final FileExporter fileExporter;
 
-    public FilesService(NetworkService networkImporter, RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService, FileImporter fileImporter, FileExporter fileExporter) {
+    public FilesService(NetworkService networkImporter, FileImporter fileImporter, FileExporter fileExporter) {
         this.networkService = networkImporter;
-        this.removeRemoteVoltageRegulationInFranceService = removeRemoteVoltageRegulationInFranceService;
         this.fileImporter = fileImporter;
         this.fileExporter = fileExporter;
     }
@@ -53,7 +50,6 @@ public class FilesService {
         Network mergedNetwork = networkService.importMergedNetwork(sweRequest);
         List<HvdcInformation> hvdcInformationList = networkService.getHvdcInformationFromNetwork(mergedNetwork);
         networkService.addHvdcAndPstToNetwork(mergedNetwork);
-        Map<String, RemoveRemoteVoltageRegulationInFranceService.ReplacedVoltageRegulation> replacedVoltageRegulations = removeRemoteVoltageRegulationInFranceService.removeRemoteVoltageRegulationInFrance(mergedNetwork);
         fileExporter.saveMergedNetworkWithHvdc(mergedNetwork, targetProcessDateTime);
 
         Network networkEsFr = networkService.loadNetworkFromMinio(targetProcessDateTime);
@@ -71,7 +67,7 @@ public class FilesService {
         String raoParametersEsFrUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_FR);
         String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_PT);
         EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = fillMapCgmesInputFiles(sweRequest);
-        return new SweData(sweRequest.getId(), sweRequest.getCurrentRunId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, hvdcInformationList, mapCgmesInputFiles, replacedVoltageRegulations);
+        return new SweData(sweRequest.getId(), sweRequest.getCurrentRunId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, hvdcInformationList, mapCgmesInputFiles);
     }
 
     private EnumMap<CgmesFileType, SweFileResource> fillMapCgmesInputFiles(SweRequest sweRequest) {

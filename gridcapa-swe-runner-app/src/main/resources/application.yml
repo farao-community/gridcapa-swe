@@ -13,8 +13,6 @@ swe-commons:
     SV: "http://www.coreso.eu/OperationalPlanning"
 
 swe-runner:
-  data-fix:
-    remove-remote-voltage-regulation-in-france: false
   dichotomy:
     parameters:
       ES_FR:

@@ -43,9 +43,6 @@ class FilesServiceTest {
     private NetworkService networkService;
 
     @MockitoBean
-    private RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
-
-    @MockitoBean
     private FileImporter fileImporter;
 
     @MockitoBean
