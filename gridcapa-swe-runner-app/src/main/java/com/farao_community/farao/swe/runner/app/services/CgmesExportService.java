@@ -81,7 +81,6 @@ public class CgmesExportService {
     private final FileImporter fileImporter;
     private final UrlValidationService urlValidationService;
     private final ProcessConfiguration processConfiguration;
-    private final RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService;
 
     private static final Properties SSH_FILES_EXPORT_PARAMS = new Properties();
 
@@ -98,13 +97,12 @@ public class CgmesExportService {
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.UPDATE_DEPENDENCIES, false);
     }
 
-    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration, RemoveRemoteVoltageRegulationInFranceService removeRemoteVoltageRegulationInFranceService) {
+    public CgmesExportService(Logger businessLogger, FileExporter fileExporter, FileImporter fileImporter, UrlValidationService urlValidationService, ProcessConfiguration processConfiguration) {
         this.businessLogger = businessLogger;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.urlValidationService = urlValidationService;
         this.processConfiguration = processConfiguration;
-        this.removeRemoteVoltageRegulationInFranceService = removeRemoteVoltageRegulationInFranceService;
         SV_FILE_EXPORT_PARAMS.put(CgmesExport.MODELING_AUTHORITY_SET, processConfiguration.getModelingAuthorityMap().getOrDefault("SV", MODELING_AUTHORITY_DEFAULT_VALUE));
     }
 
@@ -149,7 +147,6 @@ public class CgmesExportService {
             applyHvdcSetPointToAcEquivalentModel(networkWithPra, sweData.getHvdcInformationList());
             final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
             LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), LocalComputationManager.getDefault(), loadFlowParameters);
-            removeRemoteVoltageRegulationInFranceService.resetRemoteVoltageRegulationInFrance(networkWithPra, sweData.getReplacedVoltageRegulations());
             final Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
             return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction, isHighestValid), isHighestValid);
         } catch (final IOException e) {

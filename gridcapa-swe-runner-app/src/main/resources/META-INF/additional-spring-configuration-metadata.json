@@ -14,11 +14,6 @@
       "name": "swe-commons.zone-id",
       "type": "java.lang.String",
       "description": "Description for swe-commons.zone-id."
-    },
-    {
-      "name": "swe-runner.data-fix.remove-remote-voltage-regulation-in-france",
-      "type": "java.lang.Boolean",
-      "description": "Enable or disable the removal of remote voltage regulation in France."
     }
   ]
 }
