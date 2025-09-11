@@ -42,16 +42,20 @@ public class GeneratorLimitsHandler {
     public void setPminPmaxToDefaultValue(Network network, Set<Country> countries) {
         initGenerators = new HashMap<>();
         countries.forEach(
-            country -> zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
-                        .stream()
-                        .filter(Generator.class::isInstance)
-                        .map(Generator.class::cast)
-                        .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
-                                && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country)))
-                        .forEach(generator -> {
-                            saveInitLimits(generator);
-                            setLimitsToDefault(generator);
-                        }));
+                country -> {
+                    if (zonalScalableData.getData(new EICode(country).getAreaCode()) != null) {
+                        zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
+                                .stream()
+                                .filter(Generator.class::isInstance)
+                                .map(Generator.class::cast)
+                                .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
+                                               && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country)))
+                                .forEach(generator -> {
+                                    saveInitLimits(generator);
+                                    setLimitsToDefault(generator);
+                                });
+                    }
+                });
         LOGGER.info("Pmax and Pmin are set to default values for network {}", network.getNameOrId());
     }
 
