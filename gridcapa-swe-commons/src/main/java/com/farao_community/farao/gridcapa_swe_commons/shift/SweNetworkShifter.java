@@ -158,15 +158,17 @@ public class SweNetworkShifter implements NetworkShifter {
         Map<String, Double> incompleteShiftCountries = new HashMap<>();
         for (Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
             String zoneId = entry.getKey();
-            double asked = entry.getValue();
-            String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
-            LOGGER.info(logApplyingVariationOnZone);
-            double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
-            if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                String logWarnIncompleteVariation = String.format("[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)",
-                        direction, zoneId, asked, done);
-                LOGGER.warn(logWarnIncompleteVariation);
-                incompleteShiftCountries.put(zoneId, done - asked);
+            if (zonalScalable.getData(zoneId) != null) {
+                double asked = entry.getValue();
+                String logApplyingVariationOnZone = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
+                LOGGER.info(logApplyingVariationOnZone);
+                double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
+                if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
+                    String logWarnIncompleteVariation = String.format("[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)",
+                                                                      direction, zoneId, asked, done);
+                    LOGGER.warn(logWarnIncompleteVariation);
+                    incompleteShiftCountries.put(zoneId, done - asked);
+                }
             }
         }
         // During the shift some generators linked to the main network with a transformers are not connected correctly

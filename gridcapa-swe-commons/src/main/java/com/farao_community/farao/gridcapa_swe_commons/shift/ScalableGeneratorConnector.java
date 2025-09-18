@@ -64,14 +64,20 @@ public class ScalableGeneratorConnector {
      * Collects the list of generators of a given country, that are present in the scalable list, but not connected
      * to the network's main component
      */
-    private Set<Generator> getGeneratorsNotMainConnected(Network network, Country country) {
-        return zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network)
-                .stream()
-                .filter(Generator.class::isInstance)
-                .map(Generator.class::cast)
-                .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
-                        && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country))
-                        && !getBus(gen.getTerminal()).isInMainConnectedComponent()).collect(Collectors.toSet());
+    private Set<Generator> getGeneratorsNotMainConnected(Network network,
+                                                         Country country) {
+        final String areaCode = new EICode(country).getAreaCode();
+        if (zonalScalable.getData(areaCode) != null) {
+            return zonalScalable.getData(areaCode).filterInjections(network)
+                    .stream()
+                    .filter(Generator.class::isInstance)
+                    .map(Generator.class::cast)
+                    .filter(gen -> gen.getTerminal().getVoltageLevel().getSubstation().isPresent()
+                                   && gen.getTerminal().getVoltageLevel().getSubstation().get().getCountry().equals(Optional.of(country))
+                                   && !getBus(gen.getTerminal()).isInMainConnectedComponent()).collect(Collectors.toSet());
+        } else {
+            return Set.of();
+        }
     }
 
     private static Bus getBus(Terminal terminal) {
