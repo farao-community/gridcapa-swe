@@ -43,8 +43,9 @@ public class GeneratorLimitsHandler {
         initGenerators = new HashMap<>();
         countries.forEach(
                 country -> {
-                    if (zonalScalableData.getData(new EICode(country).getAreaCode()) != null) {
-                        zonalScalableData.getData(new EICode(country).getAreaCode()).filterInjections(network)
+                    final String areaCode = new EICode(country).getAreaCode();
+                    if (zonalScalableData.getData(areaCode) != null) {
+                        zonalScalableData.getData(areaCode).filterInjections(network)
                                 .stream()
                                 .filter(Generator.class::isInstance)
                                 .map(Generator.class::cast)
