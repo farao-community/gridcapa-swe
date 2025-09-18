@@ -66,8 +66,9 @@ public class ScalableGeneratorConnector {
      */
     private Set<Generator> getGeneratorsNotMainConnected(Network network,
                                                          Country country) {
-        if (zonalScalable.getData(new EICode(country).getAreaCode()) != null) {
-            return zonalScalable.getData(new EICode(country).getAreaCode()).filterInjections(network)
+        final String areaCode = new EICode(country).getAreaCode();
+        if (zonalScalable.getData(areaCode) != null) {
+            return zonalScalable.getData(areaCode).filterInjections(network)
                     .stream()
                     .filter(Generator.class::isInstance)
                     .map(Generator.class::cast)
