@@ -134,10 +134,10 @@ public class CgmesExportService {
             try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
                 fileExporter.exportNetworkWithPra(sweData, networkIs, direction, buildFileType(direction));
             } catch (IOException e) {
-                throw new SweInvalidDataException(String.format("Can not export cgmes file associated with direction %s", direction.getDashName()), e);
+                throw new SweInvalidDataException(String.format("Can not export networkWithPra file associated with direction %s", direction.getDashName()), e);
             }
         } else {
-            businessLogger.error("Dichotomy does not have a valid step, CGMES files won't be exported");
+            businessLogger.error("Dichotomy does not have a valid step, networkWithPra file won't be exported");
         }
     }
 
