@@ -15,6 +15,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
+import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
@@ -44,6 +45,7 @@ class OutputServiceTest {
 
     private static OutputService outputService;
     private static FileExporter fileExporter;
+    private static UrlValidationService urlValidationService;
     private static ProcessConfiguration processConfiguration;
     private SweData sweData;
     private static ExecutionResult<SweDichotomyResult> executionResult;
@@ -58,7 +60,7 @@ class OutputServiceTest {
         Mockito.when(fileExporter.saveVoltageMonitoringResultInJsonZip(any(), any(), any(), any(), Mockito.anyString(), any()))
                 .thenReturn(VOLTAGE_DOCUMENT_URL_STRING);
         Mockito.when(processConfiguration.getZoneId()).thenReturn("Europe/Paris");
-        outputService = new OutputService(fileExporter, processConfiguration);
+        outputService = new OutputService(fileExporter, processConfiguration, urlValidationService);
         List<SweDichotomyResult> resultList = new ArrayList<>();
         resultList.add(getSweDichotomyResult(DichotomyDirection.FR_ES, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult())));
         resultList.add(getSweDichotomyResult(DichotomyDirection.ES_FR, Optional.of(VoltageMonitoringResultTestUtils.getMonitoringResult())));

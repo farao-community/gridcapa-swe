@@ -222,6 +222,19 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(filePath);
     }
 
+    public String exportRaoResult(SweData sweData, InputStream inputStream, String filename) {
+        String filePath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + filename;
+        minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "RAO_RESULT", sweData.getTimestamp());
+        return minioAdapter.generatePreSignedUrl(filePath);
+    }
+
+    public String exportNetworkWithPra(SweData sweData, InputStream inputStream, DichotomyDirection direction, String filetype) {
+        String filename = "networkWithPRA_" + direction.getShortName() + ".xiidm";
+        String networkPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + filename;
+        minioAdapter.uploadOutputForTimestamp(networkPath, inputStream, adaptTargetProcessName(sweData.getProcessType()), filetype, sweData.getTimestamp());
+        return minioAdapter.generatePreSignedUrl(networkPath);
+    }
+
     public String exportCgmesZipFile(SweData sweData, Map<String, ByteArrayOutputStream> mapCgmesFiles, DichotomyDirection direction, String filetype) throws IOException {
         String cgmesFilename = getCgmZipFileName(sweData.getTimestamp(), direction);
         String cgmesPath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + cgmesFilename;
