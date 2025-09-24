@@ -222,9 +222,9 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(filePath);
     }
 
-    public String exportRaoResult(SweData sweData, InputStream inputStream, String filename) {
+    public String exportRaoResult(SweData sweData, InputStream inputStream, String filename, String filetype) {
         String filePath = makeDestinationMinioPath(sweData.getTimestamp(), FileKind.OUTPUTS) + filename;
-        minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), "RAO_RESULT", sweData.getTimestamp());
+        minioAdapter.uploadOutputForTimestamp(filePath, inputStream, adaptTargetProcessName(sweData.getProcessType()), filetype, sweData.getTimestamp());
         return minioAdapter.generatePreSignedUrl(filePath);
     }
 

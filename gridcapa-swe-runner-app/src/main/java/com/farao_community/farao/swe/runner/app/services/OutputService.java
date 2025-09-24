@@ -63,11 +63,13 @@ public class OutputService {
     }
 
     public void exportRaoResultOfLastSecureStep(final SweData sweData, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final DichotomyDirection direction) {
-        String raoResultUrl = dichotomyResult.getHighestValidStep()
+        final String raoResultUrl = dichotomyResult.getHighestValidStep()
                 .getValidationData()
                 .getRaoResponse()
                 .getRaoResultFileUrl();
-        exportRaoResult(sweData, raoResultUrl, "raoresult_" + direction.getShortName() + "_LAST_SECURE.json");
+        final String filetype = "RAO_RESULT_LAST_SECURE" + direction.getShortName();
+        final String filename = "raoresult_" + direction.getShortName() + "_LAST_SECURE.json";
+        exportRaoResult(sweData, raoResultUrl, filename, filetype);
     }
 
     public void exportRaoResultOfFirstUnsecureStep(final SweData sweData, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final DichotomyDirection direction) {
@@ -75,12 +77,14 @@ public class OutputService {
                 .getValidationData()
                 .getRaoResponse()
                 .getRaoResultFileUrl();
-        exportRaoResult(sweData, raoResultUrl, "raoresult_" + direction.getShortName() + "_FIRST_UNSECURE.json");
+        final String filetype = "RAO_RESULT_FIRST_UNSECURE" + direction.getShortName();
+        final String filename = "raoresult_" + direction.getShortName() + "_FIRST_UNSECURE.json";
+        exportRaoResult(sweData, raoResultUrl, filename, filetype);
     }
 
-    private void exportRaoResult(final SweData sweData, final String raoResultUrl, final String filename) {
+    private void exportRaoResult(final SweData sweData, final String raoResultUrl, final String filename, final String filetype) {
         try (InputStream raoResultIs = urlValidationService.openUrlStream(raoResultUrl)) {
-            fileExporter.exportRaoResult(sweData, raoResultIs, filename);
+            fileExporter.exportRaoResult(sweData, raoResultIs, filename, filetype);
         } catch (IOException e) {
             throw new SweInvalidDataException("Cannot export RaoResult file from URL: " + raoResultUrl, e);
         }
