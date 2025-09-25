@@ -126,7 +126,7 @@ public class CgmesExportService {
                                                         final SweTaskParameters sweTaskParameters) {
         final DichotomyStepResult<SweDichotomyValidationData> lowestInvalidStep = dichotomyResult.getLowestInvalidStep();
 
-        if (lowestInvalidStep == null) {
+        if (lowestInvalidStep == null || lowestInvalidStep.getValidationData() == null) {
             businessLogger.error("Dichotomy does not have an invalid step, First Unsecure Shifted CGMES files won't be exported");
             return null;
         }
