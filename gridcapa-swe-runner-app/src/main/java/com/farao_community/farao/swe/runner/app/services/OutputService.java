@@ -6,17 +6,22 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
+import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.ttc_doc.TtcDocument;
+import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -34,11 +39,14 @@ public class OutputService {
     public static final String VOLTAGE_DOC_NAME_REGEX = "yyyyMMdd'_'HH'30_Voltage_[direction].zip'";
     private final FileExporter fileExporter;
     private final ProcessConfiguration processConfiguration;
+    private final UrlValidationService urlValidationService;
 
     public OutputService(final FileExporter fileExporter,
-                         final ProcessConfiguration processConfiguration) {
+                         final ProcessConfiguration processConfiguration,
+                         final UrlValidationService urlValidationService) {
         this.fileExporter = fileExporter;
         this.processConfiguration = processConfiguration;
+        this.urlValidationService = urlValidationService;
     }
 
     public String buildAndExportTtcDocument(final SweData sweData,
@@ -52,6 +60,34 @@ public class OutputService {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern(TTC_DOC_NAME_REGEX);
         final OffsetDateTime localTime = OffsetDateTime.ofInstant(sweData.getTimestamp().toInstant(), ZoneId.of(processConfiguration.getZoneId()));
         return df.format(localTime);
+    }
+
+    public void exportRaoResultOfLastSecureStep(final SweData sweData, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final DichotomyDirection direction) {
+        final String raoResultUrl = dichotomyResult.getHighestValidStep()
+                .getValidationData()
+                .getRaoResponse()
+                .getRaoResultFileUrl();
+        final String filetype = "RAO_RESULT_LAST_SECURE" + direction.getShortName();
+        final String filename = "raoresult_" + direction.getShortName() + "_LAST_SECURE.json";
+        exportRaoResult(sweData, raoResultUrl, filename, filetype);
+    }
+
+    public void exportRaoResultOfFirstUnsecureStep(final SweData sweData, final DichotomyResult<SweDichotomyValidationData> dichotomyResult, final DichotomyDirection direction) {
+        String raoResultUrl = dichotomyResult.getLowestInvalidStep()
+                .getValidationData()
+                .getRaoResponse()
+                .getRaoResultFileUrl();
+        final String filetype = "RAO_RESULT_FIRST_UNSECURE" + direction.getShortName();
+        final String filename = "raoresult_" + direction.getShortName() + "_FIRST_UNSECURE.json";
+        exportRaoResult(sweData, raoResultUrl, filename, filetype);
+    }
+
+    private void exportRaoResult(final SweData sweData, final String raoResultUrl, final String filename, final String filetype) {
+        try (InputStream raoResultIs = urlValidationService.openUrlStream(raoResultUrl)) {
+            fileExporter.exportRaoResult(sweData, raoResultIs, filename, filetype);
+        } catch (IOException e) {
+            throw new SweInvalidDataException("Cannot export RaoResult file from URL: " + raoResultUrl, e);
+        }
     }
 
     public void buildAndExportVoltageDoc(final DichotomyDirection direction,

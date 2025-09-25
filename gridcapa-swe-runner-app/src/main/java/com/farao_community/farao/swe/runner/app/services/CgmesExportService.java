@@ -128,6 +128,19 @@ public class CgmesExportService {
         }
     }
 
+    public void exportLastNetworkwithpra(final DichotomyDirection direction, final SweData sweData, final DichotomyResult<SweDichotomyValidationData> dichotomyResult) {
+        if (dichotomyResult.hasValidStep()) {
+            String networkWithPraUrl = dichotomyResult.getHighestValidStep().getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
+            try (InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
+                fileExporter.exportNetworkWithPra(sweData, networkIs, direction, buildFileType(direction));
+            } catch (IOException e) {
+                throw new SweInvalidDataException(String.format("Can not export networkWithPra file associated with direction %s", direction.getDashName()), e);
+            }
+        } else {
+            businessLogger.error("Dichotomy does not have a valid step, networkWithPra file won't be exported");
+        }
+    }
+
     private void applyHvdcSetPointToAcEquivalentModel(Network networkWithPra, List<HvdcInformation> hvdcInformationList) {
         try {
             SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
