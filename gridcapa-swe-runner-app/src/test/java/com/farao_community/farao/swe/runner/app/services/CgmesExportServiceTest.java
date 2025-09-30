@@ -163,7 +163,9 @@ class CgmesExportServiceTest {
         final CgmesExportService spyCgmesExportService = spy(cgmesExportService);
         doReturn("Test").when(spyCgmesExportService).buildAndExportCgmesFiles(any(), any(), any(), any(), eq(false));
         final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
-        when(dichotomyResult.getLowestInvalidStep()).thenReturn(mock(DichotomyStepResult.class));
+        final DichotomyStepResult<SweDichotomyValidationData> mockStepResult = mock(DichotomyStepResult.class);
+        when(dichotomyResult.getLowestInvalidStep()).thenReturn(mockStepResult);
+        when(mockStepResult.getValidationData()).thenReturn(mock(SweDichotomyValidationData.class));
         final String result = spyCgmesExportService.buildAndExportFirstUnsecureCgmesFiles(DichotomyDirection.ES_FR, mock(SweData.class), dichotomyResult, mock(SweTaskParameters.class));
         assertEquals("Test", result);
     }
