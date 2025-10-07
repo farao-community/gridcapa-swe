@@ -130,17 +130,32 @@ public final class HvdcLinkProcessor {
     }
 
     private static NetworkModification buildNetworkModification(VscConverterStationAdder adder, VoltageLevel voltageLevel, Terminal terminal) {
+        String busOrBusbarId = switch (voltageLevel.getTopologyKind()) {
+            case NODE_BREAKER -> {
+                List<BusbarSection> busbarSections = getConnectedBusbarSectionListFromTerminal(terminal);
+                if (busbarSections.isEmpty()) {
+                    throw new IllegalStateException(
+                            "No busbar sections found for terminal of " + terminal.getConnectable().getId()
+                                    + " in voltage level " + voltageLevel.getId());
+                }
+                yield busbarSections.getFirst().getId();
+            }
+            case BUS_BREAKER -> {
+                Bus connectableBus = terminal.getBusBreakerView().getConnectableBus();
+                if (connectableBus == null) {
+                    throw new IllegalStateException(
+                            "Connectable bus is null for terminal of " + terminal.getConnectable().getId()
+                                    + " in voltage level " + voltageLevel.getId());
+                }
+                yield connectableBus.getId();
+            }
+            default -> throw new IllegalArgumentException("Unsupported topology kind: " + voltageLevel.getTopologyKind());
+        };
         return new CreateFeederBayBuilder()
                 .withInjectionAdder(adder)
                 .withLogOrThrowIfIncorrectPositionOrder(false)
                 .withInjectionPositionOrder(0)
-                .withBusOrBusbarSectionId(
-                        switch (voltageLevel.getTopologyKind()) {
-                            case NODE_BREAKER -> getConnectedBusbarSectionListFromTerminal(terminal).getFirst().getId();
-                            case BUS_BREAKER -> terminal.getBusBreakerView().getConnectableBus().getId();
-                            default -> throw new IllegalArgumentException("Unsupported topology kind: " + voltageLevel.getTopologyKind());
-                        }
-                )
+                .withBusOrBusbarSectionId(busOrBusbarId)
                 .build();
     }
 
