@@ -10,19 +10,15 @@ package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataNoDetailsException;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.VscStationCreationParameters;
-import com.powsybl.iidm.network.Generator;
-import com.powsybl.iidm.network.HvdcLine;
-import com.powsybl.iidm.network.Line;
-import com.powsybl.iidm.network.Load;
-import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.Terminal;
-import com.powsybl.iidm.network.TwoSides;
-import com.powsybl.iidm.network.VoltageLevel;
-import com.powsybl.iidm.network.VscConverterStationAdder;
-import com.powsybl.iidm.network.Injection;
+import com.powsybl.iidm.modification.NetworkModification;
+import com.powsybl.iidm.modification.topology.CreateFeederBayBuilder;
+import com.powsybl.iidm.modification.topology.RemoveFeederBayBuilder;
+import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
+import com.powsybl.math.graph.TraverseResult;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -128,18 +124,59 @@ public final class HvdcLinkProcessor {
                             .setVoltageSetpoint(voltageSetpoint)
                             .setFictitious(false)
                             .setEnsureIdUnicity(true);
-                    configureTopology(adder, voltageLevel, terminal);
-                    adder.add();
-
+                    NetworkModification modification = buildNetworkModification(adder, voltageLevel, terminal);
+                    modification.apply(network);
                 });
     }
 
-    private static void configureTopology(VscConverterStationAdder adder, VoltageLevel voltageLevel, Terminal terminal) {
-        switch (voltageLevel.getTopologyKind()) {
-            case NODE_BREAKER -> adder.setNode(terminal.getNodeBreakerView().getNode());
-            case BUS_BREAKER -> adder.setConnectableBus(terminal.getBusBreakerView().getConnectableBus().getId());
-            default -> throw new IllegalArgumentException("Unsupported topology kind: " + voltageLevel.getTopologyKind());
+    private static NetworkModification buildNetworkModification(VscConverterStationAdder adder, VoltageLevel voltageLevel, Terminal terminal) {
+        return new CreateFeederBayBuilder()
+                .withInjectionAdder(adder)
+                .withLogOrThrowIfIncorrectPositionOrder(false)
+                .withInjectionPositionOrder(0)
+                .withBusOrBusbarSectionId(
+                        switch (voltageLevel.getTopologyKind()) {
+                            case NODE_BREAKER -> getConnectedBusbarSectionListFromTerminal(terminal).getFirst().getId();
+                            case BUS_BREAKER -> terminal.getBusBreakerView().getConnectableBus().getId();
+                            default -> throw new IllegalArgumentException("Unsupported topology kind: " + voltageLevel.getTopologyKind());
+                        }
+                )
+                .build();
+    }
+
+    public static List<BusbarSection> getConnectedBusbarSectionListFromTerminal(Terminal terminal) {
+        List<BusbarSection> busbarSections = new ArrayList<>();
+        int node = terminal.getNodeBreakerView().getNode();
+        VoltageLevel.NodeBreakerView vlNbv = terminal.getVoltageLevel().getNodeBreakerView();
+        boolean isConnected = terminal.isConnected();
+        if (isConnected) {
+            vlNbv.traverse(node, (node1, sw, node2) -> {
+                if (sw != null && sw.isOpen()) {
+                    return TraverseResult.TERMINATE_PATH;
+                }
+                return getTraverseResult(vlNbv, node2, busbarSections);
+            });
+        } else {
+            vlNbv.traverse(node, (node1, sw, node2) -> {
+                if (sw != null) {
+                    return TraverseResult.CONTINUE;
+                }
+                return getTraverseResult(vlNbv, node2, busbarSections);
+            });
         }
+        return busbarSections;
+    }
+
+    private static TraverseResult getTraverseResult(VoltageLevel.NodeBreakerView view, int node,
+                                                    List<BusbarSection> busbarSections) {
+        Optional<Terminal> t = view.getOptionalTerminal(node);
+        if (t.isPresent() && t.get().getConnectable() instanceof BusbarSection busbarSection) {
+            busbarSections.add(busbarSection);
+            return TraverseResult.TERMINATE_TRAVERSER;
+        } else if (t.isPresent()) {
+            return TraverseResult.TERMINATE_PATH;
+        }
+        return TraverseResult.CONTINUE;
     }
 
     private static void createHvdcLine(Optional<Line> optionalLine, Network network, HvdcCreationParameters creationParameters,
@@ -161,9 +198,13 @@ public final class HvdcLinkProcessor {
                         .add();
                 if (line.getTerminal1().isConnected()) {
                     hvdcLine.getConverterStation1().getTerminal().connect();
+                } else {
+                    hvdcLine.getConverterStation1().getTerminal().disconnect();
                 }
                 if (line.getTerminal2().isConnected()) {
                     hvdcLine.getConverterStation2().getTerminal().connect();
+                } else {
+                    hvdcLine.getConverterStation2().getTerminal().disconnect();
                 }
                 // Create angle droop active power control extension
                 if (creationParameters.getAngleDroopActivePowerControlParameters() != null) {
@@ -207,8 +248,8 @@ public final class HvdcLinkProcessor {
             connectEquivalentAcLine(optionalLine, hvdcLine);
 
             network.getHvdcLine(creationParameters.getId()).remove();
-            network.getVscConverterStation(creationParameters.getVscCreationParameters(TwoSides.ONE).getId()).remove();
-            network.getVscConverterStation(creationParameters.getVscCreationParameters(TwoSides.TWO).getId()).remove();
+            new RemoveFeederBayBuilder().withConnectableId(creationParameters.getVscCreationParameters(TwoSides.ONE).getId()).build().apply(network);
+            new RemoveFeederBayBuilder().withConnectableId(creationParameters.getVscCreationParameters(TwoSides.TWO).getId()).build().apply(network);
         } else {
             hvdcInformationList.forEach(hvdcInformation -> {
                 if (hvdcInformation.getId().equalsIgnoreCase(creationParameters.getId())) {
