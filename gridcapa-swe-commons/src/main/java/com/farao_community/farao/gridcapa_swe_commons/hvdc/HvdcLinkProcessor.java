@@ -159,7 +159,7 @@ public final class HvdcLinkProcessor {
                 .build();
     }
 
-    public static List<BusbarSection> getConnectedBusbarSectionListFromTerminal(Terminal terminal) {
+    private static List<BusbarSection> getConnectedBusbarSectionListFromTerminal(Terminal terminal) {
         List<BusbarSection> busbarSections = new ArrayList<>();
         int node = terminal.getNodeBreakerView().getNode();
         VoltageLevel.NodeBreakerView vlNbv = terminal.getVoltageLevel().getNodeBreakerView();
