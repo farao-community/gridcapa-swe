@@ -12,7 +12,7 @@
   "extensions": {
     "CimCracCreatorParameters": {
       "timeseries-mrids" : [ "REE-TimeSeries-ESFR", "RTE-TimeSeries-1", "RTE-TimeSeries-2", "RTE-TimeSeries-3", "REE-TimeSeries-70CEP-ESFR", "REE-TimeSeries-70CEP-FRES" ],
-      "range-action-groups" : [ "1_HVDC_FRES + 2_HVDC_FRES" ],
+      "range-action-groups" : [ "1_HVDC_FRES + 2_HVDC_FRES", "CUGA1 + CUGA2" ],
       "range-action-speeds": [
         {
           "range-action-id": "REE-RA-139",
@@ -25,6 +25,14 @@
         {
           "range-action-id": "2_HVDC_FRES",
           "speed": 2
+        },
+        {
+          "range-action-id": "CUGA1",
+          "speed": 3
+        },
+        {
+          "range-action-id": "CUGA2",
+          "speed": 3
         }
       ],
       "voltage-cnecs-creation-parameters": {
