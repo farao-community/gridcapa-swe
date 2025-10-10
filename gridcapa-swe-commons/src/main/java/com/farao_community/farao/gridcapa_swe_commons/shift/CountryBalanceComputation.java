@@ -10,6 +10,7 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsec
 import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.powsybl.balances_adjustment.util.CountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
+import com.powsybl.computation.ComputationManager;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
@@ -18,7 +19,9 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -32,7 +35,7 @@ public final class CountryBalanceComputation {
     private static final Logger LOGGER = LoggerFactory.getLogger(CountryBalanceComputation.class);
 
     private CountryBalanceComputation() {
-         // Should not be instantiated
+        // Should not be instantiated
     }
 
     public static Map<String, Double> computeSweCountriesBalances(Network network, LoadFlowParameters loadFlowParameters) {
@@ -40,7 +43,7 @@ public final class CountryBalanceComputation {
         Map<String, Double> countriesBalances = new HashMap<>();
         runLoadFlow(network, network.getVariantManager().getWorkingVariantId(), loadFlowParameters);
         Map<String, Double> bordersExchanges = computeSweBordersExchanges(network);
-        countriesBalances.put(SweEICode.PT_EIC,  -bordersExchanges.get("ES_PT"));
+        countriesBalances.put(SweEICode.PT_EIC, -bordersExchanges.get("ES_PT"));
         countriesBalances.put(SweEICode.ES_EIC, bordersExchanges.values().stream().reduce(0., Double::sum));
         countriesBalances.put(SweEICode.FR_EIC, -bordersExchanges.get("ES_FR"));
 
@@ -57,7 +60,19 @@ public final class CountryBalanceComputation {
     }
 
     private static void runLoadFlow(Network network, String workingStateId, LoadFlowParameters loadFlowParameters) {
-        LoadFlowResult result = LoadFlow.run(network, workingStateId, LocalComputationManager.getDefault(), loadFlowParameters);
+        ComputationManager computationManager;
+        try {
+            final Map<String, String> mdc = MDC.getCopyOfContextMap();
+            computationManager = new LocalComputationManager(command -> {
+                MDC.setContextMap(mdc);
+                command.run();
+            });
+        } catch (IOException e) {
+            LOGGER.error("Failed to build custom LocalComputationManager", e);
+            computationManager = LocalComputationManager.getDefault();
+        }
+
+        LoadFlowResult result = LoadFlow.run(network, workingStateId, computationManager, loadFlowParameters);
         if (result.isFailed()) {
             LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
             throw new SweBaseCaseUnsecureException(String.format("Loadflow computation diverged on network %s", network.getId()));
