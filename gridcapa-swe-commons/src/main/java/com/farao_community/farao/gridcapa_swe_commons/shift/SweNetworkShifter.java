@@ -11,11 +11,12 @@ import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationExceptio
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.api.results.ReasonInvalid;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.ComputationManagerUtil;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
-import com.powsybl.computation.local.LocalComputationManager;
+import com.powsybl.computation.ComputationManager;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.modification.scalable.ScalingParameters;
@@ -97,7 +98,8 @@ public class SweNetworkShifter implements NetworkShifter {
                 Map<String, Double> incompleteShiftCountries = shiftIteration(network, scalingValuesByCountry, scalingParameters, scalableGeneratorConnector);
 
                 // Step 2: Compute exchanges mismatch
-                LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, LocalComputationManager.getDefault(), loadFlowParameters);
+                final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
+                final LoadFlowResult result = LoadFlow.run(network, workingVariantCopyId, computationManager, loadFlowParameters);
                 if (result.isFailed()) {
                     LOGGER.error("Loadflow computation diverged on network '{}' for direction {}", network.getId(), direction.getDashName());
                     businessLogger.error("Loadflow computation diverged on network during balancing adjustment");
