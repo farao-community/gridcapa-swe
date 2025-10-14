@@ -26,8 +26,23 @@ public final class ComputationManagerUtil {
         try {
             final Map<String, String> mdc = MDC.getCopyOfContextMap();
             return new LocalComputationManager(command -> {
-                MDC.setContextMap(mdc);
-                command.run();
+                final Map<String, String> originalMdc = MDC.getCopyOfContextMap();
+                try {
+                    // Set executor thread's MDC to the one of the calling thread or clear executor thread's MDC to avoid reusing MDC from a previous task
+                    if (mdc != null) {
+                        MDC.setContextMap(mdc);
+                    } else {
+                        MDC.clear();
+                    }
+                    command.run();
+                } finally {
+                    // Restore executor thread's MDC to its previous value or clear it to ensure new tasks won't reuse an old context
+                    if (originalMdc != null) {
+                        MDC.setContextMap(originalMdc);
+                    } else {
+                        MDC.clear();
+                    }
+                }
             });
         } catch (IOException e) {
             LOGGER.error("Failed to build custom LocalComputationManager", e);
