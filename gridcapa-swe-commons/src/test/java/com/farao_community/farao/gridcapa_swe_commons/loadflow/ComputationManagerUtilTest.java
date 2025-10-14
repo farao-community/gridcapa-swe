@@ -32,33 +32,33 @@ class ComputationManagerUtilTest {
     void emptyMdcValueWithMdcCompliantComputationManager() {
         final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("test")));
+        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
         Assertions.assertThat(value.get()).isNull();
     }
 
     @Test
     void mdcValueWithMdcCompliantComputationManager() {
-        MDC.put("test", "test");
+        MDC.put("testKey", "testValue");
         final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("test")));
-        Assertions.assertThat(value.get()).isEqualTo("test");
+        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
+        Assertions.assertThat(value.get()).isEqualTo("testValue");
     }
 
     @Test
     void emptyMdcValueWithDefaultComputationManager() {
         final ComputationManager computationManager = ComputationManagerUtil.getDefaultComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("test")));
+        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
         Assertions.assertThat(value.get()).isNull();
     }
 
     @Test
     void mdcValueWithDefaultComputationManager() {
-        MDC.put("test", "test");
+        MDC.put("testKey", "testValue");
         final ComputationManager computationManager = ComputationManagerUtil.getDefaultComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("test")));
+        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
         Assertions.assertThat(value.get()).isNull();
     }
 
