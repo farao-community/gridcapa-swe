@@ -7,6 +7,7 @@
 package com.farao_community.farao.gridcapa_swe_commons.loadflow;
 
 import com.powsybl.computation.ComputationManager;
+import com.powsybl.computation.local.LocalComputationConfig;
 import com.powsybl.computation.local.LocalComputationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 public final class ComputationManagerUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputationManagerUtil.class);
@@ -25,25 +27,33 @@ public final class ComputationManagerUtil {
     public static ComputationManager getMdcCompliantComputationManager() {
         try {
             final Map<String, String> mdc = MDC.getCopyOfContextMap();
-            return new LocalComputationManager(command -> {
-                final Map<String, String> originalMdc = MDC.getCopyOfContextMap();
-                try {
-                    // Set executor thread's MDC to the one of the calling thread or clear executor thread's MDC to avoid reusing MDC from a previous task
-                    if (mdc != null) {
-                        MDC.setContextMap(mdc);
-                    } else {
-                        MDC.clear();
-                    }
-                    command.run();
-                } finally {
-                    // Restore executor thread's MDC to its previous value or clear it to ensure new tasks won't reuse an old context
-                    if (originalMdc != null) {
-                        MDC.setContextMap(originalMdc);
-                    } else {
-                        MDC.clear();
-                    }
+
+            return new LocalComputationManager(LocalComputationConfig.load()) {
+                @Override
+                public Executor getExecutor() {
+                    final Executor delegate = super.getExecutor();
+                    return command ->
+                            delegate.execute(() -> {
+                                final Map<String, String> originalMdc = MDC.getCopyOfContextMap();
+                                try {
+                                    // Set executor thread's MDC to the one of the calling thread or clear executor thread's MDC to avoid reusing MDC from a previous task
+                                    if (mdc != null) {
+                                        MDC.setContextMap(mdc);
+                                    } else {
+                                        MDC.clear();
+                                    }
+                                    command.run();
+                                } finally {
+                                    // Restore executor thread's MDC to its previous value or clear it to ensure new tasks won't reuse an old context
+                                    if (originalMdc != null) {
+                                        MDC.setContextMap(originalMdc);
+                                    } else {
+                                        MDC.clear();
+                                    }
+                                }
+                            });
                 }
-            });
+            };
         } catch (IOException e) {
             LOGGER.error("Failed to build custom LocalComputationManager", e);
             return getDefaultComputationManager();

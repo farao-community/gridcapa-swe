@@ -19,7 +19,9 @@ import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 class ComputationManagerUtilTest {
@@ -28,37 +30,47 @@ class ComputationManagerUtilTest {
         MDC.clear();
     }
 
+    private static void executeAndWait(final ComputationManager computationManager, final AtomicReference<String> value) throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+        computationManager.getExecutor().execute(() -> {
+                value.set(MDC.get("testKey"));
+                latch.countDown();
+            }
+        );
+        Assertions.assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+    }
+
     @Test
-    void emptyMdcValueWithMdcCompliantComputationManager() {
+    void emptyMdcValueWithMdcCompliantComputationManager() throws InterruptedException {
         final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
+        executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isNull();
     }
 
     @Test
-    void mdcValueWithMdcCompliantComputationManager() {
+    void mdcValueWithMdcCompliantComputationManager() throws InterruptedException {
         MDC.put("testKey", "testValue");
         final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
+        executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isEqualTo("testValue");
     }
 
     @Test
-    void emptyMdcValueWithDefaultComputationManager() {
+    void emptyMdcValueWithDefaultComputationManager() throws InterruptedException {
         final ComputationManager computationManager = ComputationManagerUtil.getDefaultComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
+        executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isNull();
     }
 
     @Test
-    void mdcValueWithDefaultComputationManager() {
+    void mdcValueWithDefaultComputationManager() throws InterruptedException {
         MDC.put("testKey", "testValue");
         final ComputationManager computationManager = ComputationManagerUtil.getDefaultComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
-        computationManager.getExecutor().execute(() -> value.set(MDC.get("testKey")));
+        executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isNull();
     }
 
