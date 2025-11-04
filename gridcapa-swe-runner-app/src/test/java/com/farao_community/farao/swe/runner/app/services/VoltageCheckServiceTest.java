@@ -193,9 +193,9 @@ class VoltageCheckServiceTest {
         Instant instant = Mockito.mock(Instant.class);
         Mockito.when(state.getInstant()).thenReturn(instant);
         Mockito.when(instant.isCurative()).thenReturn(true);
-        Mockito.when(result.getMaxVoltage(any(), any(), (Unit) any())).thenReturn(600d);
+        Mockito.when(result.getMaxVoltage(any(), any(), any())).thenReturn(600d);
         Mockito.when(vc.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(700d));
-        Mockito.when(result.getMinVoltage(any(), any(), (Unit) any())).thenReturn(200d);
+        Mockito.when(result.getMinVoltage(any(), any(), any())).thenReturn(200d);
         Mockito.when(vc.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(100d));
         Network network = Mockito.mock(Network.class);
         //Expect
@@ -215,9 +215,9 @@ class VoltageCheckServiceTest {
         Crac crac = Mockito.mock(Crac.class);
         Set<VoltageCnec> constrainedElements = Set.of(vc);
         Mockito.when(crac.getVoltageCnecs()).thenReturn(constrainedElements);
-        Mockito.when(result.getMaxVoltage(any(), any(), (Unit) any())).thenReturn(600d);
+        Mockito.when(result.getMaxVoltage(any(), any(), any())).thenReturn(600d);
         Mockito.when(vc.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(600d));
-        Mockito.when(result.getMinVoltage(any(), any(), (Unit) any())).thenReturn(100d);
+        Mockito.when(result.getMinVoltage(any(), any(), any())).thenReturn(100d);
         Mockito.when(vc.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(100d));
         Network network = Mockito.mock(Network.class);
         //Expect
