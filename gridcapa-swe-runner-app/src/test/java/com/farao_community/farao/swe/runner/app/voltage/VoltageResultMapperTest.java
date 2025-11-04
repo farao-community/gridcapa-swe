@@ -36,9 +36,8 @@ import static com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoring
 import static com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils.EXPECTED_UPPER_1;
 import static com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils.NETWORK_1_ID;
 import static com.farao_community.farao.swe.runner.app.voltage.VoltageMonitoringResultTestUtils.NETWORK_2_ID;
-import static com.powsybl.openrao.commons.MinOrMax.MAX;
-import static com.powsybl.openrao.commons.MinOrMax.MIN;
-import static com.powsybl.openrao.commons.Unit.KILOVOLT;
+
+import com.powsybl.openrao.commons.Unit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -77,8 +76,8 @@ class VoltageResultMapperTest {
         NetworkElement networkElement1 = Mockito.mock(NetworkElement.class);
         when(networkElement1.getId()).thenReturn(NETWORK_1_ID);
         when(voltageCnec1.getNetworkElement()).thenReturn(networkElement1);
-        when(voltageCnec1.getUpperBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_1));
-        when(voltageCnec1.getLowerBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_1));
+        when(voltageCnec1.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_1));
+        when(voltageCnec1.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_1));
         //
         VoltageCnec voltageCnec2 = Mockito.mock(VoltageCnec.class);
         State state2 = Mockito.mock(State.class);
@@ -90,15 +89,15 @@ class VoltageResultMapperTest {
         NetworkElement networkElement2 = Mockito.mock(NetworkElement.class);
         when(networkElement2.getId()).thenReturn(NETWORK_2_ID);
         when(voltageCnec2.getNetworkElement()).thenReturn(networkElement2);
-        when(voltageCnec2.getUpperBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_0));
-        when(voltageCnec2.getLowerBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_0));
-        when(voltageMonitoringResult.getMargin(CURATIVE_INSTANT, voltageCnec1, KILOVOLT)).thenReturn(-1d);
-        when(voltageMonitoringResult.getMargin(CURATIVE_INSTANT, voltageCnec2, KILOVOLT)).thenReturn(-1d);
-        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec1, MIN, KILOVOLT)).thenReturn(EXPECTED_MIN_1);
-        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec1, MIN, KILOVOLT)).thenReturn(EXPECTED_MIN_1);
-        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec1, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_1);
-        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec2, MIN, KILOVOLT)).thenReturn(EXPECTED_MIN_0);
-        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec2, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_0);
+        when(voltageCnec2.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_0));
+        when(voltageCnec2.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_0));
+        when(voltageMonitoringResult.getMargin(CURATIVE_INSTANT, voltageCnec1, Unit.KILOVOLT)).thenReturn(-1d);
+        when(voltageMonitoringResult.getMargin(CURATIVE_INSTANT, voltageCnec2, Unit.KILOVOLT)).thenReturn(-1d);
+        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec1, Unit.KILOVOLT)).thenReturn(EXPECTED_MIN_1);
+        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec1, Unit.KILOVOLT)).thenReturn(EXPECTED_MIN_1);
+        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec1, Unit.KILOVOLT)).thenReturn(EXPECTED_MAX_1);
+        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec2, Unit.KILOVOLT)).thenReturn(EXPECTED_MIN_0);
+        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec2, Unit.KILOVOLT)).thenReturn(EXPECTED_MAX_0);
         when(voltageMonitoringResult.getSecurityStatus()).thenReturn(Cnec.SecurityStatus.HIGH_CONSTRAINT);
         // gather voltage cnecs as we will need to test their values
         VOLTAGE_CNEC_SET.add(voltageCnec1);

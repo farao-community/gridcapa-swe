@@ -20,9 +20,7 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
-import static com.powsybl.openrao.commons.MinOrMax.MAX;
-import static com.powsybl.openrao.commons.MinOrMax.MIN;
-import static com.powsybl.openrao.commons.Unit.KILOVOLT;
+import com.powsybl.openrao.commons.Unit;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,8 +59,8 @@ public final class VoltageMonitoringResultTestUtils {
         NetworkElement networkElement1 = Mockito.mock(NetworkElement.class);
         when(networkElement1.getId()).thenReturn(NETWORK_1_ID);
         when(voltageCnec1.getNetworkElement()).thenReturn(networkElement1);
-        when(voltageCnec1.getUpperBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_1));
-        when(voltageCnec1.getLowerBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_1));
+        when(voltageCnec1.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_1));
+        when(voltageCnec1.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_1));
         //
         VoltageCnec voltageCnec2 = Mockito.mock(VoltageCnec.class);
         State state2 = Mockito.mock(State.class);
@@ -74,12 +72,12 @@ public final class VoltageMonitoringResultTestUtils {
         NetworkElement networkElement2 = Mockito.mock(NetworkElement.class);
         when(networkElement2.getId()).thenReturn(NETWORK_2_ID);
         when(voltageCnec2.getNetworkElement()).thenReturn(networkElement2);
-        when(voltageCnec2.getUpperBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_0));
-        when(voltageCnec2.getLowerBound(KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_0));
-        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec1, MIN, KILOVOLT)).thenReturn(EXPECTED_MIN_1);
-        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec1, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_1);
-        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec2, MIN, KILOVOLT)).thenReturn(EXPECTED_MIN_0);
-        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec2, MAX, KILOVOLT)).thenReturn(EXPECTED_MAX_0);
+        when(voltageCnec2.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_0));
+        when(voltageCnec2.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_0));
+        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec1, Unit.KILOVOLT)).thenReturn(EXPECTED_MIN_1);
+        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec1, Unit.KILOVOLT)).thenReturn(EXPECTED_MAX_1);
+        when(voltageMonitoringResult.getMinVoltage(CURATIVE_INSTANT, voltageCnec2, Unit.KILOVOLT)).thenReturn(EXPECTED_MIN_0);
+        when(voltageMonitoringResult.getMaxVoltage(CURATIVE_INSTANT, voltageCnec2, Unit.KILOVOLT)).thenReturn(EXPECTED_MAX_0);
         when(voltageMonitoringResult.getSecurityStatus()).thenReturn(Cnec.SecurityStatus.SECURE);
 
         return voltageMonitoringResult;

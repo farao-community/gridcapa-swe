@@ -9,11 +9,11 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 import com.farao_community.farao.gridcapa_swe_commons.loadflow.ComputationManagerUtil;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
-import com.powsybl.balances_adjustment.util.CountryArea;
+import com.powsybl.balances_adjustment.util.BorderBasedCountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.computation.ComputationManager;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
@@ -50,8 +50,8 @@ public final class CountryBalanceComputation {
 
     public static Map<String, Double> computeSweBordersExchanges(Network network) {
         Map<String, Double> borderExchanges = new HashMap<>();
-        Map<Country, CountryArea> countryAreaPerCountry = Stream.of(Country.FR, Country.ES, Country.PT)
-                .collect(Collectors.toMap(Function.identity(), country -> new CountryAreaFactory(country).create(network)));
+        Map<Country, BorderBasedCountryArea> countryAreaPerCountry = Stream.of(Country.FR, Country.ES, Country.PT)
+                .collect(Collectors.toMap(Function.identity(), country -> (BorderBasedCountryArea) new CountryAreaFactory(country).create(network)));
         borderExchanges.put("ES_FR", getBorderExchange(Country.ES, Country.FR, countryAreaPerCountry));
         borderExchanges.put("ES_PT", getBorderExchange(Country.ES, Country.PT, countryAreaPerCountry));
         return borderExchanges;
@@ -66,7 +66,7 @@ public final class CountryBalanceComputation {
         }
     }
 
-    private static double getBorderExchange(Country fromCountry, Country toCountry, Map<Country, CountryArea> countryAreaPerCountry) {
+    private static double getBorderExchange(Country fromCountry, Country toCountry, Map<Country, BorderBasedCountryArea> countryAreaPerCountry) {
         return countryAreaPerCountry.get(fromCountry).getLeavingFlowToCountry(countryAreaPerCountry.get(toCountry));
     }
 }
