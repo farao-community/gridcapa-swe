@@ -21,7 +21,6 @@ import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
-import com.powsybl.openrao.commons.MinOrMax;
 import com.powsybl.openrao.commons.Unit;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.Instant;
@@ -100,7 +99,7 @@ public class VoltageCheckService {
             final Instant instant = voltageCnec.getState().getInstant();
             if (instant.isCurative()) {
                 voltageCnec.getLowerBound(Unit.KILOVOLT).ifPresent(lowerBound -> {
-                    final double minVoltage = result.getMinVoltage(instant, voltageCnec, MinOrMax.MIN, Unit.KILOVOLT);
+                    final double minVoltage = result.getMinVoltage(instant, voltageCnec, Unit.KILOVOLT);
                     if (!Double.isNaN(minVoltage) && Double.compare(lowerBound, minVoltage) > 0) {
                         if (exportNetworkConfiguration.isExportFailedNetwork()) {
                             exportXiidmNetwork(network, targetProcessDateTime, processType);
@@ -113,7 +112,7 @@ public class VoltageCheckService {
                     }
                 });
                 voltageCnec.getUpperBound(Unit.KILOVOLT).ifPresent(upperBound -> {
-                    final double maxVoltage = result.getMaxVoltage(instant, voltageCnec, MinOrMax.MAX, Unit.KILOVOLT);
+                    final double maxVoltage = result.getMaxVoltage(instant, voltageCnec, Unit.KILOVOLT);
                     if (!Double.isNaN(maxVoltage) && Double.compare(maxVoltage, upperBound) > 0) {
                         if (exportNetworkConfiguration.isExportFailedNetwork()) {
                             exportXiidmNetwork(network, targetProcessDateTime, processType);

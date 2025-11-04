@@ -8,7 +8,6 @@ package com.farao_community.farao.swe.runner.app.voltage;
 
 import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckConstraintElement;
 import com.farao_community.farao.swe.runner.app.voltage.json.VoltageCheckResult;
-import com.powsybl.openrao.commons.MinOrMax;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.Instant;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.powsybl.openrao.commons.Unit.KILOVOLT;
+import com.powsybl.openrao.commons.Unit;
 
 /**
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
@@ -29,7 +28,7 @@ public class VoltageResultMapper {
         final List<VoltageCheckConstraintElement> constraintElements = crac.getVoltageCnecs()
                 .stream()
                 .filter(voltageCnec -> voltageCnec.getState().getInstant().isCurative())
-                .filter(voltageCnec -> voltageMonitoringResult.getMargin(voltageCnec.getState().getInstant(), voltageCnec, KILOVOLT) < 0)
+                .filter(voltageCnec -> voltageMonitoringResult.getMargin(voltageCnec.getState().getInstant(), voltageCnec, Unit.KILOVOLT) < 0)
                 .map(voltageCnec -> {
                     final Instant instant = voltageCnec.getState().getInstant();
                     final String contingency = voltageCnec.getState().getContingency().get().getId();
@@ -37,10 +36,10 @@ public class VoltageResultMapper {
                             voltageCnec.getNetworkElement().getId(),
                             instant.getKind().toString(),
                             contingency,
-                            voltageMonitoringResult.getMinVoltage(instant, voltageCnec, MinOrMax.MIN, KILOVOLT),
-                            voltageMonitoringResult.getMaxVoltage(instant, voltageCnec, MinOrMax.MAX, KILOVOLT),
-                            voltageCnec.getLowerBound(KILOVOLT).orElse(null),
-                            voltageCnec.getUpperBound(KILOVOLT).orElse(null));
+                            voltageMonitoringResult.getMinVoltage(instant, voltageCnec, Unit.KILOVOLT),
+                            voltageMonitoringResult.getMaxVoltage(instant, voltageCnec, Unit.KILOVOLT),
+                            voltageCnec.getLowerBound(Unit.KILOVOLT).orElse(null),
+                            voltageCnec.getUpperBound(Unit.KILOVOLT).orElse(null));
                 })
                 .toList();
         return new VoltageCheckResult(voltageMonitoringResult.getSecurityStatus(), constraintElements);
