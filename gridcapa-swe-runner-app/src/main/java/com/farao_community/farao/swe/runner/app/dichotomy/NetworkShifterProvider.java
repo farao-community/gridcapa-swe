@@ -63,7 +63,7 @@ public class NetworkShifterProvider {
                     processConfiguration,
                     loadFlowParameters, sweNetworkExporter);
         } catch (SweBaseCaseUnsecureException baseCaseUnsecureException) {
-            businessLogger.error("Base case loadflow is unsecure, the calculation is stopped");
+            businessLogger.error("Base case loadflow is unsecure, the calculation is stopped and the first unsecure network cannot be exported because it doesn't exist at this stage of the calculation.");
             throw baseCaseUnsecureException;
         }
     }
