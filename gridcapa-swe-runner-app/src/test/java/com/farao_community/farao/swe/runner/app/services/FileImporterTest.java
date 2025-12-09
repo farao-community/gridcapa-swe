@@ -7,9 +7,7 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
-import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
-import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.google.common.base.Suppliers;
 import com.powsybl.computation.local.LocalComputationManager;
@@ -92,32 +90,6 @@ class FileImporterTest {
     void testImportCracFromJson() {
         Crac cracFromJson = fileImporter.importCracFromJson(Objects.requireNonNull(getClass().getResource(testDirectory + jsonCracFilename)).toString(), network);
         assertNotNull(cracFromJson);
-    }
-
-    SweRequest createEmptySweRequest() {
-        return new SweRequest("id", "runId", ProcessType.D2CC, dateTime, null, null, null, null, null, null, null, null, null, null,
-                new SweFileResource("cracfile", getClass().getResource(testDirectory + cimCracFilename).toExternalForm()), null, null, null, null);
-    }
-
-    @Test
-    void importGlskTest() {
-        /* Generators
-        _9c3b8f97-7972-477d-9dc8-87365cc0ad0e NL G1 minP = 300 maxP = 1000, targetP = 600.49
-        _2844585c-0d35-488d-a449-685bcd57afbf NL G2 minP = 130 maxP = 250, targetP = 140.0
-        _1dc9afba-23b5-41a0-8540-b479ed8baf4b NL G3 minP = 130 maxP = 250, targetP = 150.0
-
-        _550ebe0d-f2b2-48c1-991f-cebea43a21aa BE G2 minP = 50 maxP = 200, targetP = 118
-        _3a3b27be-b18b-4385-b557-6735d733baf0 BE G1 minP = -100 maxP = 200, targetP = 90
-         */
-        Instant instant = Instant.parse("2021-02-09T19:30:00Z");
-        ZonalData<Scalable> zonalScalables = fileImporter.importGlsk(getClass().getResource(testDirectory + glskFilename).toString(), network, instant);
-        assertEquals(2, zonalScalables.getDataPerZone().size());
-        Scalable scalableNL = zonalScalables.getData("10YNL----------L"); //type B45 curve type A03
-        assertEquals(3, scalableNL.filterInjections(network).size());
-        Scalable scalableBE = zonalScalables.getData("10YBE----------2"); //type B45 curve type A01
-        assertEquals(4, scalableBE.filterInjections(network).size());
-        assertEquals(192., scalableBE.scale(network, 192), 0.001);
-        assertEquals(-450., scalableBE.scale(network, -500), 0.001);
     }
 
     @Test

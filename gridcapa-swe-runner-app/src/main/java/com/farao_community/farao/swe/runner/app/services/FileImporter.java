@@ -10,10 +10,7 @@ import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataEx
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
-import com.powsybl.glsk.api.io.GlskDocumentImporters;
 import com.powsybl.glsk.cim.CimGlskDocument;
-import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.RaUsageLimits;
@@ -33,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 
 /**
@@ -94,17 +90,6 @@ public class FileImporter {
             return new CracCreationParameters();
         }
         return JsonCracCreationParameters.read(getClass().getResourceAsStream(paramFilePath));
-    }
-
-    public ZonalData<Scalable> importGlsk(String glskUrl, Network network, Instant instant) {
-        try (InputStream glskResultStream = urlValidationService.openUrlStream(glskUrl)) {
-            synchronized (LOCK_GLSK) {
-                LOGGER.info("Importing Glsk file from url : {}", glskUrl);
-                return GlskDocumentImporters.importGlsk(glskResultStream).getZonalScalable(network, instant);
-            }
-        } catch (IOException e) {
-            throw new SweInvalidDataException(String.format("Cannot import glsk from url : %s", glskUrl), e);
-        }
     }
 
     public CimGlskDocument importCimGlskDocument(String glskUrl) {
