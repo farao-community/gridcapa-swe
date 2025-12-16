@@ -24,7 +24,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-class ComputationManagerUtilTest {
+class LoadFlowUtilTest {
     @BeforeEach
     void setUp() {
         MDC.clear();
@@ -42,7 +42,7 @@ class ComputationManagerUtilTest {
 
     @Test
     void emptyMdcValueWithMdcCompliantComputationManager() throws InterruptedException {
-        final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
+        final ComputationManager computationManager = LoadFlowUtil.getMdcCompliantComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
         executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isNull();
@@ -51,7 +51,7 @@ class ComputationManagerUtilTest {
     @Test
     void mdcValueWithMdcCompliantComputationManager() throws InterruptedException {
         MDC.put("testKey", "testValue");
-        final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
+        final ComputationManager computationManager = LoadFlowUtil.getMdcCompliantComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
         executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isEqualTo("testValue");
@@ -59,7 +59,7 @@ class ComputationManagerUtilTest {
 
     @Test
     void emptyMdcValueWithDefaultComputationManager() throws InterruptedException {
-        final ComputationManager computationManager = ComputationManagerUtil.getDefaultComputationManager();
+        final ComputationManager computationManager = LoadFlowUtil.getDefaultComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
         executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isNull();
@@ -68,7 +68,7 @@ class ComputationManagerUtilTest {
     @Test
     void mdcValueWithDefaultComputationManager() throws InterruptedException {
         MDC.put("testKey", "testValue");
-        final ComputationManager computationManager = ComputationManagerUtil.getDefaultComputationManager();
+        final ComputationManager computationManager = LoadFlowUtil.getDefaultComputationManager();
         final AtomicReference<String> value = new AtomicReference<>();
         executeAndWait(computationManager, value);
         Assertions.assertThat(value.get()).isNull();
@@ -88,7 +88,7 @@ class ComputationManagerUtilTest {
             localComputationConfigMockedStatic.when(LocalComputationConfig::load)
                     .thenReturn(Mockito.mock(LocalComputationConfig.class));
 
-            final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
+            final ComputationManager computationManager = LoadFlowUtil.getMdcCompliantComputationManager();
             Assertions.assertThat(computationManager.getExecutor()).isEqualTo(ForkJoinPool.commonPool());
         }
     }

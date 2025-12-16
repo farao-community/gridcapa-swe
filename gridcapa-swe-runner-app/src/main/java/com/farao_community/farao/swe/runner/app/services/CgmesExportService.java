@@ -9,7 +9,7 @@ package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
-import com.farao_community.farao.gridcapa_swe_commons.loadflow.ComputationManagerUtil;
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
@@ -36,11 +36,9 @@ import com.powsybl.cgmes.model.CgmesMetadataModel;
 import com.powsybl.cgmes.model.CgmesNames;
 import com.powsybl.cgmes.model.CgmesSubset;
 import com.powsybl.commons.datasource.MemDataSource;
-import com.powsybl.computation.ComputationManager;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.ExportersServiceLoader;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
@@ -147,8 +145,7 @@ public class CgmesExportService {
             final Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
             applyHvdcSetPointToAcEquivalentModel(networkWithPra, sweData.getHvdcInformationList());
             final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
-            final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
-            LoadFlow.run(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), computationManager, loadFlowParameters);
+            LoadFlowUtil.runLoadFlowWithMdc(networkWithPra, networkWithPra.getVariantManager().getWorkingVariantId(), loadFlowParameters);
             final Map<String, ByteArrayOutputStream> mapCgmesFiles = generateCgmesFile(networkWithPra, sweData);
             return fileExporter.exportCgmesZipFile(sweData, mapCgmesFiles, direction, buildFileType(direction, isHighestValid), isHighestValid);
         } catch (final IOException e) {
