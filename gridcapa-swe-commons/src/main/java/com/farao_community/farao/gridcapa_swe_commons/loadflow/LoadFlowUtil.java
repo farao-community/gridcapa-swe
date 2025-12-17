@@ -9,6 +9,11 @@ package com.farao_community.farao.gridcapa_swe_commons.loadflow;
 import com.powsybl.computation.ComputationManager;
 import com.powsybl.computation.local.LocalComputationConfig;
 import com.powsybl.computation.local.LocalComputationManager;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowResult;
+import com.powsybl.loadflow.LoadFlowRunParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -17,11 +22,21 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-public final class ComputationManagerUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ComputationManagerUtil.class);
+public final class LoadFlowUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadFlowUtil.class);
 
-    private ComputationManagerUtil() {
+    private LoadFlowUtil() {
         // No instantiation needed
+    }
+
+    public static LoadFlowResult runLoadFlowWithMdc(final Network network,
+                                                    final String workingVariantId,
+                                                    final LoadFlowParameters loadFlowParameters) {
+        final ComputationManager computationManager = LoadFlowUtil.getMdcCompliantComputationManager();
+        final LoadFlowRunParameters runParameters = new LoadFlowRunParameters()
+            .setComputationManager(computationManager)
+            .setParameters(loadFlowParameters);
+        return LoadFlow.run(network, workingVariantId, runParameters);
     }
 
     public static ComputationManager getMdcCompliantComputationManager() {
