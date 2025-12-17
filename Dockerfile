@@ -1,4 +1,4 @@
-FROM farao/farao-computation-base:1.9.0 AS builder
+FROM farao/farao-computation-base:1.9.0 AS BUILDER
 ARG JAR_FILE=gridcapa-swe-runner-app/target/*.jar
 COPY ${JAR_FILE} app.jar
 RUN mkdir -p /tmp/app  \
