@@ -14,6 +14,7 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.dichotomy.api.utils.ContingenciesLoggerUtil;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.farao_community.farao.rao_runner.api.resource.AbstractRaoResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoFailureResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
@@ -94,7 +95,13 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
                 final Crac crac = sweData.getCracEsPt().getCrac();
                 final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()).getZonalScalable(network, sweData.getTimestamp().toInstant())).build();
-                final RaoResultWithAngleMonitoring raoResultWithAngleMonitoring = (RaoResultWithAngleMonitoring) Monitoring.runAngleAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, input);
+                final RaoResultWithAngleMonitoring raoResultWithAngleMonitoring =
+                    (RaoResultWithAngleMonitoring) Monitoring.runAngleAndUpdateRaoResult(
+                        LoadFlow.find().getName(),
+                        loadFlowParameters,
+                        LoadFlowUtil.getMdcCompliantComputationManager(),
+                        4,
+                        input);
                 if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
                     businessLogger.warn("Angle monitoring result is failure");
                     return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,

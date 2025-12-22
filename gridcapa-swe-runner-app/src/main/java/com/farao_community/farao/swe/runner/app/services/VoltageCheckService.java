@@ -9,6 +9,7 @@ package com.farao_community.farao.swe.runner.app.services;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 
 import com.farao_community.farao.swe.runner.app.configurations.ExportNetworkConfiguration;
@@ -82,7 +83,13 @@ public class VoltageCheckService {
             final Network network = getNetworkWithPra(dichotomyResult);
             final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
             final MonitoringInput input = MonitoringInput.buildWithVoltage(network, crac, dichotomyResult.getHighestValidStep().getRaoResult()).build();
-            final RaoResultWithVoltageMonitoring result = (RaoResultWithVoltageMonitoring) Monitoring.runVoltageAndUpdateRaoResult(LoadFlow.find().getName(), loadFlowParameters, 4, input);
+            final RaoResultWithVoltageMonitoring result =
+                (RaoResultWithVoltageMonitoring) Monitoring.runVoltageAndUpdateRaoResult(
+                    LoadFlow.find().getName(),
+                    loadFlowParameters,
+                    LoadFlowUtil.getMdcCompliantComputationManager(),
+                    4,
+                    input);
             generateHighAndLowVoltageConstraints(result, crac, network, sweData.getTimestamp(), sweData.getProcessType()).forEach(businessLogger::warn);
             return Optional.of(result);
         } catch (final Exception e) {
