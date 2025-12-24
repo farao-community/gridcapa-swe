@@ -6,15 +6,13 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.gridcapa_swe_commons.loadflow.ComputationManagerUtil;
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.powsybl.balances_adjustment.util.BorderBasedCountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
-import com.powsybl.computation.ComputationManager;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
 import org.slf4j.Logger;
@@ -58,8 +56,8 @@ public final class CountryBalanceComputation {
     }
 
     private static void runLoadFlow(final Network network, final String workingStateId, final LoadFlowParameters loadFlowParameters) {
-        final ComputationManager computationManager = ComputationManagerUtil.getMdcCompliantComputationManager();
-        final LoadFlowResult result = LoadFlow.run(network, workingStateId, computationManager, loadFlowParameters);
+        final LoadFlowResult result = LoadFlowUtil.runLoadFlowWithMdc(network, workingStateId, loadFlowParameters);
+
         if (result.isFailed()) {
             LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
             throw new SweBaseCaseUnsecureException(String.format("Loadflow computation diverged on network %s", network.getId()));
