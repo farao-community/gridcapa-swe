@@ -6,13 +6,13 @@
     <parent>
         <artifactId>gridcapa-swe</artifactId>
         <groupId>com.farao-community.farao</groupId>
-        <version>1.43.0-SNAPSHOT</version>
+        <version>1.44.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>gridcapa-swe-runner-app</artifactId>
     <name>GridCapa SWE runner application</name>
     <description>Application that performs capacity calculation on SWE zone</description>
-    <version>1.43.0-SNAPSHOT</version>
+    <version>1.44.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <build>
