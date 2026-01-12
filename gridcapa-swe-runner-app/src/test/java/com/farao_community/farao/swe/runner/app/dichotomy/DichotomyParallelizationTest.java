@@ -331,12 +331,12 @@ class DichotomyParallelizationTest {
 
     @Test
     void testParallelizationWithOneErrorInDichotomy() throws ExecutionException, InterruptedException {
-        final Future futurErrorMock = mock(Future.class);
-        when(worker.runDichotomyForOneDirection(any(), any(), eq(DichotomyDirection.ES_FR), any())).thenReturn(futurErrorMock);
-        when(futurErrorMock.get()).thenThrow(ExecutionException.class);
         final Future futureMock = mock(Future.class);
         when(worker.runDichotomyForOneDirection(any(), any(), any(), any())).thenReturn(futureMock);
         final SweDichotomyResult result = mock(SweDichotomyResult.class);
+        final Future futurErrorMock = mock(Future.class);
+        when(worker.runDichotomyForOneDirection(any(), any(), eq(DichotomyDirection.ES_FR), any())).thenReturn(futurErrorMock);
+        when(futurErrorMock.get()).thenThrow(ExecutionException.class);
         when(futureMock.get()).thenReturn(result);
         final SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
         Assertions.assertThat(sweResponse).isNotNull();
