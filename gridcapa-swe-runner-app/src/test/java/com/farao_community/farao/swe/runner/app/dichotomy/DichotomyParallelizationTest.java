@@ -342,6 +342,7 @@ class DichotomyParallelizationTest {
         Assertions.assertThat(sweResponse).isNotNull();
         Assertions.assertThat(sweResponse.isAllRaoFailed()).isFalse();
         Assertions.assertThat(sweResponse.isInterrupted()).isFalse();
+        Assertions.assertThat(sweResponse.isAllParallelRunsFailed()).isFalse();
     }
 
     @Test
