@@ -48,7 +48,7 @@ class RequestServiceTest {
     void testRequestService() {
         String id = UUID.randomUUID().toString();
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, false);
+        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, false, false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any(), any())).thenReturn(cseResponse);
 
@@ -64,7 +64,7 @@ class RequestServiceTest {
     void testInterruptedRequestService() {
         String id = UUID.randomUUID().toString();
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true, true);
+        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", true, true, false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any(), any())).thenReturn(cseResponse);
 
@@ -80,7 +80,7 @@ class RequestServiceTest {
     void testRaoFailedRequestService() {
         String id = UUID.randomUUID().toString();
         SweRequest cseRequest = new SweRequest(id, "runId", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, true);
+        SweResponse cseResponse = new SweResponse(cseRequest.getId(), "null", false, true, false);
         byte[] req = jsonApiConverter.toJsonMessage(cseRequest, SweRequest.class);
         when(sweRunner.run(any(), any())).thenReturn(cseResponse);
 

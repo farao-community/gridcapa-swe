@@ -10,7 +10,6 @@ import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -27,6 +26,7 @@ import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.CracFactory;
 import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -45,7 +45,6 @@ import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -201,7 +200,11 @@ class DichotomyParallelizationTest {
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.FR_ES, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.ES_PT, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
         when(worker.runDichotomyForOneDirection(sweData, defaultParameters, DichotomyDirection.PT_ES, startingTime)).thenReturn(CompletableFuture.failedFuture(new InterruptedException()));
-        assertThrows(SweInternalException.class, () -> dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime));
+        final SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
+        Assertions.assertThat(sweResponse).isNotNull();
+        Assertions.assertThat(sweResponse.isAllRaoFailed()).isFalse();
+        Assertions.assertThat(sweResponse.isInterrupted()).isFalse();
+        Assertions.assertThat(sweResponse.isAllParallelRunsFailed()).isTrue();
     }
 
     @Test
@@ -316,10 +319,29 @@ class DichotomyParallelizationTest {
 
     @Test
     void testParallelizationWithErrorInDichotomy() throws ExecutionException, InterruptedException {
-        Future futureMock = mock(Future.class);
+        final Future futureMock = mock(Future.class);
         when(worker.runDichotomyForOneDirection(any(), any(), any(), any())).thenReturn(futureMock);
         when(futureMock.get()).thenThrow(ExecutionException.class);
-        assertThrows(SweInternalException.class, () -> dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime));
+        final SweResponse response = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.isAllRaoFailed()).isFalse();
+        Assertions.assertThat(response.isInterrupted()).isFalse();
+        Assertions.assertThat(response.isAllParallelRunsFailed()).isTrue();
+    }
+
+    @Test
+    void testParallelizationWithOneErrorInDichotomy() throws ExecutionException, InterruptedException {
+        final Future futurErrorMock = mock(Future.class);
+        when(worker.runDichotomyForOneDirection(any(), any(), eq(DichotomyDirection.ES_FR), any())).thenReturn(futurErrorMock);
+        when(futurErrorMock.get()).thenThrow(ExecutionException.class);
+        final Future futureMock = mock(Future.class);
+        when(worker.runDichotomyForOneDirection(any(), any(), any(), any())).thenReturn(futureMock);
+        final SweDichotomyResult result = mock(SweDichotomyResult.class);
+        when(futureMock.get()).thenReturn(result);
+        final SweResponse sweResponse = dichotomyParallelization.launchDichotomy(sweData, defaultParameters, startingTime);
+        Assertions.assertThat(sweResponse).isNotNull();
+        Assertions.assertThat(sweResponse.isAllRaoFailed()).isFalse();
+        Assertions.assertThat(sweResponse.isInterrupted()).isFalse();
     }
 
     @Test

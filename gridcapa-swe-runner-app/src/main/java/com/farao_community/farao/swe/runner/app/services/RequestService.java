@@ -77,6 +77,9 @@ public class RequestService {
         } else if (sweResponse.isAllRaoFailed()) {
             businessLogger.warn("RAO failed for all computed directions");
             sendTaskStatusUpdate(sweResponse.getId(), TaskStatus.ERROR);
+        } else if (sweResponse.isAllParallelRunsFailed()) {
+            businessLogger.warn("Run failed for all computed directions");
+            sendTaskStatusUpdate(sweResponse.getId(), TaskStatus.ERROR);
         } else {
             sendTaskStatusUpdate(sweResponse.getId(), TaskStatus.SUCCESS);
         }

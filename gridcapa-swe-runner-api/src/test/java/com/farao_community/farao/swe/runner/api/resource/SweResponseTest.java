@@ -19,21 +19,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SweResponseTest {
     @Test
     void simpleRequestTest() {
-        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", true, false);
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", true, false, false);
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertTrue(sweResponse.isInterrupted());
         assertFalse(sweResponse.isAllRaoFailed());
+        assertFalse(sweResponse.isAllParallelRunsFailed());
     }
 
     @Test
     void simpleRequestRaoFailedTest() {
-        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", false, true);
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", false, true, false);
         assertNotNull(sweResponse);
         assertEquals("id", sweResponse.getId());
         assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
         assertFalse(sweResponse.isInterrupted());
         assertTrue(sweResponse.isAllRaoFailed());
+        assertFalse(sweResponse.isAllParallelRunsFailed());
+    }
+
+    @Test
+    void simpleRequestAllRunsFailedTest() {
+        SweResponse sweResponse = new SweResponse("id", "ttcDocUrl", false, false, true);
+        assertNotNull(sweResponse);
+        assertEquals("id", sweResponse.getId());
+        assertEquals("ttcDocUrl", sweResponse.getTtcDocUrl());
+        assertFalse(sweResponse.isInterrupted());
+        assertFalse(sweResponse.isAllRaoFailed());
+        assertTrue(sweResponse.isAllParallelRunsFailed());
     }
 }

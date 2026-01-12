@@ -26,6 +26,7 @@ public class SweDichotomyResult {
     private final String lowestInvalidStepUrl;
     private final boolean interrupted;
     private final boolean raoFailed;
+    private final boolean runFailed;
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<SweDichotomyValidationData> dichotomyResult,
@@ -43,12 +44,26 @@ public class SweDichotomyResult {
         this.lowestInvalidStepUrl = lowestInvalidStepUrl;
         this.interrupted = dichotomyResult.isInterrupted();
         this.raoFailed = dichotomyResult.isRaoFailed();
+        this.runFailed = false;
     }
 
     public SweDichotomyResult(DichotomyDirection dichotomyDirection,
                               DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                               String lowestInvalidStepUrl) {
         this(dichotomyDirection, dichotomyResult, Optional.empty(), null, null, null, lowestInvalidStepUrl);
+    }
+
+    public SweDichotomyResult(final DichotomyDirection dichotomyDirection) {
+        this.dichotomyDirection = dichotomyDirection;
+        this.dichotomyResult = null;
+        this.voltageMonitoringResult = Optional.empty();
+        this.exportedLastSecureCgmesUrl = null;
+        this.exportedFirstUnsecureCgmesUrl = null;
+        this.highestValidStepUrl = null;
+        this.lowestInvalidStepUrl = null;
+        this.interrupted = false;
+        this.raoFailed = false;
+        this.runFailed = true;
     }
 
     public DichotomyDirection getDichotomyDirection() {
@@ -85,5 +100,9 @@ public class SweDichotomyResult {
 
     public boolean isRaoFailed() {
         return raoFailed;
+    }
+
+    public boolean isRunFailed() {
+        return runFailed;
     }
 }
