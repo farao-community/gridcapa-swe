@@ -92,8 +92,9 @@ public class DichotomyParallelization {
         try {
             return dichotomy.getValue().get();
         } catch (ExecutionException e) {
-            businessLogger.error("Error on dichotomy direction", e);
-            return new SweDichotomyResult(dichotomy.getKey());
+            final DichotomyDirection direction = dichotomy.getKey();
+            businessLogger.error(String.format("[%s]: Error on dichotomy direction", direction.getDashName()));
+            return SweDichotomyResult.fromFailedRun(direction);
         }
     }
 }

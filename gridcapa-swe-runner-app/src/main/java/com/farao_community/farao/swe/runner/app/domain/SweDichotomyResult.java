@@ -53,7 +53,11 @@ public class SweDichotomyResult {
         this(dichotomyDirection, dichotomyResult, Optional.empty(), null, null, null, lowestInvalidStepUrl);
     }
 
-    public SweDichotomyResult(final DichotomyDirection dichotomyDirection) {
+    public static SweDichotomyResult fromFailedRun(final DichotomyDirection dichotomyDirection) {
+        return new SweDichotomyResult(dichotomyDirection);
+    }
+
+    private SweDichotomyResult(final DichotomyDirection dichotomyDirection) {
         this.dichotomyDirection = dichotomyDirection;
         this.dichotomyResult = null;
         this.voltageMonitoringResult = Optional.empty();
