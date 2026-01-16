@@ -61,7 +61,7 @@ public class TtcDocument {
 
     private void buildMapResult() {
         executionResult.getResult().stream()
-                .filter(r -> !r.isRaoFailed())
+                .filter(r -> !r.isRaoFailed() && !r.isRunFailed())
                 .forEach(r -> addValueToResultMap(r.getDichotomyDirection(), r.getDichotomyResult()));
     }
 
