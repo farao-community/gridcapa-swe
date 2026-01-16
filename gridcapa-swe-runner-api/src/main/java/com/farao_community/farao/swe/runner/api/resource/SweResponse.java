@@ -22,16 +22,19 @@ public class SweResponse {
     private final String ttcDocUrl;
     private final boolean interrupted;
     private final boolean allRaoFailed;
+    private final boolean allParallelRunsFailed;
 
     @JsonCreator
     public SweResponse(@JsonProperty("id") String id,
                        @JsonProperty("ttcDocUrl") String ttcDocUrl,
                        @JsonProperty("interrupted") boolean interrupted,
-                       @JsonProperty("allRaoFailed") boolean allRaoFailed) {
+                       @JsonProperty("allRaoFailed") boolean allRaoFailed,
+                       @JsonProperty("allParallelRunsFailed") boolean allParallelRunsFailed) {
         this.id = id;
         this.ttcDocUrl = ttcDocUrl;
         this.interrupted = interrupted;
         this.allRaoFailed = allRaoFailed;
+        this.allParallelRunsFailed = allParallelRunsFailed;
     }
 
     public String getId() {
@@ -48,6 +51,10 @@ public class SweResponse {
 
     public boolean isAllRaoFailed() {
         return allRaoFailed;
+    }
+
+    public boolean isAllParallelRunsFailed() {
+        return allParallelRunsFailed;
     }
 
     @Override

@@ -7,7 +7,6 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
-import com.farao_community.farao.gridcapa_swe_commons.exception.SweInternalException;
 import com.farao_community.farao.swe.runner.api.resource.SweResponse;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult;
@@ -16,6 +15,8 @@ import com.farao_community.farao.swe.runner.app.parallelization.DichotomyParalle
 import com.farao_community.farao.swe.runner.app.parallelization.ExecutionResult;
 import com.farao_community.farao.swe.runner.app.services.InterruptionService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
+import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -34,13 +35,15 @@ public class DichotomyParallelization {
     private final OutputService outputService;
     private final DichotomyParallelizationWorker worker;
     private final InterruptionService interruptionService;
+    private final Logger businessLogger;
 
-    public DichotomyParallelization(DichotomyLogging dichotomyLogging, OutputService outputService, DichotomyParallelizationWorker worker, InterruptionService interruptionService) {
+    public DichotomyParallelization(DichotomyLogging dichotomyLogging, OutputService outputService, DichotomyParallelizationWorker worker, InterruptionService interruptionService, Logger businessLogger) {
 
         this.dichotomyLogging = dichotomyLogging;
         this.outputService = outputService;
         this.worker = worker;
         this.interruptionService = interruptionService;
+        this.businessLogger = businessLogger;
     }
 
     public SweResponse launchDichotomy(final SweData sweData,
@@ -52,43 +55,46 @@ public class DichotomyParallelization {
         final String ttcDocUrl = interrupted ? "" : outputService.buildAndExportTtcDocument(sweData, executionResult);
         interruptionService.removeRunToBeInterrupted(sweData.getId());
         final boolean allRaoFailed = executionResult.getResult().stream().allMatch(SweDichotomyResult::isRaoFailed);
-        return new SweResponse(sweData.getId(), ttcDocUrl, interrupted, allRaoFailed);
+        final boolean allParallelRunsFailed = executionResult.getResult().stream().allMatch(SweDichotomyResult::isRunFailed);
+        return new SweResponse(sweData.getId(), ttcDocUrl, interrupted, allRaoFailed, allParallelRunsFailed);
     }
 
     private ExecutionResult<SweDichotomyResult> runAndGetSweDichotomyResults(final SweData sweData,
                                                                              final SweTaskParameters sweTaskParameters,
                                                                              final OffsetDateTime startTime) {
         List<SweDichotomyResult> results = new ArrayList<>();
-        List<Future<SweDichotomyResult>> futures = new ArrayList<>();
+        List<Pair<DichotomyDirection, Future<SweDichotomyResult>>> futures = new ArrayList<>();
         try {
             if (sweTaskParameters.isRunDirectionEsFr()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_FR, startTime));
+                futures.add(Pair.create(DichotomyDirection.ES_FR, worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_FR, startTime)));
             }
             if (sweTaskParameters.isRunDirectionFrEs()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.FR_ES, startTime));
+                futures.add(Pair.create(DichotomyDirection.FR_ES, worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.FR_ES, startTime)));
             }
             if (sweTaskParameters.isRunDirectionEsPt()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_PT, startTime));
+                futures.add(Pair.create(DichotomyDirection.ES_PT, worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.ES_PT, startTime)));
             }
             if (sweTaskParameters.isRunDirectionPtEs()) {
-                futures.add(worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.PT_ES, startTime));
+                futures.add(Pair.create(DichotomyDirection.PT_ES, worker.runDichotomyForOneDirection(sweData, sweTaskParameters, DichotomyDirection.PT_ES, startTime)));
             }
 
-            for (Future<SweDichotomyResult> future : futures) {
+            for (Pair<DichotomyDirection, Future<SweDichotomyResult>> future : futures) {
                 results.add(waitAndGet(future));
             }
         } catch (InterruptedException e) {
-            futures.forEach(f -> f.cancel(true));
+            futures.forEach(f -> f.getValue().cancel(true));
             Thread.currentThread().interrupt();
         }
         return new ExecutionResult<>(results);
     }
 
-    private SweDichotomyResult waitAndGet(Future<SweDichotomyResult> dichotomy) throws InterruptedException {
+    private SweDichotomyResult waitAndGet(Pair<DichotomyDirection, Future<SweDichotomyResult>> dichotomy) throws InterruptedException {
         try {
-            return dichotomy.get();
+            return dichotomy.getValue().get();
         } catch (ExecutionException e) {
-            throw new SweInternalException("Error on dichotomy direction", e);
+            final DichotomyDirection direction = dichotomy.getKey();
+            businessLogger.error(String.format("[%s]: Error on dichotomy direction", direction.getDashName()));
+            return SweDichotomyResult.fromFailedRun(direction);
         }
     }
 }
