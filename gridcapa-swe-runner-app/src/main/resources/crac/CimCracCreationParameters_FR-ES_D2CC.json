@@ -33,6 +33,10 @@
         {
           "range-action-id": "CUGA2",
           "speed": 3
+        },
+        {
+          "range-action-id": "REE-RA-139_PST_BAIXAS",
+          "speed": 4
         }
       ],
       "voltage-cnecs-creation-parameters": {
