@@ -12,6 +12,7 @@ public class DichotomyParameters {
     private double maxValue;
     private double precision;
     private boolean runAngleCheck;
+    private boolean runGlskChecksFirst;
 
     public double getMinValue() {
         return minValue;
@@ -43,5 +44,13 @@ public class DichotomyParameters {
 
     public void setRunAngleCheck(boolean runAngleCheck) {
         this.runAngleCheck = runAngleCheck;
+    }
+
+    public boolean shouldRunGlskChecksFirst() {
+        return runGlskChecksFirst;
+    }
+
+    public void setRunGlskChecksFirst(final boolean runGlskChecksFirst) {
+        this.runGlskChecksFirst = runGlskChecksFirst;
     }
 }

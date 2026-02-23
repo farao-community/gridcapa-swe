@@ -43,6 +43,7 @@ public class SweTaskParameters {
     private static final String MAX_NEWTON_RAPHSON_ITERATIONS = "MAX_NEWTON_RAPHSON_ITERATIONS";
     private static final String DISABLE_SECOND_PREVENTIVE_RAO = "DISABLE_SECOND_PREVENTIVE_RAO";
     private static final String EXPORT_FIRST_UNSECURE_SHIFTED_CGM = "EXPORT_FIRST_UNSECURE_SHIFTED_CGM";
+    private static final String RUN_GLSK_CHECKS_FIRST = "RUN_GLSK_CHECKS_FIRST";
 
     private boolean runDirectionEsFr;
     private boolean runDirectionFrEs;
@@ -66,8 +67,9 @@ public class SweTaskParameters {
     private int maxNewtonRaphsonIterations;
     private boolean secondPreventiveRaoDisabled;
     private boolean exportFirstUnsecureShiftedCGM;
+    private boolean runGlskChecksFirst;
 
-    public SweTaskParameters(List<TaskParameterDto> parameters) {
+    public SweTaskParameters(final List<TaskParameterDto> parameters) {
         List<String> errors = new ArrayList<>();
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
@@ -93,6 +95,7 @@ public class SweTaskParameters {
                 case MAX_NEWTON_RAPHSON_ITERATIONS -> maxNewtonRaphsonIterations = validateIsPositiveIntegerAndGet(parameter, errors);
                 case DISABLE_SECOND_PREVENTIVE_RAO -> secondPreventiveRaoDisabled = validateIsBooleanAndGet(parameter, errors);
                 case EXPORT_FIRST_UNSECURE_SHIFTED_CGM -> exportFirstUnsecureShiftedCGM = validateIsBooleanAndGet(parameter, errors);
+                case RUN_GLSK_CHECKS_FIRST -> runGlskChecksFirst = validateIsBooleanAndGet(parameter, errors);
                 default -> LOGGER.warn("Unknown parameter {} (value: {}) will be ignored", parameter.getId(), parameter.getValue());
             }
         }
@@ -105,7 +108,8 @@ public class SweTaskParameters {
         }
     }
 
-    private boolean validateIsBooleanAndGet(TaskParameterDto parameter, List<String> errors) {
+    private boolean validateIsBooleanAndGet(final TaskParameterDto parameter,
+                                            final List<String> errors) {
         if (StringUtils.equals("BOOLEAN", parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             return Boolean.parseBoolean(value);
@@ -115,7 +119,8 @@ public class SweTaskParameters {
         }
     }
 
-    private int validateIsIntegerAndGet(TaskParameterDto parameter, List<String> errors) {
+    private int validateIsIntegerAndGet(final TaskParameterDto parameter,
+                                        final List<String> errors) {
         if (StringUtils.equals("INT", parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             try {
@@ -129,7 +134,8 @@ public class SweTaskParameters {
         return 0; // default return value, won't be used as this return can be reached only in case of validation error
     }
 
-    private int validateIsPositiveIntegerAndGet(TaskParameterDto parameter, List<String> errors) {
+    private int validateIsPositiveIntegerAndGet(final TaskParameterDto parameter,
+                                                final List<String> errors) {
         int value = validateIsIntegerAndGet(parameter, errors);
         if (value < 0) {
             errors.add(String.format("Parameter %s should be positive (value: %s)", parameter.getId(), parameter.getValue()));
@@ -138,7 +144,7 @@ public class SweTaskParameters {
         return value;
     }
 
-    private void crossValidateParameters(List<String> errors) {
+    private void crossValidateParameters(final List<String> errors) {
         if (runDirectionEsFr) {
             validateStartingPointAndMinPoint("ES-FR", maxTtcEsFr, minTtcEsFr, errors);
         }
@@ -153,7 +159,10 @@ public class SweTaskParameters {
         }
     }
 
-    private void validateStartingPointAndMinPoint(String direction, int startingPointValue, int minPointValue, List<String> errors) {
+    private void validateStartingPointAndMinPoint(final String direction,
+                                                  final int startingPointValue,
+                                                  final int minPointValue,
+                                                  final List<String> errors) {
         if (startingPointValue < minPointValue) {
             errors.add(String.format("[%s] Starting point (value: %d) should be greater than minimum point (value: %d)", direction, startingPointValue, minPointValue));
         }
@@ -247,6 +256,10 @@ public class SweTaskParameters {
         return exportFirstUnsecureShiftedCGM;
     }
 
+    public boolean shouldRunGlskChecksFirst() {
+        return runGlskChecksFirst;
+    }
+
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
@@ -275,6 +288,7 @@ public class SweTaskParameters {
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_NEWTON_RAPHSON_ITERATIONS, maxNewtonRaphsonIterations));
         appender.add(String.format(KEY_VALUE_FORMAT, DISABLE_SECOND_PREVENTIVE_RAO, secondPreventiveRaoDisabled));
         appender.add(String.format(KEY_VALUE_FORMAT, EXPORT_FIRST_UNSECURE_SHIFTED_CGM, exportFirstUnsecureShiftedCGM));
+        appender.add(String.format(KEY_VALUE_FORMAT, RUN_GLSK_CHECKS_FIRST, runGlskChecksFirst));
 
         return String.format("{%s%n}", String.join(", ", appender));
     }

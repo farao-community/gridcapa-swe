@@ -78,9 +78,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccEsFrTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.ES_FR, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(0., shifts.get("ES_PT"), 0.001);
         assertEquals(1000., shifts.get("ES_FR"), 0.001);
@@ -88,9 +88,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccFrEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
-                DichotomyDirection.FR_ES, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.FR_ES, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(0., shifts.get("ES_PT"), 0.001);
         assertEquals(-1000., shifts.get("ES_FR"), 0.001);
@@ -98,9 +98,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccPtEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
-                DichotomyDirection.PT_ES, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.PT_ES, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-1000., shifts.get("ES_PT"), 0.001);
         assertEquals(0., shifts.get("ES_FR"), 0.001);
@@ -108,9 +108,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccEsPtTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.D2CC,
-                DichotomyDirection.ES_PT, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.ES_PT, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(1000., shifts.get("ES_PT"), 0.001);
         assertEquals(0., shifts.get("ES_FR"), 0.001);
@@ -118,9 +118,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccEsFrTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
-                DichotomyDirection.ES_FR, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.ES_FR, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-150., shifts.get("ES_PT"), 0.001);
         assertEquals(1000., shifts.get("ES_FR"), 0.001);
@@ -128,9 +128,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccFrEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
-                DichotomyDirection.FR_ES, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.FR_ES, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-150., shifts.get("ES_PT"), 0.001);
         assertEquals(-1000., shifts.get("ES_FR"), 0.001);
@@ -138,9 +138,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccEsPtTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
-                DichotomyDirection.ES_PT, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.ES_PT, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(1000., shifts.get("ES_PT"), 0.001);
         assertEquals(200, shifts.get("ES_FR"), 0.001);
@@ -148,9 +148,9 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccPtEsTargetExchangesCalculatedCorrectly() {
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 50., SweEICode.FR_EIC, 100., SweEICode.PT_EIC, 150.);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(null, ProcessType.IDCC,
-                DichotomyDirection.PT_ES, null, null, 0., 0., intialNetPositions, null, null, null);
+                DichotomyDirection.PT_ES, null, null, 0., 0., initialNetPositions, null, null, null, true);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-1000., shifts.get("ES_PT"), 0.001);
         assertEquals(200., shifts.get("ES_FR"), 0.001);
@@ -159,10 +159,10 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworkSuccessTest() throws GlskLimitationException, ShiftingException {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
 
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         sweNetworkShifter.shiftNetwork(1000., network);
@@ -176,10 +176,10 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworWithGlskLimitationEs() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(11000., network));
     }
@@ -187,10 +187,10 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworSucceedWithIncompleteVariationEs() throws GlskLimitationException, ShiftingException {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
 
         sweNetworkShifter.shiftNetwork(10820, network); // incomplete shift for ES in the first iteration , but no Glsk limitation error
@@ -202,12 +202,12 @@ class SweNetworkShifterTest {
     }
 
     @Test
-    void shiftNetworkSuccedWithIncompleteVariationFr() throws GlskLimitationException, ShiftingException {
+    void shiftNetworkSuccedWithIncompleteVariationFrAndNoGlskCheck() throws GlskLimitationException, ShiftingException {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, false);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
 
         sweNetworkShifter.shiftNetwork(4645, network); // incomplete shift for FR in the first iteration , but no Glsk limitation error
@@ -219,12 +219,25 @@ class SweNetworkShifterTest {
     }
 
     @Test
+    void shiftNetworkFailsWithIncompleteVariationFr() {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, initialNetPositions);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
+                                                                    DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
+        Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
+
+        assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(4645, network));
+
+    }
+
+    @Test
     void shiftNetworkWithGlskLimitationForFr() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.FR_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.FR_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
 
         assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(4647, network));
@@ -234,10 +247,10 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworWithGlskLimitationPt() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_PT, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_PT, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_PT, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_PT, getZonalWithMinMax(), shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(3000., network));
     }
@@ -245,10 +258,10 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworWithShiftingException() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2317., SweEICode.FR_EIC, -2317., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(1);
         assertThrows(ShiftingException.class, () -> sweNetworkShifter.shiftNetwork(1000., network));
     }
@@ -268,10 +281,10 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworkSuccessWithChangePminPmaxFromGlskTest() throws GlskLimitationException, ShiftingException {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 2310., SweEICode.FR_EIC, -2310., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 2310., SweEICode.FR_EIC, -2310., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_FR, getZonalWithMinMax(), shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
 
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         sweNetworkShifter.shiftNetwork(9050., network);
@@ -284,17 +297,17 @@ class SweNetworkShifterTest {
     @Test
     void shiftNetworWithGlskLimitationWithChangePminPmaxFromGlskTest() {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        Map<String, Double> intialNetPositions = Map.of(SweEICode.ES_EIC, 231., SweEICode.FR_EIC, -231., SweEICode.PT_EIC, 0.);
-        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, intialNetPositions);
+        Map<String, Double> initialNetPositions = Map.of(SweEICode.ES_EIC, 231., SweEICode.FR_EIC, -231., SweEICode.PT_EIC, 0.);
+        ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, getZonalWithMinMax(), shiftDispatcher, 1., 1., intialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_FR, getZonalWithMinMax(), shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
         assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(11000., network));
     }
 
     @Test
     void updateScalingValuesWithMismatchPtEsTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.PT_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null);
+        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.PT_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
                 Map.of(SweEICode.FR_EIC, 12.0,
                         SweEICode.ES_EIC, 27.0,
@@ -310,7 +323,7 @@ class SweNetworkShifterTest {
 
     @Test
     void updateScalingValuesWithMismatchEsPtTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_PT, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null);
+        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_PT, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
                 Map.of(SweEICode.FR_EIC, 12.0,
                         SweEICode.ES_EIC, 27.0,
@@ -326,7 +339,7 @@ class SweNetworkShifterTest {
 
     @Test
     void updateScalingValuesWithMismatchFrEsTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.FR_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null);
+        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.FR_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
                 Map.of(SweEICode.FR_EIC, 12.0,
                         SweEICode.ES_EIC, 27.0,
@@ -342,7 +355,7 @@ class SweNetworkShifterTest {
 
     @Test
     void updateScalingValuesWithMismatchEsFrTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_FR, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null);
+        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC, DichotomyDirection.ES_FR, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true);
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
                 Map.of(SweEICode.FR_EIC, 12.0,
                         SweEICode.ES_EIC, 27.0,
@@ -366,7 +379,7 @@ class SweNetworkShifterTest {
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.ES_FR, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.ES_FR, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.ES_FR, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 
@@ -420,7 +433,7 @@ class SweNetworkShifterTest {
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(DichotomyDirection.PT_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, ProcessType.D2CC,
-                DichotomyDirection.PT_ES, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null);
+                DichotomyDirection.PT_ES, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 

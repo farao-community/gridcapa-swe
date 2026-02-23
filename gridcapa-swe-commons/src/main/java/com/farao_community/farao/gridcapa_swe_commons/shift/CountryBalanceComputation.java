@@ -6,23 +6,28 @@
  */
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
-import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
-import com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode;
 import com.powsybl.balances_adjustment.util.BorderBasedCountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
-import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
-import com.powsybl.loadflow.LoadFlowResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil.runLoadFlowWithMdc;
+import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.ES_EIC;
+import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.FR_EIC;
+import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.PT_EIC;
+import static com.powsybl.iidm.network.Country.ES;
+import static com.powsybl.iidm.network.Country.FR;
+import static com.powsybl.iidm.network.Country.PT;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -34,37 +39,36 @@ public final class CountryBalanceComputation {
         // Should not be instantiated
     }
 
-    public static Map<String, Double> computeSweCountriesBalances(Network network, LoadFlowParameters loadFlowParameters) {
+    public static Map<String, Double> computeSweCountriesBalances(final Network network, final LoadFlowParameters loadFlowParameters) {
         LOGGER.info("Computing initial SWE countries balance");
-        Map<String, Double> countriesBalances = new HashMap<>();
+        final Map<String, Double> countriesBalances = new HashMap<>();
         runLoadFlow(network, network.getVariantManager().getWorkingVariantId(), loadFlowParameters);
-        Map<String, Double> bordersExchanges = computeSweBordersExchanges(network);
-        countriesBalances.put(SweEICode.PT_EIC, -bordersExchanges.get("ES_PT"));
-        countriesBalances.put(SweEICode.ES_EIC, bordersExchanges.values().stream().reduce(0., Double::sum));
-        countriesBalances.put(SweEICode.FR_EIC, -bordersExchanges.get("ES_FR"));
+        final Map<String, Double> bordersExchanges = computeSweBordersExchanges(network);
+        countriesBalances.put(PT_EIC, -bordersExchanges.get("ES_PT"));
+        countriesBalances.put(ES_EIC, bordersExchanges.values().stream().reduce(0., Double::sum));
+        countriesBalances.put(FR_EIC, -bordersExchanges.get("ES_FR"));
 
         return countriesBalances;
     }
 
-    public static Map<String, Double> computeSweBordersExchanges(Network network) {
-        Map<String, Double> borderExchanges = new HashMap<>();
-        Map<Country, BorderBasedCountryArea> countryAreaPerCountry = Stream.of(Country.FR, Country.ES, Country.PT)
-                .collect(Collectors.toMap(Function.identity(), country -> (BorderBasedCountryArea) new CountryAreaFactory(country).create(network)));
-        borderExchanges.put("ES_FR", getBorderExchange(Country.ES, Country.FR, countryAreaPerCountry));
-        borderExchanges.put("ES_PT", getBorderExchange(Country.ES, Country.PT, countryAreaPerCountry));
+    public static Map<String, Double> computeSweBordersExchanges(final Network network) {
+        final Map<String, Double> borderExchanges = new HashMap<>();
+        final Map<Country, BorderBasedCountryArea> countryAreaPerCountry = Stream.of(FR, ES, PT)
+                .collect(toMap(Function.identity(),
+                               country -> (BorderBasedCountryArea) new CountryAreaFactory(country).create(network)));
+        borderExchanges.put("ES_FR", getBorderExchange(ES, FR, countryAreaPerCountry));
+        borderExchanges.put("ES_PT", getBorderExchange(ES, PT, countryAreaPerCountry));
         return borderExchanges;
     }
 
     private static void runLoadFlow(final Network network, final String workingStateId, final LoadFlowParameters loadFlowParameters) {
-        final LoadFlowResult result = LoadFlowUtil.runLoadFlowWithMdc(network, workingStateId, loadFlowParameters);
-
-        if (result.isFailed()) {
+        if (runLoadFlowWithMdc(network, workingStateId, loadFlowParameters).isFailed()) {
             LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
             throw new SweBaseCaseUnsecureException(String.format("Loadflow computation diverged on network %s", network.getId()));
         }
     }
 
-    private static double getBorderExchange(Country fromCountry, Country toCountry, Map<Country, BorderBasedCountryArea> countryAreaPerCountry) {
-        return countryAreaPerCountry.get(fromCountry).getLeavingFlowToCountry(countryAreaPerCountry.get(toCountry));
+    private static double getBorderExchange(final Country origin, final Country destination, final Map<Country, BorderBasedCountryArea> countryAreaByCountry) {
+        return countryAreaByCountry.get(origin).getLeavingFlowToCountry(countryAreaByCountry.get(destination));
     }
 }
