@@ -16,7 +16,6 @@ import com.powsybl.glsk.cim.CimGlskDocument;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.commons.ZonalDataImpl;
 import com.powsybl.iidm.modification.scalable.Scalable;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
@@ -34,7 +33,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +47,8 @@ import static com.farao_community.farao.gridcapa_swe_commons.resource.ProcessTyp
 import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.ES_EIC;
 import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.FR_EIC;
 import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.PT_EIC;
+import static com.powsybl.iidm.network.Country.FR;
+import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -323,7 +323,9 @@ class SweNetworkShifterTest {
 
     @Test
     void updateScalingValuesWithMismatchEsPtTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, D2CC, ES_PT, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true);
+        SweNetworkShifter networkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, ES_PT, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true
+        );
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
             Map.of(FR_EIC, 12.0,
                    ES_EIC, 27.0,
@@ -339,7 +341,9 @@ class SweNetworkShifterTest {
 
     @Test
     void updateScalingValuesWithMismatchFrEsTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, D2CC, FR_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true);
+        SweNetworkShifter networkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, FR_ES, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true
+        );
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
             Map.of(FR_EIC, 12.0,
                    ES_EIC, 27.0,
@@ -355,9 +359,9 @@ class SweNetworkShifterTest {
 
     @Test
     void updateScalingValuesWithMismatchEsFrTest() {
-        SweNetworkShifter networkShifter = new SweNetworkShifter(businessLogger, D2CC, ES_FR, zonalScalable,
-                                                                 null, 10, 10, Map.of(),
-                                                                 processConfiguration, LoadFlowParameters.load(), null, true);
+        SweNetworkShifter networkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, ES_FR, zonalScalable, null, 10, 10, Map.of(), processConfiguration, LoadFlowParameters.load(), null, true
+        );
         Map<String, Double> scalingValuesByCountry = new HashMap<>(
             Map.of(FR_EIC, 12.0,
                    ES_EIC, 27.0,
@@ -377,11 +381,12 @@ class SweNetworkShifterTest {
         CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("/shift/TestCase_with_transformers_glsk.xml"));
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
         ZonalData<Scalable> customZonalScalable = doc.getZonalScalable(network, instant);
-        customZonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
+        customZonalScalable.addAll(new ZonalDataImpl<>(singletonMap(new EICode(FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(ES_FR, initialNetPositions);
-        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, D2CC,
-                                                                    ES_FR, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, ES_FR, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true
+        );
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 
@@ -431,11 +436,13 @@ class SweNetworkShifterTest {
         CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("/shift/TestCase_with_transformers_glsk.xml"));
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
         ZonalData<Scalable> customZonalScalable = doc.getZonalScalable(network, instant);
-        customZonalScalable.addAll(new ZonalDataImpl<>(Collections.singletonMap(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))));
+        customZonalScalable.addAll(new ZonalDataImpl<>(singletonMap(new EICode(FR).getAreaCode(),
+                                                                    getCountryGeneratorsScalableForFR(network))));
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(PT_ES, initialNetPositions);
-        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, D2CC,
-                                                                    PT_ES, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, PT_ES, customZonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true
+        );
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(100);
         sweNetworkShifter.shiftNetwork(1000., network);
 
@@ -482,7 +489,7 @@ class SweNetworkShifterTest {
         List<Double> percentages = new ArrayList<>();
         List<Generator> generators;
         generators = network.getGeneratorStream()
-            .filter(generator -> Country.FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
+            .filter(generator -> FR.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
             .filter(NetworkUtil::isCorrect)
             .toList();
         //calculate sum P of country's generators
