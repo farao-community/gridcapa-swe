@@ -81,7 +81,7 @@ public class DichotomyRunner {
             .withIndex(new Index<>(parameters.minValue(), parameters.maxValue(), parameters.precision()))
             .withIndexStrategy(HALF_INDEX_STRATEGY_CONFIGURATION)
             .withInterruptionStrategy(interruptionService)
-            .withNetworkShifter(networkShifterProvider.get(sweData, direction, loadFlowParameters, parameters.runGlskChecksFirst()))
+            .withNetworkShifter(networkShifterProvider.get(sweData, direction, loadFlowParameters, parameters.runGlskChecksBeforeLoadFlow()))
             .withNetworkValidator(getNetworkValidator(sweData, direction, parameters.runAngleCheck(), loadFlowParameters))
             .withRunId(sweData.getId())
             .build();

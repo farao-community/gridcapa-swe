@@ -58,7 +58,7 @@ public class SweNetworkShifter implements NetworkShifter {
     private final ProcessConfiguration processConfiguration;
     private final LoadFlowParameters loadFlowParameters;
     private final NetworkExporter networkExporter;
-    private final boolean runGlskChecksFirst;
+    private final boolean runGlskChecksBeforeLoadFlow;
 
     public SweNetworkShifter(final Logger businessLogger,
                              final ProcessType processType,
@@ -71,7 +71,7 @@ public class SweNetworkShifter implements NetworkShifter {
                              final ProcessConfiguration processConfiguration,
                              final LoadFlowParameters loadFlowParameters,
                              final NetworkExporter networkExporter,
-                             final boolean runGlskChecksFirst) { // NOSONAR
+                             final boolean runGlskChecksBeforeLoadFlow) { // NOSONAR
         this.businessLogger = businessLogger;
         this.processType = processType;
         this.direction = direction;
@@ -83,7 +83,7 @@ public class SweNetworkShifter implements NetworkShifter {
         this.processConfiguration = processConfiguration;
         this.loadFlowParameters = loadFlowParameters;
         this.networkExporter = networkExporter;
-        this.runGlskChecksFirst = runGlskChecksFirst;
+        this.runGlskChecksBeforeLoadFlow = runGlskChecksBeforeLoadFlow;
     }
 
     @Override
@@ -140,7 +140,7 @@ public class SweNetworkShifter implements NetworkShifter {
 
                 // Step 3: Checks GLSK limitation and balance adjustment results
 
-                if (runGlskChecksFirst) {
+                if (runGlskChecksBeforeLoadFlow) {
                     checkGlskLimitation(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
                 }
                 if (hasShiftSucceeded(mismatchEsPt, mismatchEsFr)) {
@@ -148,7 +148,7 @@ public class SweNetworkShifter implements NetworkShifter {
                     variantManager.cloneVariant(workingVariantCopyId, initialVariantId, true);
                     shiftSucceeded = true;
                 } else {
-                    if (!runGlskChecksFirst) {
+                    if (!runGlskChecksBeforeLoadFlow) {
                         checkGlskLimitation(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
                     }
                     // Reset current variant with initial state for each iteration (keeping pre-processing)
@@ -203,13 +203,13 @@ public class SweNetworkShifter implements NetworkShifter {
             final String zoneId = entry.getKey();
             if (zonalScalable.getData(zoneId) != null) {
                 double asked = entry.getValue();
-                final String info = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
-                LOGGER.info(info);
+                final String infoMessage = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
+                LOGGER.info(infoMessage);
                 double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
                 if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    String warning = String.format("[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)",
+                    final String warningMessage = String.format("[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)",
                                                                       direction, zoneId, asked, done);
-                    LOGGER.warn(warning);
+                    LOGGER.warn(warningMessage);
                     incompleteShiftCountries.put(zoneId, done - asked);
                 }
             }
@@ -245,9 +245,9 @@ public class SweNetworkShifter implements NetworkShifter {
         // In case of asked > 0 : (done - asked) will be < 0, we have Glsk limitation if the next asked value increase (mismatch < 0),
         // In case of asked < 0 : (done - asked) will be > 0, we have Glsk limitation if the next asked value decrease (mismatch > 0)
         if (diffShift < 0 && mismatch < 0 || diffShift > 0 && mismatch > 0) {
-            final String error = "GLSK limitation occurred for country " + country;
-            businessLogger.error(error);
-            throw new GlskLimitationException(error);
+            final String errorMessage = "GLSK limitation occurred for country " + country;
+            businessLogger.error(errorMessage);
+            throw new GlskLimitationException(errorMessage);
         }
     }
 
@@ -290,11 +290,11 @@ public class SweNetworkShifter implements NetworkShifter {
     }
 
     public Map<String, Double> getTargetExchanges(final double stepValue) {
-        return processType == D2CC ? getDayAheadTargetExchanges(stepValue) : getIntradayTargetExchanges(stepValue, initialNetPositions);
+        return processType == D2CC ? getDayAheadTargetExchanges(stepValue) : getIdccTargetExchanges(stepValue, initialNetPositions);
     }
 
-    private Map<String, Double> getIntradayTargetExchanges(final double stepValue,
-                                                           final Map<String, Double> initialNetPositions) {
+    private Map<String, Double> getIdccTargetExchanges(final double stepValue,
+                                                       final Map<String, Double> initialNetPositions) {
         return switch (direction) {
             case ES_FR -> Map.of(ES_PT, -initialNetPositions.get(PT_EIC), ES_FR, stepValue);
             case FR_ES -> Map.of(ES_PT, -initialNetPositions.get(PT_EIC), ES_FR, -stepValue);

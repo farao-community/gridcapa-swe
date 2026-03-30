@@ -58,7 +58,7 @@ public class NetworkShifterProvider {
     public NetworkShifter get(final SweData sweData,
                               final DichotomyDirection direction,
                               final LoadFlowParameters loadFlowParameters,
-                              final boolean runGlskChecksFirst) {
+                              final boolean runGlskChecksBeforeLoadFlow) {
         final ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
         final Network network = NetworkService.getNetworkByDirection(sweData, direction);
         try {
@@ -83,7 +83,7 @@ public class NetworkShifterProvider {
                                          processConfiguration,
                                          loadFlowParameters,
                                          sweNetworkExporter,
-                                         runGlskChecksFirst);
+                                         runGlskChecksBeforeLoadFlow);
 
         } catch (final SweBaseCaseUnsecureException baseCaseUnsecureException) {
             businessLogger.error("Base case loadflow is unsecure, the calculation is stopped and the first unsecure network cannot be exported because it doesn't exist at this stage of the calculation.");

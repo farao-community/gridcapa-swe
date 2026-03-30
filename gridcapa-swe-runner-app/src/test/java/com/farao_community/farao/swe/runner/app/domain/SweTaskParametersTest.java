@@ -42,7 +42,7 @@ class SweTaskParametersTest {
             new TaskParameterDto("MAX_NEWTON_RAPHSON_ITERATIONS", "INT", "38", "63"),
             new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false"),
             new TaskParameterDto("EXPORT_FIRST_UNSECURE_SHIFTED_CGM", "BOOLEAN", "true", "false"),
-            new TaskParameterDto("RUN_GLSK_CHECKS_FIRST", "BOOLEAN", "true", "true")
+            new TaskParameterDto("RUN_GLSK_CHECKS_BEFORE_LOADFLOW", "BOOLEAN", "true", "true")
         );
 
         final SweTaskParameters params = new SweTaskParameters(parameters);
