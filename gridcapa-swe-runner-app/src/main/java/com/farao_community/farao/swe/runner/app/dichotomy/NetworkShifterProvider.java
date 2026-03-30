@@ -12,7 +12,6 @@ import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfi
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
-import com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation;
 import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter;
@@ -29,6 +28,8 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+
+import static com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation.computeSweCountriesBalances;
 
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
@@ -58,22 +59,26 @@ public class NetworkShifterProvider {
                               final DichotomyDirection direction,
                               final LoadFlowParameters loadFlowParameters,
                               final boolean runGlskChecksFirst) {
-        ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
-        Network network = NetworkService.getNetworkByDirection(sweData, direction);
+        final ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
+        final Network network = NetworkService.getNetworkByDirection(sweData, direction);
         try {
-            Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, loadFlowParameters);
+            final Map<String, Double> initialNetPositions = computeSweCountriesBalances(network, loadFlowParameters);
 
             businessLogger.info("Base case loadflow is secure");
-            final SweNetworkExporter sweNetworkExporter = exportNetworkConfiguration.isExportFailedNetwork() ?
-                new SweNetworkExporter(sweData, fileExporter) : null;
+
+            final SweNetworkExporter sweNetworkExporter = exportNetworkConfiguration.isExportFailedNetwork()
+                ? new SweNetworkExporter(sweData, fileExporter)
+                : null;
+
+            final DichotomyConfiguration.Parameters directionParameters = dichotomyConfiguration.getParameters().get(direction);
 
             return new SweNetworkShifter(businessLogger,
                                          sweData.getProcessType(),
                                          direction,
                                          zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
                                          getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-                                         dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-                                         dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
+                                         directionParameters.getToleranceEsPt(),
+                                         directionParameters.getToleranceEsFr(),
                                          initialNetPositions,
                                          processConfiguration,
                                          loadFlowParameters,

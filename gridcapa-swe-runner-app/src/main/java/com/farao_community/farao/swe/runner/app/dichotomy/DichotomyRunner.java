@@ -19,6 +19,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.farao_community.farao.swe.runner.app.services.InterruptionService;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -61,15 +62,15 @@ public class DichotomyRunner {
     public DichotomyResult<SweDichotomyValidationData> run(final SweData sweData,
                                                            final SweTaskParameters sweTaskParameters,
                                                            final DichotomyDirection direction) {
-        final DichotomyParameters dichotomyParameters = getDichotomyParameters(sweTaskParameters,
-                                                                               direction);
-        dichotomyLogging.logStartDichotomy(dichotomyParameters);
-        final DichotomyEngine<SweDichotomyValidationData> engine = buildDichotomyEngine(sweData,
-                                                                                        direction,
-                                                                                        dichotomyParameters,
-                                                                                        getLoadFlowParameters(sweTaskParameters));
 
-        return engine.run(getNetworkByDirection(sweData, direction));
+        final DichotomyParameters dichotomyParameters = getDichotomyParameters(sweTaskParameters, direction);
+        dichotomyLogging.logStartDichotomy(dichotomyParameters);
+        final DichotomyEngine<SweDichotomyValidationData> engine =
+            buildDichotomyEngine(sweData, direction, dichotomyParameters, getLoadFlowParameters(sweTaskParameters));
+
+        final Network networkForDirection = getNetworkByDirection(sweData, direction);
+
+        return engine.run(networkForDirection);
     }
 
     DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(final SweData sweData,
@@ -77,56 +78,50 @@ public class DichotomyRunner {
                                                                      final DichotomyParameters parameters,
                                                                      final LoadFlowParameters loadFlowParameters) {
         return DichotomyEngine.<SweDichotomyValidationData>builder()
-                .withIndex(new Index<>(parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision()))
-                .withIndexStrategy(HALF_INDEX_STRATEGY_CONFIGURATION)
-                .withInterruptionStrategy(interruptionService)
-                .withNetworkShifter(networkShifterProvider.get(sweData, direction, loadFlowParameters, parameters.shouldRunGlskChecksFirst()))
-                .withNetworkValidator(getNetworkValidator(sweData, direction, parameters.isRunAngleCheck(), loadFlowParameters))
-                .withRunId(sweData.getId())
-                .build();
+            .withIndex(new Index<>(parameters.minValue(), parameters.maxValue(), parameters.precision()))
+            .withIndexStrategy(HALF_INDEX_STRATEGY_CONFIGURATION)
+            .withInterruptionStrategy(interruptionService)
+            .withNetworkShifter(networkShifterProvider.get(sweData, direction, loadFlowParameters, parameters.runGlskChecksFirst()))
+            .withNetworkValidator(getNetworkValidator(sweData, direction, parameters.runAngleCheck(), loadFlowParameters))
+            .withRunId(sweData.getId())
+            .build();
     }
 
     private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(final SweData sweData,
                                                                              final DichotomyDirection direction,
                                                                              final boolean runAngleCheck,
                                                                              final LoadFlowParameters loadFlowParameters) {
-        return new RaoValidator(fileExporter,
-                                fileImporter,
-                                raoRunnerClient,
-                                sweData,
-                                direction,
-                                runAngleCheck,
-                                loadFlowParameters,
-                                businessLogger);
+        return new RaoValidator(
+            fileExporter, fileImporter, raoRunnerClient, sweData, direction, runAngleCheck, loadFlowParameters, businessLogger
+        );
     }
 
-    private DichotomyParameters getDichotomyParameters(final SweTaskParameters sweTaskParameters,
-                                                       final DichotomyDirection direction) {
-        final DichotomyParameters result = new DichotomyParameters();
-        switch (direction) {
-            case ES_FR -> {
-                result.setMinValue(sweTaskParameters.getMinTtcEsFr());
-                result.setMaxValue(sweTaskParameters.getMaxTtcEsFr());
-                result.setPrecision(sweTaskParameters.getDichotomyPrecisionEsFr());
-            }
-            case FR_ES -> {
-                result.setMinValue(sweTaskParameters.getMinTtcFrEs());
-                result.setMaxValue(sweTaskParameters.getMaxTtcFrEs());
-                result.setPrecision(sweTaskParameters.getDichotomyPrecisionFrEs());
-            }
-            case ES_PT -> {
-                result.setMinValue(sweTaskParameters.getMinTtcEsPt());
-                result.setMaxValue(sweTaskParameters.getMaxTtcEsPt());
-                result.setPrecision(sweTaskParameters.getDichotomyPrecisionEsPt());
-            }
-            case PT_ES -> {
-                result.setMinValue(sweTaskParameters.getMinTtcPtEs());
-                result.setMaxValue(sweTaskParameters.getMaxTtcPtEs());
-                result.setPrecision(sweTaskParameters.getDichotomyPrecisionPtEs());
-            }
-        }
-        result.setRunAngleCheck(sweTaskParameters.isRunAngleCheck());
-        result.setRunGlskChecksFirst(sweTaskParameters.shouldRunGlskChecksFirst());
-        return result;
+    private DichotomyParameters getDichotomyParameters(final SweTaskParameters sweTaskParameters, final DichotomyDirection direction) {
+        final boolean angleCheck = sweTaskParameters.isRunAngleCheck();
+        final boolean glskCheck = sweTaskParameters.shouldRunGlskChecksFirst();
+
+        return switch (direction) {
+            case ES_FR -> new DichotomyParameters(sweTaskParameters.getMinTtcEsFr(),
+                                                  sweTaskParameters.getMaxTtcEsFr(),
+                                                  sweTaskParameters.getDichotomyPrecisionEsFr(),
+                                                  angleCheck,
+                                                  glskCheck);
+            case FR_ES -> new DichotomyParameters(sweTaskParameters.getMinTtcFrEs(),
+                                                  sweTaskParameters.getMaxTtcFrEs(),
+                                                  sweTaskParameters.getDichotomyPrecisionFrEs(),
+                                                  angleCheck,
+                                                  glskCheck);
+            case ES_PT -> new DichotomyParameters(sweTaskParameters.getMinTtcEsPt(),
+                                                  sweTaskParameters.getMaxTtcEsPt(),
+                                                  sweTaskParameters.getDichotomyPrecisionEsPt(),
+                                                  angleCheck,
+                                                  glskCheck);
+            case PT_ES -> new DichotomyParameters(sweTaskParameters.getMinTtcPtEs(),
+                                                  sweTaskParameters.getMaxTtcPtEs(),
+                                                  sweTaskParameters.getDichotomyPrecisionPtEs(),
+                                                  angleCheck,
+                                                  glskCheck);
+        };
+
     }
 }

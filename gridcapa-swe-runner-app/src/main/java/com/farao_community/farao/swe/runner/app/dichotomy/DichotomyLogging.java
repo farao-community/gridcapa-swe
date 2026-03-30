@@ -58,7 +58,7 @@ public class DichotomyLogging {
     }
 
     public void logStartDichotomy(final DichotomyParameters parameters) {
-        businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.getMinValue(), parameters.getMaxValue(), parameters.getPrecision());
+        businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.minValue(), parameters.maxValue(), parameters.precision());
     }
 
     public void logEndOneDichotomy() {

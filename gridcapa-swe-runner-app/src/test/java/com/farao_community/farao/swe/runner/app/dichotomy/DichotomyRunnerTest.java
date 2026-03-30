@@ -97,10 +97,10 @@ class DichotomyRunnerTest {
 
         DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
         assertNotNull(dichotomyParametersCaptorValue);
-        assertEquals(82, dichotomyParametersCaptorValue.getMaxValue());
-        assertEquals(42, dichotomyParametersCaptorValue.getMinValue());
-        assertEquals(12, dichotomyParametersCaptorValue.getPrecision());
-        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+        assertEquals(82, dichotomyParametersCaptorValue.maxValue());
+        assertEquals(42, dichotomyParametersCaptorValue.minValue());
+        assertEquals(12, dichotomyParametersCaptorValue.precision());
+        assertTrue(dichotomyParametersCaptorValue.runAngleCheck());
 
         LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
         assertNotNull(loadFlowParametersCaptorValue);
@@ -130,10 +130,10 @@ class DichotomyRunnerTest {
 
         DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
         assertNotNull(dichotomyParametersCaptorValue);
-        assertEquals(83, dichotomyParametersCaptorValue.getMaxValue());
-        assertEquals(43, dichotomyParametersCaptorValue.getMinValue());
-        assertEquals(13, dichotomyParametersCaptorValue.getPrecision());
-        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+        assertEquals(83, dichotomyParametersCaptorValue.maxValue());
+        assertEquals(43, dichotomyParametersCaptorValue.minValue());
+        assertEquals(13, dichotomyParametersCaptorValue.precision());
+        assertTrue(dichotomyParametersCaptorValue.runAngleCheck());
 
         LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
         assertNotNull(loadFlowParametersCaptorValue);
@@ -163,10 +163,10 @@ class DichotomyRunnerTest {
 
         DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
         assertNotNull(dichotomyParametersCaptorValue);
-        assertEquals(84, dichotomyParametersCaptorValue.getMaxValue());
-        assertEquals(44, dichotomyParametersCaptorValue.getMinValue());
-        assertEquals(14, dichotomyParametersCaptorValue.getPrecision());
-        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+        assertEquals(84, dichotomyParametersCaptorValue.maxValue());
+        assertEquals(44, dichotomyParametersCaptorValue.minValue());
+        assertEquals(14, dichotomyParametersCaptorValue.precision());
+        assertTrue(dichotomyParametersCaptorValue.runAngleCheck());
 
         LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
         assertNotNull(loadFlowParametersCaptorValue);
@@ -196,10 +196,10 @@ class DichotomyRunnerTest {
 
         DichotomyParameters dichotomyParametersCaptorValue = dichotomyParametersCaptor.getValue();
         assertNotNull(dichotomyParametersCaptorValue);
-        assertEquals(85, dichotomyParametersCaptorValue.getMaxValue());
-        assertEquals(45, dichotomyParametersCaptorValue.getMinValue());
-        assertEquals(15, dichotomyParametersCaptorValue.getPrecision());
-        assertTrue(dichotomyParametersCaptorValue.isRunAngleCheck());
+        assertEquals(85, dichotomyParametersCaptorValue.maxValue());
+        assertEquals(45, dichotomyParametersCaptorValue.minValue());
+        assertEquals(15, dichotomyParametersCaptorValue.precision());
+        assertTrue(dichotomyParametersCaptorValue.runAngleCheck());
 
         LoadFlowParameters loadFlowParametersCaptorValue = loadFlowParametersCaptor.getValue();
         assertNotNull(loadFlowParametersCaptorValue);

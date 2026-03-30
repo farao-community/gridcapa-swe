@@ -7,11 +7,13 @@
 package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.powsybl.balances_adjustment.util.BorderBasedCountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +22,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil.runLoadFlowWithMdc;
 import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.ES_EIC;
 import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.FR_EIC;
 import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.PT_EIC;
@@ -62,13 +63,15 @@ public final class CountryBalanceComputation {
     }
 
     private static void runLoadFlow(final Network network, final String workingStateId, final LoadFlowParameters loadFlowParameters) {
-        if (runLoadFlowWithMdc(network, workingStateId, loadFlowParameters).isFailed()) {
+        final LoadFlowResult result = LoadFlowUtil.runLoadFlowWithMdc(network, workingStateId, loadFlowParameters);
+
+        if (result.isFailed()) {
             LOGGER.error("Loadflow computation diverged on network '{}'", network.getId());
             throw new SweBaseCaseUnsecureException(String.format("Loadflow computation diverged on network %s", network.getId()));
         }
     }
 
-    private static double getBorderExchange(final Country origin, final Country destination, final Map<Country, BorderBasedCountryArea> countryAreaByCountry) {
-        return countryAreaByCountry.get(origin).getLeavingFlowToCountry(countryAreaByCountry.get(destination));
+    private static double getBorderExchange(final Country from, final Country to, final Map<Country, BorderBasedCountryArea> countryAreaByCountry) {
+        return countryAreaByCountry.get(from).getLeavingFlowToCountry(countryAreaByCountry.get(to));
     }
 }

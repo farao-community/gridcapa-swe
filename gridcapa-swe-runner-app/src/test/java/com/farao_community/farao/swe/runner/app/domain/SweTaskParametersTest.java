@@ -45,7 +45,7 @@ class SweTaskParametersTest {
             new TaskParameterDto("RUN_GLSK_CHECKS_FIRST", "BOOLEAN", "true", "true")
         );
 
-        SweTaskParameters params = new SweTaskParameters(parameters);
+        final SweTaskParameters params = new SweTaskParameters(parameters);
 
         assertThat(params.isRunDirectionEsFr()).isTrue();
         assertThat(params.isRunDirectionFrEs()).isFalse();
@@ -84,7 +84,7 @@ class SweTaskParametersTest {
 
     @Test
     void absentParametersTest() {
-        SweTaskParameters params = new SweTaskParameters(List.of());
+        final SweTaskParameters params = new SweTaskParameters(List.of());
 
         assertThat(params.isRunDirectionEsFr()).isFalse();
         assertThat(params.isRunDirectionFrEs()).isFalse();
