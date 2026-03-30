@@ -40,7 +40,8 @@ public final class CountryBalanceComputation {
         // Should not be instantiated
     }
 
-    public static Map<String, Double> computeSweCountriesBalances(final Network network, final LoadFlowParameters loadFlowParameters) {
+    public static Map<String, Double> computeSweCountriesBalances(final Network network,
+                                                                  final LoadFlowParameters loadFlowParameters) {
         LOGGER.info("Computing initial SWE countries balance");
         final Map<String, Double> countriesBalances = new HashMap<>();
         runLoadFlow(network, network.getVariantManager().getWorkingVariantId(), loadFlowParameters);
@@ -54,15 +55,20 @@ public final class CountryBalanceComputation {
 
     public static Map<String, Double> computeSweBordersExchanges(final Network network) {
         final Map<String, Double> borderExchanges = new HashMap<>();
+
+        final Function<Country, BorderBasedCountryArea> countryToBbArea =
+            country -> (BorderBasedCountryArea) new CountryAreaFactory(country).create(network);
+
         final Map<Country, BorderBasedCountryArea> countryAreaPerCountry = Stream.of(FR, ES, PT)
-                .collect(toMap(Function.identity(),
-                               country -> (BorderBasedCountryArea) new CountryAreaFactory(country).create(network)));
+            .collect(toMap(Function.identity(), countryToBbArea));
         borderExchanges.put("ES_FR", getBorderExchange(ES, FR, countryAreaPerCountry));
         borderExchanges.put("ES_PT", getBorderExchange(ES, PT, countryAreaPerCountry));
         return borderExchanges;
     }
 
-    private static void runLoadFlow(final Network network, final String workingStateId, final LoadFlowParameters loadFlowParameters) {
+    private static void runLoadFlow(final Network network,
+                                    final String workingStateId,
+                                    final LoadFlowParameters loadFlowParameters) {
         final LoadFlowResult result = LoadFlowUtil.runLoadFlowWithMdc(network, workingStateId, loadFlowParameters);
 
         if (result.isFailed()) {
@@ -71,7 +77,9 @@ public final class CountryBalanceComputation {
         }
     }
 
-    private static double getBorderExchange(final Country from, final Country to, final Map<Country, BorderBasedCountryArea> countryAreaByCountry) {
+    private static double getBorderExchange(final Country from,
+                                            final Country to,
+                                            final Map<Country, BorderBasedCountryArea> countryAreaByCountry) {
         return countryAreaByCountry.get(from).getLeavingFlowToCountry(countryAreaByCountry.get(to));
     }
 }

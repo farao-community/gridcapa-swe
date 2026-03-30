@@ -256,7 +256,7 @@ public class SweTaskParameters {
         return exportFirstUnsecureShiftedCGM;
     }
 
-    public boolean shouldRunGlskChecksFirst() {
+    public boolean isRunGlskChecksBeforeLoadFlow() {
         return runGlskChecksBeforeLoadFlow;
     }
 

@@ -7,6 +7,7 @@
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
+import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -25,6 +26,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.farao_community.farao.swe.runner.app.dichotomy.DichotomyResultHelper.getActivatedActionInCurative;
+import static com.farao_community.farao.swe.runner.app.dichotomy.DichotomyResultHelper.getActivatedActionInPreventive;
+import static com.farao_community.farao.swe.runner.app.dichotomy.DichotomyResultHelper.getLimitingElement;
+import static com.farao_community.farao.swe.runner.app.dichotomy.DichotomyResultHelper.limitingCauseToString;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -58,7 +64,10 @@ public class DichotomyLogging {
     }
 
     public void logStartDichotomy(final DichotomyParameters parameters) {
-        businessLogger.info("Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}", parameters.minValue(), parameters.maxValue(), parameters.precision());
+        businessLogger.info(
+            "Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}",
+            parameters.minValue(), parameters.maxValue(), parameters.precision()
+        );
     }
 
     public void logEndOneDichotomy() {
@@ -83,33 +92,43 @@ public class DichotomyLogging {
         final String firstUnsecureTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
         final String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
         String angleCheckStatus = NONE;
-        final String limitingCause = dichotomyResult.getLimitingCause() != null ? DichotomyResultHelper.limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
-        final Crac crac = (direction == DichotomyDirection.ES_FR || direction == DichotomyDirection.FR_ES) ? sweData.getCracFrEs().getCrac() : sweData.getCracEsPt().getCrac();
-        if (dichotomyResult.getLowestInvalidStep() != null && dichotomyResult.getLowestInvalidStep().getRaoResult() != null) {
+        final String limitingCause = dichotomyResult.getLimitingCause() == null ? NONE : limitingCauseToString(dichotomyResult.getLimitingCause());
+        final Crac crac = (isBetweenFranceAndSpain(direction) ? sweData.getCracFrEs() : sweData.getCracEsPt()).getCrac();
+
+        if (hasRaoResult(dichotomyResult.getLowestInvalidStep())) {
             final RaoResult raoResult = dichotomyResult.getLowestInvalidStep().getRaoResult();
-            limitingElement = DichotomyResultHelper.getLimitingElement(crac, raoResult);
+            limitingElement = getLimitingElement(crac, raoResult);
         }
-        if (dichotomyResult.hasValidStep() && dichotomyResult.getHighestValidStep().getRaoResult() != null) {
+        if (dichotomyResult.hasValidStep() && hasRaoResult(dichotomyResult.getHighestValidStep())) {
             final RaoResult raoResult = dichotomyResult.getHighestValidStep().getRaoResult();
-            printablePrasIds = toString(DichotomyResultHelper.getActivatedActionInPreventive(crac, raoResult));
-            printableCrasIds = toString(DichotomyResultHelper.getActivatedActionInCurative(crac, raoResult));
-            if (dichotomyResult.getHighestValidStep().getValidationData() != null && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus() != null) {
+            printablePrasIds = toString(getActivatedActionInPreventive(crac, raoResult));
+            printableCrasIds = toString(getActivatedActionInCurative(crac, raoResult));
+
+            if (dichotomyResult.getHighestValidStep().getValidationData() != null
+                && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus() != null) {
                 angleCheckStatus = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus().name();
             }
         }
         final Duration difference = Duration.between(startTime, OffsetDateTime.now());
         businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
-        businessLogger.info(SUMMARY_BD, timestamp, lastSecureTtc, firstUnsecureTtc, voltageCheckStatus, angleCheckStatus, difference.toHours(), difference.toMinutesPart(), difference.toSecondsPart());
+        businessLogger.info(
+            SUMMARY_BD, timestamp, lastSecureTtc, firstUnsecureTtc, voltageCheckStatus, angleCheckStatus,
+            difference.toHours(), difference.toMinutesPart(), difference.toSecondsPart()
+        );
+    }
+
+    private static boolean hasRaoResult(final DichotomyStepResult<?> stepResult) {
+        return stepResult != null && stepResult.getRaoResult() != null;
     }
 
     private static String toString(final Collection<String> c) {
         return c.stream().map(Object::toString).collect(Collectors.joining(", "));
     }
 
-    private String getVoltageCheckResult(final DichotomyDirection direction,
+    private static String getVoltageCheckResult(final DichotomyDirection direction,
                                          final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
                                          final SweTaskParameters sweTaskParameters) {
-        if (sweTaskParameters.isRunVoltageCheck() && (direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR))) {
+        if (sweTaskParameters.isRunVoltageCheck() && isBetweenFranceAndSpain(direction)) {
             if (voltageMonitoringResult.isPresent()) {
                 return String.valueOf(voltageMonitoringResult.get().getSecurityStatus());
             } else {
@@ -122,5 +141,9 @@ public class DichotomyLogging {
     private String getTimestampLocalized(final OffsetDateTime timestamp) {
         final OffsetDateTime localOffsetDateTime = OffsetDateTime.ofInstant(timestamp.toInstant(), zoneId);
         return DATE_TIME_FORMATTER.format(localOffsetDateTime);
+    }
+
+    private static boolean isBetweenFranceAndSpain(final DichotomyDirection direction) {
+        return direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR);
     }
 }

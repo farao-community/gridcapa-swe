@@ -69,7 +69,7 @@ class SweTaskParametersTest {
         assertThat(params.getMaxNewtonRaphsonIterations()).isEqualTo(38);
         assertThat(params.isSecondPreventiveRaoDisabled()).isTrue();
         assertThat(params.isExportFirstUnsecureShiftedCGM()).isTrue();
-        assertThat(params.shouldRunGlskChecksFirst()).isTrue();
+        assertThat(params.isRunGlskChecksBeforeLoadFlow()).isTrue();
     }
 
     @Test
@@ -108,7 +108,7 @@ class SweTaskParametersTest {
         assertThat(params.getMaxNewtonRaphsonIterations()).isZero();
         assertThat(params.isSecondPreventiveRaoDisabled()).isFalse();
         assertThat(params.isExportFirstUnsecureShiftedCGM()).isFalse();
-        assertThat(params.shouldRunGlskChecksFirst()).isFalse();
+        assertThat(params.isRunGlskChecksBeforeLoadFlow()).isFalse();
     }
 
     @Test

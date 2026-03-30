@@ -98,29 +98,21 @@ public class DichotomyRunner {
 
     private DichotomyParameters getDichotomyParameters(final SweTaskParameters sweTaskParameters, final DichotomyDirection direction) {
         final boolean angleCheck = sweTaskParameters.isRunAngleCheck();
-        final boolean glskCheck = sweTaskParameters.shouldRunGlskChecksFirst();
+        final boolean glskCheck = sweTaskParameters.isRunGlskChecksBeforeLoadFlow();
 
         return switch (direction) {
-            case ES_FR -> new DichotomyParameters(sweTaskParameters.getMinTtcEsFr(),
-                                                  sweTaskParameters.getMaxTtcEsFr(),
+            case ES_FR -> new DichotomyParameters(sweTaskParameters.getMinTtcEsFr(), sweTaskParameters.getMaxTtcEsFr(),
                                                   sweTaskParameters.getDichotomyPrecisionEsFr(),
-                                                  angleCheck,
-                                                  glskCheck);
-            case FR_ES -> new DichotomyParameters(sweTaskParameters.getMinTtcFrEs(),
-                                                  sweTaskParameters.getMaxTtcFrEs(),
+                                                  angleCheck, glskCheck);
+            case FR_ES -> new DichotomyParameters(sweTaskParameters.getMinTtcFrEs(), sweTaskParameters.getMaxTtcFrEs(),
                                                   sweTaskParameters.getDichotomyPrecisionFrEs(),
-                                                  angleCheck,
-                                                  glskCheck);
-            case ES_PT -> new DichotomyParameters(sweTaskParameters.getMinTtcEsPt(),
-                                                  sweTaskParameters.getMaxTtcEsPt(),
+                                                  angleCheck, glskCheck);
+            case ES_PT -> new DichotomyParameters(sweTaskParameters.getMinTtcEsPt(), sweTaskParameters.getMaxTtcEsPt(),
                                                   sweTaskParameters.getDichotomyPrecisionEsPt(),
-                                                  angleCheck,
-                                                  glskCheck);
-            case PT_ES -> new DichotomyParameters(sweTaskParameters.getMinTtcPtEs(),
-                                                  sweTaskParameters.getMaxTtcPtEs(),
+                                                  angleCheck, glskCheck);
+            case PT_ES -> new DichotomyParameters(sweTaskParameters.getMinTtcPtEs(), sweTaskParameters.getMaxTtcPtEs(),
                                                   sweTaskParameters.getDichotomyPrecisionPtEs(),
-                                                  angleCheck,
-                                                  glskCheck);
+                                                  angleCheck, glskCheck);
         };
 
     }

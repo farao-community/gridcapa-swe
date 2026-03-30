@@ -9,7 +9,6 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 import com.farao_community.farao.dichotomy.api.NetworkShifter;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
-import com.farao_community.farao.dichotomy.api.results.ReasonInvalid;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.farao_community.farao.dichotomy.api.results.ReasonInvalid.BALANCE_LOADFLOW_DIVERGENCE;
 import static com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil.runLoadFlowWithMdc;
 import static com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType.D2CC;
 import static com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode.ES_EIC;
@@ -96,21 +96,20 @@ public class SweNetworkShifter implements NetworkShifter {
         final GeneratorLimitsHandler generatorLimitsHandler = new GeneratorLimitsHandler(zonalScalable);
 
         try {
-            final String logTargetCountriesShift = String.format("Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]",
-                                                                 scalingValuesByCountry.get(ES_EIC), scalingValuesByCountry.get(FR_EIC), scalingValuesByCountry.get(PT_EIC));
-            businessLogger.info(logTargetCountriesShift);
+            final String targetCountriesShiftMessage = String.format(
+                "Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(ES_EIC), scalingValuesByCountry.get(FR_EIC), scalingValuesByCountry.get(PT_EIC)
+            );
+            businessLogger.info(targetCountriesShiftMessage);
+
             final Map<String, Double> targetExchanges = getTargetExchanges(stepValue);
             int iterationCounter = 1;
             boolean shiftSucceeded = false;
             final String initialVariantId = variantManager.getWorkingVariantId();
             final String processedVariantId = initialVariantId + " PROCESSED COPY";
             final String workingVariantCopyId = initialVariantId + " WORKING COPY";
-            preProcessNetwork(network,
-                              scalableGeneratorConnector,
-                              generatorLimitsHandler,
-                              initialVariantId,
-                              processedVariantId,
-                              workingVariantCopyId);
+            preProcessNetwork(
+                network, scalableGeneratorConnector, generatorLimitsHandler, initialVariantId, processedVariantId, workingVariantCopyId
+            );
             Map<String, Double> bordersExchanges;
             final int maxIterationNumber = processConfiguration.getShiftMaxIterationNumber();
             final ScalingParameters scalingParameters = getScalingParameters();
@@ -118,11 +117,9 @@ public class SweNetworkShifter implements NetworkShifter {
             do {
                 // Step 1: Perform the scaling
                 LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
-                final Map<String, Double> incompleteShiftCountries = shiftIteration(network,
-                                                                                    scalingValuesByCountry,
-                                                                                    scalingParameters,
-                                                                                    scalableGeneratorConnector,
-                                                                                    stepValue);
+                final Map<String, Double> incompleteShiftCountries = shiftIteration(
+                    network, scalingValuesByCountry, scalingParameters, scalableGeneratorConnector
+                );
                 // Step 2: Compute exchanges mismatch
                 final LoadFlowResult result = runLoadFlowWithMdc(network, workingVariantCopyId, loadFlowParameters);
                 if (result.isFailed()) {
@@ -131,7 +128,7 @@ public class SweNetworkShifter implements NetworkShifter {
                     if (networkExporter != null) {
                         networkExporter.export(network);
                     }
-                    throw new ShiftingException("Loadflow computation diverged during balancing adjustment", ReasonInvalid.BALANCE_LOADFLOW_DIVERGENCE);
+                    throw new ShiftingException("Loadflow computation diverged during balancing adjustment", BALANCE_LOADFLOW_DIVERGENCE);
                 }
 
                 bordersExchanges = computeSweBordersExchanges(network);
@@ -161,8 +158,9 @@ public class SweNetworkShifter implements NetworkShifter {
 
             // Step 4 : check after iteration max and out of tolerance
             if (!shiftSucceeded) {
-                String message = String.format("Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f",
-                                               bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
+                final String message = String.format(
+                    "Balancing adjustment out of tolerances : Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR)
+                );
                 businessLogger.error(message);
                 throw new ShiftingException(message);
             }
@@ -179,13 +177,15 @@ public class SweNetworkShifter implements NetworkShifter {
 
     private void logShiftSuccess(final int iterationCounter,
                                  final Map<String, Double> bordersExchanges) {
-        final String logShiftSucceeded = String.format("[%s] : Shift succeeded after %s iteration ",
-                                                       direction, iterationCounter);
+        final String logShiftSucceeded = String.format(
+            "[%s] : Shift succeeded after %s iteration ", direction, iterationCounter
+        );
         LOGGER.info(logShiftSucceeded);
         businessLogger.info("Shift succeeded after {} iteration ", iterationCounter);
-        final String info = String.format("Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f",
-                                          bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR));
-        businessLogger.info(info);
+        final String infoMessage = String.format(
+            "Exchange ES-PT = %.2f , Exchange ES-FR =  %.2f", bordersExchanges.get(ES_PT), bordersExchanges.get(ES_FR)
+        );
+        businessLogger.info(infoMessage);
     }
 
     private boolean hasShiftSucceeded(final double mismatchEsPt,
@@ -196,19 +196,21 @@ public class SweNetworkShifter implements NetworkShifter {
     private Map<String, Double> shiftIteration(final Network network,
                                                final Map<String, Double> scalingValuesByCountry,
                                                final ScalingParameters scalingParameters,
-                                               final ScalableGeneratorConnector scalableGeneratorConnector,
-                                               final double stepValue) throws GlskLimitationException {
+                                               final ScalableGeneratorConnector scalableGeneratorConnector) {
         final Map<String, Double> incompleteShiftCountries = new HashMap<>();
         for (final Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
             final String zoneId = entry.getKey();
             if (zonalScalable.getData(zoneId) != null) {
                 double asked = entry.getValue();
-                final String infoMessage = String.format("[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked);
+                final String infoMessage = String.format(
+                    "[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked
+                );
                 LOGGER.info(infoMessage);
                 double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
                 if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    final String warningMessage = String.format("[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)",
-                                                                      direction, zoneId, asked, done);
+                    final String warningMessage = String.format(
+                        "[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)", direction, zoneId, asked, done
+                    );
                     LOGGER.warn(warningMessage);
                     incompleteShiftCountries.put(zoneId, done - asked);
                 }
@@ -242,8 +244,8 @@ public class SweNetworkShifter implements NetworkShifter {
     private void checkGlskLimitationCountry(final String country,
                                             final double diffShift,
                                             final double mismatch) throws GlskLimitationException {
-        // In case of asked > 0 : (done - asked) will be < 0, we have Glsk limitation if the next asked value increase (mismatch < 0),
-        // In case of asked < 0 : (done - asked) will be > 0, we have Glsk limitation if the next asked value decrease (mismatch > 0)
+        // In case of asked > 0 : (done - asked) will be < 0, we have GLSK limitation if the next asked value increase (mismatch < 0),
+        // In case of asked < 0 : (done - asked) will be > 0, we have GLSK limitation if the next asked value decrease (mismatch > 0)
         if (diffShift < 0 && mismatch < 0 || diffShift > 0 && mismatch > 0) {
             final String errorMessage = "GLSK limitation occurred for country " + country;
             businessLogger.error(errorMessage);
@@ -282,30 +284,35 @@ public class SweNetworkShifter implements NetworkShifter {
                                                 final double mismatchEsPt,
                                                 final double mismatchEsFr) {
         switch (direction) {
-            case ES_FR, FR_ES -> scalingValuesByCountry.put(FR_EIC, scalingValuesByCountry.get(FR_EIC) - mismatchEsFr);
-            case ES_PT, PT_ES -> scalingValuesByCountry.put(PT_EIC, scalingValuesByCountry.get(PT_EIC) - mismatchEsPt);
+            case ES_FR, FR_ES ->
+                scalingValuesByCountry.computeIfPresent(FR_EIC, (k, frValue) -> frValue - mismatchEsFr);
+            case ES_PT, PT_ES ->
+                scalingValuesByCountry.computeIfPresent(PT_EIC, (k, ptValue) -> ptValue - mismatchEsPt);
         }
 
-        scalingValuesByCountry.put(ES_EIC, scalingValuesByCountry.get(ES_EIC) + mismatchEsPt + mismatchEsFr);
+        scalingValuesByCountry.computeIfPresent(ES_EIC, (k, esValue) -> esValue + mismatchEsPt + mismatchEsFr);
     }
 
     public Map<String, Double> getTargetExchanges(final double stepValue) {
-        return processType == D2CC ? getDayAheadTargetExchanges(stepValue) : getIdccTargetExchanges(stepValue, initialNetPositions);
+        return processType == D2CC
+            ? getD2ccTargetExchanges(stepValue)
+            : getIdccTargetExchanges(stepValue, initialNetPositions);
     }
 
     private Map<String, Double> getIdccTargetExchanges(final double stepValue,
                                                        final Map<String, Double> initialNetPositions) {
+        final double ptNetPosition = initialNetPositions.get(PT_EIC);
+        final double esNetPosition = initialNetPositions.get(ES_EIC);
+
         return switch (direction) {
-            case ES_FR -> Map.of(ES_PT, -initialNetPositions.get(PT_EIC), ES_FR, stepValue);
-            case FR_ES -> Map.of(ES_PT, -initialNetPositions.get(PT_EIC), ES_FR, -stepValue);
-            case ES_PT ->
-                Map.of(ES_PT, stepValue, ES_FR, initialNetPositions.get(ES_EIC) + initialNetPositions.get(PT_EIC));
-            case PT_ES ->
-                Map.of(ES_PT, -stepValue, ES_FR, initialNetPositions.get(ES_EIC) + initialNetPositions.get(PT_EIC));
+            case ES_FR -> Map.of(ES_PT, -ptNetPosition, ES_FR, stepValue);
+            case FR_ES -> Map.of(ES_PT, -ptNetPosition, ES_FR, -stepValue);
+            case ES_PT -> Map.of(ES_PT, stepValue, ES_FR, esNetPosition + ptNetPosition);
+            case PT_ES -> Map.of(ES_PT, -stepValue, ES_FR, esNetPosition + ptNetPosition);
         };
     }
 
-    private Map<String, Double> getDayAheadTargetExchanges(final double stepValue) {
+    private Map<String, Double> getD2ccTargetExchanges(final double stepValue) {
         return switch (direction) {
             case ES_FR -> Map.of(ES_PT, 0., ES_FR, stepValue);
             case FR_ES -> Map.of(ES_PT, 0., ES_FR, -stepValue);

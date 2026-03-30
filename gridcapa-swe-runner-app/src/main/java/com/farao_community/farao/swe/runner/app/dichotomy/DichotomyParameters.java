@@ -11,6 +11,4 @@ public record DichotomyParameters(double minValue,
                                   double precision,
                                   boolean runAngleCheck,
                                   boolean runGlskChecksBeforeLoadFlow) {
-
-
 }
