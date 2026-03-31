@@ -96,7 +96,8 @@ public class SweNetworkShifter implements NetworkShifter {
 
         try {
             final String targetCountriesShiftMessage = String.format(
-                "Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]", scalingValuesByCountry.get(ES_EIC), scalingValuesByCountry.get(FR_EIC), scalingValuesByCountry.get(PT_EIC)
+                "Target countries shift [ES = %.2f, FR = %.2f, PT = %.2f]",
+                scalingValuesByCountry.get(ES_EIC), scalingValuesByCountry.get(FR_EIC), scalingValuesByCountry.get(PT_EIC)
             );
             businessLogger.info(targetCountriesShiftMessage);
 
