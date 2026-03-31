@@ -209,8 +209,9 @@ class SweNetworkShifterTest {
         Map<String, Double> initialNetPositions = Map.of(ES_EIC, 2317., FR_EIC, -2317., PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(FR_ES, initialNetPositions);
 
-        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, D2CC,
-                                                                    FR_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, false);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, FR_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, false
+        );
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
 
         sweNetworkShifter.shiftNetwork(4645, network); // incomplete shift for FR in the first iteration , but no Glsk limitation error
