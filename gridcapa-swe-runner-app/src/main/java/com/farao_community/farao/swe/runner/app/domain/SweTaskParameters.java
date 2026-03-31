@@ -118,8 +118,7 @@ public class SweTaskParameters {
         }
     }
 
-    private int validateIsIntegerAndGet(final TaskParameterDto parameter,
-                                        final List<String> errors) {
+    private int validateIsIntegerAndGet(final TaskParameterDto parameter, final List<String> errors) {
         if (StringUtils.equals("INT", parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             try {
