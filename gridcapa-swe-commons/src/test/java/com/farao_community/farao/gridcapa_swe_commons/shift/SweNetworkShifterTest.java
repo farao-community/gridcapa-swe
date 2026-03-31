@@ -267,8 +267,9 @@ class SweNetworkShifterTest {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
         Map<String, Double> initialNetPositions = Map.of(ES_EIC, 2317., FR_EIC, -2317., PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(ES_FR, initialNetPositions);
-        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, D2CC,
-                                                                    ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, ES_FR, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true
+        );
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(1);
         assertThrows(ShiftingException.class, () -> sweNetworkShifter.shiftNetwork(1000., network));
     }
