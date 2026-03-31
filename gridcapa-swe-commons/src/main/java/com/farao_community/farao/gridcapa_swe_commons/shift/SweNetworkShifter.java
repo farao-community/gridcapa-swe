@@ -87,8 +87,7 @@ public class SweNetworkShifter implements NetworkShifter {
     }
 
     @Override
-    public void shiftNetwork(final double stepValue,
-                             final Network network) throws GlskLimitationException, ShiftingException {
+    public void shiftNetwork(final double stepValue, final Network network) throws GlskLimitationException, ShiftingException {
         final VariantManager variantManager = network.getVariantManager();
         businessLogger.info("Starting shift on network {}", variantManager.getWorkingVariantId());
         final Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
