@@ -187,8 +187,7 @@ public class SweNetworkShifter implements NetworkShifter {
         businessLogger.info(infoMessage);
     }
 
-    private boolean hasShiftSucceeded(final double mismatchEsPt,
-                                      final double mismatchEsFr) {
+    private boolean hasShiftSucceeded(final double mismatchEsPt, final double mismatchEsFr) {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
