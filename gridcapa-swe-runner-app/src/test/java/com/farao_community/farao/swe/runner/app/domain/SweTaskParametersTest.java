@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class SweTaskParametersTest {
 
     @Test
@@ -39,33 +41,35 @@ class SweTaskParametersTest {
             new TaskParameterDto("MAX_CRA", "INT", "72", "25"),
             new TaskParameterDto("MAX_NEWTON_RAPHSON_ITERATIONS", "INT", "38", "63"),
             new TaskParameterDto("DISABLE_SECOND_PREVENTIVE_RAO", "BOOLEAN", "true", "false"),
-            new TaskParameterDto("EXPORT_FIRST_UNSECURE_SHIFTED_CGM", "BOOLEAN", "true", "false")
+            new TaskParameterDto("EXPORT_FIRST_UNSECURE_SHIFTED_CGM", "BOOLEAN", "true", "false"),
+            new TaskParameterDto("RUN_GLSK_CHECKS_BEFORE_LOADFLOW", "BOOLEAN", "true", "true")
         );
 
-        SweTaskParameters sweTaskParameters = new SweTaskParameters(parameters);
+        final SweTaskParameters params = new SweTaskParameters(parameters);
 
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsFr()).isTrue();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionFrEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsPt()).isTrue();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionPtEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.getMaxTtcEsFr()).isEqualTo(42);
-        Assertions.assertThat(sweTaskParameters.getMaxTtcFrEs()).isEqualTo(43);
-        Assertions.assertThat(sweTaskParameters.getMaxTtcEsPt()).isEqualTo(44);
-        Assertions.assertThat(sweTaskParameters.getMaxTtcPtEs()).isEqualTo(45);
-        Assertions.assertThat(sweTaskParameters.getMinTtcEsFr()).isEqualTo(26);
-        Assertions.assertThat(sweTaskParameters.getMinTtcFrEs()).isEqualTo(27);
-        Assertions.assertThat(sweTaskParameters.getMinTtcEsPt()).isEqualTo(28);
-        Assertions.assertThat(sweTaskParameters.getMinTtcPtEs()).isEqualTo(29);
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsFr()).isEqualTo(10);
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionFrEs()).isEqualTo(11);
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsPt()).isEqualTo(12);
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionPtEs()).isEqualTo(13);
-        Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isTrue();
-        Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isTrue();
-        Assertions.assertThat(sweTaskParameters.getMaxCra()).isEqualTo(72);
-        Assertions.assertThat(sweTaskParameters.getMaxNewtonRaphsonIterations()).isEqualTo(38);
-        Assertions.assertThat(sweTaskParameters.isSecondPreventiveRaoDisabled()).isTrue();
-        Assertions.assertThat(sweTaskParameters.isExportFirstUnsecureShiftedCGM()).isTrue();
+        assertThat(params.isRunDirectionEsFr()).isTrue();
+        assertThat(params.isRunDirectionFrEs()).isFalse();
+        assertThat(params.isRunDirectionEsPt()).isTrue();
+        assertThat(params.isRunDirectionPtEs()).isFalse();
+        assertThat(params.getMaxTtcEsFr()).isEqualTo(42);
+        assertThat(params.getMaxTtcFrEs()).isEqualTo(43);
+        assertThat(params.getMaxTtcEsPt()).isEqualTo(44);
+        assertThat(params.getMaxTtcPtEs()).isEqualTo(45);
+        assertThat(params.getMinTtcEsFr()).isEqualTo(26);
+        assertThat(params.getMinTtcFrEs()).isEqualTo(27);
+        assertThat(params.getMinTtcEsPt()).isEqualTo(28);
+        assertThat(params.getMinTtcPtEs()).isEqualTo(29);
+        assertThat(params.getDichotomyPrecisionEsFr()).isEqualTo(10);
+        assertThat(params.getDichotomyPrecisionFrEs()).isEqualTo(11);
+        assertThat(params.getDichotomyPrecisionEsPt()).isEqualTo(12);
+        assertThat(params.getDichotomyPrecisionPtEs()).isEqualTo(13);
+        assertThat(params.isRunAngleCheck()).isTrue();
+        assertThat(params.isRunVoltageCheck()).isTrue();
+        assertThat(params.getMaxCra()).isEqualTo(72);
+        assertThat(params.getMaxNewtonRaphsonIterations()).isEqualTo(38);
+        assertThat(params.isSecondPreventiveRaoDisabled()).isTrue();
+        assertThat(params.isExportFirstUnsecureShiftedCGM()).isTrue();
+        assertThat(params.isRunGlskChecksBeforeLoadFlow()).isTrue();
     }
 
     @Test
@@ -75,35 +79,36 @@ class SweTaskParametersTest {
         );
 
         // expected: object is created and no exception is thrown
-        Assertions.assertThat(new SweTaskParameters(parameters)).isInstanceOf(SweTaskParameters.class);
+        assertThat(new SweTaskParameters(parameters)).isInstanceOf(SweTaskParameters.class);
     }
 
     @Test
     void absentParametersTest() {
-        SweTaskParameters sweTaskParameters = new SweTaskParameters(List.of());
+        final SweTaskParameters params = new SweTaskParameters(List.of());
 
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsFr()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionFrEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionEsPt()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunDirectionPtEs()).isFalse();
-        Assertions.assertThat(sweTaskParameters.getMaxTtcEsFr()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMaxTtcFrEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMaxTtcEsPt()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMaxTtcPtEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinTtcEsFr()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinTtcFrEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinTtcEsPt()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMinTtcPtEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsFr()).isZero();
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionFrEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionEsPt()).isZero();
-        Assertions.assertThat(sweTaskParameters.getDichotomyPrecisionPtEs()).isZero();
-        Assertions.assertThat(sweTaskParameters.isRunAngleCheck()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isRunVoltageCheck()).isFalse();
-        Assertions.assertThat(sweTaskParameters.getMaxCra()).isZero();
-        Assertions.assertThat(sweTaskParameters.getMaxNewtonRaphsonIterations()).isZero();
-        Assertions.assertThat(sweTaskParameters.isSecondPreventiveRaoDisabled()).isFalse();
-        Assertions.assertThat(sweTaskParameters.isExportFirstUnsecureShiftedCGM()).isFalse();
+        assertThat(params.isRunDirectionEsFr()).isFalse();
+        assertThat(params.isRunDirectionFrEs()).isFalse();
+        assertThat(params.isRunDirectionEsPt()).isFalse();
+        assertThat(params.isRunDirectionPtEs()).isFalse();
+        assertThat(params.getMaxTtcEsFr()).isZero();
+        assertThat(params.getMaxTtcFrEs()).isZero();
+        assertThat(params.getMaxTtcEsPt()).isZero();
+        assertThat(params.getMaxTtcPtEs()).isZero();
+        assertThat(params.getMinTtcEsFr()).isZero();
+        assertThat(params.getMinTtcFrEs()).isZero();
+        assertThat(params.getMinTtcEsPt()).isZero();
+        assertThat(params.getMinTtcPtEs()).isZero();
+        assertThat(params.getDichotomyPrecisionEsFr()).isZero();
+        assertThat(params.getDichotomyPrecisionFrEs()).isZero();
+        assertThat(params.getDichotomyPrecisionEsPt()).isZero();
+        assertThat(params.getDichotomyPrecisionPtEs()).isZero();
+        assertThat(params.isRunAngleCheck()).isFalse();
+        assertThat(params.isRunVoltageCheck()).isFalse();
+        assertThat(params.getMaxCra()).isZero();
+        assertThat(params.getMaxNewtonRaphsonIterations()).isZero();
+        assertThat(params.isSecondPreventiveRaoDisabled()).isFalse();
+        assertThat(params.isExportFirstUnsecureShiftedCGM()).isFalse();
+        assertThat(params.isRunGlskChecksBeforeLoadFlow()).isFalse();
     }
 
     @Test

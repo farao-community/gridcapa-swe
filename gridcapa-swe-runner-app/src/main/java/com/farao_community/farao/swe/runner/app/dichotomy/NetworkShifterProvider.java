@@ -12,7 +12,10 @@ import com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfi
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
-import com.farao_community.farao.gridcapa_swe_commons.shift.*;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher;
+import com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter;
+import com.farao_community.farao.gridcapa_swe_commons.shift.ZonalScalableProvider;
 import com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration;
 import com.farao_community.farao.swe.runner.app.configurations.ExportNetworkConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
@@ -26,6 +29,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+import static com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation.computeSweCountriesBalances;
+
 /**
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
@@ -38,7 +43,11 @@ public class NetworkShifterProvider {
     private final ExportNetworkConfiguration exportNetworkConfiguration;
     private final FileExporter fileExporter;
 
-    public NetworkShifterProvider(DichotomyConfiguration dichotomyConfiguration, Logger businessLogger, ProcessConfiguration processConfiguration, ExportNetworkConfiguration exportNetworkConfiguration, FileExporter fileExporter) {
+    public NetworkShifterProvider(final DichotomyConfiguration dichotomyConfiguration,
+                                  final Logger businessLogger,
+                                  final ProcessConfiguration processConfiguration,
+                                  final ExportNetworkConfiguration exportNetworkConfiguration,
+                                  final FileExporter fileExporter) {
         this.dichotomyConfiguration = dichotomyConfiguration;
         this.businessLogger = businessLogger;
         this.processConfiguration = processConfiguration;
@@ -46,32 +55,48 @@ public class NetworkShifterProvider {
         this.fileExporter = fileExporter;
     }
 
-    public NetworkShifter get(SweData sweData, DichotomyDirection direction, LoadFlowParameters loadFlowParameters) {
-        ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
-        Network network = NetworkService.getNetworkByDirection(sweData, direction);
+    public NetworkShifter get(final SweData sweData,
+                              final DichotomyDirection direction,
+                              final LoadFlowParameters loadFlowParameters,
+                              final boolean runGlskChecksBeforeLoadFlow) {
+        final ZonalScalableProvider zonalScalableProvider = new ZonalScalableProvider();
+        final Network network = NetworkService.getNetworkByDirection(sweData, direction);
         try {
-            Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, loadFlowParameters);
+            final Map<String, Double> initialNetPositions = computeSweCountriesBalances(network, loadFlowParameters);
 
             businessLogger.info("Base case loadflow is secure");
-            SweNetworkExporter sweNetworkExporter = exportNetworkConfiguration.isExportFailedNetwork() ? new SweNetworkExporter(sweData, fileExporter) : null;
-            return new SweNetworkShifter(businessLogger, sweData.getProcessType(), direction,
-                    zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
-                    getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
-                    dichotomyConfiguration.getParameters().get(direction).getToleranceEsPt(),
-                    dichotomyConfiguration.getParameters().get(direction).getToleranceEsFr(),
-                    initialNetPositions,
-                    processConfiguration,
-                    loadFlowParameters, sweNetworkExporter);
-        } catch (SweBaseCaseUnsecureException baseCaseUnsecureException) {
+
+            final SweNetworkExporter sweNetworkExporter = exportNetworkConfiguration.isExportFailedNetwork()
+                ? new SweNetworkExporter(sweData, fileExporter)
+                : null;
+
+            final DichotomyConfiguration.Parameters directionParameters = dichotomyConfiguration.getParameters().get(direction);
+
+            return new SweNetworkShifter(businessLogger,
+                                         sweData.getProcessType(),
+                                         direction,
+                                         zonalScalableProvider.get(sweData.getGlskUrl(), network, sweData.getTimestamp()),
+                                         getShiftDispatcher(sweData.getProcessType(), direction, initialNetPositions),
+                                         directionParameters.getToleranceEsPt(),
+                                         directionParameters.getToleranceEsFr(),
+                                         initialNetPositions,
+                                         processConfiguration,
+                                         loadFlowParameters,
+                                         sweNetworkExporter,
+                                         runGlskChecksBeforeLoadFlow);
+
+        } catch (final SweBaseCaseUnsecureException baseCaseUnsecureException) {
             businessLogger.error("Base case loadflow is unsecure, the calculation is stopped and the first unsecure network cannot be exported because it doesn't exist at this stage of the calculation.");
             throw baseCaseUnsecureException;
         }
     }
 
-    ShiftDispatcher getShiftDispatcher(ProcessType processType, DichotomyDirection direction, Map<String, Double> initialNetPositions) {
+    ShiftDispatcher getShiftDispatcher(final ProcessType processType,
+                                       final DichotomyDirection direction,
+                                       final Map<String, Double> initialNetPositionsByCountry) {
         return switch (processType) {
-            case D2CC -> new SweD2ccShiftDispatcher(direction, initialNetPositions);
-            case IDCC, IDCC_IDCF, BTCC -> new SweIdccShiftDispatcher(direction, initialNetPositions);
+            case D2CC -> new SweD2ccShiftDispatcher(direction, initialNetPositionsByCountry);
+            case IDCC, IDCC_IDCF, BTCC -> new SweIdccShiftDispatcher(direction, initialNetPositionsByCountry);
         };
     }
 }
