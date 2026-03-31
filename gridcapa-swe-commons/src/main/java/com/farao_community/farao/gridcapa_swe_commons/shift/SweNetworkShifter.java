@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.farao_community.farao.dichotomy.api.results.ReasonInvalid.BALANCE_LOADFLOW_DIVERGENCE;
@@ -87,7 +88,8 @@ public class SweNetworkShifter implements NetworkShifter {
     }
 
     @Override
-    public void shiftNetwork(final double stepValue, final Network network) throws GlskLimitationException, ShiftingException {
+    public void shiftNetwork(final double stepValue,
+                             final Network network) throws GlskLimitationException, ShiftingException {
         final VariantManager variantManager = network.getVariantManager();
         businessLogger.info("Starting shift on network {}", variantManager.getWorkingVariantId());
         final Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
@@ -117,7 +119,7 @@ public class SweNetworkShifter implements NetworkShifter {
             do {
                 // Step 1: Perform the scaling
                 LOGGER.info("[{}] : Applying shift iteration {} ", direction, iterationCounter);
-                final Map<String, Double> incompleteShiftCountries = shiftIteration(
+                final Map<String, Double> incompleteShiftCountries = iterateOnShift(
                     network, scalingValuesByCountry, scalingParameters, scalableGeneratorConnector
                 );
                 // Step 2: Compute exchanges mismatch
@@ -138,15 +140,15 @@ public class SweNetworkShifter implements NetworkShifter {
                 // Step 3: Checks GLSK limitation and balance adjustment results
 
                 if (runGlskChecksBeforeLoadFlow) {
-                    checkGlskLimitation(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
+                    checkGlskLimitations(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
                 }
-                if (hasShiftSucceeded(mismatchEsPt, mismatchEsFr)) {
+                if (isWithinTolerances(mismatchEsPt, mismatchEsFr)) {
                     logShiftSuccess(iterationCounter, bordersExchanges);
                     variantManager.cloneVariant(workingVariantCopyId, initialVariantId, true);
                     shiftSucceeded = true;
                 } else {
                     if (!runGlskChecksBeforeLoadFlow) {
-                        checkGlskLimitation(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
+                        checkGlskLimitations(incompleteShiftCountries, mismatchEsPt, mismatchEsFr);
                     }
                     // Reset current variant with initial state for each iteration (keeping pre-processing)
                     variantManager.cloneVariant(processedVariantId, workingVariantCopyId, true);
@@ -175,7 +177,8 @@ public class SweNetworkShifter implements NetworkShifter {
         }
     }
 
-    private void logShiftSuccess(final int iterationCounter, final Map<String, Double> bordersExchanges) {
+    private void logShiftSuccess(final int iterationCounter,
+                                 final Map<String, Double> bordersExchanges) {
         final String logShiftSucceeded = String.format(
             "[%s] : Shift succeeded after %s iteration ", direction, iterationCounter
         );
@@ -187,61 +190,73 @@ public class SweNetworkShifter implements NetworkShifter {
         businessLogger.info(infoMessage);
     }
 
-    private boolean hasShiftSucceeded(final double mismatchEsPt, final double mismatchEsFr) {
+    private boolean isWithinTolerances(final double mismatchEsPt,
+                                       final double mismatchEsFr) {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
-    private Map<String, Double> shiftIteration(final Network network,
+    private Map<String, Double> iterateOnShift(final Network network,
                                                final Map<String, Double> scalingValuesByCountry,
                                                final ScalingParameters scalingParameters,
                                                final ScalableGeneratorConnector scalableGeneratorConnector) {
         final Map<String, Double> incompleteShiftCountries = new HashMap<>();
-        for (final Map.Entry<String, Double> entry : scalingValuesByCountry.entrySet()) {
-            final String zoneId = entry.getKey();
-            if (zonalScalable.getData(zoneId) != null) {
-                double asked = entry.getValue();
-                final String infoMessage = String.format(
-                    "[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked
-                );
-                LOGGER.info(infoMessage);
-                double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
-                if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
-                    final String warningMessage = String.format(
-                        "[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)", direction, zoneId, asked, done
-                    );
-                    LOGGER.warn(warningMessage);
-                    incompleteShiftCountries.put(zoneId, done - asked);
-                }
-            }
-        }
+        scalingValuesByCountry
+            .forEach((zoneId, asked) ->
+                         computeShift(zoneId, asked, network, scalingParameters)
+                             .ifPresent(shift -> incompleteShiftCountries.put(zoneId, shift)));
+
         // During the shift some generators linked to the main network with a transformers are not connected correctly
         // Waiting for a fix in powsybl-core, we connect the transformers linked to these generators to be correctly connected to the main network component
         scalableGeneratorConnector.connectGeneratorsTransformers(network, PRE_PROCESSING_COUNTRIES);
         return incompleteShiftCountries;
     }
 
-    private void checkGlskLimitation(final Map<String, Double> incompleteShiftCountries,
-                                     final double mismatchEsPt,
-                                     final double mismatchEsFr) throws GlskLimitationException {
+    private Optional<Double> computeShift(final String zoneId,
+                                          final Double asked,
+                                          final Network network,
+                                          final ScalingParameters scalingParameters) {
+        if (zonalScalable.getData(zoneId) == null) {
+            return Optional.empty();
+        }
+        final String infoMessage = String.format(
+            "[%s] : Applying variation on zone %s (target: %.2f)", direction, zoneId, asked
+        );
+        LOGGER.info(infoMessage);
+        double done = zonalScalable.getData(zoneId).scale(network, asked, scalingParameters);
+        if (Math.abs(done - asked) > DEFAULT_SHIFT_EPSILON) {
+            final String warningMessage = String.format(
+                "[%s] : Incomplete shift on zone %s (target: %.2f, done: %.2f)", direction, zoneId, asked, done
+            );
+            LOGGER.warn(warningMessage);
+            return Optional.of(done - asked);
+
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private void checkGlskLimitations(final Map<String, Double> incompleteShiftCountries,
+                                      final double mismatchEsPt,
+                                      final double mismatchEsFr) throws GlskLimitationException {
 
         final Double ptDiff = incompleteShiftCountries.get(PT_EIC);
         final Double frDiff = incompleteShiftCountries.get(FR_EIC);
         final Double esDiff = incompleteShiftCountries.get(ES_EIC);
 
         if (ptDiff != null) {
-            checkGlskLimitationCountry("PT", ptDiff, mismatchEsPt);
+            checkGlskLimitation("PT", ptDiff, mismatchEsPt);
         }
         if (frDiff != null) {
-            checkGlskLimitationCountry("FR", frDiff, mismatchEsFr);
+            checkGlskLimitation("FR", frDiff, mismatchEsFr);
         }
         if (esDiff != null) {
-            checkGlskLimitationCountry("ES", esDiff, -(mismatchEsFr + mismatchEsPt));
+            checkGlskLimitation("ES", esDiff, -(mismatchEsFr + mismatchEsPt));
         }
     }
 
-    private void checkGlskLimitationCountry(final String country,
-                                            final double diffShift,
-                                            final double mismatch) throws GlskLimitationException {
+    private void checkGlskLimitation(final String country,
+                                     final double diffShift,
+                                     final double mismatch) throws GlskLimitationException {
         // In case of asked > 0 : (done - asked) will be < 0, we have GLSK limitation if the next asked value increase (mismatch < 0),
         // In case of asked < 0 : (done - asked) will be > 0, we have GLSK limitation if the next asked value decrease (mismatch > 0)
         if (diffShift < 0 && mismatch < 0 || diffShift > 0 && mismatch > 0) {
@@ -282,13 +297,17 @@ public class SweNetworkShifter implements NetworkShifter {
                                                 final double mismatchEsPt,
                                                 final double mismatchEsFr) {
         switch (direction) {
-            case ES_FR, FR_ES ->
-                scalingValuesByCountry.computeIfPresent(FR_EIC, (k, frValue) -> frValue - mismatchEsFr);
-            case ES_PT, PT_ES ->
-                scalingValuesByCountry.computeIfPresent(PT_EIC, (k, ptValue) -> ptValue - mismatchEsPt);
+            case ES_FR, FR_ES -> scalingValuesByCountry.computeIfPresent(
+                FR_EIC, (k, frValue) -> frValue - mismatchEsFr
+            );
+            case ES_PT, PT_ES -> scalingValuesByCountry.computeIfPresent(
+                PT_EIC, (k, ptValue) -> ptValue - mismatchEsPt
+            );
         }
 
-        scalingValuesByCountry.computeIfPresent(ES_EIC, (k, esValue) -> esValue + mismatchEsPt + mismatchEsFr);
+        scalingValuesByCountry.computeIfPresent(
+            ES_EIC, (k, esValue) -> esValue + mismatchEsPt + mismatchEsFr
+        );
     }
 
     public Map<String, Double> getTargetExchanges(final double stepValue) {

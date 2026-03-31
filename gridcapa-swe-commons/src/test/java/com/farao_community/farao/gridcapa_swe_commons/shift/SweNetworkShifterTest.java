@@ -86,14 +86,13 @@ class SweNetworkShifterTest {
     }
 
     private static SweNetworkShifter zeroToleranceShifter(final DichotomyDirection direction,
-                                                          final ProcessType process,
-                                                          final Map<String, Double> initialNetPositions) {
-        return new SweNetworkShifter(null, process, direction, null, null, 0., 0., initialNetPositions, null, null, null, true);
+                                                          final ProcessType process) {
+        return new SweNetworkShifter(null, process, direction, null, null, 0., 0., SweNetworkShifterTest.DEFAULT_TEST_NPS, null, null, null, true);
     }
 
     @Test
     void checkD2ccEsFrTargetExchangesCalculatedCorrectly() {
-        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_FR, D2CC, DEFAULT_TEST_NPS);
+        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_FR, D2CC);
         final Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(0., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(1000., shifts.get("ES_FR"), TARGET_P_TOLERANCE);
@@ -101,7 +100,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccFrEsTargetExchangesCalculatedCorrectly() {
-        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(FR_ES, D2CC, DEFAULT_TEST_NPS);
+        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(FR_ES, D2CC);
         final Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(0., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(-1000., shifts.get("ES_FR"), TARGET_P_TOLERANCE);
@@ -109,7 +108,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccPtEsTargetExchangesCalculatedCorrectly() {
-        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(PT_ES, D2CC, DEFAULT_TEST_NPS);
+        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(PT_ES, D2CC);
         final Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-1000., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(0., shifts.get("ES_FR"), TARGET_P_TOLERANCE);
@@ -117,7 +116,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkD2ccEsPtTargetExchangesCalculatedCorrectly() {
-        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_PT, D2CC, DEFAULT_TEST_NPS);
+        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_PT, D2CC);
         final Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(1000., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(0., shifts.get("ES_FR"), TARGET_P_TOLERANCE);
@@ -125,7 +124,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccEsFrTargetExchangesCalculatedCorrectly() {
-        SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_FR, IDCC, DEFAULT_TEST_NPS);
+        SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_FR, IDCC);
         Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-150., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(1000., shifts.get("ES_FR"), TARGET_P_TOLERANCE);
@@ -133,7 +132,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccFrEsTargetExchangesCalculatedCorrectly() {
-        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(FR_ES, IDCC, DEFAULT_TEST_NPS);
+        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(FR_ES, IDCC);
         final Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-150., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(-1000., shifts.get("ES_FR"), TARGET_P_TOLERANCE);
@@ -141,7 +140,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccEsPtTargetExchangesCalculatedCorrectly() {
-        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_PT, IDCC, DEFAULT_TEST_NPS);
+        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(ES_PT, IDCC);
         final Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(1000., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(200, shifts.get("ES_FR"), TARGET_P_TOLERANCE);
@@ -149,7 +148,7 @@ class SweNetworkShifterTest {
 
     @Test
     void checkIdccPtEsTargetExchangesCalculatedCorrectly() {
-        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(PT_ES, IDCC, DEFAULT_TEST_NPS);
+        final SweNetworkShifter sweNetworkShifter = zeroToleranceShifter(PT_ES, IDCC);
         final Map<String, Double> shifts = sweNetworkShifter.getTargetExchanges(1000);
         assertEquals(-1000., shifts.get("ES_PT"), TARGET_P_TOLERANCE);
         assertEquals(200., shifts.get("ES_FR"), TARGET_P_TOLERANCE);
