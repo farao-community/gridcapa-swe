@@ -108,8 +108,7 @@ public class SweTaskParameters {
         }
     }
 
-    private boolean validateIsBooleanAndGet(final TaskParameterDto parameter,
-                                            final List<String> errors) {
+    private boolean validateIsBooleanAndGet(final TaskParameterDto parameter, final List<String> errors) {
         if (StringUtils.equals("BOOLEAN", parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             return Boolean.parseBoolean(value);
