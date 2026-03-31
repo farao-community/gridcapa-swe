@@ -446,8 +446,9 @@ class SweNetworkShifterTest {
         CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("/shift/TestCase_with_transformers_glsk.xml"));
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
         ZonalData<Scalable> customZonalScalable = doc.getZonalScalable(network, instant);
-        customZonalScalable.addAll(new ZonalDataImpl<>(singletonMap(new EICode(FR).getAreaCode(),
-                                                                    getCountryGeneratorsScalableForFR(network))));
+        customZonalScalable.addAll(new ZonalDataImpl<>(
+            singletonMap(new EICode(FR).getAreaCode(), getCountryGeneratorsScalableForFR(network))
+        ));
         Map<String, Double> initialNetPositions = CountryBalanceComputation.computeSweCountriesBalances(network, LoadFlowParameters.load());
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(PT_ES, initialNetPositions);
         SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(
