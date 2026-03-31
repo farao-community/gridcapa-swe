@@ -88,8 +88,7 @@ public class SweNetworkShifter implements NetworkShifter {
     }
 
     @Override
-    public void shiftNetwork(final double stepValue,
-                             final Network network) throws GlskLimitationException, ShiftingException {
+    public void shiftNetwork(final double stepValue, final Network network) throws GlskLimitationException, ShiftingException {
         final VariantManager variantManager = network.getVariantManager();
         businessLogger.info("Starting shift on network {}", variantManager.getWorkingVariantId());
         final Map<String, Double> scalingValuesByCountry = shiftDispatcher.dispatch(stepValue);
@@ -177,8 +176,7 @@ public class SweNetworkShifter implements NetworkShifter {
         }
     }
 
-    private void logShiftSuccess(final int iterationCounter,
-                                 final Map<String, Double> bordersExchanges) {
+    private void logShiftSuccess(final int iterationCounter, final Map<String, Double> bordersExchanges) {
         final String logShiftSucceeded = String.format(
             "[%s] : Shift succeeded after %s iteration ", direction, iterationCounter
         );
@@ -190,8 +188,7 @@ public class SweNetworkShifter implements NetworkShifter {
         businessLogger.info(infoMessage);
     }
 
-    private boolean isWithinTolerances(final double mismatchEsPt,
-                                       final double mismatchEsFr) {
+    private boolean isWithinTolerances(final double mismatchEsPt, final double mismatchEsFr) {
         return Math.abs(mismatchEsPt) < toleranceEsPt && Math.abs(mismatchEsFr) < toleranceEsFr;
     }
 
@@ -211,10 +208,7 @@ public class SweNetworkShifter implements NetworkShifter {
         return incompleteShiftCountries;
     }
 
-    private Optional<Double> computeShift(final String zoneId,
-                                          final Double asked,
-                                          final Network network,
-                                          final ScalingParameters scalingParameters) {
+    private Optional<Double> computeShift(final String zoneId, final Double asked, final Network network, final ScalingParameters scalingParameters) {
         if (zonalScalable.getData(zoneId) == null) {
             return Optional.empty();
         }
@@ -235,9 +229,7 @@ public class SweNetworkShifter implements NetworkShifter {
         }
     }
 
-    private void checkGlskLimitations(final Map<String, Double> incompleteShiftCountries,
-                                      final double mismatchEsPt,
-                                      final double mismatchEsFr) throws GlskLimitationException {
+    private void checkGlskLimitations(final Map<String, Double> incompleteShiftCountries, final double mismatchEsPt, final double mismatchEsFr) throws GlskLimitationException {
 
         final Double ptDiff = incompleteShiftCountries.get(PT_EIC);
         final Double frDiff = incompleteShiftCountries.get(FR_EIC);
@@ -254,9 +246,7 @@ public class SweNetworkShifter implements NetworkShifter {
         }
     }
 
-    private void checkGlskLimitation(final String country,
-                                     final double diffShift,
-                                     final double mismatch) throws GlskLimitationException {
+    private void checkGlskLimitation(final String country, final double diffShift, final double mismatch) throws GlskLimitationException {
         // In case of asked > 0 : (done - asked) will be < 0, we have GLSK limitation if the next asked value increase (mismatch < 0),
         // In case of asked < 0 : (done - asked) will be > 0, we have GLSK limitation if the next asked value decrease (mismatch > 0)
         if (diffShift < 0 && mismatch < 0 || diffShift > 0 && mismatch > 0) {
@@ -316,8 +306,7 @@ public class SweNetworkShifter implements NetworkShifter {
             : getIdccTargetExchanges(stepValue, initialNetPositions);
     }
 
-    private Map<String, Double> getIdccTargetExchanges(final double stepValue,
-                                                       final Map<String, Double> initialNetPositions) {
+    private Map<String, Double> getIdccTargetExchanges(final double stepValue, final Map<String, Double> initialNetPositions) {
         final double ptNetPosition = initialNetPositions.get(PT_EIC);
         final double esNetPosition = initialNetPositions.get(ES_EIC);
 
