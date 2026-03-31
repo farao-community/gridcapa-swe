@@ -241,8 +241,9 @@ class SweNetworkShifterTest {
         Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
         Map<String, Double> initialNetPositions = Map.of(ES_EIC, 2317., FR_EIC, -2317., PT_EIC, 0.);
         ShiftDispatcher shiftDispatcher = new SweD2ccShiftDispatcher(FR_ES, initialNetPositions);
-        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(businessLogger, D2CC,
-                                                                    FR_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true);
+        SweNetworkShifter sweNetworkShifter = new SweNetworkShifter(
+            businessLogger, D2CC, FR_ES, zonalScalable, shiftDispatcher, 1., 1., initialNetPositions, processConfiguration, LoadFlowParameters.load(), null, true
+        );
         Mockito.when(processConfiguration.getShiftMaxIterationNumber()).thenReturn(5);
 
         assertThrows(GlskLimitationException.class, () -> sweNetworkShifter.shiftNetwork(4647, network));
