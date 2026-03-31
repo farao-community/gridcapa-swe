@@ -175,8 +175,7 @@ public class SweNetworkShifter implements NetworkShifter {
         }
     }
 
-    private void logShiftSuccess(final int iterationCounter,
-                                 final Map<String, Double> bordersExchanges) {
+    private void logShiftSuccess(final int iterationCounter, final Map<String, Double> bordersExchanges) {
         final String logShiftSucceeded = String.format(
             "[%s] : Shift succeeded after %s iteration ", direction, iterationCounter
         );
