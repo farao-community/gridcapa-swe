@@ -134,8 +134,7 @@ public class SweTaskParameters {
         return 0; // default return value, won't be used as this return can be reached only in case of validation error
     }
 
-    private int validateIsPositiveIntegerAndGet(final TaskParameterDto parameter,
-                                                final List<String> errors) {
+    private int validateIsPositiveIntegerAndGet(final TaskParameterDto parameter, final List<String> errors) {
         int value = validateIsIntegerAndGet(parameter, errors);
         if (value < 0) {
             errors.add(String.format("Parameter %s should be positive (value: %s)", parameter.getId(), parameter.getValue()));
