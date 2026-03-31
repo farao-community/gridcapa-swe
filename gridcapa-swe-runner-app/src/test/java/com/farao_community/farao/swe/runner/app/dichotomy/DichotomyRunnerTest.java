@@ -155,8 +155,8 @@ class DichotomyRunnerTest {
         final ArgumentCaptor<LoadFlowParameters> loadFlowParametersCaptor = ArgumentCaptor.forClass(LoadFlowParameters.class);
 
         doReturn(mockEngine)
-            .when(spyDichotomyRunner).buildDichotomyEngine(anySweData(), anyDirection(),
-                                                           dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture());
+            .when(spyDichotomyRunner)
+            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture());
 
         assertEquals(mockDichotomyResult, spyDichotomyRunner.run(sweData, getSweTaskParameters(), ES_PT));
 
