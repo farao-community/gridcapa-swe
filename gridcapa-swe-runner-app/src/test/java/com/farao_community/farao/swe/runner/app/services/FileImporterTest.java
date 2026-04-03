@@ -81,7 +81,6 @@ class FileImporterTest {
         RaUsageLimits raUsageLimits = raUsageLimitsPerInstant.values().stream().findFirst().get();
         assertEquals(32, raUsageLimits.getMaxRa());
         assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
-        assertTrue(raUsageLimits.getMaxTopoPerTso().isEmpty());
         assertEquals(3, raUsageLimits.getMaxRaPerTso().get("RTE"));
     }
 
