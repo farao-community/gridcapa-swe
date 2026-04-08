@@ -311,7 +311,7 @@ public class CgmesExportService {
     }
 
     private double computeNetInterchange(Network network) {
-        return network.getBoundaryLineStream().filter(dl -> !Double.isNaN(dl.getBoundary().getP())).mapToDouble(dl -> dl.getBoundary().getP()).sum();
+        return network.getBoundaryLineStream().filter(bl -> !Double.isNaN(bl.getBoundary().getP())).mapToDouble(bl -> bl.getBoundary().getP()).sum();
     }
 
     private Map<String, ByteArrayOutputStream> createCommonFile(Network network, SweData sweData, List<String> inputSshIds, List<String> outputSshIds) throws IOException {
