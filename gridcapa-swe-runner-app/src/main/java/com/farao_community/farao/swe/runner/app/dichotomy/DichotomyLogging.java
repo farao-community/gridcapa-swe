@@ -14,6 +14,7 @@ import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.raoresult.api.ComputationStatus;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import org.slf4j.Logger;
@@ -87,14 +88,23 @@ public class DichotomyLogging {
         String limitingElement = NONE;
         String printablePrasIds = NONE;
         String printableCrasIds = NONE;
+        String limitingCause;
         final String timestamp = getTimestampLocalized(sweData.getTimestamp());
         final String lastSecureTtc = String.valueOf((int) dichotomyResult.getHighestValidStepValue());
         final String firstUnsecureTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
         final String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
         String angleCheckStatus = NONE;
-        final String limitingCause = dichotomyResult.getLimitingCause() == null ? NONE : limitingCauseToString(dichotomyResult.getLimitingCause());
         final Crac crac = (isBetweenFranceAndSpain(direction) ? sweData.getCracFrEs() : sweData.getCracEsPt()).getCrac();
 
+        final boolean isFailure = hasRaoResult(dichotomyResult.getLowestInvalidStep()) && (
+                dichotomyResult.getLowestInvalidStep().getRaoResult().getComputationStatus() == ComputationStatus.FAILURE
+                        || isAnyContingencyInFailure(crac, dichotomyResult.getLowestInvalidStep().getRaoResult()));
+        if (isFailure) {
+            limitingCause = "Rao failure";
+
+        } else {
+            limitingCause = dichotomyResult.getLimitingCause() != null ? limitingCauseToString(dichotomyResult.getLimitingCause()) : NONE;
+        }
         if (hasRaoResult(dichotomyResult.getLowestInvalidStep())) {
             final RaoResult raoResult = dichotomyResult.getLowestInvalidStep().getRaoResult();
             limitingElement = getLimitingElement(crac, raoResult);
@@ -145,5 +155,14 @@ public class DichotomyLogging {
 
     private static boolean isBetweenFranceAndSpain(final DichotomyDirection direction) {
         return direction.equals(DichotomyDirection.FR_ES) || direction.equals(DichotomyDirection.ES_FR);
+    }
+
+    private boolean isAnyContingencyInFailure(Crac crac, RaoResult raoResult) {
+        return crac.getContingencies().stream()
+                .anyMatch(contingency ->
+                        crac.getStates(contingency).stream().anyMatch(state -> raoResult.getComputationStatus(state)
+                                .equals(ComputationStatus.FAILURE)
+                        )
+                );
     }
 }
