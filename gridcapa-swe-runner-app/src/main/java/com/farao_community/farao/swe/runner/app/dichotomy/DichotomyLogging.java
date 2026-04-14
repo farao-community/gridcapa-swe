@@ -96,9 +96,14 @@ public class DichotomyLogging {
         String angleCheckStatus = NONE;
         final Crac crac = (isBetweenFranceAndSpain(direction) ? sweData.getCracFrEs() : sweData.getCracEsPt()).getCrac();
 
-        final boolean isFailure = hasRaoResult(dichotomyResult.getLowestInvalidStep()) && (
-                dichotomyResult.getLowestInvalidStep().getRaoResult().getComputationStatus() == ComputationStatus.FAILURE
-                        || isAnyContingencyInFailure(crac, dichotomyResult.getLowestInvalidStep().getRaoResult()));
+        final RaoResult raoRes = hasRaoResult(dichotomyResult.getLowestInvalidStep())
+                ? dichotomyResult.getLowestInvalidStep().getRaoResult()
+                : null;
+
+        final boolean isFailure = raoRes != null && (
+                raoRes.getComputationStatus() == ComputationStatus.FAILURE
+                        || isAnyContingencyInFailure(crac, raoRes)
+        );
         if (isFailure) {
             limitingCause = "Rao failure";
 
@@ -160,8 +165,8 @@ public class DichotomyLogging {
     private boolean isAnyContingencyInFailure(Crac crac, RaoResult raoResult) {
         return crac.getContingencies().stream()
                 .anyMatch(contingency ->
-                        crac.getStates(contingency).stream().anyMatch(state -> raoResult.getComputationStatus(state)
-                                .equals(ComputationStatus.FAILURE)
+                        crac.getStates(contingency).stream().anyMatch(state -> ComputationStatus.FAILURE
+                                .equals(raoResult.getComputationStatus(state))
                         )
                 );
     }
