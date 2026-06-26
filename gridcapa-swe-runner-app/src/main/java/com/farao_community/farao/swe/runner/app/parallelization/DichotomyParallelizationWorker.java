@@ -17,13 +17,18 @@ import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationDat
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.CgmesExportService;
 import com.farao_community.farao.swe.runner.app.services.CneFileExportService;
+import com.farao_community.farao.swe.runner.app.services.FilesService;
 import com.farao_community.farao.swe.runner.app.services.OutputService;
 import com.farao_community.farao.swe.runner.app.services.VoltageCheckService;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -35,6 +40,7 @@ import java.util.concurrent.Future;
 
 @Service
 public class DichotomyParallelizationWorker {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DichotomyParallelizationWorker.class);
 
     private final DichotomyLogging dichotomyLogging;
     private final DichotomyRunner dichotomyRunner;
@@ -77,11 +83,23 @@ public class DichotomyParallelizationWorker {
         }
 
         // Generate files specific for one direction (cne, cgm, voltage) and add them to the returned object (to create)
-        final String zippedLastSecureCgmesUrl = cgmesExportService.buildAndExportLastSecureCgmesFiles(direction, sweData, dichotomyResult, sweTaskParameters);
+        Path temporaryBoundariesDirectory = null;
+        String zippedLastSecureCgmesUrl = null;
         String zippedFirstUnsecureCgmesUrl = null;
-        if (sweTaskParameters.isExportFirstUnsecureShiftedCGM()) {
-            zippedFirstUnsecureCgmesUrl = cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(direction, sweData, dichotomyResult, sweTaskParameters);
+        try {
+            temporaryBoundariesDirectory = FilesService.createTemporaryBoundariesDirectory(sweData.getBoundariesFiles());
+            zippedLastSecureCgmesUrl = cgmesExportService.buildAndExportLastSecureCgmesFiles(direction, sweData, temporaryBoundariesDirectory, dichotomyResult, sweTaskParameters);
+            if (sweTaskParameters.isExportFirstUnsecureShiftedCGM()) {
+                zippedFirstUnsecureCgmesUrl = cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(direction, sweData, temporaryBoundariesDirectory, dichotomyResult, sweTaskParameters);
+            }
+        } finally {
+            try {
+                FilesService.deleteTemporaryBoundariesDirectoryIfExists(temporaryBoundariesDirectory);
+            } catch (IOException e) {
+                LOGGER.warn("An error occured while trying to delete temporary boundaries directory", e);
+            }
         }
+
         final String highestValidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, true, direction);
         final String lowestInvalidStepUrl = cneFileExportService.exportCneUrl(sweData, dichotomyResult, false, direction);
         final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult = voltageCheckService.runVoltageCheck(sweData, dichotomyResult, sweTaskParameters, direction);

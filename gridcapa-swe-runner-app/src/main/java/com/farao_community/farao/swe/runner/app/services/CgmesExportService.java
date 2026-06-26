@@ -20,12 +20,15 @@ import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreproc
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
+import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil;
 import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.powsybl.cgmes.conversion.CgmesExport;
+import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.cgmes.conversion.export.CgmesExportUtil;
 import com.powsybl.cgmes.conversion.naming.NamingStrategyFactory;
 import com.powsybl.cgmes.extensions.CgmesMetadataModels;
@@ -37,6 +40,7 @@ import com.powsybl.commons.datasource.MemDataSource;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +49,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -76,7 +81,7 @@ public class CgmesExportService {
     private final UrlValidationService urlValidationService;
     private final ProcessConfiguration processConfiguration;
 
-    private static final List<String> CGMES_PROFILES = List.of("EQ", "TP", "SSH");
+    private static final List<String> CGMES_PROFILES = List.of("TP", "SSH");
     private static final Properties TSO_FILES_EXPORT_PARAMS = new Properties();
     private static final Properties SV_FILE_EXPORT_PARAMS = new Properties();
 
@@ -102,12 +107,13 @@ public class CgmesExportService {
 
     public String buildAndExportLastSecureCgmesFiles(final DichotomyDirection direction,
                                                      final SweData sweData,
+                                                     final Path temporaryBoundariesDirectory,
                                                      final DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                                                      final SweTaskParameters sweTaskParameters) {
         if (dichotomyResult.hasValidStep()) {
             businessLogger.info("Start export of the Last Secure CGMES files");
             final DichotomyStepResult<SweDichotomyValidationData> highestValidStep = dichotomyResult.getHighestValidStep();
-            return buildAndExportCgmesFiles(direction, sweData, sweTaskParameters, highestValidStep, true);
+            return buildAndExportCgmesFiles(direction, sweData, temporaryBoundariesDirectory, sweTaskParameters, highestValidStep, true);
         } else {
             businessLogger.error("Dichotomy does not have a valid step, Last Secure CGMES files won't be exported");
             return null;
@@ -116,6 +122,7 @@ public class CgmesExportService {
 
     public String buildAndExportFirstUnsecureCgmesFiles(final DichotomyDirection direction,
                                                         final SweData sweData,
+                                                        final Path temporaryBoundariesDirectory,
                                                         final DichotomyResult<SweDichotomyValidationData> dichotomyResult,
                                                         final SweTaskParameters sweTaskParameters) {
         final DichotomyStepResult<SweDichotomyValidationData> lowestInvalidStep = dichotomyResult.getLowestInvalidStep();
@@ -126,15 +133,19 @@ public class CgmesExportService {
         }
 
         businessLogger.info("Start export of the First Unsecure CGMES files");
-        return buildAndExportCgmesFiles(direction, sweData, sweTaskParameters, lowestInvalidStep, false);
+        return buildAndExportCgmesFiles(direction, sweData, temporaryBoundariesDirectory, sweTaskParameters, lowestInvalidStep, false);
     }
 
     String buildAndExportCgmesFiles(final DichotomyDirection direction,
                                     final SweData sweData,
+                                    final Path temporaryBoundariesDirectory,
                                     final SweTaskParameters sweTaskParameters,
                                     final DichotomyStepResult<SweDichotomyValidationData> stepResult,
                                     final boolean isHighestValid) {
         final String networkWithPraUrl = stepResult.getValidationData().getRaoResponse().getNetworkWithPraFileUrl();
+
+        TSO_FILES_EXPORT_PARAMS.put(CgmesImport.BOUNDARY_LOCATION, temporaryBoundariesDirectory.toString());
+        LOGGER.info("BOUNDARY_LOCATION: {}", temporaryBoundariesDirectory);
 
         try (final InputStream networkIs = urlValidationService.openUrlStream(networkWithPraUrl)) {
             final Network networkWithPra = Network.read("networkWithPra.xiidm", networkIs);
@@ -165,7 +176,7 @@ public class CgmesExportService {
         List<String> outputSshIds = new ArrayList<>();
 //        mapCgmesFiles.putAll(createAllSshFiles(mergedNetwork, sweData, inputSshIds, outputSshIds));
         mapCgmesFiles.putAll(createCommonFile(mergedNetwork, sweData, inputSshIds, outputSshIds));
-//        mapCgmesFiles.putAll(retrieveEqAndTpFiles(sweData));
+        mapCgmesFiles.putAll(retrieveEqFiles(sweData));
         return mapCgmesFiles;
     }
 
@@ -192,6 +203,15 @@ public class CgmesExportService {
         return mapFiles;
     }
 
+    private Map<String, ByteArrayOutputStream> retrieveEqFiles(SweData sweData) throws IOException {
+        LOGGER.info("Retrieving EQ files");
+        Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
+        mapFiles.putAll(createOneFile(sweData, CgmesFileType.RTE_EQ));
+        mapFiles.putAll(createOneFile(sweData, CgmesFileType.REE_EQ));
+        mapFiles.putAll(createOneFile(sweData, CgmesFileType.REN_EQ));
+        return mapFiles;
+    }
+
     private Map<String, ByteArrayOutputStream> createTsoFiles(Network network, SweData sweData, String tso) throws IOException {
         updateControlAreasExtension(network);
         Map<String, ByteArrayOutputStream> mapFiles = new HashMap<>();
@@ -205,6 +225,23 @@ public class CgmesExportService {
 
     private static String getFormattedVersionString(int version) {
         return String.format("%03d", version);
+    }
+
+    private Map<String, ByteArrayOutputStream> createOneFile(SweData sweData, CgmesFileType cgmesFileType) throws IOException {
+        try (InputStream inputStream = getInputStreamFromData(sweData, cgmesFileType);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            IOUtils.copy(inputStream, outputStream);
+            return Map.of(buildCgmesFilename(sweData, cgmesFileType.getTso(), cgmesFileType.getFileType(), getFormattedVersionString(DEFAULT_VERSION)), outputStream);
+        }
+    }
+
+    private InputStream getInputStreamFromData(SweData sweData, CgmesFileType cgmesFileType) {
+        SweFileResource sweFileResource = sweData.getMapCgmesInputFiles().get(cgmesFileType);
+        if (sweFileResource != null) {
+            return fileImporter.importCgmesFiles(sweFileResource.getUrl());
+        } else {
+            throw new SweInvalidDataException(String.format("Can not find file associated with %s", cgmesFileType.name()));
+        }
     }
 
     private void updateControlAreasExtension(final Network network) {
