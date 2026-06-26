@@ -120,7 +120,7 @@ class DichotomyParallelizationTest {
     void testParallelization() {
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -236,7 +236,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -267,7 +267,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -351,7 +351,7 @@ class DichotomyParallelizationTest {
         when(interruptedSweDichotomyResult.isInterrupted()).thenReturn(true);
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -383,7 +383,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -414,7 +414,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);
@@ -445,7 +445,7 @@ class DichotomyParallelizationTest {
 
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(sweDichotomyResult);
         when(outputService.buildAndExportTtcDocument(any(SweData.class), any(ExecutionResult.class))).thenReturn("ttcDocUrl");
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any())).thenReturn("ok");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(), any(), any(), any(), any())).thenReturn("ok");
         when(sweDichotomyResult.getHighestValidStep()).thenReturn(highestValidStep);
         when(highestValidStep.getRaoResult()).thenReturn(raoResult);
         when(sweDichotomyResult.hasValidStep()).thenReturn(true);

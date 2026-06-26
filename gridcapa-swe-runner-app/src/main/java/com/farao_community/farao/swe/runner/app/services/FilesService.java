@@ -7,18 +7,29 @@
 package com.farao_community.farao.swe.runner.app.services;
 
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.EnumMap;
 import java.util.List;
@@ -28,6 +39,7 @@ import java.util.List;
  */
 @Service
 public class FilesService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
 
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_IDCC_JSON = "/crac/CimCracCreationParameters_PT-ES_IDCC.json";
     public static final String CRAC_CIM_CRAC_CREATION_PARAMETERS_PT_ES_D2CC_JSON = "/crac/CimCracCreationParameters_PT-ES_D2CC.json";
@@ -67,7 +79,9 @@ public class FilesService {
         String raoParametersEsFrUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_FR);
         String raoParametersEsPtUrl = fileExporter.saveRaoParameters(targetProcessDateTime, sweRequest.getProcessType(), sweTaskParameters, DichotomyDirection.ES_PT);
         EnumMap<CgmesFileType, SweFileResource> mapCgmesInputFiles = fillMapCgmesInputFiles(sweRequest);
-        return new SweData(sweRequest.getId(), sweRequest.getCurrentRunId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, hvdcInformationList, mapCgmesInputFiles);
+        List<SweFileResource> boundariesFiles = List.of(sweRequest.getBoundaryEq(), sweRequest.getBoundaryTp());
+
+        return new SweData(sweRequest.getId(), sweRequest.getCurrentRunId(), sweRequest.getTargetProcessDateTime(), sweRequest.getProcessType(), networkEsFr, networkFrEs, networkEsPt, networkPtEs, cracCreationContextFrEs, cracCreationContextEsPt, sweRequest.getGlsk().getUrl(), jsonCracPathEsPt, jsonCracPathFrEs, raoParametersEsFrUrl, raoParametersEsPtUrl, hvdcInformationList, mapCgmesInputFiles, boundariesFiles);
     }
 
     private EnumMap<CgmesFileType, SweFileResource> fillMapCgmesInputFiles(SweRequest sweRequest) {
@@ -83,5 +97,31 @@ public class FilesService {
         mapCgmesInputFiles.put(CgmesFileType.REN_EQ, sweRequest.getRenEq());
         mapCgmesInputFiles.put(CgmesFileType.REN_TP, sweRequest.getRenTp());
         return mapCgmesInputFiles;
+    }
+
+    public static Path createTemporaryBoundariesDirectory(final List<SweFileResource> sweFileResources) {
+        try {
+            final Path tempDirectory = Files.createTempDirectory("tmp_boundaries_");
+
+            LOGGER.info("Copying boundaries to temporary directory: {}", tempDirectory);
+            for (SweFileResource file : sweFileResources) {
+                final InputStream inputStream = new URI(file.getUrl()).toURL().openStream();
+                final File srcFile = new File(tempDirectory.toAbsolutePath() + File.separator + file.getFilename());
+                FileUtils.copyInputStreamToFile(inputStream, srcFile);
+            }
+
+            return tempDirectory.toAbsolutePath();
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
+            throw new SweInvalidDataException("Error creating boundaries temporary zip file", e);
+        }
+    }
+
+    public static void deleteTemporaryBoundariesDirectoryIfExists(final Path tempDirectory) throws IOException {
+        if (tempDirectory == null) {
+            return;
+        }
+
+        LOGGER.info("Deleting temporary boundaries directory: {}", tempDirectory);
+        FileUtils.deleteDirectory(tempDirectory.toFile());
     }
 }

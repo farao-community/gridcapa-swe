@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -74,8 +75,8 @@ class DichotomyParallelizationWorkerTest {
     void testRunDichotomyForOneDirection(final boolean exportFirstUnsecureShiftedCgm) throws ExecutionException, InterruptedException {
         DichotomyDirection direction = DichotomyDirection.ES_PT;
         when(dichotomyRunner.run(any(SweData.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(result);
-        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesLastSecureZipFileUrl");
-        when(cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesFirstUnsecureZipFileUrl");
+        when(cgmesExportService.buildAndExportLastSecureCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(Path.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesLastSecureZipFileUrl");
+        when(cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(any(DichotomyDirection.class), any(SweData.class), any(Path.class), any(DichotomyResult.class), any(SweTaskParameters.class))).thenReturn("cgmesFirstUnsecureZipFileUrl");
         when(cneFileExportService.exportCneUrl(any(SweData.class), any(DichotomyResult.class), anyBoolean(), any(DichotomyDirection.class))).thenReturn("CneUrl");
         when(voltageCheckService.runVoltageCheck(any(SweData.class), any(DichotomyResult.class), any(SweTaskParameters.class), any(DichotomyDirection.class))).thenReturn(Optional.empty());
         SweTaskParameters sweTaskParameters = Mockito.mock(SweTaskParameters.class);
@@ -99,7 +100,7 @@ class DichotomyParallelizationWorkerTest {
         verify(outputService, times(1)).buildAndExportVoltageDoc(any(DichotomyDirection.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class));
         verify(dichotomyLogging, times(1)).generateSummaryEvents(any(DichotomyDirection.class), any(DichotomyResult.class), any(SweData.class), any(Optional.class), any(SweTaskParameters.class), any(OffsetDateTime.class));
         final int wantedNumberOfInvocations = exportFirstUnsecureShiftedCgm ? 1 : 0;
-        verify(cgmesExportService, times(wantedNumberOfInvocations)).buildAndExportFirstUnsecureCgmesFiles(any(), any(), any(), any());
+        verify(cgmesExportService, times(wantedNumberOfInvocations)).buildAndExportFirstUnsecureCgmesFiles(any(), any(), any(), any(), any());
     }
 
     @Test

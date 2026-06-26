@@ -38,8 +38,9 @@ public class SweData {
     private final String raoParametersEsPtUrl;
     private final List<HvdcInformation> hvdcInformationList;
     private final Map<CgmesFileType, SweFileResource> mapCgmesInputFiles;
+    private final List<SweFileResource> boundariesFiles;
 
-    public SweData(String id, String runId, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, List<HvdcInformation> hvdcInformationList, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles) {
+    public SweData(String id, String runId, OffsetDateTime timestamp, ProcessType processType, Network networkEsFr, Network networkFrEs, Network networkEsPt, Network networkPtEs, CimCracCreationContext cracFrEs, CimCracCreationContext cracEsPt, String glskUrl, String jsonCracPathEsPt, String jsonCracPathFrEs, String raoParametersEsFrUrl, String raoParametersEsPtUrl, List<HvdcInformation> hvdcInformationList, Map<CgmesFileType, SweFileResource> mapCgmesInputFiles, final List<SweFileResource> boundariesFiles) {
         this.id = id;
         this.runId = runId;
         this.timestamp = timestamp;
@@ -57,6 +58,7 @@ public class SweData {
         this.raoParametersEsPtUrl = raoParametersEsPtUrl;
         this.hvdcInformationList = hvdcInformationList;
         this.mapCgmesInputFiles = mapCgmesInputFiles;
+        this.boundariesFiles = boundariesFiles;
     }
 
     public String getId() {
@@ -127,4 +129,7 @@ public class SweData {
         return mapCgmesInputFiles;
     }
 
+    public List<SweFileResource> getBoundariesFiles() {
+        return boundariesFiles;
+    }
 }
