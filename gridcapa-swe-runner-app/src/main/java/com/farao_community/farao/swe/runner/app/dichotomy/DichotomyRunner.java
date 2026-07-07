@@ -66,7 +66,7 @@ public class DichotomyRunner {
         final DichotomyParameters dichotomyParameters = getDichotomyParameters(sweTaskParameters, direction);
         dichotomyLogging.logStartDichotomy(dichotomyParameters);
         final DichotomyEngine<SweDichotomyValidationData> engine =
-            buildDichotomyEngine(sweData, direction, dichotomyParameters, getLoadFlowParameters(sweTaskParameters));
+            buildDichotomyEngine(sweData, direction, dichotomyParameters, getLoadFlowParameters(sweTaskParameters), sweTaskParameters);
 
         final Network networkForDirection = getNetworkByDirection(sweData, direction);
 
@@ -76,13 +76,14 @@ public class DichotomyRunner {
     DichotomyEngine<SweDichotomyValidationData> buildDichotomyEngine(final SweData sweData,
                                                                      final DichotomyDirection direction,
                                                                      final DichotomyParameters parameters,
-                                                                     final LoadFlowParameters loadFlowParameters) {
+                                                                     final LoadFlowParameters loadFlowParameters,
+                                                                     final SweTaskParameters sweTaskParameters) {
         return DichotomyEngine.<SweDichotomyValidationData>builder()
             .withIndex(new Index<>(parameters.minValue(), parameters.maxValue(), parameters.precision()))
             .withIndexStrategy(HALF_INDEX_STRATEGY_CONFIGURATION)
             .withInterruptionStrategy(interruptionService)
             .withNetworkShifter(networkShifterProvider.get(sweData, direction, loadFlowParameters, parameters.runGlskChecksBeforeLoadFlow()))
-            .withNetworkValidator(getNetworkValidator(sweData, direction, parameters.runAngleCheck(), loadFlowParameters))
+            .withNetworkValidator(getNetworkValidator(sweData, direction, parameters.runAngleCheck(), loadFlowParameters, sweTaskParameters))
             .withRunId(sweData.getId())
             .build();
     }
@@ -90,9 +91,10 @@ public class DichotomyRunner {
     private NetworkValidator<SweDichotomyValidationData> getNetworkValidator(final SweData sweData,
                                                                              final DichotomyDirection direction,
                                                                              final boolean runAngleCheck,
-                                                                             final LoadFlowParameters loadFlowParameters) {
+                                                                             final LoadFlowParameters loadFlowParameters,
+                                                                             final SweTaskParameters sweTaskParameters) {
         return new RaoValidator(
-            fileExporter, fileImporter, raoRunnerClient, sweData, direction, runAngleCheck, loadFlowParameters, businessLogger
+            fileExporter, fileImporter, raoRunnerClient, sweData, direction, runAngleCheck, loadFlowParameters, businessLogger, sweTaskParameters
         );
     }
 

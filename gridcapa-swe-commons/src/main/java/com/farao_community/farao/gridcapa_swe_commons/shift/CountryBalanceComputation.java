@@ -8,8 +8,8 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweBaseCaseUnsecureException;
 import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
-import com.powsybl.balances_adjustment.util.BorderBasedCountryArea;
-import com.powsybl.balances_adjustment.util.CountryAreaFactory;
+import com.powsybl.networkarea.BorderBasedCountryArea;
+import com.powsybl.networkarea.CountryAreaFactory;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;

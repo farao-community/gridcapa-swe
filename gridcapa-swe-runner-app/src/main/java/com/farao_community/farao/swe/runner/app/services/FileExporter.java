@@ -20,6 +20,7 @@ import com.farao_community.farao.swe.runner.app.voltage.json.FailureVoltageCheck
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.powsybl.commons.datasource.MemDataSource;
+import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
@@ -200,7 +201,7 @@ public class FileExporter {
     public String saveRaoParameters(OffsetDateTime timestamp, ProcessType processType, SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
         RaoParameters raoParameters = getSweRaoParameters(sweTaskParameters);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        JsonRaoParameters.write(raoParameters, baos);
+        JsonRaoParameters.write(raoParameters, baos, ReportNode.NO_OP);
         String raoParametersFileName = String.format(RAO_PARAMETERS_FILE_NAME, direction);
         String raoParametersDestinationPath = makeDestinationMinioPath(timestamp, FileKind.ARTIFACTS) + raoParametersFileName;
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -208,8 +209,8 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(raoParametersDestinationPath);
     }
 
-    RaoParameters getSweRaoParameters(final SweTaskParameters sweTaskParameters) {
-        final RaoParameters raoParameters = RaoParameters.load();
+    public RaoParameters getSweRaoParameters(final SweTaskParameters sweTaskParameters) {
+        final RaoParameters raoParameters = RaoParameters.load(ReportNode.NO_OP);
         if (sweTaskParameters.isSecondPreventiveRaoDisabled() && raoParameters.hasExtension(OpenRaoSearchTreeParameters.class)) {
             raoParameters.getExtension(OpenRaoSearchTreeParameters.class).getSecondPreventiveRaoParameters().setExecutionCondition(ExecutionCondition.DISABLED);
         }

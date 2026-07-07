@@ -22,8 +22,10 @@ import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
+import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -35,6 +37,7 @@ import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.monitoring.Monitoring;
 import com.powsybl.openrao.monitoring.MonitoringInput;
 import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
+import com.powsybl.openrao.pstregulation.PstRegulation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,11 +56,12 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private final DichotomyDirection direction;
     private final boolean runAngleCheck;
     private final LoadFlowParameters loadFlowParameters;
+    private final SweTaskParameters sweTaskParameters;
     private int variantCounter = 0;
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters, Logger businessLogger) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters, Logger businessLogger, final SweTaskParameters sweTaskParameters) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoRunnerClient = raoRunnerClient;
@@ -66,6 +70,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         this.runAngleCheck = runAngleCheck;
         this.loadFlowParameters = loadFlowParameters;
         this.businessLogger = businessLogger;
+        this.sweTaskParameters = sweTaskParameters;
     }
 
     @Override
@@ -125,6 +130,11 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                                     SweDichotomyValidationData.AngleMonitoringStatus.UNSECURE),
                             false);
                 }
+            } else if (!isPortugalInDirection()) {
+                final Crac crac = sweData.getCracFrEs().getCrac();
+                final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
+                return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
+
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
         } catch (RuntimeException e) {

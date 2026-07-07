@@ -18,6 +18,7 @@ import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
+import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.glsk.cim.CimGlskDocument;
@@ -81,12 +82,14 @@ class RaoValidatorTest {
     private CimCracCreationContext cimCracCreationContext;
     @Mock
     private CimGlskDocument cimGlskDocument;
+    @Mock
+    private SweTaskParameters sweTaskParameters;
 
     private static final Instant CURATIVE_INSTANT = Mockito.mock(Instant.class);
 
     @Test
     void simpleTestPortugalSecureWithAngleCheckParameterTrue() throws RaoFailureException {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, true, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, true, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -121,7 +124,7 @@ class RaoValidatorTest {
 
     @Test
     void simpleTestPortugalUnsecureWithAngleCheckParameterTrue() throws RaoFailureException {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, true, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, true, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -149,7 +152,7 @@ class RaoValidatorTest {
 
     @Test
     void simpleTestPortugal3() throws RaoFailureException {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.PT_ES, true, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.PT_ES, true, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -184,11 +187,12 @@ class RaoValidatorTest {
     @Test
     void simpleTestFranceWithAngleCheckParameterTrue() throws RaoFailureException {
 
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.FR_ES, true, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.FR_ES, true, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
         when(fileExporter.saveNetworkInArtifact(any(Network.class), anyString(), anyString(), any(OffsetDateTime.class), any(ProcessType.class))).thenReturn("an-url");
+        when(fileExporter.getSweRaoParameters(any())).thenCallRealMethod();
         when(raoRunnerClient.runRao(any(RaoRequest.class))).thenReturn(raoResponse);
         when(raoResponse.getRaoResultFileUrl()).thenReturn("http://result-file-url");
         when(raoResponse.getCracFileUrl()).thenReturn("crac-file-url");
@@ -196,6 +200,7 @@ class RaoValidatorTest {
         when(fileImporter.importRaoResult(anyString(), any(Crac.class))).thenReturn(raoResult);
         when(raoResult.getFunctionalCost(Mockito.any())).thenReturn(-1.0);
         when(sweData.getCracEsPt()).thenReturn(cimCracCreationContext);
+        when(sweData.getCracFrEs()).thenReturn(cimCracCreationContext);
         when(sweData.getGlskUrl()).thenReturn("glsk-url");
         when(cimCracCreationContext.getCrac()).thenReturn(crac);
         when(fileImporter.importCimGlskDocument(anyString())).thenReturn(cimGlskDocument);
@@ -213,7 +218,7 @@ class RaoValidatorTest {
 
     @Test
     void simpleTestPortugalWithAngleCheckParameterFalse() throws RaoFailureException {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -242,7 +247,7 @@ class RaoValidatorTest {
 
     @Test
     void simpleTestSoftInterruption() {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -257,7 +262,7 @@ class RaoValidatorTest {
     @Test
     void simpleTestRaoFailure() {
         final RaoFailureResponse raoFailureResponse = new RaoFailureResponse.Builder().withId("id").withErrorMessage("error").build();
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");
@@ -270,7 +275,7 @@ class RaoValidatorTest {
 
     @Test
     void simpleTestRunRaoThrowsException() {
-        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger);
+        RaoValidator raoValidator = new RaoValidator(fileExporter, fileImporter, raoRunnerClient, sweData, DichotomyDirection.ES_PT, false, LoadFlowParameters.load(), businessLogger, sweTaskParameters);
         when(network.getVariantManager()).thenReturn(variantManager);
         when(network.getNameOrId()).thenReturn("network-id");
         when(variantManager.getWorkingVariantId()).thenReturn("variant-id");

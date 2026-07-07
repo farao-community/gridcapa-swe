@@ -70,6 +70,8 @@ class DichotomyRunnerTest {
     private DichotomyParameters dichotomyParameters;
     @Mock
     private LoadFlowParameters loadFlowParameters;
+    @Mock
+    private SweTaskParameters sweTaskParameters;
 
     Network network = mock(Network.class);
     DichotomyResult<AbstractRaoResponse> mockDichotomyResult = mock(DichotomyResult.class);
@@ -91,7 +93,7 @@ class DichotomyRunnerTest {
         when(fileExporter.saveRaoParameters(eq(OffsetDateTime.now()), eq(D2CC), any(SweTaskParameters.class), eq(ES_FR)))
             .thenReturn("raoParameters.json");
 
-        assertNotNull(dichotomyRunner.buildDichotomyEngine(sweData, ES_FR, dichotomyParameters, loadFlowParameters));
+        assertNotNull(dichotomyRunner.buildDichotomyEngine(sweData, ES_FR, dichotomyParameters, loadFlowParameters, sweTaskParameters));
     }
 
     @Test
@@ -104,7 +106,7 @@ class DichotomyRunnerTest {
 
         doReturn(mockEngine)
             .when(spyDichotomyRunner)
-            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture());
+            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture(), any(SweTaskParameters.class));
 
         assertEquals(mockDichotomyResult, spyDichotomyRunner.run(sweData, getSweTaskParameters(), ES_FR));
 
@@ -130,7 +132,7 @@ class DichotomyRunnerTest {
 
         doReturn(mockEngine)
             .when(spyDichotomyRunner)
-            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture());
+            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture(), any(SweTaskParameters.class));
 
         assertEquals(mockDichotomyResult, spyDichotomyRunner.run(sweData, getSweTaskParameters(), FR_ES));
 
@@ -156,7 +158,7 @@ class DichotomyRunnerTest {
 
         doReturn(mockEngine)
             .when(spyDichotomyRunner)
-            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture());
+            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture(), any(SweTaskParameters.class));
 
         assertEquals(mockDichotomyResult, spyDichotomyRunner.run(sweData, getSweTaskParameters(), ES_PT));
 
@@ -181,7 +183,7 @@ class DichotomyRunnerTest {
 
         doReturn(mockEngine)
             .when(spyDichotomyRunner)
-            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture());
+            .buildDichotomyEngine(anySweData(), anyDirection(), dichotomyParametersCaptor.capture(), loadFlowParametersCaptor.capture(), any(SweTaskParameters.class));
 
         assertEquals(mockDichotomyResult, spyDichotomyRunner.run(sweData, getSweTaskParameters(), PT_ES));
 
