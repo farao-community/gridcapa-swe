@@ -71,6 +71,10 @@
             <artifactId>open-rao-crac-io-json</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-pst-regulation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-task-manager-api</artifactId>
         </dependency>
