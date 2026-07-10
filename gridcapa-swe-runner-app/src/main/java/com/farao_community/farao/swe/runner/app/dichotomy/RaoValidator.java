@@ -37,7 +37,7 @@ import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.monitoring.Monitoring;
 import com.powsybl.openrao.monitoring.MonitoringInput;
 import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
-import com.powsybl.openrao.pstregulation.PstRegulation;
+import com.farao_community.farao.pstregulation.PstRegulation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
