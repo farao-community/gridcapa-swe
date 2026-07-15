@@ -134,7 +134,9 @@ public final class PstRegulation {
             network.getVariantManager().setWorkingVariant(initialVariantId);
             return mergePstRegulationResultsWithRaoResult(pstRegulationResults, raoResult, network, crac, raoParameters, pstRegulationReportNode);
         } catch (Exception e) {
-            Thread.currentThread().interrupt();
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             PstRegulationReports.reportErrorDuringPstRegulation(pstRegulationReportNode, e.getMessage());
             return raoResult;
         } finally {
