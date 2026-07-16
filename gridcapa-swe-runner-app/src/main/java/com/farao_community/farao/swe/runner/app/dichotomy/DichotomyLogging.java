@@ -66,8 +66,8 @@ public class DichotomyLogging {
 
     public void logStartDichotomy(final DichotomyParameters parameters) {
         businessLogger.info(
-            "Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}",
-            parameters.minValue(), parameters.maxValue(), parameters.precision()
+                "Start dichotomy : minimum dichotomy index: {}, maximum dichotomy index: {}, dichotomy precision: {}",
+                parameters.minValue(), parameters.maxValue(), parameters.precision()
         );
     }
 
@@ -91,8 +91,10 @@ public class DichotomyLogging {
         String limitingCause;
         final String timestamp = getTimestampLocalized(sweData.getTimestamp());
         final String lastSecureTtc = String.valueOf((int) dichotomyResult.getHighestValidStepValue());
-        final String firstUnsecureTtc = String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
-        final String voltageCheckStatus =  getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
+        final String firstUnsecureTtc = (dichotomyResult.getLowestInvalidStep() == null)
+                ? getMaxttc(sweTaskParameters, direction)
+                : String.valueOf((int) dichotomyResult.getLowestInvalidStepValue());
+        final String voltageCheckStatus = getVoltageCheckResult(direction, voltageMonitoringResult, sweTaskParameters);
         String angleCheckStatus = NONE;
         final Crac crac = (isBetweenFranceAndSpain(direction) ? sweData.getCracFrEs() : sweData.getCracEsPt()).getCrac();
 
@@ -120,16 +122,25 @@ public class DichotomyLogging {
             printableCrasIds = toString(getActivatedActionInCurative(crac, raoResult));
 
             if (dichotomyResult.getHighestValidStep().getValidationData() != null
-                && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus() != null) {
+                    && dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus() != null) {
                 angleCheckStatus = dichotomyResult.getHighestValidStep().getValidationData().getAngleMonitoringStatus().name();
             }
         }
         final Duration difference = Duration.between(startTime, OffsetDateTime.now());
         businessLogger.info(SUMMARY, limitingCause, limitingElement, printablePrasIds, printableCrasIds);
         businessLogger.info(
-            SUMMARY_BD, timestamp, lastSecureTtc, firstUnsecureTtc, voltageCheckStatus, angleCheckStatus,
-            difference.toHours(), difference.toMinutesPart(), difference.toSecondsPart()
+                SUMMARY_BD, timestamp, lastSecureTtc, firstUnsecureTtc, voltageCheckStatus, angleCheckStatus,
+                difference.toHours(), difference.toMinutesPart(), difference.toSecondsPart()
         );
+    }
+
+    private String getMaxttc(SweTaskParameters sweTaskParameters, DichotomyDirection direction) {
+        return switch (direction) {
+            case ES_PT -> String.valueOf(sweTaskParameters.getMaxTtcEsPt());
+            case PT_ES -> String.valueOf(sweTaskParameters.getMaxTtcPtEs());
+            case ES_FR -> String.valueOf(sweTaskParameters.getMaxTtcEsFr());
+            case FR_ES -> String.valueOf(sweTaskParameters.getMaxTtcFrEs());
+        };
     }
 
     private static boolean hasRaoResult(final DichotomyStepResult<?> stepResult) {
@@ -141,8 +152,8 @@ public class DichotomyLogging {
     }
 
     private static String getVoltageCheckResult(final DichotomyDirection direction,
-                                         final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
-                                         final SweTaskParameters sweTaskParameters) {
+                                                final Optional<RaoResultWithVoltageMonitoring> voltageMonitoringResult,
+                                                final SweTaskParameters sweTaskParameters) {
         if (sweTaskParameters.isRunVoltageCheck() && isBetweenFranceAndSpain(direction)) {
             if (voltageMonitoringResult.isPresent()) {
                 return String.valueOf(voltageMonitoringResult.get().getSecurityStatus());
