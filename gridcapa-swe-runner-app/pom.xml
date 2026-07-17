@@ -50,6 +50,11 @@
         <!-- Compile dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>gridcapa-pst-regulation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>gridcapa-swe-runner-api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -69,10 +74,6 @@
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-crac-io-json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-pst-regulation</artifactId>
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>

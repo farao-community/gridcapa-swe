@@ -37,7 +37,7 @@ import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.monitoring.Monitoring;
 import com.powsybl.openrao.monitoring.MonitoringInput;
 import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
-import com.powsybl.openrao.pstregulation.PstRegulation;
+import com.farao_community.farao.pstregulation.PstRegulation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +134,6 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                 final Crac crac = sweData.getCracFrEs().getCrac();
                 final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
                 return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
-
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
         } catch (RuntimeException e) {
