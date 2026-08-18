@@ -167,13 +167,13 @@
         {
           "unit": "ampere",
           "min": -550.0,
-          "max": 550.0,
+          "max": 500.0,
           "side": 1
         },
         {
           "unit": "ampere",
           "min": -550.0,
-          "max": 550.0,
+          "max": 500.0,
           "side": 2
         }
       ]

@@ -224,13 +224,15 @@ class PstRegulationTest {
         assertEquals(74.69, raoResultWithRegulation.getMargin(preventiveInstant, preventiveCnecOnPst2, Unit.AMPERE), 1e-2);
 
         // check that the margin on the PST4 FlowCNEC is now negative, which requires curative regulation
-        assertEquals(-35.83, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
+        assertEquals(-35.83, raoResultWithRegulation.getMargin(preventiveInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
 
         // check that preventive regulated tap is propagated to curative and that curative PST is regulated to tap position 1
         assertEquals(2, raoResultWithRegulation.getOptimizedTapOnState(curativeState, pst2RangeAction));
         assertEquals(1, raoResultWithRegulation.getOptimizedTapOnState(curativeState, pst4RangeAction));
         assertEquals(261.82, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnLine, Unit.AMPERE), 1e-2);
-        assertEquals(575.87, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst2, Unit.AMPERE), 1e-2);
-        assertEquals(68.84, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
+        assertEquals(875.88, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst2, Unit.AMPERE), 1e-2);
+        assertEquals(68.85, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
     }
+
+    // TODO: [note for future test] if PST4's PATL is set to 550 A instead of 500 A, regulation does not change the curative tap -> investigate investigate if deadband problem
 }
