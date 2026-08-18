@@ -137,7 +137,7 @@ class PstRegulationTest {
 
     @Test
     void testPreventiveRegulationResultsPropagateToCurativeScenarios() throws IOException {
-        final Network network = Network.read("2Nodes4ParallelLines3PSTs.uct", getClass().getResourceAsStream("/network/2Nodes4ParallelLines3PSTs.uct"));
+        final Network network = Network.read("2Nodes4ParallelLines2PSTs.uct", getClass().getResourceAsStream("/network/2Nodes4ParallelLines2PSTs.uct"));
         final Crac crac = Crac.read("crac-regulation-preventive-only.json", getClass().getResourceAsStream("/crac/crac-regulation-preventive-only.json"), network);
         final RaoInput raoInput = RaoInput.build(network, crac).build();
         final RaoParameters raoParameters = JsonRaoParameters.read(getClass().getResourceAsStream("/parameters/RaoParameters_ac_1pstRegulation.json"), ReportNode.NO_OP);
@@ -165,7 +165,7 @@ class PstRegulationTest {
         assertEquals(366.50, raoResult.getMargin(curativeInstant, curativeCnecOnLine, Unit.AMPERE), 1e-2);
         assertEquals(823.54, raoResult.getMargin(curativeInstant, curativeCnecOnPst, Unit.AMPERE), 1e-2);
 
-        // run PST regulation -> PST will be pushed up to tap position 4
+        // run PST regulation -> PST will be pushed up to tap position 2
         final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP);
 
         assertEquals(79.38, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
@@ -178,5 +178,59 @@ class PstRegulationTest {
         assertEquals(2, raoResultWithRegulation.getOptimizedTapOnState(curativeState, pstRangeAction));
         assertEquals(314.16, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnLine, Unit.AMPERE), 1e-2);
         assertEquals(928.22, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst, Unit.AMPERE), 1e-2);
+    }
+
+    @Test
+    void testPreventiveRegulationTriggersCurativeRegulation() throws IOException {
+        final Network network = Network.read("2Nodes4ParallelLines2PSTs.uct", getClass().getResourceAsStream("/network/2Nodes4ParallelLines2PSTs.uct"));
+        final Crac crac = Crac.read("crac-regulation-preventive-and-curative.json", getClass().getResourceAsStream("/crac/crac-regulation-preventive-and-curative.json"), network);
+        final RaoInput raoInput = RaoInput.build(network, crac).build();
+        final RaoParameters raoParameters = JsonRaoParameters.read(getClass().getResourceAsStream("/parameters/RaoParameters_ac_2pstRegulation.json"), ReportNode.NO_OP);
+
+        Instant preventiveInstant = crac.getPreventiveInstant();
+        Instant curativeInstant = crac.getLastInstant();
+        State preventiveState = crac.getPreventiveState();
+        State curativeState = crac.getState("Contingency BE1 FR1 3", crac.getLastInstant());
+        PstRangeAction pst2RangeAction = crac.getPstRangeAction("pstBeFr2");
+        PstRangeAction pst4RangeAction = crac.getPstRangeAction("pstBeFr4");
+        FlowCnec preventiveCnecOnLine = crac.getFlowCnec("cnecBeFr1Preventive");
+        FlowCnec preventiveCnecOnPst2 = crac.getFlowCnec("cnecBeFr2Preventive");
+        FlowCnec curativeCnecOnLine = crac.getFlowCnec("cnecBeFr1Curative");
+        FlowCnec curativeCnecOnPst2 = crac.getFlowCnec("cnecBeFr2Curative");
+        FlowCnec curativeCnecOnPst4 = crac.getFlowCnec("cnecBeFr4Curative");
+
+        // run RAO
+        final RaoResult raoResult = new Castor().run(raoInput, raoParameters, null, ReportNode.NO_OP).join();
+
+        // check initial results
+        assertEquals(43.08, raoResult.getCost(crac.getLastInstant()), 1e-2);
+
+        assertEquals(1, raoResult.getOptimizedTapOnState(preventiveState, pst2RangeAction));
+        assertEquals(-40.11, raoResult.getMargin(preventiveInstant, preventiveCnecOnLine, Unit.AMPERE), 1e-2);
+        assertEquals(-43.08, raoResult.getMargin(preventiveInstant, preventiveCnecOnPst2, Unit.AMPERE), 1e-2);
+
+        assertEquals(0, raoResult.getOptimizedTapOnState(curativeState, pst4RangeAction));
+        assertEquals(366.50, raoResult.getMargin(curativeInstant, curativeCnecOnLine, Unit.AMPERE), 1e-2);
+        assertEquals(823.54, raoResult.getMargin(curativeInstant, curativeCnecOnPst2, Unit.AMPERE), 1e-2);
+        assertEquals(16.51, raoResult.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
+
+        // run PST regulation -> PST will be pushed up to tap position 2 making second PST overloaded in curative
+        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP);
+
+        assertEquals(79.38, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
+
+        assertEquals(2, raoResultWithRegulation.getOptimizedTapOnState(preventiveState, pst2RangeAction));
+        assertEquals(-79.38, raoResultWithRegulation.getMargin(preventiveInstant, preventiveCnecOnLine, Unit.AMPERE), 1e-2);
+        assertEquals(74.69, raoResultWithRegulation.getMargin(preventiveInstant, preventiveCnecOnPst2, Unit.AMPERE), 1e-2);
+
+        // check that the margin on the PST4 FlowCNEC is now negative, which requires curative regulation
+        assertEquals(-35.83, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
+
+        // check that preventive regulated tap is propagated to curative and that curative PST is regulated to tap position 1
+        assertEquals(2, raoResultWithRegulation.getOptimizedTapOnState(curativeState, pst2RangeAction));
+        assertEquals(1, raoResultWithRegulation.getOptimizedTapOnState(curativeState, pst4RangeAction));
+        assertEquals(261.82, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnLine, Unit.AMPERE), 1e-2);
+        assertEquals(575.87, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst2, Unit.AMPERE), 1e-2);
+        assertEquals(68.84, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
     }
 }
