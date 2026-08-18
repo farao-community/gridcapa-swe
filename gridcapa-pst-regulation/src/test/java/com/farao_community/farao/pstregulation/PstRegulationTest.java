@@ -63,7 +63,7 @@ class PstRegulationTest {
         assertEquals("3 contingency scenario(s) to regulate: Contingency FR 12, Contingency FR 23, Contingency FR 34", logMessages.get(1));
 
         // PST FR2-FR3 is only preventive so it cannot be regulated
-        assertEquals("PST FFR2AA1  FFR3AA1  2 cannot be regulated as no curative PST range action was defined for it.", logMessages.get(5));
+        assertEquals("PST FFR1AA1  FFR2AA1  2 cannot be regulated as no PST range action was defined for it for instant preventive.", logMessages.get(5));
 
         // Contingency FR1-FR2
         assertEquals(-15, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 12", crac.getLastInstant()), pst12));
