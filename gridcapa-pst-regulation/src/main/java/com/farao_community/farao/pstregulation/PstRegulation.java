@@ -64,7 +64,7 @@ import static com.powsybl.openrao.raoapi.parameters.extensions.MultithreadingPar
  */
 public final class PstRegulation {
     private static final String PST_REGULATION_VARIANT = "PSTRegulation";
-    private static final String PREVENTIVE_REGULATION_VARIANT = "PSTRegulation";
+    private static final String PREVENTIVE_REGULATION_VARIANT = "PreventiveRegulation";
 
     private PstRegulation() {
     }
@@ -111,7 +111,6 @@ public final class PstRegulation {
                     reportNode
                 ))
             .orElse(raoResult);
-        // TODO: pay attention to variants when merging results
 
         // 3. Curative PST regulation
 
@@ -481,6 +480,9 @@ public final class PstRegulation {
 
         RangeActionActivationResultImpl preventiveRangeActionActivationResult = new RangeActionActivationResultImpl(initialFlowResult);
         raoResult.getActivatedRangeActionsDuringState(preventiveState).forEach(rangeAction -> preventiveRangeActionActivationResult.putResult(rangeAction, preventiveState, raoResult.getOptimizedSetPointOnState(preventiveState, rangeAction)));
+        if (resultsPerState.containsKey(preventiveState)) {
+            resultsPerState.get(preventiveState).regulatedTapPerPst().forEach((pstRangeAction, tap) -> preventiveRangeActionActivationResult.putResult(pstRangeAction, preventiveState, pstRangeAction.convertTapToAngle(tap)));
+        }
 
         final OptimizationResult preventiveResult = new OptimizationResultImpl(
             preventivePrePerimeterResult, preventivePrePerimeterResult, preventivePrePerimeterResult,
