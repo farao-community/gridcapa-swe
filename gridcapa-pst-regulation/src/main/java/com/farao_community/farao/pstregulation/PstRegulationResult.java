@@ -15,5 +15,5 @@ import java.util.Map;
 /**
  * @author Thomas Bouquet {@literal <thomas.bouquet at rte-france.com>}
  */
-public record PstRegulationResult(Contingency contingency, Map<PstRangeAction, Integer> regulatedTapPerPst) {
+public record PstRegulationResult(Contingency contingency, Map<PstRangeAction, Integer> regulatedTapByPst) {
 }
