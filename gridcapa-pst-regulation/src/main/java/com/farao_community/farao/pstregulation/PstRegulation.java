@@ -398,25 +398,11 @@ public final class PstRegulation {
                                                            final Map<PstRangeAction, Integer> regulatedTapByPst,
                                                            final FlowCnec mostLimitingElement,
                                                            final ReportNode reportNode) {
-        List<PstRangeAction> sortedPstRangeActions = initialTapByPst.keySet().stream()
-            .sorted(Comparator.comparing(PstRangeAction::getId))
-            .toList();
-        List<String> shiftDetails = new ArrayList<>();
-        sortedPstRangeActions.forEach(
-            pstRangeAction -> {
-                int initialTap = initialTapByPst.get(pstRangeAction);
-                int regulatedTap = regulatedTapByPst.get(pstRangeAction);
-                if (initialTap != regulatedTap) {
-                    shiftDetails.add("%s (%s -> %s)".formatted(pstRangeAction.getName(), initialTap, regulatedTap));
-                }
-            }
+        getRegulationSummary(initialTapByPst, regulatedTapByPst).ifPresent(
+            regulationSummary -> PstRegulationReports.reportPreventivePstRegulationTriggeredDueToOverloadedFlowCnec(
+                reportNode, mostLimitingElement.getId(), regulationSummary
+            )
         );
-        String allShiftedPstsDetails = shiftDetails.isEmpty() ? "no PST shifted" : String.join(", ", shiftDetails);
-        if (!shiftDetails.isEmpty()) {
-            PstRegulationReports.reportPreventivePstRegulationTriggeredDueToOverloadedFlowCnec(
-                reportNode, mostLimitingElement.getId(), allShiftedPstsDetails
-            );
-        }
     }
 
     private static void logPstRegulationResultsForContingencyScenario(final Contingency contingency,
@@ -424,6 +410,15 @@ public final class PstRegulation {
                                                                       final Map<PstRangeAction, Integer> regulatedTapByPst,
                                                                       final FlowCnec mostLimitingElement,
                                                                       final ReportNode reportNode) {
+        getRegulationSummary(initialTapByPst, regulatedTapByPst).ifPresent(
+            regulationSummary -> PstRegulationReports.reportPstRegulationTriggeredDueToOverloadedFlowCnec(
+                reportNode, mostLimitingElement.getId(), contingency.getName().orElse(contingency.getId()), regulationSummary
+            )
+        );
+    }
+
+    private static Optional<String> getRegulationSummary(final Map<PstRangeAction, Integer> initialTapByPst,
+                                               final Map<PstRangeAction, Integer> regulatedTapByPst) {
         List<PstRangeAction> sortedPstRangeActions = initialTapByPst.keySet().stream()
             .sorted(Comparator.comparing(PstRangeAction::getId))
             .toList();
@@ -437,12 +432,7 @@ public final class PstRegulation {
                 }
             }
         );
-        String allShiftedPstsDetails = shiftDetails.isEmpty() ? "no PST shifted" : String.join(", ", shiftDetails);
-        if (!shiftDetails.isEmpty()) {
-            PstRegulationReports.reportPstRegulationTriggeredDueToOverloadedFlowCnec(
-                reportNode, mostLimitingElement.getId(), contingency.getName().orElse(contingency.getId()), allShiftedPstsDetails
-            );
-        }
+        return shiftDetails.isEmpty() ? Optional.empty() : Optional.of(String.join(", ", shiftDetails));
     }
 
     private static RaoResult mergePstRegulationAndRaoResults(final Set<PstRegulationResult> pstRegulationResults,
