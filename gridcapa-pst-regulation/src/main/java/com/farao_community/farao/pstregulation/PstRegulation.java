@@ -368,6 +368,12 @@ public final class PstRegulation {
                                                                     final Crac crac,
                                                                     final RaoParameters raoParameters,
                                                                     final ReportNode reportNode) {
+        // store network variants data
+        final String initialStateVariantId = "InitialState"; // default variant id imported by PowSyBl
+        final String initialVariantId = network.getVariantManager().getWorkingVariantId();
+        final Set<String> initialVariantsIds = new HashSet<>(network.getVariantManager().getVariantIds());
+        network.getVariantManager().setWorkingVariant(initialStateVariantId);
+
         final Map<State, PstRegulationResult> resultsPerState = pstRegulationResults.stream()
             .collect(Collectors.toMap(
                 pstRegulationResult -> crac.getState(pstRegulationResult.contingency(), crac.getLastInstant()),
@@ -491,6 +497,14 @@ public final class PstRegulation {
         );
         final String executionDetails = String.format("%s %s", raoResult.getExecutionDetails(), "and went through PST regulation");
         postRegulationRaoResult.setExecutionDetails(executionDetails);
+
+        // post-process variants
+        network.getVariantManager().setWorkingVariant(initialVariantId);
+        Set<String> variantsToRemove = network.getVariantManager().getVariantIds()
+            .stream()
+            .filter(variantId -> !initialVariantsIds.contains(variantId))
+            .collect(Collectors.toSet());
+        variantsToRemove.forEach(network.getVariantManager()::removeVariant);
 
         return postRegulationRaoResult;
     }
