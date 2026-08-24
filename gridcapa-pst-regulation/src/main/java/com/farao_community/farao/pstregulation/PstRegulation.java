@@ -110,9 +110,15 @@ public final class PstRegulation {
                     network,
                     crac,
                     raoParameters,
-                    reportNode
+                    reportNode,
+                    initialVariantId
                 ))
             .orElse(raoResult);
+
+        network.getVariantManager().setWorkingVariant(PST_REGULATION_VARIANT);
+        preventiveRegulationResult.ifPresent(regulationResult -> {
+            regulationResult.regulatedTapByPst().forEach((pstRangeAction, tap) -> pstRangeAction.apply(network, pstRangeAction.convertTapToAngle(tap)));
+        });
 
         // 3. Curative PST regulation
 
@@ -155,7 +161,7 @@ public final class PstRegulation {
             }
             networkPool.shutdownAndAwaitTermination(1000, TimeUnit.SECONDS);
             network.getVariantManager().setWorkingVariant(initialVariantId);
-            return mergePstRegulationAndRaoResults(pstRegulationResults, postPreventiveRegulationRaoResult, network, crac, raoParameters, pstRegulationReportNode);
+            return mergePstRegulationAndRaoResults(pstRegulationResults, postPreventiveRegulationRaoResult, network, crac, raoParameters, pstRegulationReportNode, initialVariantId);
         } catch (Exception e) {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -440,11 +446,10 @@ public final class PstRegulation {
                                                              final Network network,
                                                              final Crac crac,
                                                              final RaoParameters raoParameters,
-                                                             final ReportNode reportNode) {
+                                                             final ReportNode reportNode,
+                                                             final String initialVariant) {
         // store network variants data
         VariantManager variantManager = network.getVariantManager();
-        String initialStateVariantId = "InitialState";
-        String initialVariantId = variantManager.getWorkingVariantId();
         Set<String> otherVariants = new HashSet<>(variantManager.getVariantIds());
 
         final Map<State, PstRegulationResult> resultsByState = pstRegulationResults.stream()
@@ -463,7 +468,7 @@ public final class PstRegulation {
 
         // create a new network variant from initial variant for performing the results merging
         final String variantName = "PSTRegulationResultsMerging";
-        network.getVariantManager().cloneVariant(initialStateVariantId, variantName);
+        network.getVariantManager().cloneVariant(initialVariant, variantName);
         network.getVariantManager().setWorkingVariant(variantName);
 
         // apply PRAs
@@ -578,7 +583,7 @@ public final class PstRegulation {
         postRegulationRaoResult.setExecutionDetails(executionDetails);
 
         // post-process variants
-        resetNetworkVariant(network, initialVariantId, otherVariants);
+        resetNetworkVariant(network, initialVariant, otherVariants);
 
         return postRegulationRaoResult;
     }

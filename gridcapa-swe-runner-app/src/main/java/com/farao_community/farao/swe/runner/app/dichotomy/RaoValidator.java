@@ -76,7 +76,8 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     @Override
     public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(final Network network, final DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoFailureException, RaoInterruptionException {
         final String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
-        final String scaledNetworkName = network.getVariantManager().getWorkingVariantId() + ".xiidm";
+        final String scaledNetworkVariantId = network.getVariantManager().getWorkingVariantId();
+        final String scaledNetworkName = scaledNetworkVariantId + ".xiidm";
         final String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
         final RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, scaledNetworkDirPath);
         try {
@@ -132,6 +133,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                 }
             } else if (!isPortugalInDirection()) {
                 final Crac crac = sweData.getCracFrEs().getCrac();
+                network.getVariantManager().setWorkingVariant(scaledNetworkVariantId);
                 final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
                 return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
             }
