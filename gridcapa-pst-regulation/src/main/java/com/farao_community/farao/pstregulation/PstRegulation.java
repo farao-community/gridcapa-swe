@@ -132,7 +132,7 @@ public final class PstRegulation {
             }
             networkPool.shutdownAndAwaitTermination(1000, TimeUnit.SECONDS);
             network.getVariantManager().setWorkingVariant(initialVariantId);
-            return mergePstRegulationResultsWithRaoResult(pstRegulationResults, raoResult, network, crac, raoParameters, pstRegulationReportNode);
+            return mergePstRegulationResultsWithRaoResult(pstRegulationResults, raoResult, network, crac, raoParameters, pstRegulationReportNode, initialVariantId);
         } catch (Exception e) {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -367,12 +367,11 @@ public final class PstRegulation {
                                                                     final Network network,
                                                                     final Crac crac,
                                                                     final RaoParameters raoParameters,
-                                                                    final ReportNode reportNode) {
+                                                                    final ReportNode reportNode,
+                                                                    final String initialVariantId) {
         // store network variants data
-        final String initialStateVariantId = "InitialState"; // default variant id imported by PowSyBl
-        final String initialVariantId = network.getVariantManager().getWorkingVariantId();
         final Set<String> initialVariantsIds = new HashSet<>(network.getVariantManager().getVariantIds());
-        network.getVariantManager().setWorkingVariant(initialStateVariantId);
+        network.getVariantManager().setWorkingVariant(initialVariantId);
 
         final Map<State, PstRegulationResult> resultsPerState = pstRegulationResults.stream()
             .collect(Collectors.toMap(
