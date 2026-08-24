@@ -27,6 +27,7 @@ import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.VariantManager;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openrao.commons.PhysicalParameter;
@@ -76,7 +77,8 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     @Override
     public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(final Network network, final DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoFailureException, RaoInterruptionException {
         final String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
-        final String scaledNetworkName = network.getVariantManager().getWorkingVariantId() + ".xiidm";
+        final String scaledNetworkVariantId = network.getVariantManager().getWorkingVariantId();
+        final String scaledNetworkName = scaledNetworkVariantId + ".xiidm";
         final String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", sweData.getTimestamp(), sweData.getProcessType());
         final RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, scaledNetworkDirPath);
         try {
@@ -131,8 +133,12 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                             false);
                 }
             } else if (!isPortugalInDirection()) {
+                VariantManager variantManager = network.getVariantManager();
+                String currentVariant = variantManager.getWorkingVariantId();
+                variantManager.setWorkingVariant(scaledNetworkVariantId);
                 final Crac crac = sweData.getCracFrEs().getCrac();
                 final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
+                variantManager.setWorkingVariant(currentVariant);
                 return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));

@@ -132,7 +132,7 @@ public final class PstRegulation {
             }
             networkPool.shutdownAndAwaitTermination(1000, TimeUnit.SECONDS);
             network.getVariantManager().setWorkingVariant(initialVariantId);
-            return mergePstRegulationResultsWithRaoResult(pstRegulationResults, raoResult, network, crac, raoParameters, pstRegulationReportNode);
+            return mergePstRegulationResultsWithRaoResult(pstRegulationResults, raoResult, network, crac, raoParameters, pstRegulationReportNode, initialVariantId);
         } catch (Exception e) {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -367,7 +367,12 @@ public final class PstRegulation {
                                                                     final Network network,
                                                                     final Crac crac,
                                                                     final RaoParameters raoParameters,
-                                                                    final ReportNode reportNode) {
+                                                                    final ReportNode reportNode,
+                                                                    final String initialVariantId) {
+        // store network variants data
+        final Set<String> initialVariantsIds = new HashSet<>(network.getVariantManager().getVariantIds());
+        network.getVariantManager().setWorkingVariant(initialVariantId);
+
         final Map<State, PstRegulationResult> resultsPerState = pstRegulationResults.stream()
             .collect(Collectors.toMap(
                 pstRegulationResult -> crac.getState(pstRegulationResult.contingency(), crac.getLastInstant()),
@@ -491,6 +496,14 @@ public final class PstRegulation {
         );
         final String executionDetails = String.format("%s %s", raoResult.getExecutionDetails(), "and went through PST regulation");
         postRegulationRaoResult.setExecutionDetails(executionDetails);
+
+        // post-process variants
+        network.getVariantManager().setWorkingVariant(initialVariantId);
+        Set<String> variantsToRemove = network.getVariantManager().getVariantIds()
+            .stream()
+            .filter(variantId -> !initialVariantsIds.contains(variantId))
+            .collect(Collectors.toSet());
+        variantsToRemove.forEach(network.getVariantManager()::removeVariant);
 
         return postRegulationRaoResult;
     }
