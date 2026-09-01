@@ -79,14 +79,28 @@ public final class PstRegulationReports {
         BUSINESS_WARNS.warn("An error occurred during PST regulation, pre-regulation RAO result will be kept. Error was: {}", errorMessage);
     }
 
-    public static void reportPstCannotBeRegulated(final ReportNode parentNode, final String pstId) {
+    public static void reportPstCannotBeRegulated(final ReportNode parentNode, final String pstId, final String instantId) {
         parentNode.newReportNode()
             .withMessageTemplate("openrao.pstregulation.reportPstCannotBeRegulated")
             .withUntypedValue("pstId", pstId)
+            .withUntypedValue("instant", instantId)
             .withSeverity(INFO_SEVERITY)
             .add();
 
-        BUSINESS_LOGS.info("PST {} cannot be regulated as no curative PST range action was defined for it.", pstId);
+        BUSINESS_LOGS.info("PST {} cannot be regulated as no PST range action was defined for it on instant {}.", pstId, instantId);
+    }
+
+    public static void reportPreventivePstRegulationTriggeredDueToOverloadedFlowCnec(final ReportNode parentNode,
+                                                                                     final String flowCnec,
+                                                                                     final String allShiftedPstsDetails) {
+        parentNode.newReportNode()
+            .withMessageTemplate("openrao.pstregulation.reportPreventivePstRegulationTriggeredDueToOverloadedFlowCnec")
+            .withUntypedValue("flowCnec", flowCnec)
+            .withUntypedValue("allShiftedPstsDetails", allShiftedPstsDetails)
+            .withSeverity(INFO_SEVERITY)
+            .add();
+
+        BUSINESS_LOGS.info("FlowCNEC '{}' of the base case is overloaded and is the most limiting element, PST regulation has been triggered: {}", flowCnec, allShiftedPstsDetails);
     }
 
     public static void reportPstRegulationTriggeredDueToOverloadedFlowCnec(final ReportNode parentNode,
