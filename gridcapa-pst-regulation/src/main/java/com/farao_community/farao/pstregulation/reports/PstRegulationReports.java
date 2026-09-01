@@ -87,7 +87,7 @@ public final class PstRegulationReports {
             .withSeverity(INFO_SEVERITY)
             .add();
 
-        BUSINESS_LOGS.info("PST {} cannot be regulated as no PST range action was defined for it for instant {}.", pstId, instantId);
+        BUSINESS_LOGS.info("PST {} cannot be regulated as no PST range action was defined for it on instant {}.", pstId, instantId);
     }
 
     public static void reportPreventivePstRegulationTriggeredDueToOverloadedFlowCnec(final ReportNode parentNode,
