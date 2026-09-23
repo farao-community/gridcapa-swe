@@ -15,6 +15,7 @@ import com.farao_community.farao.dichotomy.api.utils.ContingenciesLoggerUtil;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
 import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
+import com.farao_community.farao.pstregulation.PstRegulation;
 import com.farao_community.farao.rao_runner.api.resource.AbstractRaoResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoFailureResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
@@ -37,7 +38,6 @@ import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.monitoring.Monitoring;
 import com.powsybl.openrao.monitoring.MonitoringInput;
 import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
-import com.farao_community.farao.pstregulation.PstRegulation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,49 +97,82 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
 
             ContingenciesLoggerUtil.logContingencies(raoResponse.getRaoResultFileUrl(), businessLogger);
 
-            final RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
+            final RaoResult raoResult = fileImporter.importRaoResult(
+                raoResponse.getRaoResultFileUrl(),
+                fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network)
+            );
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
-                final Crac crac = sweData.getCracEsPt().getCrac();
-                final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()).getZonalScalable(network, sweData.getTimestamp().toInstant())).build();
-                final RaoResultWithAngleMonitoring raoResultWithAngleMonitoring =
-                    (RaoResultWithAngleMonitoring) Monitoring.runAngleAndUpdateRaoResult(
-                        LoadFlow.find().getName(),
-                        loadFlowParameters,
-                        LoadFlowUtil.getMdcCompliantComputationManager(),
-                        4,
-                        input);
-                if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
-                    businessLogger.warn("Angle monitoring result is failure");
-                    return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
-                                    SweDichotomyValidationData.AngleMonitoringStatus.FAILURE),
-                            false);
-                } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE, PhysicalParameter.FLOW)) {
-                    businessLogger.info("Angle monitoring result is secure");
-                    return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
-                                    SweDichotomyValidationData.AngleMonitoringStatus.SECURE),
-                            true);
-                } else {
-                    businessLogger.info("Angle monitoring result is unsecure");
-                    crac.getAngleCnecs().forEach(
-                            angleCnec -> {
-                                if (raoResultWithAngleMonitoring.getMargin(crac.getLastInstant(), angleCnec, Unit.DEGREE) < 0) {
-                                    businessLogger.info("Angle {}'s value is {} degrees", angleCnec.getName(), raoResultWithAngleMonitoring.getAngle(crac.getLastInstant(), angleCnec, Unit.DEGREE));
-                                }
-                            });
-
-                    return DichotomyStepResult.fromNetworkValidationResult(raoResultWithAngleMonitoring, new SweDichotomyValidationData(raoResponse,
-                                    SweDichotomyValidationData.AngleMonitoringStatus.UNSECURE),
-                            false);
-                }
+                return runAngleMonitoring(network, raoResult, raoResponse);
             } else if (!isPortugalInDirection()) {
-                final Crac crac = sweData.getCracFrEs().getCrac();
-                network.getVariantManager().setWorkingVariant(scaledNetworkVariantId);
-                final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
-                return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
+                final DichotomyStepResult<SweDichotomyValidationData> raoResultWithPstRegulation = runPstRegulation(
+                    network, scaledNetworkVariantId, raoResult, raoResponse
+                );
+                if (raoResultWithPstRegulation != null) {
+                    return raoResultWithPstRegulation;
+                }
             }
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
         } catch (RuntimeException e) {
             throw new ValidationException("RAO run failed", e);
+        }
+    }
+
+    private DichotomyStepResult<SweDichotomyValidationData> runPstRegulation(final Network network, final String scaledNetworkVariantId, final RaoResult raoResult, final RaoSuccessResponse raoResponse) {
+        try {
+            final Crac crac = sweData.getCracFrEs().getCrac();
+            network.getVariantManager().setWorkingVariant(scaledNetworkVariantId);
+            final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
+            return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
+        } catch (final Exception e) {
+            businessLogger.warn("PST Regulation failed", e);
+        }
+        return null;
+    }
+
+    private DichotomyStepResult<SweDichotomyValidationData> runAngleMonitoring(final Network network, final RaoResult raoResult, final RaoSuccessResponse raoResponse) {
+        final Crac crac = sweData.getCracEsPt().getCrac();
+        final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()).getZonalScalable(network, sweData.getTimestamp().toInstant())).build();
+        final RaoResultWithAngleMonitoring raoResultWithAngleMonitoring =
+            (RaoResultWithAngleMonitoring) Monitoring.runAngleAndUpdateRaoResult(
+                LoadFlow.find().getName(),
+                loadFlowParameters,
+                LoadFlowUtil.getMdcCompliantComputationManager(),
+                4,
+                input);
+        if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
+            businessLogger.warn("Angle monitoring result is failure");
+            return DichotomyStepResult.fromNetworkValidationResult(
+                raoResultWithAngleMonitoring, new SweDichotomyValidationData(
+                    raoResponse,
+                    SweDichotomyValidationData.AngleMonitoringStatus.FAILURE
+                ),
+                false
+            );
+        } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE, PhysicalParameter.FLOW)) {
+            businessLogger.info("Angle monitoring result is secure");
+            return DichotomyStepResult.fromNetworkValidationResult(
+                raoResultWithAngleMonitoring, new SweDichotomyValidationData(
+                    raoResponse,
+                    SweDichotomyValidationData.AngleMonitoringStatus.SECURE
+                ),
+                true
+            );
+        } else {
+            businessLogger.info("Angle monitoring result is unsecure");
+            crac.getAngleCnecs().forEach(
+                    angleCnec -> {
+                        if (raoResultWithAngleMonitoring.getMargin(crac.getLastInstant(), angleCnec, Unit.DEGREE) < 0) {
+                            businessLogger.info("Angle {}'s value is {} degrees", angleCnec.getName(), raoResultWithAngleMonitoring.getAngle(crac.getLastInstant(), angleCnec, Unit.DEGREE));
+                        }
+                    });
+
+            return DichotomyStepResult.fromNetworkValidationResult(
+                raoResultWithAngleMonitoring, new SweDichotomyValidationData(
+                    raoResponse,
+                    SweDichotomyValidationData.AngleMonitoringStatus.UNSECURE
+                ),
+                false
+            );
         }
     }
 
