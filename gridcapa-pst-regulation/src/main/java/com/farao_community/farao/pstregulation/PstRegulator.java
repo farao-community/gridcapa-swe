@@ -7,12 +7,15 @@
 
 package com.farao_community.farao.pstregulation;
 
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.powsybl.commons.report.ReportNode;
+import com.powsybl.computation.ComputationManager;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowRunParameters;
 import com.powsybl.openrao.commons.OpenRaoException;
 import com.powsybl.openrao.data.crac.api.rangeaction.PstRangeAction;
 import com.powsybl.openrao.searchtreerao.reports.CastorReports;
@@ -35,7 +38,13 @@ public final class PstRegulator {
         elementaryPstRegulationInputs.forEach(
             elementaryPstRegulationInput -> setRegulationForPst(network, elementaryPstRegulationInput, reportNode)
         );
-        LoadFlow.find("OpenLoadFlow").run(network, loadFlowParameters);
+
+        final ComputationManager computationManager = LoadFlowUtil.getMdcCompliantComputationManager();
+        final LoadFlowRunParameters loadFlowRunParameters = new LoadFlowRunParameters()
+            .setComputationManager(computationManager)
+            .setParameters(loadFlowParameters);
+
+        LoadFlow.find("OpenLoadFlow").run(network, loadFlowRunParameters);
         return elementaryPstRegulationInputs.stream()
             .collect(Collectors.toMap(
                 ElementaryPstRegulationInput::pstRangeAction,
