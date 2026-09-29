@@ -29,9 +29,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Before scaling: fetches scalable generators in ES and PT scalables. For generators connected to the grid through a
- * transformer, if the transformer is disconnected, connects the transformer.
- * After scaling: reverts unnecessary changes.
+ * Preprocesses GLSK-participating generators that are disconnected from the main component by tracking their initial state, reconnecting adjacent transformers when possible, and rolling back unsuccessful reconnections.
+ * Collaborates with {@link ZonalData} and {@link Scalable} to identify the affected generators and is invoked by {@link SweNetworkShifter} before and during iterative shifts.
+ * {@code countriesToProcess} limits this safeguard to the configured SWE countries, {@code changedGeneratorsInitialState} stores the rollback state, and the shifted-generator check uses a 1e-6 threshold to detect effective {@code targetP} changes.
  *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}

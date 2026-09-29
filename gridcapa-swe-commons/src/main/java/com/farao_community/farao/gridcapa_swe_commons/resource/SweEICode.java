@@ -11,6 +11,9 @@ import com.powsybl.glsk.commons.CountryEICode;
 import static com.powsybl.iidm.network.Country.*;
 
 /**
+ * Centralizes the EIC area codes for Portugal, Spain and France used throughout SWE balancing and reporting.
+ * Referenced by {@link com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation}, {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher} and {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher} to index country balances and scaling values consistently.
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public final class SweEICode {

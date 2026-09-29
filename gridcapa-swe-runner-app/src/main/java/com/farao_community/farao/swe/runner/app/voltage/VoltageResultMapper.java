@@ -18,6 +18,15 @@ import java.util.List;
 import com.powsybl.openrao.commons.Unit;
 
 /**
+ * Maps an OpenRAO voltage-monitoring result to the JSON DTOs exported by the SWE runner. It filters the monitored
+ * voltage CNECs to the violated curative ones and converts each violation into a
+ * {@link VoltageCheckConstraintElement}.
+ *
+ * @see VoltageCheckResult top-level DTO produced by this mapper
+ * @see VoltageCheckConstraintElement per-constraint DTO populated from voltage margins and limits
+ * @see com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring source object being transformed
+ * @see com.farao_community.farao.swe.runner.app.services.FileExporter exports the mapped result as JSON
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 @Component

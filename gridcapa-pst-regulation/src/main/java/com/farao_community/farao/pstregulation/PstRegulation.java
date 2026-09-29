@@ -62,6 +62,19 @@ import static com.powsybl.openrao.raoapi.parameters.extensions.MultithreadingPar
 import static java.util.function.Predicate.not;
 
 /**
+ * Orchestrates preventive and curative PST regulation on top of an existing RAO result. It identifies overloaded
+ * {@link FlowCnec flow CNECs} protected by configured PSTs, prepares {@link PstRegulationInput} instances,
+ * delegates tap solving to {@link PstRegulator}, then merges the regulated taps back into a new {@link RaoResult}.
+ *
+ * <p>Main collaborators are {@link Crac} and {@link RaoResult} for network-security data, {@link PstRegulator} for
+ * the actual load-flow-based tap computation, and {@link PstRegulationReports} for reporting. The behavior is mainly
+ * driven by {@link SearchTreeRaoPstRegulationParameters#getPstsToRegulate(RaoParameters)}, whose map associates each
+ * PST identifier with the monitored element in series, by the {@link Unit} used to compare margins, and by the
+ * {@link LoadFlowParameters} adjusted here to enable phase-shifter regulation and raise the OpenLoadFlow outer-loop
+ * limit to 1000 iterations.
+ *
+ * @see PstRegulationInput state-level input prepared for one regulation run
+ * @see PstRegulationResult regulated taps produced for a preventive or curative scenario
  * @author Thomas Bouquet {@literal <thomas.bouquet at rte-france.com>}
  */
 public final class PstRegulation {

@@ -18,6 +18,9 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
+ * Entry point that applies SWE HVDC preprocessing parameters to an IIDM network before the capacity-calculation workflow runs.
+ * Reads {@link SwePreprocessorParameters} through {@link JsonSwePreprocessorImporter} and delegates the actual network conversion to {@link HvdcLinkProcessor}; invalid input data is surfaced as {@link SweInvalidDataNoDetailsException}.
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweHvdcPreprocessor {

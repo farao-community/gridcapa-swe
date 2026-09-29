@@ -22,6 +22,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * Applies PST regulation settings on the network model and runs OpenLoadFlow to solve the resulting tap positions.
+ * It configures each targeted transformer in current-limiter mode, then returns the solved taps by
+ * {@link PstRangeAction}.
+ *
+ * <p>{@link PstRegulation} prepares the {@link ElementaryPstRegulationInput} set consumed here, while
+ * {@link Network} and {@link LoadFlowParameters} provide the electrical model and load-flow options. The
+ * {@code limitingThreshold} from each elementary input becomes the regulation value in amperes, the
+ * {@code limitingSide} selects the regulation terminal, and a fallback target deadband of {@code 0.0} is only set
+ * when absent because OpenLoadFlow does not use it in current-limiter mode.
+ *
+ * @see ElementaryPstRegulationInput per-PST regulation data applied by this utility
+ * @see PstRegulation orchestrates when this regulator is invoked
  * @author Thomas Bouquet {@literal <thomas.bouquet at rte-france.com>}
  */
 public final class PstRegulator {

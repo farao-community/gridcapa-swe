@@ -32,6 +32,16 @@ import java.util.Map;
 import static com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation.computeSweCountriesBalances;
 
 /**
+ * Creates the {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter} used by the dichotomy
+ * engine for one direction. {@link DichotomyRunner} calls it with the current {@link SweData}, and it combines
+ * {@link com.farao_community.farao.swe.runner.app.configurations.DichotomyConfiguration},
+ * {@link ExportNetworkConfiguration}, {@link ProcessConfiguration}, and the imported network to prepare the shifter
+ * and its dispatcher.
+ *
+ * <p>The configured {@code toleranceEsPt} and {@code toleranceEsFr} values drive the allowed balance deviations on
+ * each border, {@code runGlskChecksBeforeLoadFlow} toggles the GLSK pre-checks delegated to the shifter, and
+ * {@code exportFailedNetwork} enables creation of a {@link SweNetworkExporter} for failed-network export.</p>
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 @Service

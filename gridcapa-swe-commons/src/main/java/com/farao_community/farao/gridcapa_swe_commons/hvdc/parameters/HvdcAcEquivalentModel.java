@@ -13,7 +13,10 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Parameters of an HVDC equivalent AC model
+ * Describes the AC-side IIDM elements that act as the SWE stand-in for an HVDC interconnection before preprocessing replaces them with a physical HVDC line.
+ * Embedded in {@link HvdcCreationParameters} and used by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor} to find the equivalent generators, loads and AC line for each {@link TwoSides side}.
+ * {@code loadIds} stores candidate load identifiers by priority; for side 1 the processor first tries priority 1 and can fall back to priority 2 when requested by the input JSON.
+ *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public class HvdcAcEquivalentModel {

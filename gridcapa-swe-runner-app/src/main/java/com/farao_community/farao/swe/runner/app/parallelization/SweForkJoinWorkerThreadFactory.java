@@ -11,6 +11,12 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 
 /**
+ * Creates Fork/Join worker threads with the application context class loader propagated to each worker. This avoids
+ * class-loading issues when parallel tasks rely on libraries discovered through the current thread context.
+ *
+ * @see java.util.concurrent.ForkJoinPool.ForkJoinWorkerThreadFactory SPI implemented by this factory
+ * @see java.util.concurrent.ForkJoinWorkerThread worker type customized here
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 

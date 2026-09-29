@@ -7,8 +7,8 @@
 package com.farao_community.farao.gridcapa_swe_commons.exception;
 
 /**
- * Custom abstract exception to be extended by all application exceptions.
- * Any subclass may be automatically wrapped to a JSON API error message if needed
+ * Base runtime exception for SWE business and technical failures so callers can expose a uniform JSON-API status, code, title and details payload.
+ * Extended by {@link SweInternalException}, {@link SweInvalidDataException}, {@link SweInvalidDataNoDetailsException} and {@link SweBaseCaseUnsecureException}; {@link #getDetails()} also flattens nested causes and stops on {@link SweInvalidDataNoDetailsException} when details must stay compact.
  *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */

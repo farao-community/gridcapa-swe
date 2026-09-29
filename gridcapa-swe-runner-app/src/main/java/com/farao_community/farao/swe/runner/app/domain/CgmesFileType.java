@@ -8,6 +8,11 @@
 package com.farao_community.farao.swe.runner.app.domain;
 
 /**
+ * Enumerates the CGMES file categories handled by the SWE runner, combining the source TSO identifier with the
+ * expected CGMES family. It is used as the key of the input-file map stored in {@link SweData} and by
+ * {@link com.farao_community.farao.swe.runner.app.services.CgmesExportService} when rebuilding exported CGMES
+ * archives.
+ *
  * @author Théo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */

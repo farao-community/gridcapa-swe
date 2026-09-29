@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
+ * Deserializes the top-level SWE HVDC preprocessor document into its root parameter container.
+ * Registered by {@link JsonSwePreprocessorImporter}, delegates the {@code hvdcCreationParameters} array to {@link HvdcCreationParametersArrayDeserializer}, and returns a {@link SwePreprocessorParameters} consumed by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor}.
+ * The single accepted top-level field is {@code hvdcCreationParameters}; any unexpected field is rejected to keep preprocessing inputs strict.
+ *
  * @author Peter Mitri {@literal <peter.mitri@rte-france.com>}
  */
 public class SwePreprocessorParametersDeserializer extends StdDeserializer<SwePreprocessorParameters> {

@@ -6,6 +6,15 @@
  */
 package com.farao_community.farao.swe.runner.app.dichotomy;
 
+/**
+ * Immutable set of per-direction parameters used to configure one dichotomy execution. It is built by
+ * {@link DichotomyRunner} from {@link com.farao_community.farao.swe.runner.app.domain.SweTaskParameters} and then
+ * consumed by {@link DichotomyLogging} and the constructed dichotomy engine.
+ *
+ * <p>{@code minValue} and {@code maxValue} define the TTC search interval, {@code precision} is the stopping step
+ * for the dichotomy, {@code runAngleCheck} enables post-RAO angle monitoring, and
+ * {@code runGlskChecksBeforeLoadFlow} enables GLSK consistency checks before load-flow execution.</p>
+ */
 public record DichotomyParameters(double minValue,
                                   double maxValue,
                                   double precision,

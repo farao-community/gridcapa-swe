@@ -9,6 +9,12 @@ package com.farao_community.farao.swe.runner.app.parallelization;
 import java.util.List;
 
 /**
+ * Lightweight wrapper around the ordered list of results returned by a parallel execution. It gives callers a single
+ * object to pass around when several directional computations must later be aggregated.
+ *
+ * @see com.farao_community.farao.swe.runner.app.ttc_doc.TtcDocument consumes an {@code ExecutionResult} to build the TTC XML
+ * @see com.farao_community.farao.swe.runner.app.domain.SweDichotomyResult typical payload stored in this container for SWE runs
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class ExecutionResult<T> {

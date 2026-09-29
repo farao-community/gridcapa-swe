@@ -24,6 +24,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
+ * Builds the SWE output documents that aggregate or complement directional dichotomy results. It currently produces
+ * the TTC XML document and the optional voltage-check archive, then delegates storage concerns to
+ * {@link FileExporter}.
+ *
+ * @see FileExporter uploads TTC and voltage documents to object storage
+ * @see TtcDocument generates the TTC XML from an {@link ExecutionResult} of directional results
+ * @see VoltageCheckService computes the monitoring result later exported by this service
+ * @see ProcessConfiguration supplies the time zone used in output file names
+ *
+ * <p>The voltage export path is driven by {@link SweTaskParameters#isRunVoltageCheck()} and only applies to the
+ * France-Spain directions.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service

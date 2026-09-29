@@ -11,6 +11,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Optional;
 
 /**
+ * Externalized configuration for the SWE starter client under the {@code swe-runner} prefix.
+ * {@link SweClientAutoConfiguration}, {@link SweClient} and {@link SweMessageHandler} read these properties to decide where requests are sent and which AMQP headers are set.
+ *
+ * <p>{@link BindingConfiguration#getDestination()} is the AMQP exchange or destination name used for publishing.
+ * {@link BindingConfiguration#getRoutingKey()} selects the broker routing key and defaults to {@code #} when unspecified.
+ * {@link BindingConfiguration#getExpiration()} is forwarded as the AMQP message TTL/expiration value, and
+ * {@link BindingConfiguration#getApplicationId()} becomes the message application identifier.
+ *
+ * @see SweClient sender using these properties
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @ConfigurationProperties("swe-runner")

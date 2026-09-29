@@ -7,6 +7,8 @@
 package com.farao_community.farao.gridcapa_swe_commons.exception;
 
 /**
+ * Signals invalid HVDC-related input data while intentionally returning only the top-level message, without expanding nested cause details in the API payload.
+ * Extends {@link AbstractSweException}; {@link AbstractSweException#getDetails()} treats this subtype specially, and {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor} plus {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor} use it for sanitized preprocessing failures.
  */
 public class SweInvalidDataNoDetailsException extends AbstractSweException {
 

@@ -64,6 +64,21 @@ import java.util.Set;
 import static com.farao_community.farao.swe.runner.app.services.NetworkService.TSO_BY_COUNTRY;
 
 /**
+ * Builds the CGMES outputs produced from a dichotomy step and uploads the resulting archive. It reconstructs the
+ * network state with PRA applied, runs a load flow, regenerates SSH/SV content and combines it with the input EQ/TP
+ * files expected by downstream consumers.
+ *
+ * @see FileExporter uploads the generated CGMES archive to object storage
+ * @see FileImporter reuses the imported input CGMES resources referenced by {@link SweData}
+ * @see UrlValidationService opens the RAO-produced network and validates remote URLs before reading them
+ * @see OpenLoadFlowParametersUtil derives the load-flow configuration applied before export
+ * @see NetworkService supplies {@code TSO_BY_COUNTRY}, used to split SSH exports by country
+ *
+ * <p>The export is influenced by {@link SweTaskParameters}, notably the maximum Newton-Raphson iteration count used
+ * for the preparatory load flow and the flag requesting the first-unsecure shifted CGM. The metadata version starts at
+ * {@value #DEFAULT_VERSION}, active-power tolerance defaults to {@value #DEFAULT_P_TOLERANCE}, and the SV modeling
+ * authority falls back to {@value #MODELING_AUTHORITY_DEFAULT_VALUE} when not configured.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */

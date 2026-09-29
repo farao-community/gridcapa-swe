@@ -12,6 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Holds the external URL settings configured under {@code swe-runner}. It is injected into
+ * {@link com.farao_community.farao.swe.runner.app.utils.UrlValidationService} to validate inbound file URLs and
+ * into {@link com.farao_community.farao.swe.runner.app.services.SweRunner} to query the interruption endpoint.
+ *
+ * <p>The {@code whitelist} defines the allowed URL prefixes for remote resources, while
+ * {@code interruptServerUrl} is the base URL used to check whether a run must stop.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 @ConfigurationProperties("swe-runner")

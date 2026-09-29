@@ -24,6 +24,18 @@ import java.util.EnumMap;
 import java.util.List;
 
 /**
+ * Assembles all imported inputs required by an SWE run into a {@link SweData} instance. It loads the merged network,
+ * enriches it with HVDC/PST adjustments, imports the directional CRACs, exports shared artifacts and keeps track of
+ * the CGMES inputs needed later for file regeneration.
+ *
+ * @see NetworkService imports the merged CGMES network and applies HVDC/PST preprocessing
+ * @see FileImporter loads CRAC resources and turns them into directional {@code CimCracCreationContext} instances
+ * @see FileExporter publishes intermediate artifacts such as merged-network snapshots, JSON CRACs and RAO parameters
+ * @see SweData aggregate returned to the rest of the runner pipeline
+ *
+ * <p>The selected embedded CRAC-creation-parameter resource depends on the {@link ProcessType} carried by the request,
+ * while the generated RAO parameters are driven by {@link SweTaskParameters}.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service

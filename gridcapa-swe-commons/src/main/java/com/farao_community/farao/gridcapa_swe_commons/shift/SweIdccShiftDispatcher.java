@@ -15,6 +15,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * Computes country-wise scaling requests for the 1D/IDCF SWE process from one directed exchange step while preserving the initial balance constraints of the non-driven border.
+ * Implements {@link ShiftDispatcher} for {@link DichotomyDirection}, uses {@link SweEICode} keys, and feeds the zonal targets consumed by {@link SweNetworkShifter}.
+ * {@code stepExchangeValue} is the requested border exchange in the chosen direction; {@code initialNetPositions} anchors the returned values so the third country's balance and the initial cross-border schedule are respected.
+ *
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
  */
 public class SweIdccShiftDispatcher implements ShiftDispatcher {

@@ -39,6 +39,10 @@ import static com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanc
 import static com.powsybl.iidm.modification.scalable.ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED;
 
 /**
+ * Applies the SWE iterative balancing shift on an IIDM network by scaling zonal generators, running load flow, and correcting the mismatch until the requested ES-FR or ES-PT exchange is reached.
+ * Collaborates with {@link ProcessConfiguration}, {@link ShiftDispatcher}, {@link ScalableGeneratorConnector}, {@link GeneratorLimitsHandler}, {@link CountryBalanceComputation} and the optional {@link NetworkExporter}; it also uses {@link ProcessType} and {@link DichotomyDirection} to derive the border targets to satisfy.
+ * {@code toleranceEsPt} and {@code toleranceEsFr} define the acceptable residual mismatch per border, {@code runGlskChecksBeforeLoadFlow} selects when GLSK saturation is evaluated, {@code processConfiguration.getShiftMaxIterationNumber()} caps retries, and {@code DEFAULT_SHIFT_EPSILON} is the threshold below which a country's scaling shortfall is ignored.
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public class SweNetworkShifter implements NetworkShifter {

@@ -10,7 +10,10 @@ package com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters;
 import java.util.Objects;
 
 /**
- * Parameters for creating a VSC converter station
+ * Describes how one converter station of a created SWE HVDC line must be instantiated in IIDM.
+ * Used per {@link com.powsybl.iidm.network.TwoSides side} inside {@link HvdcCreationParameters} and consumed by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor} when it builds the corresponding VSC station.
+ * {@code reactivePowerSetpoint}, {@code lossFactor}, {@code voltageRegulatorOn} and {@code defaultVoltageSetpoint} drive the converter operating point; the default voltage setpoint is used when the equivalent generator terminal is disconnected and no live target voltage can be reused.
+ *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public class VscStationCreationParameters {

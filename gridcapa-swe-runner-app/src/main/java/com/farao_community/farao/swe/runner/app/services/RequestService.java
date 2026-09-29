@@ -27,6 +27,14 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
+ * Entry point for SWE requests received from the messaging layer. It deserializes incoming messages, sets task status
+ * updates, delegates the computation to {@link SweRunner} and reports the final task outcome back through
+ * {@link StreamBridge}.
+ *
+ * @see SweRunner performs the actual SWE computation for a deserialized request
+ * @see JsonApiConverter converts the raw message payload into {@link SweRequest}
+ * @see StreamBridge publishes task-status updates
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */

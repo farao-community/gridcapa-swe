@@ -7,6 +7,9 @@
 package com.farao_community.farao.gridcapa_swe_commons.exception;
 
 /**
+ * Signals unexpected technical failures in SWE orchestration, file handling or message conversion that must surface as generic internal-server errors.
+ * Extends {@link AbstractSweException}; caller-side components use it when no domain-specific validation exception is more appropriate.
+ *
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public class SweInternalException extends AbstractSweException {

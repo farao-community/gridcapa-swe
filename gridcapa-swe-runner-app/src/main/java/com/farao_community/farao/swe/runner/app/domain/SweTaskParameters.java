@@ -17,6 +17,20 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Parses, validates, and exposes the task parameters that drive one SWE calculation run. It is instantiated by
+ * {@link com.farao_community.farao.swe.runner.app.services.SweRunner}, then consumed by
+ * {@link com.farao_community.farao.swe.runner.app.services.FilesService},
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner}, and
+ * {@link com.farao_community.farao.swe.runner.app.services.VoltageCheckService} to configure imports, the dichotomy
+ * search, RAO, and optional post-processing steps.
+ *
+ * <p>The {@code runDirection*} flags select the border directions to compute; the {@code minTtc*},
+ * {@code maxTtc*}, and {@code dichotomyPrecision*} values define the search interval and stopping criterion per
+ * direction; {@code runAngleCheck}, {@code runVoltageCheck}, {@code secondPreventiveRaoDisabled},
+ * {@code exportFirstUnsecureShiftedCGM}, and {@code runGlskChecksBeforeLoadFlow} toggle optional behaviors; and
+ * {@code maxCra} plus {@code maxNewtonRaphsonIterations} are forwarded to downstream RAO/load-flow parameterization.</p>
+ */
 public class SweTaskParameters {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweTaskParameters.class);
     private static final String KEY_VALUE_FORMAT = "%n\t\"%s\": %s";

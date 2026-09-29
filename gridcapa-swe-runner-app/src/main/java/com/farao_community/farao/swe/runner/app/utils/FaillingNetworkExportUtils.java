@@ -13,6 +13,14 @@ import com.powsybl.iidm.network.Network;
 
 import java.time.OffsetDateTime;
 
+/**
+ * Utility methods for exporting an XIIDM snapshot of a network that triggered a failure condition. It centralizes the
+ * artifact naming convention used when voltage checks or balancing adjustments want to keep the failing state.
+ *
+ * @see FileExporter performs the actual artifact upload
+ * @see com.farao_community.farao.swe.runner.app.services.SweNetworkExporter adapts this helper to the shared network-export API
+ * @see com.farao_community.farao.swe.runner.app.services.VoltageCheckService uses this helper when a voltage violation must be exported
+ */
 public final class FaillingNetworkExportUtils {
     private static final String XIIDM_EXTENSION = "xiidm";
 

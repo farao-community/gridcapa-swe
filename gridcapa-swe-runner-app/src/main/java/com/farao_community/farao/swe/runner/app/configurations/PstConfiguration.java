@@ -12,6 +12,12 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
+ * Binds the list of phase-shifting transformer identifiers configured for SWE preprocessing.
+ * {@link com.farao_community.farao.swe.runner.app.services.NetworkService} uses these identifiers when preparing
+ * imported networks and disabling the targeted PST regulation behavior.
+ *
+ * <p>The {@code pstIds} list selects the transformers to which that PST-specific treatment applies.</p>
+ *
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 @Configuration

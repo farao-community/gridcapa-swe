@@ -7,6 +7,9 @@
 package com.farao_community.farao.gridcapa_swe_commons.exception;
 
 /**
+ * Signals that the base-case network cannot be secured because the prerequisite load flow diverged during SWE balance evaluation.
+ * Extends {@link AbstractSweException} with a dedicated 500 error code and is thrown by {@link com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation} so orchestration can distinguish an unsecure base case from other internal failures.
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public class SweBaseCaseUnsecureException extends AbstractSweException {

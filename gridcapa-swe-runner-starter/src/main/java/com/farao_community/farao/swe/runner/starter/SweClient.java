@@ -11,6 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 
 /**
+ * Client entry point of the starter module for publishing SWE runner requests on AMQP.
+ * It delegates payload serialization and message-property creation to {@link SweMessageHandler}, then sends the message through the configured {@link AmqpTemplate}.
+ *
+ * <p>The collaborators are {@link SweClientProperties}, which provide the destination exchange and routing key,
+ * and {@link SweMessageHandler}, which converts the request object into a broker {@code Message}.
+ *
+ * <p>{@code priority} is the AMQP message priority passed to the broker, and the overload without this argument uses the default priority value {@value #DEFAULT_PRIORITY}.
+ *
+ * @see SweClientAutoConfiguration auto-configuration exposing this client as a bean
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweClient {

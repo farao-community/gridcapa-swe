@@ -16,6 +16,10 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
+ * Computes country-wise scaling requests for the 2D SWE process from one directed border-exchange step.
+ * Implements {@link ShiftDispatcher} for {@link DichotomyDirection} and uses {@link SweEICode} keys so {@link SweNetworkShifter} can scale ES, FR and PT consistently.
+ * {@code value} is the target exchange on the selected border direction, and {@code initialNetPositions} is subtracted afterward so the returned map represents the net shift still to apply in each country.
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public class SweD2ccShiftDispatcher implements ShiftDispatcher {

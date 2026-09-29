@@ -11,6 +11,16 @@ import com.farao_community.farao.swe.runner.api.JsonApiConverter;
 import org.springframework.amqp.core.*;
 
 /**
+ * Builds and reads AMQP messages carrying the SWE JSON:API contract.
+ * It bridges {@link JsonApiConverter} with Spring AMQP {@link Message} objects so that {@link SweClient} can publish requests with the expected headers and body format.
+ *
+ * <p>The main collaborators are {@link JsonApiConverter} for JSON:API serialization,
+ * {@link SweClientProperties} for binding-specific headers, and {@link MessagePropertiesBuilder} for constructing the outgoing AMQP metadata.
+ *
+ * <p>{@code priority} controls the AMQP message priority.
+ * The binding {@code applicationId} and {@code expiration} properties are copied into message headers, while content type is fixed to JSON:API and encoding to UTF-8.
+ *
+ * @see SweClient sender relying on this handler
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweMessageHandler {

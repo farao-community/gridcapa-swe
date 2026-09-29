@@ -16,6 +16,16 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
 /**
+ * Declares the asynchronous executor used by the SWE runner to process per-direction computations in parallel.
+ * The {@code threadPoolTaskExecutor} bean is consumed by
+ * {@link com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker} through
+ * {@link org.springframework.scheduling.annotation.Async @Async}, and uses
+ * {@link com.farao_community.farao.swe.runner.app.parallelization.SweForkJoinWorkerThreadFactory} to create
+ * runner-specific worker threads.
+ *
+ * <p>The pool parallelism is sized to {@code min(32767, availableProcessors())}, so execution scales with the host
+ * CPU count while staying within {@link java.util.concurrent.ForkJoinPool} limits.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 

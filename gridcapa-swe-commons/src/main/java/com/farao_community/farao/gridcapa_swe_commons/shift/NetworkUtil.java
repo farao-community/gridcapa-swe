@@ -10,6 +10,10 @@ import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Injection;
 
 /**
+ * Small network helpers shared by SWE scaling components when they need robust generator weights and connectivity checks.
+ * Used by {@link ZonalScalableProvider} to build the fallback French proportional scalable from IIDM injections that are actually usable in the calculation.
+ * {@code MINIMAL_ABS_POWER_VALUE} is a floor applied by {@link #pseudoTargetP(Generator)} so generators with zero target active power still receive a strictly positive scaling weight.
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public final class NetworkUtil {

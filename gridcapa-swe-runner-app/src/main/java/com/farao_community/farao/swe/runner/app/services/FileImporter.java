@@ -33,6 +33,18 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 
 /**
+ * Loads the external files required by the SWE computation into domain objects. It is responsible for reading CRAC,
+ * GLSK, CGMES and RAO-result resources from validated URLs and for adapting imported CRAC parameters to the current
+ * run context.
+ *
+ * @see UrlValidationService validates and opens the remote resources consumed here
+ * @see FilesService orchestrates these imports while assembling a {@link com.farao_community.farao.swe.runner.app.domain.SweData}
+ * @see SweTaskParameters provides limits such as the maximum number of curative remedial actions written into CRAC parameters
+ * @see com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext principal result of the CIM CRAC import path
+ *
+ * <p>The imported CRAC behavior is adjusted with task parameters, notably {@link SweTaskParameters#getMaxCra()},
+ * which overrides the curative RA usage limit before the CRAC is built.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */

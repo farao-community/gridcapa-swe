@@ -12,6 +12,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 /**
+ * References one external file exchanged in the SWE broker contract by pairing a logical file name with a downloadable URL.
+ * {@link SweRequest} aggregates these resources for CGMES, CRAC and GLSK inputs, and services such as
+ * {@code NetworkService} or {@code FileImporter} dereference the URL to load the actual content.
+ *
+ * @see SweRequest request carrying the input file references
+ * @see com.farao_community.farao.swe.runner.app.services.NetworkService consumer assembling CGMES inputs from these resources
+ * @see com.farao_community.farao.swe.runner.app.services.FileImporter consumer opening the referenced files
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweFileResource {

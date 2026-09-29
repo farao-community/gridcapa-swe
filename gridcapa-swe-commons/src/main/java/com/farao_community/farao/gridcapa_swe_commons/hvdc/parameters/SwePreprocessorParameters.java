@@ -10,6 +10,9 @@ package com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters;
 import java.util.Set;
 
 /**
+ * Root container for the HVDC preprocessing configuration applied to SWE input networks.
+ * Groups the set of {@link HvdcCreationParameters} read by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter} and consumed by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor}.
+ *
  * @author Peter Mitri {@literal <peter.mitri@rte-france.com>}
  */
 public class SwePreprocessorParameters {

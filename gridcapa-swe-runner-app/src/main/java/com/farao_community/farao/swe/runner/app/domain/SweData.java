@@ -17,6 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Immutable container gathering the imported inputs and derived references for one SWE computation run. It is
+ * created by {@link com.farao_community.farao.swe.runner.app.services.FilesService}, then consumed by
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner},
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.NetworkShifterProvider}, and the export services to
+ * access direction-specific networks, CRAC data, URLs, and source CGMES files.
+ *
+ * <p>The four network fields and the paired ES-FR / ES-PT CRAC and RAO-parameter URLs are direction-specific
+ * resources reused throughout the workflow.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweData {

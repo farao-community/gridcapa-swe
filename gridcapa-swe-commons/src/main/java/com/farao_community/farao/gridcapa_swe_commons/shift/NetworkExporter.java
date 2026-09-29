@@ -9,6 +9,9 @@ package com.farao_community.farao.gridcapa_swe_commons.shift;
 import com.powsybl.iidm.network.Network;
 
 /**
+ * Extension point used by SWE shifting code to persist or publish a network snapshot when a balancing run fails and diagnostics are needed.
+ * Called by {@link SweNetworkShifter} and implemented by runner-side exporters such as {@link com.farao_community.farao.swe.runner.app.services.SweNetworkExporter}.
+ *
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public interface NetworkExporter {

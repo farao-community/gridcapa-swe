@@ -21,10 +21,9 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Before scaling: set generators pmin and pmax values to default values,
- * so that glsk generator pmin and pmax values are used
- * Only for {ES, PT} because FR is always in proportional and not absolute values
- * After scaling: reset to initial Pmin Pmax
+ * Temporarily widens generator active-power limits so GLSK-based shifts can use their own ES/PT bounds, then restores compatible limits on the working variant afterward.
+ * Used by {@link SweNetworkShifter} together with {@link ZonalData} and {@link Scalable} to identify shifted generators in the requested countries.
+ * {@code DEFAULT_PMIN} and {@code DEFAULT_PMAX} are sentinel bounds applied during preprocessing, and {@code initGenerators} stores the original limits that must be restored after scaling.
  *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */

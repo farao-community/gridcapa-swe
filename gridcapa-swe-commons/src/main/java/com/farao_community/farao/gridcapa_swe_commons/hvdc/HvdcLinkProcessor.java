@@ -29,7 +29,9 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Replaces an HVDC line's equivalent AC model with an actual HVDC line, and vice-versa
+ * Converts the SWE network representation of an interconnection between its equivalent AC model and an explicit IIDM {@link HvdcLine}, both when preprocessing input networks and when exporting them back.
+ * Consumes {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters} and nested {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.VscStationCreationParameters} to create converter stations and the HVDC line, uses {@link HvdcInformation} to restore missing lines from the original snapshot, and reports blocking data gaps with {@link SweInvalidDataNoDetailsException}.
+ * The created HVDC is dimensioned by {@code maxP}, {@code r}, {@code nominalV} and the optional angle-droop parameters carried by each {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters}; on side 1, load identifiers are interpreted by priority so a fallback load ID can be used when the preferred one is missing.
  *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}

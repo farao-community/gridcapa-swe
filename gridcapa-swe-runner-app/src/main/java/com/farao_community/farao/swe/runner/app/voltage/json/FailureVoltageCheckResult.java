@@ -10,6 +10,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Fallback JSON payload returned when voltage monitoring could not be produced. It keeps the exported schema stable by
+ * exposing the same top-level fields as a regular {@link VoltageCheckResult}, but with a failure status and no
+ * constraint details.
+ *
+ * @see VoltageCheckResult successful counterpart exported when monitoring completed
+ * @see VoltageCheckConstraintElement element type intentionally returned as an empty list here
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public class FailureVoltageCheckResult {

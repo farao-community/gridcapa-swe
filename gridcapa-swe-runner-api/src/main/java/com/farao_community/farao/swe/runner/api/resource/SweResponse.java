@@ -13,6 +13,18 @@ import com.github.jasminb.jsonapi.annotations.Type;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
+ * JSON:API response emitted by the SWE runner once a request has finished or has been stopped.
+ * It returns the task identifier, the exported TTC document location when available, and summary flags used by the caller to translate the run outcome into business statuses.
+ *
+ * <p>{@link com.farao_community.farao.swe.runner.app.services.SweRunner} and
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.DichotomyParallelization} create this contract,
+ * while {@link com.farao_community.farao.swe.runner.app.services.RequestService} interprets its flags to publish task status updates.
+ *
+ * <p>{@code interrupted} means the run was cancelled before producing the final document.
+ * {@code allRaoFailed} means every computed direction ended with an RAO failure.
+ * {@code allParallelRunsFailed} means every directional execution failed technically, even if no interruption occurred.
+ *
+ * @see SweRequest request answered by this response
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Type("swe-response")

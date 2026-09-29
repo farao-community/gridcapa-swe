@@ -22,6 +22,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+/**
+ * Utility methods for running SWE load flows with logging-context propagation across Powsybl computation threads.
+ * {@link com.farao_community.farao.gridcapa_swe_commons.shift.CountryBalanceComputation} and {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter} call it to execute {@link LoadFlow} with {@link LoadFlowParameters} while preserving the caller MDC through a custom {@link LocalComputationManager}.
+ * {@code workingVariantId} selects the IIDM variant to solve; when the MDC-aware manager cannot be created, the utility falls back to {@link #getDefaultComputationManager()}.
+ */
 public final class LoadFlowUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadFlowUtil.class);
 

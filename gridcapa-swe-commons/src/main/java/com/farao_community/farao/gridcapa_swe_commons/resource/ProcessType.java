@@ -7,6 +7,10 @@
 package com.farao_community.farao.gridcapa_swe_commons.resource;
 
 /**
+ * Identifies which SWE capacity-calculation flavour is being processed so downstream components can pick the proper dispatch and target-exchange logic.
+ * {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter} branches on it to compute border targets, and runner-side providers use it to choose between {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher} and {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher}.
+ * {@code code} is the external short label written in requests and exports ({@code 2D}, {@code 1D}, {@code IDCF}, {@code BTCC}).
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public enum ProcessType {

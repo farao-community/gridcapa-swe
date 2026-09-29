@@ -11,6 +11,12 @@ import com.google.auto.service.AutoService;
 import com.powsybl.commons.report.ReportResourceBundle;
 
 /**
+ * Registers the report message bundle used by PST-regulation reporting.
+ *
+ * <p>The {@link ReportResourceBundle} service loader discovers this class so that {@link PstRegulationReports} can
+ * resolve its message templates from the base name exposed here.
+ *
+ * @see PstRegulationReports emits report nodes backed by this bundle
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */
 @AutoService(ReportResourceBundle.class)

@@ -12,7 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Map;
 
 /**
+ * Spring-bound configuration shared by SWE common components to parameterize balancing and export behavior across the Spain-Portugal-France capacity-calculation flow.
+ * {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter} uses {@code shiftMaxIterationNumber} to cap balancing-adjustment retries, while downstream exporters consume {@code zoneId} and {@code modelingAuthorityMap} to tag outputs with the expected regional and modeling-authority identifiers.
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @see com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter uses the iterative shift settings
  */
 @Configuration
 @ConfigurationProperties(prefix = "swe-commons")

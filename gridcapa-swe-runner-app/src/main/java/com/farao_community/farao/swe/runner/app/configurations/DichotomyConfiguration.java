@@ -13,6 +13,15 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Map;
 
 /**
+ * Binds the per-direction dichotomy shifting tolerances declared under {@code swe-runner.dichotomy}.
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.NetworkShifterProvider} reads this configuration to
+ * build each {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweNetworkShifter}, and the map is keyed
+ * by {@link com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection} to select the values for
+ * the requested border direction.
+ *
+ * <p>The {@code toleranceEsPt} and {@code toleranceEsFr} values are the country-balance tolerances passed to the
+ * network shifter for the ES-PT and ES-FR borders respectively.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Configuration

@@ -29,6 +29,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Loads the GLSK zonal scalables used by SWE shifting and adds a fallback French proportional scalable when the GLSK file does not provide one.
+ * Collaborates with {@link GlskDocumentImporters} to import the file, uses {@link NetworkUtil} to build the fallback FR generator weights, and throws {@link SweInvalidDataException} when the GLSK URL or content cannot be consumed.
+ * {@code glskUrl} identifies the remote GLSK artifact, {@code timestamp} selects the applicable time slice, and the fallback FR scalable distributes 100% proportionally to the pseudo target active power of connected French generators.
+ */
 public class ZonalScalableProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZonalScalableProvider.class);

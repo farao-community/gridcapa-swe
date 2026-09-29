@@ -18,6 +18,13 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
+ * Tracks runs that must be interrupted softly and exposes the hook expected by the dichotomy engine. It also publishes
+ * a Spring {@link Consumer} so external messages can request that a given run stops at the next safe interruption
+ * point.
+ *
+ * @see com.farao_community.farao.dichotomy.api.InterruptionStrategy strategy interface implemented for the dichotomy engine
+ * @see SweRunner consults the interruption state before launching a computation
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */

@@ -17,6 +17,21 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
+ * JSON:API request sent to the SWE runner over the message broker to describe one capacity-calculation execution.
+ * It bundles the run identity, target process timestamp, all required input file references and task-manager parameters consumed by the runner application.
+ *
+ * <p>The main collaborators are {@link SweFileResource}, used for every referenced input artifact,
+ * {@link TaskParameterDto}, which carries task-level overrides later interpreted by the runner, and
+ * {@link com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType}, which selects the process family handled by the run.
+ *
+ * <p>{@code currentRunId} identifies the task-manager run checked for interruption before launching the computation.
+ * {@code processType} drives process-specific behavior such as the CRAC creation parameter set to use.
+ * {@code targetProcessDateTime} is the business timestamp of the network being computed.
+ * {@code boundaryEq}/{@code boundaryTp} are the boundary CGMES files merged with the national files, and {@code taskParameterList} contains non-default calculation parameters.
+ *
+ * @see SweResponse broker response produced for this request
+ * @see com.farao_community.farao.swe.runner.app.services.RequestService service deserializing and dispatching this request
+ * @see com.farao_community.farao.swe.runner.app.services.FilesService service consuming the referenced input files
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Type("swe-request")

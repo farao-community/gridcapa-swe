@@ -9,6 +9,14 @@ package com.farao_community.farao.swe.runner.api.resource;
 import java.util.Optional;
 
 /**
+ * Wraps the outcome of a launched computation thread by distinguishing a produced value, an interruption and an execution error.
+ * Callers can inspect the optional result together with the error markers without relying on exceptions alone.
+ *
+ * <p>The collaboration is between {@link Optional}, which holds the successful value, and the factory methods
+ * {@link #success(Object)}, {@link #interrupt()} and {@link #error(Exception)}, which encode the three supported end states.
+ *
+ * <p>{@code hasError} differentiates a technical failure from an interruption, where the result is empty but no exception is attached.
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class ThreadLauncherResult<U> {

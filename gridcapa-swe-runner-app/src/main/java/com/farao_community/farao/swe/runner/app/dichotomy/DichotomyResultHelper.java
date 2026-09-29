@@ -22,6 +22,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * Utility methods that extract business-oriented information from dichotomy and RAO results, such as limiting
+ * causes, limiting elements, and activated remedial actions. These helpers are primarily used by
+ * {@link DichotomyLogging} and navigate {@link com.powsybl.openrao.data.crac.api.Crac} together with
+ * {@link com.powsybl.openrao.data.raoresult.api.RaoResult} to build log-friendly summaries.
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public final class DichotomyResultHelper {

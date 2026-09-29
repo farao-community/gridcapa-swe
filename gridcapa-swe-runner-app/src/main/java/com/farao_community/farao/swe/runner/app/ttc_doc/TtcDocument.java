@@ -32,6 +32,13 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
+ * Builds the XML TTC document summarizing the secure exchange found for each computed direction. It transforms the
+ * parallel dichotomy results into the simple border/value structure expected by downstream consumers.
+ *
+ * @see ExecutionResult carries the directional {@link SweDichotomyResult} instances aggregated in the TTC document
+ * @see SweDichotomyResult provides the per-direction dichotomy outcome consumed here
+ * @see OutputService exports the resulting XML stream as an output artifact
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class TtcDocument {

@@ -10,7 +10,10 @@ package com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters;
 import java.util.Objects;
 
 /**
- * Parameters of angle droop active power control on an HVDC line
+ * Holds the optional angle-droop control settings attached to a created SWE HVDC line.
+ * Embedded in {@link HvdcCreationParameters} and consumed by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor} when it adds the Powsybl HVDC angle-droop extension.
+ * {@code p0} is the reference active-power target passed to the extension, while {@code droop} is the controller gain used to translate angle deviations into active-power adjustments.
+ *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public class AngleDroopActivePowerControlParameters {

@@ -13,7 +13,10 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Parameters for creating an HVDC line and replacing an existing equivalent AC model
+ * Aggregates all data required to replace one SWE AC equivalent model by an IIDM HVDC line and later rebuild the equivalent model if needed.
+ * Composes {@link VscStationCreationParameters}, {@link AngleDroopActivePowerControlParameters} and {@link HvdcAcEquivalentModel}, and is consumed by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor} and {@link SwePreprocessorParameters}.
+ * {@code maxP}, {@code r} and {@code nominalV} are the electrical sizing values applied to the created HVDC line; {@code vscCreationParameters} selects per-side converter settings and {@code angleDroopActivePowerControlParameters} toggles the optional angle-droop operating mode.
+ *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public class HvdcCreationParameters {

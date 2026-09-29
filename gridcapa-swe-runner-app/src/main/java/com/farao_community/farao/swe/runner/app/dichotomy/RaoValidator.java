@@ -42,6 +42,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * {@link NetworkValidator} implementation that validates each dichotomy step by exporting the scaled network,
+ * invoking the RAO runner, and enriching the result with optional PST regulation or angle monitoring. It is created
+ * by {@link DichotomyRunner}, uses {@link FileExporter}, {@link FileImporter}, and {@link RaoRunnerClient} to run
+ * the external optimization, and returns {@link SweDichotomyValidationData} for downstream logging and exports.
+ *
+ * <p>The {@code runAngleCheck} flag enables angle monitoring only for Portugal-related directions after a secure
+ * flow result, and {@link SweTaskParameters} supplies the RAO/load-flow settings reused for PST regulation and
+ * monitoring computations.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class RaoValidator implements NetworkValidator<SweDichotomyValidationData> {

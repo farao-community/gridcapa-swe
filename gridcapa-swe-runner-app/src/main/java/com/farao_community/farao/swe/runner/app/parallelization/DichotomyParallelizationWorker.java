@@ -30,6 +30,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
+ * Runs one directional dichotomy asynchronously and enriches its result with the output artifacts produced for that
+ * direction. It is the per-direction worker used by the parallel SWE execution flow once inputs have been prepared.
+ *
+ * @see com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner runs the actual dichotomy and RAO loop
+ * @see VoltageCheckService performs the optional post-RAO voltage assessment on the winning step
+ * @see CneFileExportService exports CNE files for the highest valid and lowest invalid steps
+ * @see CgmesExportService exports the last-secure and optional first-unsecure CGMES snapshots
+ * @see OutputService publishes the voltage document generated from the monitoring result
+ *
+ * <p>Its behavior is mainly driven by the direction being computed and by {@link SweTaskParameters}, especially the
+ * flags enabling first-unsecure CGMES export and voltage-check execution.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 

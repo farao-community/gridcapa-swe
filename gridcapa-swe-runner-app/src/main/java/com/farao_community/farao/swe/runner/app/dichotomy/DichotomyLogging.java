@@ -34,6 +34,15 @@ import static com.farao_community.farao.swe.runner.app.dichotomy.DichotomyResult
 import static com.farao_community.farao.swe.runner.app.dichotomy.DichotomyResultHelper.limitingCauseToString;
 
 /**
+ * Produces the business log messages associated with dichotomy execution, from start and end markers to the final
+ * summary lines published for each direction. It is called by
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.DichotomyRunner} and
+ * {@link com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker}, and relies on
+ * {@link DichotomyResultHelper} plus {@link com.farao_community.farao.gridcapa_swe_commons.configuration.ProcessConfiguration}
+ * to format result details and localized timestamps.
+ *
+ * <p>The configured {@code zoneId} drives timestamp localization in the summary events.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service

@@ -7,6 +7,10 @@
 package com.farao_community.farao.gridcapa_swe_commons.hvdc;
 
 /**
+ * Stores the pre-preprocessing state of one SWE HVDC equivalent model so the original AC generators, loads and line terminals can be restored after workflows convert an HVDC back to its equivalent model.
+ * Populated alongside {@link HvdcLinkProcessor} conversions and later reused when an expected HVDC line is absent during restoration.
+ * The side 1 and side 2 active-power fields capture generator {@code targetP} and load {@code P0} values copied back to IIDM elements, while the boolean flags preserve whether each generator, load or AC-line terminal was initially connected.
+ *
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public class HvdcInformation {

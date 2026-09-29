@@ -31,6 +31,10 @@ import static com.powsybl.iidm.network.Country.PT;
 import static java.util.stream.Collectors.toMap;
 
 /**
+ * Computes SWE country balances and ES-PT / ES-FR border exchanges from an IIDM network after a load-flow solve.
+ * Delegates the solve to {@link LoadFlowUtil}, derives EIC-keyed results with {@link com.farao_community.farao.gridcapa_swe_commons.resource.SweEICode}, and throws {@link SweBaseCaseUnsecureException} when the prerequisite base-case load flow diverges.
+ * Exchange signs follow the ES-outbound convention returned by {@link #computeSweBordersExchanges(Network)}: ES is the sum of ES->PT and ES->FR flows, while PT and FR balances are the opposite of their respective incoming border exchange.
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public final class CountryBalanceComputation {

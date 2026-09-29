@@ -7,6 +7,9 @@
 package com.farao_community.farao.gridcapa_swe_commons.dichotomy;
 
 /**
+ * Enumerates the four directed border exchanges solved by the SWE dichotomy, distinguishing the ES-FR and ES-PT capacities in both directions.
+ * {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher} and {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher} translate each value into country scaling signs, and reporting code reuses {@code dashName} and {@code shortName} to label outputs consistently.
+ *
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  */
 public enum DichotomyDirection {

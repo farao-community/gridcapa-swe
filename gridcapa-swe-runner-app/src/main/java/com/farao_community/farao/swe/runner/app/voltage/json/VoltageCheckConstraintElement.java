@@ -11,6 +11,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Objects;
 
 /**
+ * One violated voltage constraint reported in the exported voltage-check JSON. It captures the monitored network
+ * element, the instant and contingency context, together with the observed voltage extrema and the corresponding
+ * admissible bounds.
+ *
+ * @see VoltageCheckResult contains the list of exported constraint elements
+ * @see com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper creates these DTOs from monitoring results
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public class VoltageCheckConstraintElement {

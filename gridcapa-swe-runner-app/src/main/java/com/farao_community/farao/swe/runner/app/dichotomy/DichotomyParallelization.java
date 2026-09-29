@@ -26,6 +26,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
+ * Orchestrates the directional dichotomy executions requested for one SWE run, waits for their asynchronous
+ * completion, and aggregates the results into the final {@link SweResponse}. It is invoked by
+ * {@link com.farao_community.farao.swe.runner.app.services.SweRunner}, delegates each direction to
+ * {@link com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker}, and uses
+ * {@link com.farao_community.farao.swe.runner.app.services.OutputService} plus
+ * {@link com.farao_community.farao.swe.runner.app.services.InterruptionService} to finalize artifacts and cleanup.
+ *
+ * <p>The {@code runDirection*} flags carried by {@link SweTaskParameters} determine which directional futures are
+ * launched for the current run.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */

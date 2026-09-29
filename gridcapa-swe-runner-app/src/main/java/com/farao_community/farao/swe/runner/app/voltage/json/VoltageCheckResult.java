@@ -12,6 +12,13 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * JSON view of the voltage-monitoring outcome exported by the SWE runner. It carries the overall security status and
+ * the list of violated voltage constraints detected on curative instants.
+ *
+ * @see VoltageCheckConstraintElement DTO used for each reported violation
+ * @see com.farao_community.farao.swe.runner.app.voltage.VoltageResultMapper assembles this result from RAO monitoring data
+ * @see FailureVoltageCheckResult fallback payload used when no monitoring result is available
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public class VoltageCheckResult {

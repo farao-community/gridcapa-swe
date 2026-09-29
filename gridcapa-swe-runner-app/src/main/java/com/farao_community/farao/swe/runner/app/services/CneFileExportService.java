@@ -50,6 +50,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
+ * Produces the zipped CNE document associated with a dichotomy result and uploads it to object storage. Depending on
+ * the requested security state, it serializes either the RAO result itself or an error document describing the
+ * limiting cause or RAO failure.
+ *
+ * @see FileExporter builds destination paths and file names shared with the rest of the output pipeline
+ * @see com.powsybl.openrao.data.raoresult.api.RaoResult provides the data exported when a usable RAO result exists
+ * @see NetworkService provides the network timestamp used in the generated market document header
+ * @see SweData supplies process metadata and CRAC contexts for each direction
+ *
+ * <p>Behavior is driven mainly by the requested {@link DichotomyDirection} and by the {@code isHighestValid} switch,
+ * which selects whether the export targets the last secure or first unsecure step.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 

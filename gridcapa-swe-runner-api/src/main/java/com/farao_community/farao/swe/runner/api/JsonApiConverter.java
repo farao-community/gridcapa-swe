@@ -20,6 +20,13 @@ import com.github.jasminb.jsonapi.exceptions.DocumentSerializationException;
 import com.github.jasminb.jsonapi.models.errors.Error;
 
 /**
+ * Converts SWE runner broker payloads between Java objects and JSON:API documents.
+ * It is used by the API and starter modules to serialize {@link com.farao_community.farao.swe.runner.api.resource.SweRequest}
+ * and {@link com.farao_community.farao.swe.runner.api.resource.SweResponse}, and to expose {@link AbstractSweException} instances as JSON:API errors.
+ *
+ * @see com.farao_community.farao.swe.runner.api.resource.SweRequest request contract serialized by this converter
+ * @see com.farao_community.farao.swe.runner.api.resource.SweResponse response contract serialized by this converter
+ * @see com.farao_community.farao.swe.runner.starter.SweMessageHandler AMQP/JMS message adapter delegating payload conversion here
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class JsonApiConverter {

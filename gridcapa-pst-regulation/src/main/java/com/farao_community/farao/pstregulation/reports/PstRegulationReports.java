@@ -19,6 +19,13 @@ import static com.powsybl.openrao.commons.logs.OpenRaoLoggerProvider.BUSINESS_LO
 import static com.powsybl.openrao.commons.logs.OpenRaoLoggerProvider.BUSINESS_WARNS;
 
 /**
+ * Centralizes the creation of report nodes and business logs related to PST regulation.
+ *
+ * <p>{@link com.farao_community.farao.pstregulation.PstRegulation} calls this utility to describe the regulation
+ * lifecycle, impacted contingencies, regulated {@link PstRangeAction PST range actions}, and execution errors in a
+ * {@link ReportNode}. Message templates are resolved through {@link PstRegulationReportResourceBundle}.
+ *
+ * @see PstRegulationReportResourceBundle provides the message bundle used by these reports
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
  */
 public final class PstRegulationReports {

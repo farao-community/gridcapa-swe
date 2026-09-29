@@ -41,6 +41,19 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
+ * Executes the optional post-RAO voltage monitoring step for the France-Spain directions and reports any voltage
+ * violations. It reloads the highest-valid network with PRA, runs monitoring with load-flow settings aligned with the
+ * task parameters, and can export the failing network when configured to do so.
+ *
+ * @see UrlValidationService retrieves the network-with-PRA file produced by RAO
+ * @see OpenLoadFlowParametersUtil builds the load-flow parameters used for monitoring
+ * @see FileExporter exports failing-network artifacts when requested
+ * @see com.farao_community.farao.swe.runner.app.configurations.ExportNetworkConfiguration toggles failing-network export
+ *
+ * <p>Execution is governed by {@link SweTaskParameters#isRunVoltageCheck()}, by the task's maximum Newton-Raphson
+ * iteration count, and by {@link ExportNetworkConfiguration#isExportFailedNetwork()} for optional network export on
+ * violations.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 

@@ -12,6 +12,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Exposes the named business {@link Logger} bean used to publish SWE calculation events. This logger is injected
+ * into services such as {@link com.farao_community.farao.swe.runner.app.dichotomy.DichotomyLogging} and
+ * {@link com.farao_community.farao.swe.runner.app.services.SweRunner} so that business messages are separated from
+ * technical logs.
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Configuration

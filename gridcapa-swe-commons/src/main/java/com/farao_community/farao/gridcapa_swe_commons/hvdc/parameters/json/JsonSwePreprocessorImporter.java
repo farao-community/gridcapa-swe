@@ -20,7 +20,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 /**
- * JSON deserializer for SwePreprocessorParameters
+ * Imports the SWE HVDC preprocessor JSON payload from a file or stream and builds the object graph expected by the network preprocessor.
+ * Creates the Jackson module that registers {@link SwePreprocessorParametersDeserializer}, returns {@link SwePreprocessorParameters}, and is called by {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor} before delegating to {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor}.
  *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */

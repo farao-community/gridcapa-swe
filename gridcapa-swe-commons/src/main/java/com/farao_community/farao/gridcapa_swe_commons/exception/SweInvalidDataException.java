@@ -7,6 +7,9 @@
 package com.farao_community.farao.gridcapa_swe_commons.exception;
 
 /**
+ * Signals invalid or unusable SWE inputs or intermediate data, typically when a direction, URL or imported artifact cannot be interpreted safely.
+ * Extends {@link AbstractSweException}; helpers such as {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweD2ccShiftDispatcher}, {@link com.farao_community.farao.gridcapa_swe_commons.shift.SweIdccShiftDispatcher} and {@link com.farao_community.farao.gridcapa_swe_commons.shift.ZonalScalableProvider} throw it for business-data inconsistencies.
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweInvalidDataException extends AbstractSweException {

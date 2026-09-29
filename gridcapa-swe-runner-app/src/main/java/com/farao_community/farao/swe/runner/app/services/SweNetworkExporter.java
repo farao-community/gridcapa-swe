@@ -15,6 +15,13 @@ import com.powsybl.iidm.network.Network;
 import java.time.OffsetDateTime;
 
 /**
+ * Adapter from the shared SWE shifting API to this application's artifact-export mechanism. When the balancing phase
+ * asks for a failing network export, this implementation stores the network snapshot with the SWE naming convention.
+ *
+ * @see FaillingNetworkExportUtils performs the actual artifact naming and export
+ * @see FileExporter uploads the exported XIIDM snapshot
+ * @see SweData provides the process timestamp and type associated with the current run
+ *
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public class SweNetworkExporter implements NetworkExporter {

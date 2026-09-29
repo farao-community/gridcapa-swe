@@ -24,6 +24,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Deserializes the JSON array of HVDC creation blocks used by the SWE preprocessor into strongly typed {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters} objects.
+ * Invoked by {@link SwePreprocessorParametersDeserializer}; delegates nested sections to the embedded VSC, angle-droop and AC-equivalent parsing helpers before handing the result to {@link com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor}.
+ * The parser enforces the SWE field names such as {@code maxP}, {@code nominalV} and {@code hvdcAcEquivalentModel}; inside the AC-equivalent section, side-1 load IDs are ordered by priority to support the fallback lookup implemented by the processor.
+ *
  * @author Peter Mitri {@literal <peter.mitri at rte-france.com>}
  */
 public final class HvdcCreationParametersArrayDeserializer {

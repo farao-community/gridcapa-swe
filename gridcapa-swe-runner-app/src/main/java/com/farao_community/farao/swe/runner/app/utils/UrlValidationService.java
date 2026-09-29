@@ -19,6 +19,16 @@ import java.net.URL;
 import java.util.StringJoiner;
 
 /**
+ * Guards access to remote resources by enforcing the application's URL whitelist before opening a stream. It provides
+ * the common safe entry point used by import and export services whenever they need to read an external file.
+ *
+ * @see UrlConfiguration supplies the whitelist prefixes checked before any access
+ * @see com.farao_community.farao.swe.runner.app.services.FileImporter uses this service for CRAC, GLSK, CGMES and RAO inputs
+ * @see com.farao_community.farao.swe.runner.app.services.CgmesExportService and
+ * {@link com.farao_community.farao.swe.runner.app.services.VoltageCheckService} reuse it to read RAO-produced networks
+ *
+ * <p>The behavior-driving setting is the whitelist configured in {@link UrlConfiguration#getWhitelist()}.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 @Component

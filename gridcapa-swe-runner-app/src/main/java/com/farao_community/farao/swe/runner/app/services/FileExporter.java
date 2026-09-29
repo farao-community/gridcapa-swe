@@ -49,6 +49,20 @@ import java.util.zip.ZipOutputStream;
 import static com.powsybl.openrao.raoapi.parameters.extensions.SecondPreventiveRaoParameters.ExecutionCondition;
 
 /**
+ * Centralizes artifact and output publication for the SWE runner. It serializes networks, CRACs, CGMES archives,
+ * RAO parameters, TTC documents and voltage-check results, then uploads them through the MinIO adapter using the
+ * naming conventions expected by downstream systems.
+ *
+ * @see MinioAdapter performs the actual upload and pre-signed URL generation
+ * @see VoltageResultMapper converts voltage-monitoring results into the JSON payload exported by this service
+ * @see SweTaskParameters influences the exported RAO parameter set
+ * @see OutputService and {@link FilesService} are the main orchestration services calling into this exporter
+ *
+ * <p>Relevant behavior switches come from {@link SweTaskParameters}, especially
+ * {@link SweTaskParameters#isSecondPreventiveRaoDisabled()}, which disables the second preventive RAO in the exported
+ * parameters. Output paths also depend on the configured application time zone carried by
+ * {@link ProcessConfiguration}.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */

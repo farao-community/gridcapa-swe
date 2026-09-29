@@ -13,6 +13,13 @@ import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
 import java.util.Optional;
 
 /**
+ * Wraps the outcome of one directional dichotomy, including the raw dichotomy result, optional voltage-monitoring
+ * result, generated artifact URLs, and failure/interruption flags. It is produced by
+ * {@link com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker}, aggregated by
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.DichotomyParallelization}, and consumed by
+ * {@link com.farao_community.farao.swe.runner.app.services.OutputService} and
+ * {@link com.farao_community.farao.swe.runner.app.ttc_doc.TtcDocument}.
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 public class SweDichotomyResult {

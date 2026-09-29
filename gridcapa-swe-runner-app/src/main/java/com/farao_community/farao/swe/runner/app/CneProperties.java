@@ -7,6 +7,11 @@
 
 package com.farao_community.farao.swe.runner.app;
 
+/**
+ * Enumerates the metadata property keys used when exporting SWE CNE documents and centralizes the common
+ * {@code rao-result.export.swe-cne.} prefix applied to each key. It is used by {@link com.farao_community.farao.swe.runner.app.services.CneFileExportService}
+ * to populate and read the CNE market document header consistently across exports.
+ */
 public enum CneProperties {
     DOCUMENT_ID("document-id"),
     REVISION_NUMBER("revision-number"),

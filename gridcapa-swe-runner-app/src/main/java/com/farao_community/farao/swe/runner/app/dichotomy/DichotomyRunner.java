@@ -28,6 +28,15 @@ import static com.farao_community.farao.swe.runner.app.services.NetworkService.g
 import static com.farao_community.farao.swe.runner.app.utils.OpenLoadFlowParametersUtil.getLoadFlowParameters;
 
 /**
+ * Builds and runs the dichotomy engine for a single border direction. It is called by
+ * {@link com.farao_community.farao.swe.runner.app.parallelization.DichotomyParallelizationWorker}, wires a
+ * direction-specific shifter from {@link NetworkShifterProvider}, and creates the
+ * {@link RaoValidator} used to validate each shifted network during the search.
+ *
+ * <p>The selected {@link DichotomyParameters} come from {@link SweTaskParameters}: the direction-specific minimum,
+ * maximum, and precision values define the search interval, while the angle-check and GLSK-check flags enable the
+ * corresponding optional validations.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service

@@ -10,6 +10,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Binds runner settings controlling whether diagnostic networks are exported when a calculation fails. It is
+ * consumed by {@link com.farao_community.farao.swe.runner.app.dichotomy.NetworkShifterProvider} and
+ * {@link com.farao_community.farao.swe.runner.app.services.VoltageCheckService} when they decide whether to create
+ * a {@link com.farao_community.farao.swe.runner.app.services.SweNetworkExporter} or other failure artifacts.
+ *
+ * <p>The {@code exportFailedNetwork} flag toggles those additional exports and defaults to {@code false}.</p>
+ *
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 @Configuration

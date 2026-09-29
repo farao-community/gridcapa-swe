@@ -24,10 +24,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Helper class to store all the data required for the regulation of a PST. It contains the PST range action with the
- * most limiting threshold of the FlowCNEC monitored by the PST and its associated side. The record representation
- * allows a more elegant and convenient manipulation of the data to configure the PST regulation for OpenLoadFlow.
+ * Aggregates the regulation data computed for one PST on one monitored element: the {@link PstRangeAction} to apply,
+ * the transformer side that must regulate, and the most constraining current threshold extracted from the associated
+ * {@link FlowCnec flow CNECs}.
  *
+ * <p>Built by {@link PstRegulation} and consumed by {@link PstRegulator} to configure OpenLoadFlow current-limiter
+ * regulation. The {@code limitingSide} selects the {@link TwoSides} terminal used for regulation, and
+ * {@code limitingThreshold} is the absolute current limit in amperes retained from the monitored CNECs on that side.
+ *
+ * @see PstRegulationInput aggregates one elementary input per regulated PST
+ * @see PstRegulator applies this input on the network model
  * @author Thomas Bouquet {@literal <thomas.bouquet at rte-france.com>}
  */
 public record ElementaryPstRegulationInput(PstRangeAction pstRangeAction, TwoSides limitingSide, double limitingThreshold) {

@@ -58,6 +58,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
+ * Imports the merged CGMES network used by the SWE calculation and prepares directional network snapshots for later
+ * processing. It also applies SWE-specific preprocessing, such as HVDC modeling and PST regulation deactivation, and
+ * exposes helpers to retrieve the network matching a dichotomy direction.
+ *
+ * @see FilesService orchestrates this service while building the run input data
+ * @see FileExporter persists the merged network once preprocessing has been applied
+ * @see com.farao_community.farao.gridcapa_swe_commons.hvdc.SweHvdcPreprocessor injects the HVDC equivalent model
+ * @see com.farao_community.farao.swe.runner.app.configurations.PstConfiguration supplies the PST identifiers to freeze
+ *
+ * <p>Its behavior is notably driven by the PST identifier list from {@link PstConfiguration}; every listed transformer
+ * is forced to a fixed setpoint when present in the imported network.</p>
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}

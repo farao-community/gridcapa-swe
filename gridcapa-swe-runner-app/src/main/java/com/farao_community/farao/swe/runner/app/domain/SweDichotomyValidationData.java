@@ -9,6 +9,14 @@ package com.farao_community.farao.swe.runner.app.domain;
 import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 
 /**
+ * Additional validation payload attached to each dichotomy step. {@link com.farao_community.farao.swe.runner.app.dichotomy.RaoValidator}
+ * creates it from the {@link RaoSuccessResponse} returned by RAO, and components such as
+ * {@link com.farao_community.farao.swe.runner.app.dichotomy.DichotomyLogging} reuse it to inspect angle-monitoring
+ * status when reporting results.
+ *
+ * <p>{@code angleMonitoringStatus} indicates whether the optional angle check was skipped ({@code NONE}), secure,
+ * unsecure, or failed.</p>
+ *
  * @author Marc Schwitzguébel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 

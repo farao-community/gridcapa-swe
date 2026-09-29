@@ -12,6 +12,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Spring Boot auto-configuration that exposes a ready-to-use {@link SweClient} bean for sending SWE runner requests.
+ * It binds external {@link SweClientProperties} and injects the application {@link AmqpTemplate} used by the client.
+ *
+ * @see SweClient client created by this configuration
+ * @see SweClientProperties broker settings bound from {@code swe-runner.*}
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Configuration

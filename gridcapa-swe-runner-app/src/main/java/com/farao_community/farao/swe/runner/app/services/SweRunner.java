@@ -24,6 +24,14 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
+ * Orchestrates one complete SWE run from a validated request. It checks whether the run was interrupted upstream,
+ * materializes the input data, launches the parallel dichotomy computation and returns the aggregated response.
+ *
+ * @see FilesService imports and prepares the networks, CRACs and auxiliary artifacts used by the run
+ * @see com.farao_community.farao.swe.runner.app.dichotomy.DichotomyParallelization performs the directional parallel execution
+ * @see RequestService invokes this runner for each incoming message
+ * @see UrlConfiguration provides the base URL used to query the interruption service
+ *
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
 @Service
