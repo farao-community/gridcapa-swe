@@ -55,7 +55,7 @@ jobs:
           tagging_message: v${{ github.event.inputs.releaseVersion }}
 
       - name: Release Maven package
-        run: mvn --batch-mode --projects :gridcapa-swe-commons,:gridcapa-swe-runner-api,:gridcapa-swe-runner-starter deploy -DskipTests
+        run: mvn --batch-mode --projects :gridcapa-swe-commons,:gridcapa-swe-runner-api,:gridcapa-swe-runner-starter -Pdefault,release deploy -DskipTests
         env:
           MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
