@@ -15,7 +15,6 @@ import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openrao.commons.OpenRaoException;
 import com.powsybl.openrao.data.crac.api.rangeaction.PstRangeAction;
-import com.powsybl.openrao.searchtreerao.reports.CastorReports;
 
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +53,7 @@ public final class PstRegulator {
     }
 
     private static TwoWindingsTransformer getTwoWindingsTransformer(Network network, PstRangeAction pstRangeAction) {
-        String pstId = pstRangeAction.getNetworkElement().getId();
+        String pstId = pstRangeAction.getNetworkElementId();
         TwoWindingsTransformer twt = network.getTwoWindingsTransformer(pstId);
         if (twt == null) {
             throw new OpenRaoException("No two-windings transformer with id %s found in network.".formatted(pstId));
@@ -67,7 +66,7 @@ public final class PstRegulator {
                                               final ReportNode reportNode) {
         PhaseTapChanger phaseTapChanger = twt.getPhaseTapChanger();
         if (phaseTapChanger.getRegulationTerminal() == null) {
-            CastorReports.reportNoDefaultRegulationTerminalDefined(reportNode, twt.getId(), elementaryPstRegulationInput.limitingSide());
+            //FIXME: CastorReports.reportNoDefaultRegulationTerminalDefined(reportNode, twt.getId(), elementaryPstRegulationInput.limitingSide());
             phaseTapChanger.setRegulationTerminal(twt.getTerminal(elementaryPstRegulationInput.limitingSide()));
         }
     }
@@ -75,7 +74,7 @@ public final class PstRegulator {
     private static void setTargetDeadband(final TwoWindingsTransformer twt, final ReportNode reportNode) {
         PhaseTapChanger phaseTapChanger = twt.getPhaseTapChanger();
         if (Double.isNaN(phaseTapChanger.getTargetDeadband())) {
-            CastorReports.reportNoDefaultTargetDeadbandDefined(reportNode, twt.getId());
+            //FIXME: CastorReports.reportNoDefaultTargetDeadbandDefined(reportNode, twt.getId());
             phaseTapChanger.setTargetDeadband(0.0); // value is not used by OpenLoadFlow in CURRENT_LIMITER mode
         }
     }

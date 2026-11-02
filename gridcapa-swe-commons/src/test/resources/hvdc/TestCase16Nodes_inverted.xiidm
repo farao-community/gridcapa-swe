@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<iidm:network xmlns:iidm="http://www.powsybl.org/schema/iidm/1_17" id="TestCase16Nodes" caseDate="2022-05-16T14:43:53.106+02:00" forecastDistance="0" sourceFormat="UCTE" minimumValidationLevel="STEADY_STATE_HYPOTHESIS">
+<iidm:network xmlns:iidm="http://www.powsybl.org/schema/iidm/1_18" id="TestCase16Nodes" caseDate="2022-05-16T14:43:53.106+02:00" forecastDistance="0" sourceFormat="UCTE" minimumValidationLevel="STEADY_STATE_HYPOTHESIS">
     <iidm:substation id="BBE1AA" country="BE">
         <iidm:voltageLevel id="BBE1AA1" nominalV="380.0" topologyKind="BUS_BREAKER">
             <iidm:busBreakerTopology>
@@ -14,11 +14,13 @@
                     <iidm:property name="currentLimit" value="2000"/>
                 </iidm:switch>
             </iidm:busBreakerTopology>
-            <iidm:generator id="BBE1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="1500.0" targetV="400.0" targetQ="0.0" bus="BBE1AA1 " connectableBus="BBE1AA1 ">
+            <iidm:generator id="BBE1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="1500.0" localTargetV="400.0" localTargetQ="0.0" bus="BBE1AA1 " connectableBus="BBE1AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
-            <iidm:generator id="BBE4AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="2500.0" targetV="400.0" targetQ="0.0" bus="BBE4AA1 " connectableBus="BBE4AA1 ">
+            <iidm:generator id="BBE4AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="2500.0" localTargetV="400.0" localTargetQ="0.0" bus="BBE4AA1 " connectableBus="BBE4AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="BBE1AA1 _load" loadType="UNDEFINED" p0="2500.0" q0="0.0" bus="BBE1AA1 " connectableBus="BBE1AA1 "/>
             <iidm:load id="BBE4AA1 _load" loadType="UNDEFINED" p0="2000.0" q0="0.0" bus="BBE4AA1 " connectableBus="BBE4AA1 "/>
@@ -34,11 +36,13 @@
                     <iidm:property name="geographicalName" value="BE3"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="BBE2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="0.0" targetV="400.0" targetQ="0.0" bus="BBE2AA1 " connectableBus="BBE2AA1 ">
+            <iidm:generator id="BBE2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="0.0" localTargetV="400.0" localTargetQ="0.0" bus="BBE2AA1 " connectableBus="BBE2AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
-            <iidm:generator id="BBE3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="2500.0" targetV="400.0" targetQ="0.0" bus="BBE3AA1 " connectableBus="BBE3AA1 ">
+            <iidm:generator id="BBE3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="2500.0" localTargetV="400.0" localTargetQ="0.0" bus="BBE3AA1 " connectableBus="BBE3AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="BBE2AA1 _load" loadType="UNDEFINED" p0="0.0" q0="0.0" bus="BBE2AA1 " connectableBus="BBE2AA1 "/>
             <iidm:load id="BBE3AA1 _load" loadType="UNDEFINED" p0="1500.0" q0="0.0" bus="BBE3AA1 " connectableBus="BBE3AA1 "/>
@@ -82,7 +86,7 @@
                 <iidm:step rho="1.0" alpha="6.2276423729910535"/>
             </iidm:phaseTapChanger>
             <iidm:operationalLimitsGroup2 id="DEFAULT">
-                <iidm:currentLimits permanentLimit="2000.0"/>
+                <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
             </iidm:operationalLimitsGroup2>
         </iidm:twoWindingsTransformer>
     </iidm:substation>
@@ -93,8 +97,9 @@
                     <iidm:property name="geographicalName" value="DE1"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="DDE1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="0.0" targetV="400.0" targetQ="0.0" bus="DDE1AA1 " connectableBus="DDE1AA1 ">
+            <iidm:generator id="DDE1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="0.0" localTargetV="400.0" localTargetQ="0.0" bus="DDE1AA1 " connectableBus="DDE1AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="DDE1AA1 _load" loadType="UNDEFINED" p0="0.0" q0="0.0" bus="DDE1AA1 " connectableBus="DDE1AA1 "/>
         </iidm:voltageLevel>
@@ -106,8 +111,9 @@
                     <iidm:property name="geographicalName" value="DE2"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="DDE2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="2000.0" targetV="400.0" targetQ="0.0" bus="DDE2AA1 " connectableBus="DDE2AA1 ">
+            <iidm:generator id="DDE2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="2000.0" localTargetV="400.0" localTargetQ="0.0" bus="DDE2AA1 " connectableBus="DDE2AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="DDE2AA1 _load" loadType="UNDEFINED" p0="3000.0" q0="0.0" bus="DDE2AA1 " connectableBus="DDE2AA1 "/>
         </iidm:voltageLevel>
@@ -126,11 +132,13 @@
                     <iidm:property name="currentLimit" value="2000"/>
                 </iidm:switch>
             </iidm:busBreakerTopology>
-            <iidm:generator id="DDE3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="1500.0" targetV="400.0" targetQ="0.0" bus="DDE3AA1 " connectableBus="DDE3AA1 ">
+            <iidm:generator id="DDE3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="1500.0" localTargetV="400.0" localTargetQ="0.0" bus="DDE3AA1 " connectableBus="DDE3AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
-            <iidm:generator id="DDE4AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="1500.0" targetV="400.0" targetQ="0.0" bus="DDE4AA1 " connectableBus="DDE4AA1 ">
+            <iidm:generator id="DDE4AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="1500.0" localTargetV="400.0" localTargetQ="0.0" bus="DDE4AA1 " connectableBus="DDE4AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="DDE3AA1 _load" loadType="UNDEFINED" p0="2000.0" q0="0.0" bus="DDE3AA1 " connectableBus="DDE3AA1 "/>
             <iidm:load id="DDE4AA1 _load" loadType="UNDEFINED" p0="0.0" q0="0.0" bus="DDE4AA1 " connectableBus="DDE4AA1 "/>
@@ -143,8 +151,9 @@
                     <iidm:property name="geographicalName" value="FR1"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="FFR1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="2000.0" targetV="400.0" targetQ="0.0" bus="FFR1AA1 " connectableBus="FFR1AA1 ">
+            <iidm:generator id="FFR1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="2000.0" localTargetV="400.0" localTargetQ="0.0" bus="FFR1AA1 " connectableBus="FFR1AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="FFR1AA1 _load" loadType="UNDEFINED" p0="1000.0" q0="0.0" bus="FFR1AA1 " connectableBus="FFR1AA1 "/>
         </iidm:voltageLevel>
@@ -159,11 +168,13 @@
                     <iidm:property name="geographicalName" value="FR4"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="FFR2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="2000.0" targetV="400.0" targetQ="0.0" bus="FFR2AA1 " connectableBus="FFR2AA1 ">
+            <iidm:generator id="FFR2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="2000.0" localTargetV="400.0" localTargetQ="0.0" bus="FFR2AA1 " connectableBus="FFR2AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
-            <iidm:generator id="FFR4AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="0.0" targetV="400.0" targetQ="0.0" bus="FFR4AA1 " connectableBus="FFR4AA1 ">
+            <iidm:generator id="FFR4AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="0.0" localTargetV="400.0" localTargetQ="0.0" bus="FFR4AA1 " connectableBus="FFR4AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="FFR2AA1 _load" loadType="UNDEFINED" p0="3500.0" q0="0.0" bus="FFR2AA1 " connectableBus="FFR2AA1 "/>
             <iidm:load id="FFR4AA1 _load" loadType="UNDEFINED" p0="0.0" q0="0.0" bus="FFR4AA1 " connectableBus="FFR4AA1 "/>
@@ -207,7 +218,7 @@
                 <iidm:step rho="1.0" alpha="6.2276423729910535"/>
             </iidm:phaseTapChanger>
             <iidm:operationalLimitsGroup2 id="DEFAULT">
-                <iidm:currentLimits permanentLimit="2000.0"/>
+                <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
             </iidm:operationalLimitsGroup2>
         </iidm:twoWindingsTransformer>
     </iidm:substation>
@@ -218,8 +229,9 @@
                     <iidm:property name="geographicalName" value="FR3"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="FFR3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="0.0" targetV="400.0" targetQ="0.0" bus="FFR3AA1 " connectableBus="FFR3AA1 ">
+            <iidm:generator id="FFR3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="0.0" localTargetV="400.0" localTargetQ="0.0" bus="FFR3AA1 " connectableBus="FFR3AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="FFR3AA1 _load" loadType="UNDEFINED" p0="0.0" q0="0.0" bus="FFR3AA1 " connectableBus="FFR3AA1 "/>
         </iidm:voltageLevel>
@@ -231,8 +243,9 @@
                     <iidm:property name="geographicalName" value="FR5"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="FFR5AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="1500.0" targetV="400.0" targetQ="0.0" bus="FFR5AA1 " connectableBus="FFR5AA1 ">
+            <iidm:generator id="FFR5AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="1500.0" localTargetV="400.0" localTargetQ="0.0" bus="FFR5AA1 " connectableBus="FFR5AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="FFR5AA1 _load" loadType="UNDEFINED" p0="1500.0" q0="0.0" bus="FFR5AA1 " connectableBus="FFR5AA1 "/>
         </iidm:voltageLevel>
@@ -244,8 +257,9 @@
                     <iidm:property name="geographicalName" value="NL1"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="NNL1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="1500.0" targetV="400.0" targetQ="0.0" bus="NNL1AA1 " connectableBus="NNL1AA1 ">
+            <iidm:generator id="NNL1AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="1500.0" localTargetV="400.0" localTargetQ="0.0" bus="NNL1AA1 " connectableBus="NNL1AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="NNL1AA1 _load" loadType="UNDEFINED" p0="1000.0" q0="0.0" bus="NNL1AA1 " connectableBus="NNL1AA1 "/>
         </iidm:voltageLevel>
@@ -257,8 +271,9 @@
                     <iidm:property name="geographicalName" value="NL2"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="NNL2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="500.0" targetV="400.0" targetQ="0.0" bus="NNL2AA1 " connectableBus="NNL2AA1 ">
+            <iidm:generator id="NNL2AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="500.0" localTargetV="400.0" localTargetQ="0.0" bus="NNL2AA1 " connectableBus="NNL2AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="NNL2AA1 _load" loadType="UNDEFINED" p0="1000.0" q0="0.0" bus="NNL2AA1 " connectableBus="NNL2AA1 "/>
         </iidm:voltageLevel>
@@ -270,210 +285,211 @@
                     <iidm:property name="geographicalName" value="NL3"/>
                 </iidm:bus>
             </iidm:busBreakerTopology>
-            <iidm:generator id="NNL3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" voltageRegulatorOn="true" targetP="2000.0" targetV="400.0" targetQ="0.0" bus="NNL3AA1 " connectableBus="NNL3AA1 ">
+            <iidm:generator id="NNL3AA1 _generator" energySource="OTHER" minP="-9000.0" maxP="9000.0" targetP="2000.0" localTargetV="400.0" localTargetQ="0.0" bus="NNL3AA1 " connectableBus="NNL3AA1 ">
                 <iidm:minMaxReactiveLimits minQ="-9000.0" maxQ="9000.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:load id="NNL3AA1 _load" loadType="UNDEFINED" p0="2500.0" q0="0.0" bus="NNL3AA1 " connectableBus="NNL3AA1 "/>
         </iidm:voltageLevel>
     </iidm:substation>
     <iidm:line id="BBE1AA1  BBE2AA1  1" r="0.0" x="10.0" voltageLevelId1="BBE1AA1" bus1="BBE1AA1 " connectableBus1="BBE1AA1 " voltageLevelId2="BBE2AA1" bus2="BBE2AA1 " connectableBus2="BBE2AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="BBE1AA1  BBE3AA1  1" r="0.0" x="10.0" voltageLevelId1="BBE1AA1" bus1="BBE1AA1 " connectableBus1="BBE1AA1 " voltageLevelId2="BBE2AA1" bus2="BBE3AA1 " connectableBus2="BBE3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="BBE1AA1  BBE3AA1  2" r="0.0" x="10.0" voltageLevelId1="BBE1AA1" bus1="BBE1AA1 " connectableBus1="BBE1AA1 " voltageLevelId2="BBE2AA1" bus2="BBE3AA1 " connectableBus2="BBE3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="BBE3AA1  BBE4AA1  1" r="0.0" x="10.0" voltageLevelId1="BBE2AA1" bus1="BBE3AA1 " connectableBus1="BBE3AA1 " voltageLevelId2="BBE1AA1" bus2="BBE4AA1 " connectableBus2="BBE4AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR1AA1  FFR2AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR1AA1" bus1="FFR1AA1 " connectableBus1="FFR1AA1 " voltageLevelId2="FFR2AA1" bus2="FFR2AA1 " connectableBus2="FFR2AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR1AA1  FFR3AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR1AA1" bus1="FFR1AA1 " connectableBus1="FFR1AA1 " voltageLevelId2="FFR3AA1" bus2="FFR3AA1 " connectableBus2="FFR3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR1AA1  FFR4AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR1AA1" bus1="FFR1AA1 " connectableBus1="FFR1AA1 " voltageLevelId2="FFR2AA1" bus2="FFR4AA1 " connectableBus2="FFR4AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR1AA1  FFR5AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR1AA1" connectableBus1="FFR1AA1 " voltageLevelId2="FFR5AA1" connectableBus2="FFR5AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR2AA1  FFR3AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR2AA1" bus1="FFR2AA1 " connectableBus1="FFR2AA1 " voltageLevelId2="FFR3AA1" bus2="FFR3AA1 " connectableBus2="FFR3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR2AA1  FFR3AA1  2" r="0.0" x="10.0" voltageLevelId1="FFR2AA1" bus1="FFR2AA1 " connectableBus1="FFR2AA1 " voltageLevelId2="FFR3AA1" bus2="FFR3AA1 " connectableBus2="FFR3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR3AA1  FFR5AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR3AA1" bus1="FFR3AA1 " connectableBus1="FFR3AA1 " voltageLevelId2="FFR5AA1" bus2="FFR5AA1 " connectableBus2="FFR5AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="DDE1AA1  DDE2AA1  1" r="0.0" x="10.0" voltageLevelId1="DDE1AA1" bus1="DDE1AA1 " connectableBus1="DDE1AA1 " voltageLevelId2="DDE2AA1" bus2="DDE2AA1 " connectableBus2="DDE2AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="DDE1AA1  DDE4AA1  1" r="0.0" x="10.0" voltageLevelId1="DDE1AA1" bus1="DDE1AA1 " connectableBus1="DDE1AA1 " voltageLevelId2="DDE3AA1" bus2="DDE4AA1 " connectableBus2="DDE4AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="DDE2AA1  DDE3AA1  1" r="0.0" x="10.0" voltageLevelId1="DDE2AA1" bus1="DDE2AA1 " connectableBus1="DDE2AA1 " voltageLevelId2="DDE3AA1" bus2="DDE3AA1 " connectableBus2="DDE3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="NNL1AA1  NNL2AA1  1" r="0.0" x="10.0" voltageLevelId1="NNL1AA1" bus1="NNL1AA1 " connectableBus1="NNL1AA1 " voltageLevelId2="NNL2AA1" bus2="NNL2AA1 " connectableBus2="NNL2AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="NNL1AA1  NNL3AA1  1" r="0.0" x="10.0" voltageLevelId1="NNL1AA1" bus1="NNL1AA1 " connectableBus1="NNL1AA1 " voltageLevelId2="NNL3AA1" bus2="NNL3AA1 " connectableBus2="NNL3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="NNL2AA1  NNL3AA1  1" r="0.0" x="10.0" voltageLevelId1="NNL2AA1" bus1="NNL2AA1 " connectableBus1="NNL2AA1 " voltageLevelId2="NNL3AA1" bus2="NNL3AA1 " connectableBus2="NNL3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR4AA1  DDE1AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR2AA1" bus1="FFR4AA1 " connectableBus1="FFR4AA1 " voltageLevelId2="DDE1AA1" bus2="DDE1AA1 " connectableBus2="DDE1AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR4AA1  DDE4AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR2AA1" bus1="FFR4AA1 " connectableBus1="FFR4AA1 " voltageLevelId2="DDE3AA1" bus2="DDE4AA1 " connectableBus2="DDE4AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="FFR2AA1  DDE3AA1  1" r="0.0" x="10.0" voltageLevelId1="FFR2AA1" bus1="FFR2AA1 " connectableBus1="FFR2AA1 " voltageLevelId2="DDE3AA1" bus2="DDE3AA1 " connectableBus2="DDE3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="DDE2AA1  NNL3AA1  1" r="0.0" x="10.0" voltageLevelId1="DDE2AA1" bus1="DDE2AA1 " connectableBus1="DDE2AA1 " voltageLevelId2="NNL3AA1" bus2="NNL3AA1 " connectableBus2="NNL3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="NNL2AA1  BBE3AA1  1" r="0.0" x="10.0" voltageLevelId1="NNL2AA1" bus1="NNL2AA1 " connectableBus1="NNL2AA1 " voltageLevelId2="BBE2AA1" bus2="BBE3AA1 " connectableBus2="BBE3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="BBE2AA1  FFR3AA1  1" r="0.0" x="10.0" voltageLevelId1="BBE2AA1" bus1="BBE2AA1 " connectableBus1="BBE2AA1 " voltageLevelId2="FFR3AA1" bus2="FFR3AA1 " connectableBus2="FFR3AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="BBE1AA1  FFR5AA1  1" r="0.0" x="10.0" voltageLevelId1="BBE1AA1" bus1="BBE1AA1 " connectableBus1="BBE1AA1 " voltageLevelId2="FFR5AA1" bus2="FFR5AA1 " connectableBus2="FFR5AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
     <iidm:line id="BBE4AA1  FFR5AA1  1" r="0.0" x="10.0" voltageLevelId1="BBE1AA1" bus1="BBE4AA1 " connectableBus1="BBE4AA1 " voltageLevelId2="FFR5AA1" bus2="FFR5AA1 " connectableBus2="FFR5AA1 ">
         <iidm:operationalLimitsGroup1 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup1>
         <iidm:operationalLimitsGroup2 id="DEFAULT">
-            <iidm:currentLimits permanentLimit="2000.0"/>
+            <iidm:currentLimits detectionKind="HIGH" permanentLimit="2000.0"/>
         </iidm:operationalLimitsGroup2>
     </iidm:line>
 </iidm:network>

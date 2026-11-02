@@ -27,7 +27,6 @@ import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.raoapi.RaoInput;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.powsybl.openrao.raoapi.parameters.extensions.OpenRaoSearchTreeParameters;
-import com.powsybl.openrao.raoapi.parameters.extensions.SearchTreeRaoPstRegulationParameters;
 import com.powsybl.openrao.searchtreerao.castor.algorithm.PostPerimeterSensitivityAnalysis;
 import com.powsybl.openrao.searchtreerao.castor.algorithm.PrePerimeterSensitivityAnalysis;
 import com.powsybl.openrao.searchtreerao.castor.algorithm.StateTree;
@@ -41,7 +40,7 @@ import com.powsybl.openrao.searchtreerao.result.impl.PostPerimeterResult;
 import com.powsybl.openrao.searchtreerao.result.impl.PreventiveAndCurativesRaoResultImpl;
 import com.powsybl.openrao.searchtreerao.result.impl.RangeActionActivationResultImpl;
 import com.powsybl.openrao.sensitivityanalysis.AppliedRemedialActions;
-import com.powsybl.openrao.util.AbstractNetworkPool;
+import com.powsybl.openrao.searchtreerao.networkpool.AbstractNetworkPool;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +74,8 @@ public final class PstRegulation {
                                          final Crac crac,
                                          final RaoResult raoResult,
                                          final RaoParameters raoParameters,
-                                         final ReportNode reportNode) {
+                                         final ReportNode reportNode,
+                                         final Map<String, String> pstsToRegulate) {
         final ReportNode pstRegulationReportNode = PstRegulationReports.reportPstRegulation(reportNode);
         String initialVariantId = network.getVariantManager().getWorkingVariantId();
         Set<String> initialVariants = new HashSet<>(network.getVariantManager().getVariantIds());
@@ -83,7 +83,6 @@ public final class PstRegulation {
         network.getVariantManager().cloneVariant(initialVariantId, PST_REGULATION_VARIANT);
         network.getVariantManager().setWorkingVariant(PST_REGULATION_VARIANT);
 
-        Map<String, String> pstsToRegulate = SearchTreeRaoPstRegulationParameters.getPstsToRegulate(raoParameters);
         if (pstsToRegulate.isEmpty()) {
             resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants);
             return raoResult;
@@ -128,7 +127,7 @@ public final class PstRegulation {
             return postPreventiveRegulationRaoResult;
         }
 
-        Set<PstRegulationInput> statesToRegulate = getStatesToRegulate(crac, postPreventiveRegulationRaoResult, flowUnit, rangeActionsToRegulate, SearchTreeRaoPstRegulationParameters.getPstsToRegulate(raoParameters), network);
+        Set<PstRegulationInput> statesToRegulate = getStatesToRegulate(crac, postPreventiveRegulationRaoResult, flowUnit, rangeActionsToRegulate, pstsToRegulate, network);
         if (statesToRegulate.isEmpty()) {
             resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants);
             return postPreventiveRegulationRaoResult;
@@ -193,7 +192,7 @@ public final class PstRegulation {
             raoResult,
             flowUnit,
             preventiveRangeActionsToRegulate,
-            SearchTreeRaoPstRegulationParameters.getPstsToRegulate(raoParameters),
+            pstsToRegulate,
             network
         );
         if (preventiveRegulationInput.isEmpty()) {
@@ -267,8 +266,8 @@ public final class PstRegulation {
         );
         if (limitingElement.isPresent()) {
             Set<ElementaryPstRegulationInput> elementaryPstRegulationInputs = rangeActionsToRegulate.stream()
-                .filter(pstRangeAction -> linesInSeriesWithPst.containsKey(pstRangeAction.getNetworkElement().getId()))
-                .map(pstRangeAction -> ElementaryPstRegulationInput.of(pstRangeAction, linesInSeriesWithPst.get(pstRangeAction.getNetworkElement().getId()), state, crac, network))
+                .filter(pstRangeAction -> linesInSeriesWithPst.containsKey(pstRangeAction.getNetworkElementId()))
+                .map(pstRangeAction -> ElementaryPstRegulationInput.of(pstRangeAction, linesInSeriesWithPst.get(pstRangeAction.getNetworkElementId()), state, crac, network))
                 .collect(Collectors.toSet());
             return Optional.of(new PstRegulationInput(state, limitingElement.get(), elementaryPstRegulationInputs));
         }
@@ -302,7 +301,7 @@ public final class PstRegulation {
             .filter(entry -> entry.getValue() == minMargin)
             .forEach(entry -> limitingElements.add(entry.getKey()));
         return limitingElements.stream()
-            .filter(flowCnec -> linesInSeriesWithPst.contains(flowCnec.getNetworkElement().getId()))
+            .filter(flowCnec -> linesInSeriesWithPst.contains(flowCnec.getNetworkElementId()))
             .min(Comparator.comparing(Identifiable::getId));
     }
 
@@ -350,8 +349,8 @@ public final class PstRegulation {
         // filter out crac's last instant range actions, as results reporting would be less relevant
         return crac.getPstRangeActions().stream()
             .filter(pstRangeAction -> pstRangeAction.getUsageRules().stream().anyMatch(usageRule -> usageRule.getInstant() == instant))
-            .filter(pstRangeAction -> pstsToRegulate.contains(pstRangeAction.getNetworkElement().getId()))
-            .collect(Collectors.toMap(pstRangeAction -> pstRangeAction.getNetworkElement().getId(), Function.identity()));
+            .filter(pstRangeAction -> pstsToRegulate.contains(pstRangeAction.getNetworkElementId()))
+            .collect(Collectors.toMap(pstRangeAction -> pstRangeAction.getNetworkElementId(), Function.identity()));
     }
 
     private static int getNumberOfThreads(Crac crac, RaoParameters raoParameters) {
@@ -396,7 +395,7 @@ public final class PstRegulation {
         return rangeActionsToRegulate.stream()
             .collect(Collectors.toMap(
                 Function.identity(),
-                pstRangeAction -> networkClone.getTwoWindingsTransformer(pstRangeAction.getNetworkElement().getId()).getPhaseTapChanger().getTapPosition()
+                pstRangeAction -> networkClone.getTwoWindingsTransformer(pstRangeAction.getNetworkElementId()).getPhaseTapChanger().getTapPosition()
             ));
     }
 

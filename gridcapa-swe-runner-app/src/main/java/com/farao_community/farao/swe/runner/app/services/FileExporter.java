@@ -136,7 +136,7 @@ public class FileExporter {
 
     public String zipTargetNameChangeExtension(String targetName, String extension) {
         if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(ZIP_EXT)) {
-            return StringUtils.replaceIgnoreCase(targetName, ZIP_EXT, extension);
+            return targetName.replace(ZIP_EXT, extension).replace(ZIP_EXT.toUpperCase(), extension);
         }
         return targetName;
     }

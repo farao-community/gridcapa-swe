@@ -21,6 +21,7 @@ import com.farao_community.farao.rao_runner.api.resource.RaoFailureResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
+import com.farao_community.farao.swe.runner.app.configurations.PstConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
@@ -41,6 +42,9 @@ import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
  */
@@ -60,8 +64,9 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private int variantCounter = 0;
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
+    private final Map<String, String> pstsToRegulate;
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters, Logger businessLogger, final SweTaskParameters sweTaskParameters) {
+    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters, Logger businessLogger, final SweTaskParameters sweTaskParameters, final PstConfiguration pstConfiguration) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoRunnerClient = raoRunnerClient;
@@ -71,6 +76,8 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         this.loadFlowParameters = loadFlowParameters;
         this.businessLogger = businessLogger;
         this.sweTaskParameters = sweTaskParameters;
+        this.pstsToRegulate = pstConfiguration.getPstsToRegulate().stream()
+                .collect(Collectors.toMap(PstConfiguration.PstToRegulate::getPstId, PstConfiguration.PstToRegulate::getMonitoredLineId));
     }
 
     @Override
@@ -121,7 +128,7 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         try {
             final Crac crac = sweData.getCracFrEs().getCrac();
             network.getVariantManager().setWorkingVariant(scaledNetworkVariantId);
-            final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
+            final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP, pstsToRegulate);
             return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
         } catch (final Exception e) {
             businessLogger.warn("PST Regulation failed", e);

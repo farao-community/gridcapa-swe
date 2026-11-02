@@ -8,7 +8,6 @@ package com.farao_community.farao.swe.runner.app.domain;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_swe_commons.exception.SweInvalidDataException;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -109,7 +108,7 @@ public class SweTaskParameters {
     }
 
     private boolean validateIsBooleanAndGet(final TaskParameterDto parameter, final List<String> errors) {
-        if (StringUtils.equals("BOOLEAN", parameter.getParameterType())) {
+        if ("BOOLEAN".equals(parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             return Boolean.parseBoolean(value);
         } else {
@@ -119,7 +118,7 @@ public class SweTaskParameters {
     }
 
     private int validateIsIntegerAndGet(final TaskParameterDto parameter, final List<String> errors) {
-        if (StringUtils.equals("INT", parameter.getParameterType())) {
+        if ("INT".equals(parameter.getParameterType())) {
             String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             try {
                 return Integer.parseInt(value);

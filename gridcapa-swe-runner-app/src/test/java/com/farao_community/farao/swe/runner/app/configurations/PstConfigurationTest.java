@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -26,5 +29,19 @@ class PstConfigurationTest {
         assertTrue(pstConfiguration.getPstIds().contains("twt-not-found-id"));
         assertTrue(pstConfiguration.getPstIds().contains("twt-test-regulation-id"));
         assertTrue(pstConfiguration.getPstIds().contains("twt-without-tap-changer-id"));
+    }
+
+    @Test
+    void checkPstsToRegulateConfig() {
+        PstConfiguration.PstToRegulate regul1 = new PstConfiguration.PstToRegulate();
+        regul1.setPstId("pstTestId1");
+        regul1.setMonitoredLineId("_line1 + _line2");
+        PstConfiguration.PstToRegulate regul2 = new PstConfiguration.PstToRegulate();
+        regul2.setPstId("pstTestId2");
+        regul2.setMonitoredLineId("_line3 + _line4");
+
+        final List<PstConfiguration.PstToRegulate> pstsToRegulate = pstConfiguration.getPstsToRegulate();
+        assertThat(pstsToRegulate).hasSize(2);
+        assertThat(pstsToRegulate).contains(regul1, regul2);
     }
 }

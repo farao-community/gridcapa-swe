@@ -33,7 +33,7 @@ public class VoltageResultMapper {
                     final Instant instant = voltageCnec.getState().getInstant();
                     final String contingency = voltageCnec.getState().getContingency().get().getId();
                     return new VoltageCheckConstraintElement(
-                            voltageCnec.getNetworkElement().getId(),
+                            voltageCnec.getNetworkElementId(),
                             instant.getKind().toString(),
                             contingency,
                             voltageMonitoringResult.getMinVoltage(instant, voltageCnec, Unit.KILOVOLT),

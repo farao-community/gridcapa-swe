@@ -26,9 +26,9 @@ import com.powsybl.openrao.commons.Unit;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.Instant;
 import com.powsybl.openrao.data.crac.api.cnec.VoltageCnec;
-import com.powsybl.openrao.monitoring.Monitoring;
 import com.powsybl.openrao.monitoring.MonitoringInput;
 import com.powsybl.openrao.monitoring.results.RaoResultWithVoltageMonitoring;
+import com.powsybl.openrao.monitoring.voltage.VoltageMonitoring;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +84,7 @@ public class VoltageCheckService {
             final LoadFlowParameters loadFlowParameters = OpenLoadFlowParametersUtil.getLoadFlowParameters(sweTaskParameters);
             final MonitoringInput input = MonitoringInput.buildWithVoltage(network, crac, dichotomyResult.getHighestValidStep().getRaoResult()).build();
             final RaoResultWithVoltageMonitoring result =
-                (RaoResultWithVoltageMonitoring) Monitoring.runVoltageAndUpdateRaoResult(
+                (RaoResultWithVoltageMonitoring) VoltageMonitoring.runAndUpdateRaoResult(
                     LoadFlow.find().getName(),
                     loadFlowParameters,
                     LoadFlowUtil.getMdcCompliantComputationManager(),
@@ -113,7 +113,7 @@ public class VoltageCheckService {
                         }
                         voltageConstraints.add(String.format(Locale.ENGLISH,
                                 "Low Voltage constraint reached - biggest violation on node \"%s\" - Minimum voltage of %f kV for a limit of %f kV",
-                                voltageCnec.getNetworkElement().getName(),
+                                voltageCnec.getNetworkElementId(),
                                 minVoltage,
                                 lowerBound));
                     }
@@ -126,7 +126,7 @@ public class VoltageCheckService {
                         }
                         voltageConstraints.add(String.format(Locale.ENGLISH,
                                 "High voltage constraint reached - biggest violation on node \"%s\" - Maximum voltage of %f kV for a limit of %f kV",
-                                voltageCnec.getNetworkElement().getName(),
+                                voltageCnec.getNetworkElementId(),
                                 maxVoltage,
                                 upperBound));
                     }

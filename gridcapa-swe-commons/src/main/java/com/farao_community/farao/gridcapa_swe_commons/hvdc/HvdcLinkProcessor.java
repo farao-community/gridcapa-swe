@@ -16,6 +16,7 @@ import com.powsybl.iidm.modification.topology.RemoveFeederBayBuilder;
 import com.powsybl.iidm.network.*;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
+import com.powsybl.iidm.network.regulation.RegulationMode;
 import com.powsybl.math.graph.TraverseResult;
 
 import java.util.ArrayList;
@@ -114,14 +115,17 @@ public final class HvdcLinkProcessor {
                     Terminal terminal = gen.getTerminal();
                     // WARNING : in CVG, this is done for the equivalent generator of HVDC line 1 for both HVDC lines. Here it is more generic => check if OK
                     VscStationCreationParameters vscStationCreationParameters = creationParameters.getVscCreationParameters(side);
-                    double voltageSetpoint = terminal.isConnected() ? gen.getTargetV() : vscStationCreationParameters.getDefaultVoltageSetpoint();
+                    double voltageSetpoint = terminal.isConnected() ? gen.getLocalTargetV() : vscStationCreationParameters.getDefaultVoltageSetpoint();
                     VoltageLevel voltageLevel = terminal.getVoltageLevel();
                     VscConverterStationAdder adder = voltageLevel.newVscConverterStation()
                             .setId(vscStationCreationParameters.getId())
-                            .setReactivePowerSetpoint(vscStationCreationParameters.getReactivePowerSetpoint())
                             .setLossFactor(vscStationCreationParameters.getLossFactor())
-                            .setVoltageRegulatorOn(vscStationCreationParameters.isVoltageRegulatorOn())
-                            .setVoltageSetpoint(voltageSetpoint)
+                            .newVoltageRegulation()
+                                .withRegulating(vscStationCreationParameters.isVoltageRegulatorOn())
+                                .withMode(RegulationMode.VOLTAGE)
+                                .add()
+                            .setLocalTargetV(voltageSetpoint)
+                            .setLocalTargetQ(vscStationCreationParameters.getReactivePowerSetpoint())
                             .setFictitious(false)
                             .setEnsureIdUnicity(true);
                     NetworkModification modification = buildNetworkModification(adder, voltageLevel, terminal);

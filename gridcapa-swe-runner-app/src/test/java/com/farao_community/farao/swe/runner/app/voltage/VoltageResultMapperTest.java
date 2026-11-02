@@ -11,7 +11,6 @@ import com.powsybl.contingency.Contingency;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.Instant;
 import com.powsybl.openrao.data.crac.api.InstantKind;
-import com.powsybl.openrao.data.crac.api.NetworkElement;
 import com.powsybl.openrao.data.crac.api.State;
 import com.powsybl.openrao.data.crac.api.cnec.Cnec;
 import com.powsybl.openrao.data.crac.api.cnec.VoltageCnec;
@@ -73,9 +72,7 @@ class VoltageResultMapperTest {
         State state1 = Mockito.mock(State.class);
         when(state1.getInstant()).thenReturn(PREVENTIVE_INSTANT);
         when(voltageCnec1.getState()).thenReturn(state1);
-        NetworkElement networkElement1 = Mockito.mock(NetworkElement.class);
-        when(networkElement1.getId()).thenReturn(NETWORK_1_ID);
-        when(voltageCnec1.getNetworkElement()).thenReturn(networkElement1);
+        when(voltageCnec1.getNetworkElementId()).thenReturn(NETWORK_1_ID);
         when(voltageCnec1.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_1));
         when(voltageCnec1.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_1));
         //
@@ -86,9 +83,7 @@ class VoltageResultMapperTest {
         when(contingency.getId()).thenReturn(CONTINGENCY_ID);
         when(state2.getContingency()).thenReturn(Optional.of(contingency));
         when(voltageCnec2.getState()).thenReturn(state2);
-        NetworkElement networkElement2 = Mockito.mock(NetworkElement.class);
-        when(networkElement2.getId()).thenReturn(NETWORK_2_ID);
-        when(voltageCnec2.getNetworkElement()).thenReturn(networkElement2);
+        when(voltageCnec2.getNetworkElementId()).thenReturn(NETWORK_2_ID);
         when(voltageCnec2.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_UPPER_0));
         when(voltageCnec2.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(EXPECTED_LOWER_0));
         when(voltageMonitoringResult.getMargin(CURATIVE_INSTANT, voltageCnec1, Unit.KILOVOLT)).thenReturn(-1d);

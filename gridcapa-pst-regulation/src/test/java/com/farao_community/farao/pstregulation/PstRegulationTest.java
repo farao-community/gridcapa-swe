@@ -24,8 +24,6 @@ import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.raoapi.RaoInput;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
-import com.powsybl.openrao.raoapi.parameters.extensions.OpenRaoSearchTreeParameters;
-import com.powsybl.openrao.raoapi.parameters.extensions.SearchTreeRaoPstRegulationParameters;
 import com.powsybl.openrao.searchtreerao.castor.algorithm.Castor;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -56,7 +54,10 @@ class PstRegulationTest {
         ListAppender<ILoggingEvent> listAppender = getBusinessLogs();
         List<ILoggingEvent> logsList = listAppender.list;
 
-        RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP);
+        RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of(
+                "FFR1AA1  FFR2AA1  2", "FFR1AA1  FFR2AA1  2",
+                "FFR2AA1  FFR3AA1  2", "FFR2AA1  FFR3AA1  2",
+                "FFR3AA1  FFR4AA1  2", "FFR3AA1  FFR4AA1  2"));
         List<String> logMessages = logsList.stream().map(ILoggingEvent::getFormattedMessage).sorted().toList();
 
         assertEquals("2 PST(s) to regulate: pstFr12, pstFr34", logMessages.get(0));
@@ -69,27 +70,27 @@ class PstRegulationTest {
         assertEquals(-15, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 12", crac.getLastInstant()), pst12));
         assertEquals(-5, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 12", crac.getLastInstant()), pst34));
         assertEquals(
-            "FlowCNEC 'cnecFr34PstCurative - Co12' of contingency scenario 'Contingency FR 12' is overloaded and is the most limiting element, " +
+                "FlowCNEC 'cnecFr34PstCurative - Co12' of contingency scenario 'Contingency FR 12' is overloaded and is the most limiting element, " +
                 "PST regulation has been triggered: pstFr12 (-10 -> -15), pstFr34 (0 -> -5)",
-            logMessages.get(4)
+                logMessages.get(4)
         );
 
         // Contingency FR2-FR3
         assertEquals(-5, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 23", crac.getLastInstant()), pst12));
         assertEquals(-5, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 23", crac.getLastInstant()), pst34));
         assertEquals(
-            "FlowCNEC 'cnecFr23PstCurative - Co23' of contingency scenario 'Contingency FR 23' is overloaded and is the most limiting element, " +
+                "FlowCNEC 'cnecFr23PstCurative - Co23' of contingency scenario 'Contingency FR 23' is overloaded and is the most limiting element, " +
                 "PST regulation has been triggered: pstFr12 (0 -> -5), pstFr34 (0 -> -5)",
-            logMessages.get(3)
+                logMessages.get(3)
         );
 
         // Contingency FR3-FR4
         assertEquals(-5, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 34", crac.getLastInstant()), pst12));
         assertEquals(-15, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 34", crac.getLastInstant()), pst34));
         assertEquals(
-            "FlowCNEC 'cnecFr12PstCurative - Co34' of contingency scenario 'Contingency FR 34' is overloaded and is the most limiting element, " +
+                "FlowCNEC 'cnecFr12PstCurative - Co34' of contingency scenario 'Contingency FR 34' is overloaded and is the most limiting element, " +
                 "PST regulation has been triggered: pstFr12 (0 -> -5)",
-            logMessages.get(2)
+                logMessages.get(2)
         );
     }
 
@@ -124,11 +125,7 @@ class PstRegulationTest {
         assertEquals(-690.23, raoResult.getMargin(curativeInstant, curativeCnecOnPst, Unit.AMPERE), 1e-2);
 
         // second run with regulation: regulation shifts PST's tap to position 7 to remove the overload but worsens min margin
-        final SearchTreeRaoPstRegulationParameters pstRegulationParameters = new SearchTreeRaoPstRegulationParameters();
-        pstRegulationParameters.setPstsToRegulate(Map.of("BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2"));
-        raoParameters.getExtension(OpenRaoSearchTreeParameters.class).setPstRegulationParameters(pstRegulationParameters);
-
-        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP);
+        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of("BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2"));
         assertEquals(1382.77, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
         assertEquals(7, raoResultWithRegulation.getOptimizedTapOnState(curativeState, pstRangeAction));
         assertEquals(-1382.77, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnLine, Unit.AMPERE), 1e-2);
@@ -166,7 +163,7 @@ class PstRegulationTest {
         assertEquals(823.54, raoResult.getMargin(curativeInstant, curativeCnecOnPst, Unit.AMPERE), 1e-2);
 
         // run PST regulation -> PST will be pushed up to tap position 2
-        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP);
+        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of("BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2"));
 
         assertEquals(79.38, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
 
@@ -215,7 +212,9 @@ class PstRegulationTest {
         assertEquals(16.51, raoResult.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
 
         // run PST regulation -> PST will be pushed up to tap position 2 making second PST overloaded in curative
-        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP);
+        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of(
+                "BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2",
+                "BBE1AA1  FFR1AA1  4", "BBE1AA1  FFR1AA1  4"));
 
         assertEquals(79.38, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
 

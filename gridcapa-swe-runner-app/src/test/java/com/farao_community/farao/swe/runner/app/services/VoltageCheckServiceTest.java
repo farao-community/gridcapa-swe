@@ -20,7 +20,6 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.commons.Unit;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.Instant;
-import com.powsybl.openrao.data.crac.api.NetworkElement;
 import com.powsybl.openrao.data.crac.api.State;
 import com.powsybl.openrao.data.crac.api.cnec.VoltageCnec;
 import com.powsybl.openrao.data.crac.io.cim.craccreator.CimCracCreationContext;
@@ -167,9 +166,7 @@ class VoltageCheckServiceTest {
         Mockito.when(vc.getLowerBound(Unit.KILOVOLT)).thenReturn(Optional.of(100d));
         Mockito.when(result.getMaxVoltage(any(), any(),  any())).thenReturn(600d);
         Mockito.when(vc.getUpperBound(Unit.KILOVOLT)).thenReturn(Optional.of(500d));
-        NetworkElement ne = Mockito.mock(NetworkElement.class);
-        Mockito.when(vc.getNetworkElement()).thenReturn(ne);
-        Mockito.when(ne.getName()).thenReturn("VL1");
+        Mockito.when(vc.getNetworkElementId()).thenReturn("VL1");
         Network network = Mockito.mock(Network.class);
         Mockito.when(fileExporter.saveNetworkInArtifact(any(), any(), any(), any(), any())).thenReturn("filepath");
         //When

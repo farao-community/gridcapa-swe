@@ -13,6 +13,7 @@ import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
+import com.farao_community.farao.swe.runner.app.configurations.PstConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
@@ -40,6 +41,7 @@ public class DichotomyRunner {
     private final NetworkShifterProvider networkShifterProvider;
     private final RaoRunnerClient raoRunnerClient;
     private final InterruptionService interruptionService;
+    private final PstConfiguration pstConfiguration;
 
     private final Logger businessLogger;
 
@@ -49,7 +51,8 @@ public class DichotomyRunner {
                            final NetworkShifterProvider networkShifterProvider,
                            final RaoRunnerClient raoRunnerClient,
                            final InterruptionService interruptionService,
-                           final Logger businessLogger) {
+                           final Logger businessLogger,
+                           final PstConfiguration pstConfiguration) {
         this.dichotomyLogging = dichotomyLogging;
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
@@ -57,6 +60,7 @@ public class DichotomyRunner {
         this.raoRunnerClient = raoRunnerClient;
         this.interruptionService = interruptionService;
         this.businessLogger = businessLogger;
+        this.pstConfiguration = pstConfiguration;
     }
 
     public DichotomyResult<SweDichotomyValidationData> run(final SweData sweData,
@@ -94,7 +98,7 @@ public class DichotomyRunner {
                                                                              final LoadFlowParameters loadFlowParameters,
                                                                              final SweTaskParameters sweTaskParameters) {
         return new RaoValidator(
-            fileExporter, fileImporter, raoRunnerClient, sweData, direction, runAngleCheck, loadFlowParameters, businessLogger, sweTaskParameters
+            fileExporter, fileImporter, raoRunnerClient, sweData, direction, runAngleCheck, loadFlowParameters, businessLogger, sweTaskParameters, pstConfiguration
         );
     }
 
