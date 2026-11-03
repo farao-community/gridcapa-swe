@@ -102,7 +102,7 @@ public final class PstRegulation {
         applyOptimalRemedialActionsForState(network, raoResult, crac.getPreventiveState());
 
         // 2. Preventive PST regulation
-        Optional<PstRegulationResult> preventiveRegulationResult = regulatePreventiveState(network, crac, raoResult, raoParameters, pstsToRegulate, flowUnit, loadFlowParameters, businessLogger);
+        Optional<PstRegulationResult> preventiveRegulationResult = regulatePreventiveState(network, crac, raoResult, pstsToRegulate, flowUnit, loadFlowParameters, businessLogger);
         final RaoResult postPreventiveRegulationRaoResult = preventiveRegulationResult.map(
                         regulationResult -> mergePstRegulationAndRaoResults(
                                 Set.of(regulationResult),
@@ -176,7 +176,6 @@ public final class PstRegulation {
     private static Optional<PstRegulationResult> regulatePreventiveState(final Network network,
                                                                          final Crac crac,
                                                                          final RaoResult raoResult,
-                                                                         final RaoParameters raoParameters,
                                                                          final Map<String, String> pstsToRegulate,
                                                                          final Unit flowUnit,
                                                                          final LoadFlowParameters loadFlowParameters,
