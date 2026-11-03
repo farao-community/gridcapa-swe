@@ -28,6 +28,7 @@ import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
 import com.powsybl.openrao.raoapi.parameters.extensions.OpenRaoSearchTreeParameters;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -136,7 +137,7 @@ public class FileExporter {
 
     public String zipTargetNameChangeExtension(String targetName, String extension) {
         if (StringUtils.isNotBlank(targetName) && targetName.toLowerCase().contains(ZIP_EXT)) {
-            return targetName.replace(ZIP_EXT, extension).replace(ZIP_EXT.toUpperCase(), extension);
+            return Strings.CI.replace(targetName, ZIP_EXT, extension);
         }
         return targetName;
     }
