@@ -7,6 +7,7 @@
 
 package com.farao_community.farao.pstregulation;
 
+import com.farao_community.farao.gridcapa_swe_commons.loadflow.LoadFlowUtil;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.contingency.Contingency;
 import com.powsybl.iidm.network.Network;
@@ -479,6 +480,7 @@ public final class PstRegulation {
         final PrePerimeterSensitivityAnalysis initialPrePerimeterSensitivityAnalysis = new PrePerimeterSensitivityAnalysis(
                 crac, crac.getFlowCnecs(), crac.getRangeActions(), raoParameters, toolProvider, true
         );
+        initialPrePerimeterSensitivityAnalysis.setComputationManager(LoadFlowUtil.getMdcCompliantComputationManager());
         final PrePerimeterResult initialFlowResult = initialPrePerimeterSensitivityAnalysis.runInitialSensitivityAnalysis(network, ReportNode.NO_OP);
 
         // create a new network variant from initial variant for performing the results merging
@@ -512,8 +514,10 @@ public final class PstRegulation {
                 preventiveRangeActionActivationResult
         );
 
+        final PostPerimeterSensitivityAnalysis postPerimeterSensitivityAnalysis = new PostPerimeterSensitivityAnalysis(crac, crac.getFlowCnecs(), crac.getRangeActions(), raoParameters, toolProvider, true);
+        postPerimeterSensitivityAnalysis.setComputationManager(LoadFlowUtil.getMdcCompliantComputationManager());
         final PostPerimeterResult preventivePostPerimeterResult =
-                new PostPerimeterSensitivityAnalysis(crac, crac.getFlowCnecs(), crac.getRangeActions(), raoParameters, toolProvider, true)
+                postPerimeterSensitivityAnalysis
                         .runBasedOnInitialPreviousAndOptimizationResults(network, initialFlowResult, preventivePrePerimeterResult, Set.of(), preventiveResult, new AppliedRemedialActions(), ReportNode.NO_OP);
 
         final Map<State, PostPerimeterResult> postRegulationPostContingencyResults = new HashMap<>();
@@ -557,6 +561,7 @@ public final class PstRegulation {
                     final PrePerimeterSensitivityAnalysis statePrePerimeterSensitivityAnalysis = new PrePerimeterSensitivityAnalysis(
                             crac, crac.getFlowCnecs(state), crac.getRangeActions(), raoParameters, toolProvider, true
                     );
+                    statePrePerimeterSensitivityAnalysis.setComputationManager(LoadFlowUtil.getMdcCompliantComputationManager());
 
                     final PrePerimeterResult statePrePerimeterResult = statePrePerimeterSensitivityAnalysis.runBasedOnInitialResults(
                             network, initialFlowResult, Collections.emptySet(), appliedRemedialActions, ReportNode.NO_OP
@@ -574,8 +579,10 @@ public final class PstRegulation {
                             .filter(cnec -> cnec.getState().getContingency().orElseThrow().equals(contingency))
                             .collect(Collectors.toSet());
 
+                    final PostPerimeterSensitivityAnalysis statePostPerimeterSensitivityAnalysis = new PostPerimeterSensitivityAnalysis(crac, statePostPerimeterFlowCnecs, crac.getRangeActions(), raoParameters, toolProvider, true);
+                    statePostPerimeterSensitivityAnalysis.setComputationManager(LoadFlowUtil.getMdcCompliantComputationManager());
                     final PostPerimeterResult statePostPerimeterResult =
-                            new PostPerimeterSensitivityAnalysis(crac, statePostPerimeterFlowCnecs, crac.getRangeActions(), raoParameters, toolProvider, true)
+                            statePostPerimeterSensitivityAnalysis
                                     .runBasedOnInitialPreviousAndOptimizationResults(network, initialFlowResult, contingencyPrePerimeterResult, Set.of(), stateOptimizationResult, appliedRemedialActions, ReportNode.NO_OP);
                     postRegulationPostContingencyResults.put(state, statePostPerimeterResult);
 
