@@ -40,11 +40,11 @@ class HvdcLinkProcessorTest {
     @Test
     void testHvdcCreationRoundTrip() {
         // Test that when we create the HVDC then remove it, the network is the same
-        Network network = Network.read("hvdc/TestCase16Nodes.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes.xiidm"));
+        Network network = Network.read("hvdc/TestCase16Nodes_roundTrip_v1_18.xiidm", getClass().getResourceAsStream("/hvdc/TestCase16Nodes_roundTrip_v1_18.xiidm"));
         SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters_16nodes.json"));
         HvdcLinkProcessor.replaceEquivalentModelByHvdc(network, params.getHvdcCreationParametersSet());
         HvdcLinkProcessor.replaceHvdcByEquivalentModel(network, params.getHvdcCreationParametersSet(), null);
-        TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes.xiidm", getClass());
+        TestUtils.assertNetworksAreEqual(network, "/hvdc/TestCase16Nodes_roundTrip_v1_18.xiidm", getClass());
     }
 
     @Test

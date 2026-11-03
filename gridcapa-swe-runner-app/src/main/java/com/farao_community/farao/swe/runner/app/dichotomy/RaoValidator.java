@@ -21,12 +21,12 @@ import com.farao_community.farao.rao_runner.api.resource.RaoFailureResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.rao_runner.starter.RaoRunnerClient;
+import com.farao_community.farao.swe.runner.app.configurations.PstConfiguration;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
 import com.farao_community.farao.swe.runner.app.services.FileExporter;
 import com.farao_community.farao.swe.runner.app.services.FileImporter;
-import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -35,11 +35,14 @@ import com.powsybl.openrao.commons.Unit;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.raoresult.api.ComputationStatus;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
-import com.powsybl.openrao.monitoring.Monitoring;
 import com.powsybl.openrao.monitoring.MonitoringInput;
+import com.powsybl.openrao.monitoring.angle.AngleMonitoring;
 import com.powsybl.openrao.monitoring.results.RaoResultWithAngleMonitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Theo Pascoli {@literal <theo.pascoli at rte-france.com>}
@@ -60,8 +63,18 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
     private int variantCounter = 0;
     private static final String REGION = "SWE";
     private static final String MINIO_SEPARATOR = "/";
+    private final Map<String, String> pstsToRegulate;
 
-    public RaoValidator(FileExporter fileExporter, FileImporter fileImporter, RaoRunnerClient raoRunnerClient, SweData sweData, DichotomyDirection direction, boolean runAngleCheck, LoadFlowParameters loadFlowParameters, Logger businessLogger, final SweTaskParameters sweTaskParameters) {
+    public RaoValidator(final FileExporter fileExporter,
+                        final FileImporter fileImporter,
+                        final RaoRunnerClient raoRunnerClient,
+                        final SweData sweData,
+                        final DichotomyDirection direction,
+                        final boolean runAngleCheck,
+                        final LoadFlowParameters loadFlowParameters,
+                        final Logger businessLogger,
+                        final SweTaskParameters sweTaskParameters,
+                        final PstConfiguration pstConfiguration) {
         this.fileExporter = fileExporter;
         this.fileImporter = fileImporter;
         this.raoRunnerClient = raoRunnerClient;
@@ -71,10 +84,16 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         this.loadFlowParameters = loadFlowParameters;
         this.businessLogger = businessLogger;
         this.sweTaskParameters = sweTaskParameters;
+        this.pstsToRegulate = pstConfiguration.getPstsToRegulate().stream()
+                .collect(Collectors.toMap(
+                        PstConfiguration.PstToRegulate::pstId,
+                        PstConfiguration.PstToRegulate::monitoredLineId
+                ));
     }
 
     @Override
-    public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(final Network network, final DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoFailureException, RaoInterruptionException {
+    public DichotomyStepResult<SweDichotomyValidationData> validateNetwork(final Network network,
+                                                                           final DichotomyStepResult<SweDichotomyValidationData> lastDichotomyStepResult) throws ValidationException, RaoFailureException, RaoInterruptionException {
         final String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
         final String scaledNetworkVariantId = network.getVariantManager().getWorkingVariantId();
         final String scaledNetworkName = scaledNetworkVariantId + ".xiidm";
@@ -98,14 +117,14 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
             ContingenciesLoggerUtil.logContingencies(raoResponse.getRaoResultFileUrl(), businessLogger);
 
             final RaoResult raoResult = fileImporter.importRaoResult(
-                raoResponse.getRaoResultFileUrl(),
-                fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network)
+                    raoResponse.getRaoResultFileUrl(),
+                    fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network)
             );
             if (this.runAngleCheck && isPortugalInDirection() && raoResult.isSecure(PhysicalParameter.FLOW)) {
                 return runAngleMonitoring(network, raoResult, raoResponse);
             } else if (!isPortugalInDirection()) {
                 final DichotomyStepResult<SweDichotomyValidationData> raoResultWithPstRegulation = runPstRegulation(
-                    network, scaledNetworkVariantId, raoResult, raoResponse
+                        network, scaledNetworkVariantId, raoResult, raoResponse
                 );
                 if (raoResultWithPstRegulation != null) {
                     return raoResultWithPstRegulation;
@@ -117,11 +136,14 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         }
     }
 
-    private DichotomyStepResult<SweDichotomyValidationData> runPstRegulation(final Network network, final String scaledNetworkVariantId, final RaoResult raoResult, final RaoSuccessResponse raoResponse) {
+    private DichotomyStepResult<SweDichotomyValidationData> runPstRegulation(final Network network,
+                                                                             final String scaledNetworkVariantId,
+                                                                             final RaoResult raoResult,
+                                                                             final RaoSuccessResponse raoResponse) {
         try {
             final Crac crac = sweData.getCracFrEs().getCrac();
             network.getVariantManager().setWorkingVariant(scaledNetworkVariantId);
-            final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), ReportNode.NO_OP);
+            final RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, fileExporter.getSweRaoParameters(sweTaskParameters), pstsToRegulate, businessLogger);
             return DichotomyStepResult.fromNetworkValidationResult(raoResultWithPstRegulation, new SweDichotomyValidationData(raoResponse, SweDichotomyValidationData.AngleMonitoringStatus.NONE));
         } catch (final Exception e) {
             businessLogger.warn("PST Regulation failed", e);
@@ -129,33 +151,35 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         return null;
     }
 
-    private DichotomyStepResult<SweDichotomyValidationData> runAngleMonitoring(final Network network, final RaoResult raoResult, final RaoSuccessResponse raoResponse) {
+    private DichotomyStepResult<SweDichotomyValidationData> runAngleMonitoring(final Network network,
+                                                                               final RaoResult raoResult,
+                                                                               final RaoSuccessResponse raoResponse) {
         final Crac crac = sweData.getCracEsPt().getCrac();
         final MonitoringInput input = MonitoringInput.buildWithAngle(network, crac, raoResult, fileImporter.importCimGlskDocument(sweData.getGlskUrl()).getZonalScalable(network, sweData.getTimestamp().toInstant())).build();
         final RaoResultWithAngleMonitoring raoResultWithAngleMonitoring =
-            (RaoResultWithAngleMonitoring) Monitoring.runAngleAndUpdateRaoResult(
-                LoadFlow.find().getName(),
-                loadFlowParameters,
-                LoadFlowUtil.getMdcCompliantComputationManager(),
-                4,
-                input);
+                (RaoResultWithAngleMonitoring) AngleMonitoring.runAndUpdateRaoResult(
+                        LoadFlow.find().getName(),
+                        loadFlowParameters,
+                        LoadFlowUtil.getMdcCompliantComputationManager(),
+                        4,
+                        input);
         if (ComputationStatus.FAILURE == raoResultWithAngleMonitoring.getComputationStatus() || null == raoResultWithAngleMonitoring.getComputationStatus()) {
             businessLogger.warn("Angle monitoring result is failure");
             return DichotomyStepResult.fromNetworkValidationResult(
-                raoResultWithAngleMonitoring, new SweDichotomyValidationData(
-                    raoResponse,
-                    SweDichotomyValidationData.AngleMonitoringStatus.FAILURE
-                ),
-                false
+                    raoResultWithAngleMonitoring, new SweDichotomyValidationData(
+                            raoResponse,
+                            SweDichotomyValidationData.AngleMonitoringStatus.FAILURE
+                    ),
+                    false
             );
         } else if (raoResultWithAngleMonitoring.isSecure(PhysicalParameter.ANGLE, PhysicalParameter.FLOW)) {
             businessLogger.info("Angle monitoring result is secure");
             return DichotomyStepResult.fromNetworkValidationResult(
-                raoResultWithAngleMonitoring, new SweDichotomyValidationData(
-                    raoResponse,
-                    SweDichotomyValidationData.AngleMonitoringStatus.SECURE
-                ),
-                true
+                    raoResultWithAngleMonitoring, new SweDichotomyValidationData(
+                            raoResponse,
+                            SweDichotomyValidationData.AngleMonitoringStatus.SECURE
+                    ),
+                    true
             );
         } else {
             businessLogger.info("Angle monitoring result is unsecure");
@@ -167,16 +191,17 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
                     });
 
             return DichotomyStepResult.fromNetworkValidationResult(
-                raoResultWithAngleMonitoring, new SweDichotomyValidationData(
-                    raoResponse,
-                    SweDichotomyValidationData.AngleMonitoringStatus.UNSECURE
-                ),
-                false
+                    raoResultWithAngleMonitoring, new SweDichotomyValidationData(
+                            raoResponse,
+                            SweDichotomyValidationData.AngleMonitoringStatus.UNSECURE
+                    ),
+                    false
             );
         }
     }
 
-    private RaoRequest buildRaoRequest(String networkPresignedUrl, String scaledNetworkDirPath) {
+    private RaoRequest buildRaoRequest(String networkPresignedUrl,
+                                       String scaledNetworkDirPath) {
         String resultsDestination = REGION + MINIO_SEPARATOR + sweData.getProcessType() + MINIO_SEPARATOR + scaledNetworkDirPath;
         String raoParametersUrl = getMatchingRaoParametersUrl(direction);
         return new RaoRequest.RaoRequestBuilder()
@@ -196,7 +221,8 @@ public class RaoValidator implements NetworkValidator<SweDichotomyValidationData
         return String.format("%s/%s-%s/", basePath, ++variantCounter, variantName);
     }
 
-    private String getMatchingCracPath(DichotomyDirection direction, SweData sweData) {
+    private String getMatchingCracPath(DichotomyDirection direction,
+                                       SweData sweData) {
         if (direction.equals(DichotomyDirection.ES_FR) || direction.equals(DichotomyDirection.FR_ES)) {
             return sweData.getJsonCracPathFrEs();
         } else if (direction.equals(DichotomyDirection.ES_PT) || direction.equals(DichotomyDirection.PT_ES)) {

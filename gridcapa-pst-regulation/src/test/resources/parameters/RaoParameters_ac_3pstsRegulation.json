@@ -1,5 +1,5 @@
 {
-  "version" : "3.4",
+  "version" : "3.5",
   "objective-function" : {
     "type" : "MAX_MIN_MARGIN"
   },
@@ -135,13 +135,6 @@
       "costly-min-margin-parameters": {
         "shifted-violation-penalty" : 10000.0,
         "shifted-violation-threshold": 0.0
-      },
-      "pst-regulation-parameters" : {
-        "psts-to-regulate" : {
-          "FFR1AA1  FFR2AA1  2" : "FFR1AA1  FFR2AA1  2",
-          "FFR2AA1  FFR3AA1  2" : "FFR2AA1  FFR3AA1  2",
-          "FFR3AA1  FFR4AA1  2" : "FFR3AA1  FFR4AA1  2"
-        }
       }
     }
   }

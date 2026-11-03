@@ -17,6 +17,11 @@ swe-commons:
 
 swe-runner:
   pst:
+    psts-to-regulate:
+      - pst-id: "pstTestId1"
+        monitored-line-id: "_line1 + _line2"
+      - pst-id: "pstTestId2"
+        monitored-line-id: "_line3 + _line4"
     pst-ids:
       - twt-not-found-id
       - twt-test-regulation-id

@@ -33,14 +33,14 @@ import java.util.stream.Collectors;
 public record ElementaryPstRegulationInput(PstRangeAction pstRangeAction, TwoSides limitingSide, double limitingThreshold) {
     public static ElementaryPstRegulationInput of(PstRangeAction pstRangeAction, String monitoredNetworkElement, State state, Crac crac, Network network) {
         Set<FlowCnec> curativeFlowCnecs = crac.getFlowCnecs(state).stream()
-            .filter(flowCnec -> monitoredNetworkElement.equals(flowCnec.getNetworkElement().getId()))
+            .filter(flowCnec -> monitoredNetworkElement.equals(flowCnec.getNetworkElementId()))
             .collect(Collectors.toSet());
         if (curativeFlowCnecs.isEmpty()) {
             return null;
         }
 
         // if the PST monitors itself, the most limiting terminal is used for regulation
-        if (pstRangeAction.getNetworkElement().getId().equals(monitoredNetworkElement)) {
+        if (pstRangeAction.getNetworkElementId().equals(monitoredNetworkElement)) {
             double thresholdOne = getMostLimitingThreshold(curativeFlowCnecs, TwoSides.ONE);
             double thresholdTwo = getMostLimitingThreshold(curativeFlowCnecs, TwoSides.TWO);
             return thresholdOne <= thresholdTwo ? new ElementaryPstRegulationInput(pstRangeAction, TwoSides.ONE, thresholdOne) : new ElementaryPstRegulationInput(pstRangeAction, TwoSides.TWO, thresholdTwo);
@@ -87,7 +87,7 @@ public record ElementaryPstRegulationInput(PstRangeAction pstRangeAction, TwoSid
             throw new OpenRaoException("No branch with id '%s' found in network.".formatted(monitoredNetworkElement));
         }
 
-        String twoWindingsTransformerId = pstRangeAction.getNetworkElement().getId();
+        String twoWindingsTransformerId = pstRangeAction.getNetworkElementId();
         TwoWindingsTransformer twoWindingsTransformer = network.getTwoWindingsTransformer(twoWindingsTransformerId);
         if (twoWindingsTransformer == null) {
             throw new OpenRaoException("No two-windings transformer with id '%s' found in network.".formatted(twoWindingsTransformerId));
