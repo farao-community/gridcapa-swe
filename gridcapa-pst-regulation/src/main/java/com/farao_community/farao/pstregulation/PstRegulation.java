@@ -140,10 +140,16 @@ public final class PstRegulation {
                 .collect(Collectors.toSet());
 
         final int nbContingencies = contingencies.size();
-        final String contingenciesList = String.join(", ", contingencies.stream().map(contingency -> contingency.getName().orElse(contingency.getId())).sorted().toList());
+        final String contingenciesList = contingencies.stream().
+                map(contingency -> contingency.getName().orElse(contingency.getId()))
+                .sorted()
+                .collect(Collectors.joining(", "));
         businessLogger.info("{} contingency scenario(s) to regulate: {}", nbContingencies, contingenciesList);
         final int nbPsts = rangeActionsToRegulate.size();
-        final String pstsList = String.join(", ", rangeActionsToRegulate.stream().map(PstRangeAction::getName).sorted().toList());
+        final String pstsList = rangeActionsToRegulate.stream()
+                .map(PstRangeAction::getName)
+                .sorted()
+                .collect(Collectors.joining(", "));
         businessLogger.info("{} PST(s) to regulate: {}", nbPsts, pstsList);
 
         // regulate PSTs for each curative scenario in parallel
