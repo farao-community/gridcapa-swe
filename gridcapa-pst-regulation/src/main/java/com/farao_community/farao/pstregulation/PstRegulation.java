@@ -7,7 +7,6 @@
 
 package com.farao_community.farao.pstregulation;
 
-import com.farao_community.farao.pstregulation.reports.PstRegulationReports;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.contingency.Contingency;
 import com.powsybl.iidm.network.Network;
@@ -140,8 +139,12 @@ public final class PstRegulation {
                 .map(Optional::get)
                 .collect(Collectors.toSet());
 
-        PstRegulationReports.reportContingencyScenariosToRegulate(businessLogger, contingencies);
-        PstRegulationReports.reportPstsToRegulate(businessLogger, rangeActionsToRegulate);
+        final int nbContingencies = contingencies.size();
+        final String contingenciesList = String.join(", ", contingencies.stream().map(contingency -> contingency.getName().orElse(contingency.getId())).sorted().toList());
+        businessLogger.info("{} contingency scenario(s) to regulate: {}", nbContingencies, contingenciesList);
+        final int nbPsts = rangeActionsToRegulate.size();
+        final String pstsList = String.join(", ", rangeActionsToRegulate.stream().map(PstRangeAction::getName).sorted().toList());
+        businessLogger.info("{} PST(s) to regulate: {}", nbPsts, pstsList);
 
         // regulate PSTs for each curative scenario in parallel
         try (AbstractNetworkPool networkPool = AbstractNetworkPool.create(network, network.getVariantManager().getWorkingVariantId(), getNumberOfThreads(crac, raoParameters), true)) {
