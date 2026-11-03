@@ -7,7 +7,6 @@
 
 package com.farao_community.farao.pstregulation;
 
-import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -16,6 +15,8 @@ import com.powsybl.openrao.data.crac.api.rangeaction.PstRangeAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PstRegulatorTest {
     private Network network;
     private final LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
+    private static final Logger LOGGER = LoggerFactory.getLogger(PstRegulatorTest.class);
 
     @BeforeEach
     void setUp() {
@@ -42,7 +44,7 @@ class PstRegulatorTest {
     void testRegulationWithOnePst() {
         PstRangeAction pstRangeAction = Mockito.mock(PstRangeAction.class);
         Mockito.when(pstRangeAction.getNetworkElementId()).thenReturn("BBE1AA1  FFR1AA1  2");
-        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(Set.of(new ElementaryPstRegulationInput(pstRangeAction, TwoSides.ONE, 500.0)), network, loadFlowParameters, ReportNode.NO_OP);
+        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(Set.of(new ElementaryPstRegulationInput(pstRangeAction, TwoSides.ONE, 500.0)), network, loadFlowParameters, LOGGER);
         // PATL of PST is 500 A; tap must be in range [3; 15]
         assertEquals(Map.of(pstRangeAction, 3), regulatedTapPerPst);
     }
@@ -53,7 +55,7 @@ class PstRegulatorTest {
         network.getTwoWindingsTransformer("BBE1AA1  FFR1AA1  2").getPhaseTapChanger().setTapPosition(8);
         PstRangeAction pstRangeAction = Mockito.mock(PstRangeAction.class);
         Mockito.when(pstRangeAction.getNetworkElementId()).thenReturn("BBE1AA1  FFR1AA1  2");
-        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(Set.of(new ElementaryPstRegulationInput(pstRangeAction, TwoSides.ONE, 500.0)), network, loadFlowParameters, ReportNode.NO_OP);
+        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(Set.of(new ElementaryPstRegulationInput(pstRangeAction, TwoSides.ONE, 500.0)), network, loadFlowParameters, LOGGER);
         // PATL of PST is 500 A; tap must be in range [3; 15]
         assertEquals(Map.of(pstRangeAction, 8), regulatedTapPerPst);
     }

@@ -41,6 +41,7 @@ import com.powsybl.openrao.searchtreerao.result.impl.PreventiveAndCurativesRaoRe
 import com.powsybl.openrao.searchtreerao.result.impl.RangeActionActivationResultImpl;
 import com.powsybl.openrao.sensitivityanalysis.AppliedRemedialActions;
 import com.powsybl.openrao.searchtreerao.networkpool.AbstractNetworkPool;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,9 +75,9 @@ public final class PstRegulation {
                                          final Crac crac,
                                          final RaoResult raoResult,
                                          final RaoParameters raoParameters,
-                                         final ReportNode reportNode,
-                                         final Map<String, String> pstsToRegulate) {
-        final ReportNode pstRegulationReportNode = PstRegulationReports.reportPstRegulation(reportNode);
+                                         final Map<String, String> pstsToRegulate,
+                                         final Logger businessLogger) {
+        businessLogger.info("PST regulation [start]");
         String initialVariantId = network.getVariantManager().getWorkingVariantId();
         Set<String> initialVariants = new HashSet<>(network.getVariantManager().getVariantIds());
 
@@ -84,7 +85,7 @@ public final class PstRegulation {
         network.getVariantManager().setWorkingVariant(PST_REGULATION_VARIANT);
 
         if (pstsToRegulate.isEmpty()) {
-            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants);
+            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants, businessLogger);
             return raoResult;
         }
 
@@ -101,18 +102,17 @@ public final class PstRegulation {
         applyOptimalRemedialActionsForState(network, raoResult, crac.getPreventiveState());
 
         // 2. Preventive PST regulation
-        Optional<PstRegulationResult> preventiveRegulationResult = regulatePreventiveState(network, crac, raoResult, raoParameters, pstsToRegulate, flowUnit, loadFlowParameters, pstRegulationReportNode);
+        Optional<PstRegulationResult> preventiveRegulationResult = regulatePreventiveState(network, crac, raoResult, raoParameters, pstsToRegulate, flowUnit, loadFlowParameters, businessLogger);
         final RaoResult postPreventiveRegulationRaoResult = preventiveRegulationResult.map(
-                regulationResult -> mergePstRegulationAndRaoResults(
-                    Set.of(regulationResult),
-                    raoResult,
-                    network,
-                    crac,
-                    raoParameters,
-                    reportNode,
-                    initialVariantId
-                ))
-            .orElse(raoResult);
+                        regulationResult -> mergePstRegulationAndRaoResults(
+                                Set.of(regulationResult),
+                                raoResult,
+                                network,
+                                crac,
+                                raoParameters,
+                                initialVariantId
+                        ))
+                .orElse(raoResult);
 
         network.getVariantManager().setWorkingVariant(PST_REGULATION_VARIANT);
         preventiveRegulationResult.ifPresent(regulationResult -> {
@@ -121,35 +121,35 @@ public final class PstRegulation {
 
         // 3. Curative PST regulation
 
-        Set<PstRangeAction> rangeActionsToRegulate = getPstRangeActionsForRegulation(pstsToRegulate.keySet(), crac, crac.getLastInstant(), pstRegulationReportNode);
+        Set<PstRangeAction> rangeActionsToRegulate = getPstRangeActionsForRegulation(pstsToRegulate.keySet(), crac, crac.getLastInstant(), businessLogger);
         if (rangeActionsToRegulate.isEmpty()) {
-            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants);
+            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants, businessLogger);
             return postPreventiveRegulationRaoResult;
         }
 
         Set<PstRegulationInput> statesToRegulate = getStatesToRegulate(crac, postPreventiveRegulationRaoResult, flowUnit, rangeActionsToRegulate, pstsToRegulate, network);
         if (statesToRegulate.isEmpty()) {
-            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants);
+            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants, businessLogger);
             return postPreventiveRegulationRaoResult;
         }
 
         Set<Contingency> contingencies = statesToRegulate.stream()
-            .map(PstRegulationInput::curativeState)
-            .map(State::getContingency)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(Collectors.toSet());
+                .map(PstRegulationInput::curativeState)
+                .map(State::getContingency)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
 
-        PstRegulationReports.reportContingencyScenariosToRegulate(pstRegulationReportNode, contingencies);
-        PstRegulationReports.reportPstsToRegulate(pstRegulationReportNode, rangeActionsToRegulate);
+        PstRegulationReports.reportContingencyScenariosToRegulate(businessLogger, contingencies);
+        PstRegulationReports.reportPstsToRegulate(businessLogger, rangeActionsToRegulate);
 
         // regulate PSTs for each curative scenario in parallel
         try (AbstractNetworkPool networkPool = AbstractNetworkPool.create(network, network.getVariantManager().getWorkingVariantId(), getNumberOfThreads(crac, raoParameters), true)) {
             List<ForkJoinTask<PstRegulationResult>> tasks = statesToRegulate.stream()
-                .map(pstRegulationInput -> networkPool.submit(
-                    () -> regulatePstsForContingencyScenario(pstRegulationInput, crac, rangeActionsToRegulate, postPreventiveRegulationRaoResult, loadFlowParameters, networkPool, pstRegulationReportNode)
-                ))
-                .toList();
+                    .map(pstRegulationInput -> networkPool.submit(
+                            () -> regulatePstsForContingencyScenario(pstRegulationInput, crac, rangeActionsToRegulate, postPreventiveRegulationRaoResult, loadFlowParameters, networkPool, businessLogger)
+                    ))
+                    .toList();
             Set<PstRegulationResult> pstRegulationResults = new HashSet<>();
             for (ForkJoinTask<PstRegulationResult> task : tasks) {
                 try {
@@ -160,16 +160,16 @@ public final class PstRegulation {
             }
             networkPool.shutdownAndAwaitTermination(1000, TimeUnit.SECONDS);
             network.getVariantManager().setWorkingVariant(initialVariantId);
-            return mergePstRegulationAndRaoResults(pstRegulationResults, postPreventiveRegulationRaoResult, network, crac, raoParameters, pstRegulationReportNode, initialVariantId);
+            return mergePstRegulationAndRaoResults(pstRegulationResults, postPreventiveRegulationRaoResult, network, crac, raoParameters, initialVariantId);
         } catch (Exception e) {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
-            PstRegulationReports.reportErrorDuringPstRegulation(pstRegulationReportNode, e.getMessage());
+            businessLogger.warn("An error occurred during PST regulation, pre-regulation RAO result will be kept. Error was: {}", e.getMessage());
             return postPreventiveRegulationRaoResult;
         } finally {
             loadFlowParameters.setPhaseShifterRegulationOn(initialPhaseShifterRegulationOnValue);
-            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants);
+            resetNetworkVariantAndLogEnd(network, initialVariantId, initialVariants, businessLogger);
         }
     }
 
@@ -180,20 +180,20 @@ public final class PstRegulation {
                                                                          final Map<String, String> pstsToRegulate,
                                                                          final Unit flowUnit,
                                                                          final LoadFlowParameters loadFlowParameters,
-                                                                         final ReportNode pstRegulationReportNode) {
-        Set<PstRangeAction> preventiveRangeActionsToRegulate = getPstRangeActionsForRegulation(pstsToRegulate.keySet(), crac, crac.getPreventiveInstant(), pstRegulationReportNode);
+                                                                         final Logger businessLogger) {
+        Set<PstRangeAction> preventiveRangeActionsToRegulate = getPstRangeActionsForRegulation(pstsToRegulate.keySet(), crac, crac.getPreventiveInstant(), businessLogger);
         if (preventiveRangeActionsToRegulate.isEmpty()) {
             return Optional.empty();
         }
 
         Optional<PstRegulationInput> preventiveRegulationInput = getPstRegulationInput(
-            crac.getPreventiveState(),
-            crac,
-            raoResult,
-            flowUnit,
-            preventiveRangeActionsToRegulate,
-            pstsToRegulate,
-            network
+                crac.getPreventiveState(),
+                crac,
+                raoResult,
+                flowUnit,
+                preventiveRangeActionsToRegulate,
+                pstsToRegulate,
+                network
         );
         if (preventiveRegulationInput.isEmpty()) {
             return Optional.empty();
@@ -203,8 +203,8 @@ public final class PstRegulation {
         network.getVariantManager().setWorkingVariant(PREVENTIVE_REGULATION_VARIANT);
         PstRegulationInput input = preventiveRegulationInput.get();
         Map<PstRangeAction, Integer> initialTapPerPst = getInitialTapPerPst(preventiveRangeActionsToRegulate, network);
-        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(input.elementaryPstRegulationInputs(), network, loadFlowParameters, pstRegulationReportNode);
-        logPstRegulationResultsForBaseCase(initialTapPerPst, regulatedTapPerPst, input.limitingElement(), pstRegulationReportNode);
+        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(input.elementaryPstRegulationInputs(), network, loadFlowParameters, businessLogger);
+        logPstRegulationResultsForBaseCase(initialTapPerPst, regulatedTapPerPst, input.limitingElement(), businessLogger);
         network.getVariantManager().setWorkingVariant(PST_REGULATION_VARIANT);
         network.getVariantManager().removeVariant(PREVENTIVE_REGULATION_VARIANT);
         return Optional.of(new PstRegulationResult(null, regulatedTapPerPst));
@@ -212,9 +212,10 @@ public final class PstRegulation {
 
     private static void resetNetworkVariantAndLogEnd(final Network network,
                                                      final String initialVariantId,
-                                                     final Set<String> initialVariants) {
+                                                     final Set<String> initialVariants,
+                                                     final Logger businessLogger) {
         resetNetworkVariant(network, initialVariantId, initialVariants);
-        PstRegulationReports.reportPstRegulationEnd();
+        businessLogger.info("PST regulation [end]");
     }
 
     private static void resetNetworkVariant(final Network network,
@@ -223,9 +224,9 @@ public final class PstRegulation {
         VariantManager variantManager = network.getVariantManager();
         variantManager.setWorkingVariant(initialVariantId);
         Set<String> variantsToRemove = variantManager.getVariantIds()
-            .stream()
-            .filter(not(initialVariants::contains))
-            .collect(Collectors.toSet());
+                .stream()
+                .filter(not(initialVariants::contains))
+                .collect(Collectors.toSet());
         variantsToRemove.forEach(variantManager::removeVariant);
     }
 
@@ -245,13 +246,13 @@ public final class PstRegulation {
                                                                Network network) {
         Instant lastInstant = crac.getLastInstant();
         return lastInstant.isCurative()
-            ? crac.getStates(lastInstant).stream()
+                ? crac.getStates(lastInstant).stream()
                 .filter(state -> raoResult.getComputationStatus(state) != ComputationStatus.FAILURE)
                 .map(curativeState -> getPstRegulationInput(curativeState, crac, raoResult, unit, rangeActionsToRegulate, linesInSeriesWithPst, network))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet())
-            : Set.of();
+                : Set.of();
     }
 
     private static Optional<PstRegulationInput> getPstRegulationInput(State state,
@@ -262,13 +263,13 @@ public final class PstRegulation {
                                                                       Map<String, String> linesInSeriesWithPst,
                                                                       Network network) {
         Optional<FlowCnec> limitingElement = getMostLimitingElementProtectedByPst(
-            state, crac, raoResult, unit, new HashSet<>(linesInSeriesWithPst.values())
+                state, crac, raoResult, unit, new HashSet<>(linesInSeriesWithPst.values())
         );
         if (limitingElement.isPresent()) {
             Set<ElementaryPstRegulationInput> elementaryPstRegulationInputs = rangeActionsToRegulate.stream()
-                .filter(pstRangeAction -> linesInSeriesWithPst.containsKey(pstRangeAction.getNetworkElementId()))
-                .map(pstRangeAction -> ElementaryPstRegulationInput.of(pstRangeAction, linesInSeriesWithPst.get(pstRangeAction.getNetworkElementId()), state, crac, network))
-                .collect(Collectors.toSet());
+                    .filter(pstRangeAction -> linesInSeriesWithPst.containsKey(pstRangeAction.getNetworkElementId()))
+                    .map(pstRangeAction -> ElementaryPstRegulationInput.of(pstRangeAction, linesInSeriesWithPst.get(pstRangeAction.getNetworkElementId()), state, crac, network))
+                    .collect(Collectors.toSet());
             return Optional.of(new PstRegulationInput(state, limitingElement.get(), elementaryPstRegulationInputs));
         }
         return Optional.empty();
@@ -284,31 +285,31 @@ public final class PstRegulation {
                                                                            Unit unit,
                                                                            Set<String> linesInSeriesWithPst) {
         Map<FlowCnec, Double> marginPerCnec = crac.getFlowCnecs(curativeState).stream()
-            .collect(Collectors.toMap(
-                Function.identity(),
-                flowCnec -> raoResult.getMargin(curativeState.getInstant(), flowCnec, unit)
-            ));
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        flowCnec -> raoResult.getMargin(curativeState.getInstant(), flowCnec, unit)
+                ));
         List<Map.Entry<FlowCnec, Double>> sortedNegativeMargins = marginPerCnec.entrySet().stream()
-            .filter(entry -> entry.getValue() < 0)
-            .sorted(Map.Entry.comparingByValue())
-            .toList();
+                .filter(entry -> entry.getValue() < 0)
+                .sorted(Map.Entry.comparingByValue())
+                .toList();
         if (sortedNegativeMargins.isEmpty()) {
             return Optional.empty();
         }
         double minMargin = sortedNegativeMargins.getFirst().getValue();
         Set<FlowCnec> limitingElements = new HashSet<>();
         sortedNegativeMargins.stream()
-            .filter(entry -> entry.getValue() == minMargin)
-            .forEach(entry -> limitingElements.add(entry.getKey()));
+                .filter(entry -> entry.getValue() == minMargin)
+                .forEach(entry -> limitingElements.add(entry.getKey()));
         return limitingElements.stream()
-            .filter(flowCnec -> linesInSeriesWithPst.contains(flowCnec.getNetworkElementId()))
-            .min(Comparator.comparing(Identifiable::getId));
+                .filter(flowCnec -> linesInSeriesWithPst.contains(flowCnec.getNetworkElementId()))
+                .min(Comparator.comparing(Identifiable::getId));
     }
 
     private static LoadFlowParameters getLoadFlowParameters(RaoParameters raoParameters) {
         return raoParameters.hasExtension(OpenRaoSearchTreeParameters.class)
-            ? raoParameters.getExtension(OpenRaoSearchTreeParameters.class).getLoadFlowAndSensitivityParameters().getSensitivityWithLoadFlowParameters().getLoadFlowParameters()
-            : new LoadFlowParameters();
+                ? raoParameters.getExtension(OpenRaoSearchTreeParameters.class).getLoadFlowAndSensitivityParameters().getSensitivityWithLoadFlowParameters().getLoadFlowParameters()
+                : new LoadFlowParameters();
     }
 
     private static void updateLoadFlowParametersForPstRegulation(LoadFlowParameters loadFlowParameters) {
@@ -319,41 +320,46 @@ public final class PstRegulation {
         loadFlowParameters.getExtension(OpenLoadFlowParameters.class).setMaxOuterLoopIterations(1000);
     }
 
-    private static void applyOptimalRemedialActionsForState(Network networkClone, RaoResult raoResult, State state) {
+    private static void applyOptimalRemedialActionsForState(Network networkClone,
+                                                            RaoResult raoResult,
+                                                            State state) {
         // network actions need to be applied BEFORE range actions because to apply HVDC range actions we need to apply AC emulation deactivation network actions beforehand
         raoResult.getActivatedNetworkActionsDuringState(state)
-            .forEach(networkAction -> networkAction.apply(networkClone));
+                .forEach(networkAction -> networkAction.apply(networkClone));
         raoResult.getActivatedRangeActionsDuringState(state)
-            .forEach(rangeAction -> rangeAction.apply(
-                networkClone, raoResult.getOptimizedSetPointOnState(state, rangeAction)
-            ));
+                .forEach(rangeAction -> rangeAction.apply(
+                        networkClone, raoResult.getOptimizedSetPointOnState(state, rangeAction)
+                ));
     }
 
     private static Set<PstRangeAction> getPstRangeActionsForRegulation(final Set<String> pstsToRegulate,
                                                                        final Crac crac,
                                                                        final Instant instant,
-                                                                       final ReportNode reportNode) {
+                                                                       final Logger businessLogger) {
         Map<String, PstRangeAction> rangeActionPerPst = getRangeActionPerPst(pstsToRegulate, crac, instant);
         Set<PstRangeAction> rangeActionsToRegulate = new HashSet<>();
         for (String pstId : pstsToRegulate) {
             if (rangeActionPerPst.containsKey(pstId)) {
                 rangeActionsToRegulate.add(rangeActionPerPst.get(pstId));
             } else {
-                PstRegulationReports.reportPstCannotBeRegulated(reportNode, pstId, instant.getId());
+                businessLogger.info("PST {} cannot be regulated as no PST range action was defined for it on instant {}.", pstId, instant.getId());
             }
         }
         return rangeActionsToRegulate;
     }
 
-    private static Map<String, PstRangeAction> getRangeActionPerPst(Set<String> pstsToRegulate, Crac crac, Instant instant) {
+    private static Map<String, PstRangeAction> getRangeActionPerPst(Set<String> pstsToRegulate,
+                                                                    Crac crac,
+                                                                    Instant instant) {
         // filter out crac's last instant range actions, as results reporting would be less relevant
         return crac.getPstRangeActions().stream()
-            .filter(pstRangeAction -> pstRangeAction.getUsageRules().stream().anyMatch(usageRule -> usageRule.getInstant() == instant))
-            .filter(pstRangeAction -> pstsToRegulate.contains(pstRangeAction.getNetworkElementId()))
-            .collect(Collectors.toMap(pstRangeAction -> pstRangeAction.getNetworkElementId(), Function.identity()));
+                .filter(pstRangeAction -> pstRangeAction.getUsageRules().stream().anyMatch(usageRule -> usageRule.getInstant() == instant))
+                .filter(pstRangeAction -> pstsToRegulate.contains(pstRangeAction.getNetworkElementId()))
+                .collect(Collectors.toMap(PstRangeAction::getNetworkElementId, Function.identity()));
     }
 
-    private static int getNumberOfThreads(Crac crac, RaoParameters raoParameters) {
+    private static int getNumberOfThreads(Crac crac,
+                                          RaoParameters raoParameters) {
         return Math.min(getAvailableCPUs(raoParameters), crac.getContingencies().size());
     }
 
@@ -366,13 +372,13 @@ public final class PstRegulation {
                                                                           final RaoResult raoResult,
                                                                           final LoadFlowParameters loadFlowParameters,
                                                                           final AbstractNetworkPool networkPool,
-                                                                          final ReportNode reportNode) throws InterruptedException {
+                                                                          final Logger businessLogger) throws InterruptedException {
         Network networkClone = networkPool.getAvailableNetwork();
         Contingency contingency = pstRegulationInput.curativeState().getContingency().orElseThrow();
         simulateContingencyAndApplyCurativeActions(contingency, networkClone, crac, raoResult);
         Map<PstRangeAction, Integer> initialTapPerPst = getInitialTapPerPst(rangeActionsToRegulate, networkClone);
-        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(pstRegulationInput.elementaryPstRegulationInputs(), networkClone, loadFlowParameters, reportNode);
-        logPstRegulationResultsForContingencyScenario(contingency, initialTapPerPst, regulatedTapPerPst, pstRegulationInput.limitingElement(), reportNode);
+        Map<PstRangeAction, Integer> regulatedTapPerPst = PstRegulator.regulatePsts(pstRegulationInput.elementaryPstRegulationInputs(), networkClone, loadFlowParameters, businessLogger);
+        logPstRegulationResultsForContingencyScenario(contingency, initialTapPerPst, regulatedTapPerPst, pstRegulationInput.limitingElement(), businessLogger);
         networkPool.releaseUsedNetwork(networkClone);
         return new PstRegulationResult(contingency, regulatedTapPerPst);
     }
@@ -386,27 +392,28 @@ public final class PstRegulation {
 
         // apply optimal automatons and curative remedial actions
         crac.getStates(contingency).stream()
-            .filter(state -> !state.getInstant().isOutage())
-            .forEach(state -> applyOptimalRemedialActionsForState(networkClone, raoResult, state));
+                .filter(state -> !state.getInstant().isOutage())
+                .forEach(state -> applyOptimalRemedialActionsForState(networkClone, raoResult, state));
     }
 
     private static Map<PstRangeAction, Integer> getInitialTapPerPst(Set<PstRangeAction> rangeActionsToRegulate,
                                                                     Network networkClone) {
         return rangeActionsToRegulate.stream()
-            .collect(Collectors.toMap(
-                Function.identity(),
-                pstRangeAction -> networkClone.getTwoWindingsTransformer(pstRangeAction.getNetworkElementId()).getPhaseTapChanger().getTapPosition()
-            ));
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        pstRangeAction -> networkClone.getTwoWindingsTransformer(pstRangeAction.getNetworkElementId()).getPhaseTapChanger().getTapPosition()
+                ));
     }
 
     private static void logPstRegulationResultsForBaseCase(final Map<PstRangeAction, Integer> initialTapByPst,
                                                            final Map<PstRangeAction, Integer> regulatedTapByPst,
                                                            final FlowCnec mostLimitingElement,
-                                                           final ReportNode reportNode) {
+                                                           final Logger businessLogger) {
         getRegulationSummary(initialTapByPst, regulatedTapByPst).ifPresent(
-            regulationSummary -> PstRegulationReports.reportPreventivePstRegulationTriggeredDueToOverloadedFlowCnec(
-                reportNode, mostLimitingElement.getId(), regulationSummary
-            )
+                regulationSummary -> businessLogger.info("FlowCNEC '{}' of the base case is overloaded and is the most limiting element, PST regulation has been triggered: {}",
+                                                         mostLimitingElement.getId(),
+                                                         regulationSummary
+                )
         );
     }
 
@@ -414,28 +421,30 @@ public final class PstRegulation {
                                                                       final Map<PstRangeAction, Integer> initialTapByPst,
                                                                       final Map<PstRangeAction, Integer> regulatedTapByPst,
                                                                       final FlowCnec mostLimitingElement,
-                                                                      final ReportNode reportNode) {
+                                                                      final Logger businessLogger) {
         getRegulationSummary(initialTapByPst, regulatedTapByPst).ifPresent(
-            regulationSummary -> PstRegulationReports.reportPstRegulationTriggeredDueToOverloadedFlowCnec(
-                reportNode, mostLimitingElement.getId(), contingency.getName().orElse(contingency.getId()), regulationSummary
-            )
+                regulationSummary -> businessLogger.info("FlowCNEC '{}' of contingency scenario '{}' is overloaded and is the most limiting element, PST regulation has been triggered: {}",
+                                                         mostLimitingElement.getId(),
+                                                         contingency.getName().orElse(contingency.getId()),
+                                                         regulationSummary
+                )
         );
     }
 
     private static Optional<String> getRegulationSummary(final Map<PstRangeAction, Integer> initialTapByPst,
-                                               final Map<PstRangeAction, Integer> regulatedTapByPst) {
+                                                         final Map<PstRangeAction, Integer> regulatedTapByPst) {
         List<PstRangeAction> sortedPstRangeActions = initialTapByPst.keySet().stream()
-            .sorted(Comparator.comparing(PstRangeAction::getId))
-            .toList();
+                .sorted(Comparator.comparing(PstRangeAction::getId))
+                .toList();
         List<String> shiftDetails = new ArrayList<>();
         sortedPstRangeActions.forEach(
-            pstRangeAction -> {
-                int initialTap = initialTapByPst.get(pstRangeAction);
-                int regulatedTap = regulatedTapByPst.get(pstRangeAction);
-                if (initialTap != regulatedTap) {
-                    shiftDetails.add("%s (%s -> %s)".formatted(pstRangeAction.getName(), initialTap, regulatedTap));
+                pstRangeAction -> {
+                    int initialTap = initialTapByPst.get(pstRangeAction);
+                    int regulatedTap = regulatedTapByPst.get(pstRangeAction);
+                    if (initialTap != regulatedTap) {
+                        shiftDetails.add("%s (%s -> %s)".formatted(pstRangeAction.getName(), initialTap, regulatedTap));
+                    }
                 }
-            }
         );
         return shiftDetails.isEmpty() ? Optional.empty() : Optional.of(String.join(", ", shiftDetails));
     }
@@ -445,25 +454,24 @@ public final class PstRegulation {
                                                              final Network network,
                                                              final Crac crac,
                                                              final RaoParameters raoParameters,
-                                                             final ReportNode reportNode,
                                                              final String initialVariant) {
         // store network variants data
         VariantManager variantManager = network.getVariantManager();
         Set<String> otherVariants = new HashSet<>(variantManager.getVariantIds());
 
         final Map<State, PstRegulationResult> resultsByState = pstRegulationResults.stream()
-            .collect(Collectors.toMap(
-                pstRegulationResult -> getState(pstRegulationResult.contingency(), crac),
-                Function.identity()
-            ));
+                .collect(Collectors.toMap(
+                        pstRegulationResult -> getState(pstRegulationResult.contingency(), crac),
+                        Function.identity()
+                ));
 
         final ToolProvider toolProvider = ToolProvider.buildFromRaoInputAndParameters(
-            RaoInput.build(network, crac).build(), raoParameters
+                RaoInput.build(network, crac).build(), raoParameters
         );
         final PrePerimeterSensitivityAnalysis initialPrePerimeterSensitivityAnalysis = new PrePerimeterSensitivityAnalysis(
-            crac, crac.getFlowCnecs(), crac.getRangeActions(), raoParameters, toolProvider, true
+                crac, crac.getFlowCnecs(), crac.getRangeActions(), raoParameters, toolProvider, true
         );
-        final PrePerimeterResult initialFlowResult = initialPrePerimeterSensitivityAnalysis.runInitialSensitivityAnalysis(network, reportNode);
+        final PrePerimeterResult initialFlowResult = initialPrePerimeterSensitivityAnalysis.runInitialSensitivityAnalysis(network, ReportNode.NO_OP);
 
         // create a new network variant from initial variant for performing the results merging
         final String variantName = "PSTRegulationResultsMerging";
@@ -479,7 +487,7 @@ public final class PstRegulation {
 
         // this result is only used as a data holder for flows: it does not contain the proper objective function value in costly
         final PrePerimeterResult preventivePrePerimeterResult = initialPrePerimeterSensitivityAnalysis.runBasedOnInitialResults(
-            network, initialFlowResult, Set.of(), new AppliedRemedialActions(), reportNode
+                network, initialFlowResult, Set.of(), new AppliedRemedialActions(), ReportNode.NO_OP
         );
 
         RangeActionActivationResultImpl preventiveRangeActionActivationResult = new RangeActionActivationResultImpl(initialFlowResult);
@@ -489,22 +497,22 @@ public final class PstRegulation {
         }
 
         final OptimizationResult preventiveResult = new OptimizationResultImpl(
-            preventivePrePerimeterResult, preventivePrePerimeterResult, preventivePrePerimeterResult,
-            new NetworkActionsResultImpl(Map.of(
-                preventiveState, raoResult.getActivatedNetworkActionsDuringState(preventiveState)
-            )),
-            preventiveRangeActionActivationResult
+                preventivePrePerimeterResult, preventivePrePerimeterResult, preventivePrePerimeterResult,
+                new NetworkActionsResultImpl(Map.of(
+                        preventiveState, raoResult.getActivatedNetworkActionsDuringState(preventiveState)
+                )),
+                preventiveRangeActionActivationResult
         );
 
         final PostPerimeterResult preventivePostPerimeterResult =
-            new PostPerimeterSensitivityAnalysis(crac, crac.getFlowCnecs(), crac.getRangeActions(), raoParameters, toolProvider, true)
-                .runBasedOnInitialPreviousAndOptimizationResults(network, initialFlowResult, preventivePrePerimeterResult, Set.of(), preventiveResult, new AppliedRemedialActions(), reportNode);
+                new PostPerimeterSensitivityAnalysis(crac, crac.getFlowCnecs(), crac.getRangeActions(), raoParameters, toolProvider, true)
+                        .runBasedOnInitialPreviousAndOptimizationResults(network, initialFlowResult, preventivePrePerimeterResult, Set.of(), preventiveResult, new AppliedRemedialActions(), ReportNode.NO_OP);
 
         final Map<State, PostPerimeterResult> postRegulationPostContingencyResults = new HashMap<>();
 
         final List<Instant> postOutageInstants = crac.getSortedInstants().stream()
-            .filter(instant -> instant.isAuto() || instant.isCurative())
-            .toList();
+                .filter(instant -> instant.isAuto() || instant.isCurative())
+                .toList();
 
         for (final Contingency contingency : crac.getContingencies()) {
             final AppliedRemedialActions appliedRemedialActions = new AppliedRemedialActions();
@@ -520,47 +528,47 @@ public final class PstRegulation {
                     final RangeActionActivationResultImpl rangeActionActivationResult = new RangeActionActivationResultImpl(contingencyPrePerimeterResult);
                     appliedRemedialActions.addAppliedNetworkActions(state, raoResult.getActivatedNetworkActionsDuringState(state));
                     raoResult.getActivatedRangeActionsDuringState(state).forEach(
-                        rangeAction -> {
-                            final double optimizedSetPointOnState = raoResult.getOptimizedSetPointOnState(state, rangeAction);
-                            appliedRemedialActions.addAppliedRangeAction(state, rangeAction, optimizedSetPointOnState);
-                            rangeActionActivationResult.putResult(rangeAction, state, optimizedSetPointOnState);
-                        }
+                            rangeAction -> {
+                                final double optimizedSetPointOnState = raoResult.getOptimizedSetPointOnState(state, rangeAction);
+                                appliedRemedialActions.addAppliedRangeAction(state, rangeAction, optimizedSetPointOnState);
+                                rangeActionActivationResult.putResult(rangeAction, state, optimizedSetPointOnState);
+                            }
                     );
 
                     if (resultsByState.containsKey(state)) {
                         final PstRegulationResult pstRegulationResult = resultsByState.get(state);
                         pstRegulationResult.regulatedTapByPst().forEach(
-                            (pstRangeAction, regulatedTap) -> {
-                                final double angleSetpoint = pstRangeAction.convertTapToAngle(regulatedTap);
-                                appliedRemedialActions.addAppliedRangeAction(state, pstRangeAction, angleSetpoint);
-                                rangeActionActivationResult.putResult(pstRangeAction, state, angleSetpoint);
-                            }
+                                (pstRangeAction, regulatedTap) -> {
+                                    final double angleSetpoint = pstRangeAction.convertTapToAngle(regulatedTap);
+                                    appliedRemedialActions.addAppliedRangeAction(state, pstRangeAction, angleSetpoint);
+                                    rangeActionActivationResult.putResult(pstRangeAction, state, angleSetpoint);
+                                }
                         );
                     }
 
                     final PrePerimeterSensitivityAnalysis statePrePerimeterSensitivityAnalysis = new PrePerimeterSensitivityAnalysis(
-                        crac, crac.getFlowCnecs(state), crac.getRangeActions(), raoParameters, toolProvider, true
+                            crac, crac.getFlowCnecs(state), crac.getRangeActions(), raoParameters, toolProvider, true
                     );
 
                     final PrePerimeterResult statePrePerimeterResult = statePrePerimeterSensitivityAnalysis.runBasedOnInitialResults(
-                        network, initialFlowResult, Collections.emptySet(), appliedRemedialActions, reportNode
+                            network, initialFlowResult, Collections.emptySet(), appliedRemedialActions, ReportNode.NO_OP
                     );
 
                     final OptimizationResult stateOptimizationResult = new OptimizationResultImpl(
-                        statePrePerimeterResult,
-                        statePrePerimeterResult,
-                        statePrePerimeterResult,
-                        new NetworkActionsResultImpl(Map.of(state, raoResult.getActivatedNetworkActionsDuringState(state))),
-                        rangeActionActivationResult
+                            statePrePerimeterResult,
+                            statePrePerimeterResult,
+                            statePrePerimeterResult,
+                            new NetworkActionsResultImpl(Map.of(state, raoResult.getActivatedNetworkActionsDuringState(state))),
+                            rangeActionActivationResult
                     );
                     final Set<FlowCnec> statePostPerimeterFlowCnecs = crac.getFlowCnecs().stream()
-                        .filter(cnec -> !cnec.getState().getInstant().comesBefore(instant))
-                        .filter(cnec -> cnec.getState().getContingency().orElseThrow().equals(contingency))
-                        .collect(Collectors.toSet());
+                            .filter(cnec -> !cnec.getState().getInstant().comesBefore(instant))
+                            .filter(cnec -> cnec.getState().getContingency().orElseThrow().equals(contingency))
+                            .collect(Collectors.toSet());
 
                     final PostPerimeterResult statePostPerimeterResult =
-                        new PostPerimeterSensitivityAnalysis(crac, statePostPerimeterFlowCnecs, crac.getRangeActions(), raoParameters, toolProvider, true)
-                            .runBasedOnInitialPreviousAndOptimizationResults(network, initialFlowResult, contingencyPrePerimeterResult, Set.of(), stateOptimizationResult, appliedRemedialActions, reportNode);
+                            new PostPerimeterSensitivityAnalysis(crac, statePostPerimeterFlowCnecs, crac.getRangeActions(), raoParameters, toolProvider, true)
+                                    .runBasedOnInitialPreviousAndOptimizationResults(network, initialFlowResult, contingencyPrePerimeterResult, Set.of(), stateOptimizationResult, appliedRemedialActions, ReportNode.NO_OP);
                     postRegulationPostContingencyResults.put(state, statePostPerimeterResult);
 
                     contingencyPrePerimeterResult = statePrePerimeterResult;
@@ -568,15 +576,15 @@ public final class PstRegulation {
             }
         }
 
-        final StateTree stateTree = new StateTree(crac, reportNode);
+        final StateTree stateTree = new StateTree(crac, ReportNode.NO_OP);
         final PreventiveAndCurativesRaoResultImpl postRegulationRaoResult = new PreventiveAndCurativesRaoResultImpl(
-            stateTree,
-            initialFlowResult,
-            preventivePostPerimeterResult,
-            postRegulationPostContingencyResults,
-            crac,
-            raoParameters,
-            reportNode
+                stateTree,
+                initialFlowResult,
+                preventivePostPerimeterResult,
+                postRegulationPostContingencyResults,
+                crac,
+                raoParameters,
+                ReportNode.NO_OP
         );
         final String executionDetails = String.format("%s %s", raoResult.getExecutionDetails(), "and went through PST regulation");
         postRegulationRaoResult.setExecutionDetails(executionDetails);
@@ -587,7 +595,8 @@ public final class PstRegulation {
         return postRegulationRaoResult;
     }
 
-    private static State getState(Contingency contingency, Crac crac) {
+    private static State getState(Contingency contingency,
+                                  Crac crac) {
         return contingency == null ? crac.getPreventiveState() : crac.getState(contingency, crac.getLastInstant());
     }
 }

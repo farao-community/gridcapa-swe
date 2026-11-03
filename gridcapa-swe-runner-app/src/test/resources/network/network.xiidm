@@ -18,6 +18,7 @@
                     <iidm:point p="50.0" minQ="-9999.0" maxQ="9999.0"/>
                     <iidm:point p="150.0" minQ="-9999.0" maxQ="9999.0"/>
                 </iidm:reactiveCapabilityCurve>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
         </iidm:voltageLevel>
         <iidm:voltageLevel id="VL3" nominalV="380.0" topologyKind="NODE_BREAKER">

@@ -6,11 +6,12 @@
  */
 package com.farao_community.farao.swe.runner.app.configurations;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -38,38 +39,15 @@ public class PstConfiguration {
         this.pstsToRegulate = pstsToRegulate;
     }
 
-    public static class PstToRegulate {
-        private String pstId;
-        private String monitoredLineId;
-
-        public String getPstId() {
-            return pstId;
-        }
-
-        public void setPstId(final String pstId) {
-            this.pstId = pstId;
-        }
-
-        public String getMonitoredLineId() {
-            return monitoredLineId;
-        }
-
-        public void setMonitoredLineId(final String monitoredLineId) {
-            this.monitoredLineId = monitoredLineId;
-        }
-
+    public record PstToRegulate(String pstId, String monitoredLineId) {
         @Override
         public boolean equals(final Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            final PstToRegulate that = (PstToRegulate) o;
-            return Objects.equals(pstId, that.pstId) && Objects.equals(monitoredLineId, that.monitoredLineId);
+            return EqualsBuilder.reflectionEquals(this, o);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(pstId, monitoredLineId);
+            return HashCodeBuilder.reflectionHashCode(this);
         }
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<iidm:network xmlns:iidm="http://www.powsybl.org/schema/iidm/1_11" xmlns:slt="http://www.powsybl.org/schema/iidm/ext/slack_terminal/1_5" xmlns:crc="http://www.powsybl.org/schema/iidm/ext/coordinated_reactive_control/1_0" xmlns:ld="http://www.itesla_project.eu/schema/iidm/ext/load_detail/1_0" xmlns:ctc="http://www.powsybl.org/schema/iidm/ext/cgmes_tap_changers/1_0" xmlns:clbn="http://www.powsybl.org/schema/iidm/ext/cgmes_line_boundary_node/1_0" xmlns:cca="http://www.powsybl.org/schema/iidm/ext/cgmes_control_areas/1_0" xmlns:csshm="http://www.powsybl.org/schema/iidm/ext/cgmes_ssh_metadata/1_0" xmlns:bv="http://www.powsybl.org/schema/iidm/ext/base_voltage_mapping/1_0" xmlns:csm="http://www.powsybl.org/schema/iidm/ext/cgmes_sv_metadata/1_0" xmlns:cc="http://www.powsybl.org/schema/iidm/ext/cim_characteristics/1_0" id="urn:uuid:4f4a3f29-6892-49ea-bfc1-92051973c799" caseDate="2021-02-09T19:30:00.000Z" forecastDistance="1" sourceFormat="CGMES" minimumValidationLevel="STEADY_STATE_HYPOTHESIS">
+<iidm:network xmlns:iidm="http://www.powsybl.org/schema/iidm/1_18" xmlns:slt="http://www.powsybl.org/schema/iidm/ext/slack_terminal/1_5" xmlns:crc="http://www.powsybl.org/schema/iidm/ext/coordinated_reactive_control/1_0" xmlns:ld="http://www.itesla_project.eu/schema/iidm/ext/load_detail/1_0" xmlns:ctc="http://www.powsybl.org/schema/iidm/ext/cgmes_tap_changers/1_0" xmlns:clbn="http://www.powsybl.org/schema/iidm/ext/cgmes_line_boundary_node/1_0" xmlns:cca="http://www.powsybl.org/schema/iidm/ext/cgmes_control_areas/1_0" xmlns:csshm="http://www.powsybl.org/schema/iidm/ext/cgmes_ssh_metadata/1_0" xmlns:bv="http://www.powsybl.org/schema/iidm/ext/base_voltage_mapping/1_0" xmlns:csm="http://www.powsybl.org/schema/iidm/ext/cgmes_sv_metadata/1_0" xmlns:cc="http://www.powsybl.org/schema/iidm/ext/cim_characteristics/1_0" id="urn:uuid:4f4a3f29-6892-49ea-bfc1-92051973c799" caseDate="2021-02-09T19:30:00.000Z" forecastDistance="1" sourceFormat="CGMES" minimumValidationLevel="STEADY_STATE_HYPOTHESIS">
     <iidm:property name="CGMES.EQ_ID" value="urn:uuid:9e7050a8-960b-4e1a-8e34-7f56bc2b2a7b"/>
     <iidm:property name="CGMES.SSH_ID" value="urn:uuid:1e239780-b5f9-4ed1-ad73-041bc406bcfc"/>
     <iidm:property name="CGMES.EQ_BD_ID" value="urn:uuid:536f9bf1-3f8f-a546-87e3-7af2272f29b7"/>
@@ -56,6 +56,7 @@
                 <iidm:property name="CGMES.GeneratingUnit" value="_ca80ee09-3bed-4884-bc28-6dc89d067289"/>
                 <iidm:property name="CGMES.RegulatingControl" value="_1b3c88f9-c2ca-4250-bd37-ae0efa2fb022"/>
                 <iidm:minMaxReactiveLimits minQ="0.0" maxQ="200.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:generator id="_1dc9afba-23b5-41a0-8540-b479ed8baf4b" name="NL-G3" energySource="OTHER" minP="130.0" maxP="250.0" ratedS="250.0" targetP="150.0" localTargetV="16.01775" localTargetQ="83.296" node="7" p="-150.0" q="-20.66022">
                 <iidm:alias type="CGMES.Terminal1">_f04ecab5-1a12-4cc0-ba56-b157ebf11a42</iidm:alias>
@@ -63,6 +64,7 @@
                 <iidm:property name="CGMES.GeneratingUnit" value="_b850063d-eae7-4675-bc98-4642d3076783"/>
                 <iidm:property name="CGMES.RegulatingControl" value="_53e7a6c7-759b-4da2-898a-1c061d788670"/>
                 <iidm:minMaxReactiveLimits minQ="0.0" maxQ="200.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
             <iidm:generator id="_9c3b8f97-7972-477d-9dc8-87365cc0ad0e" name="NL-G1" energySource="OTHER" minP="300.0" maxP="1000.0" ratedS="1100.0" targetP="600.4927" localTargetV="16.0335" localTargetQ="386.9225" node="8" p="-567.4967" q="-184.1005">
                 <iidm:alias type="CGMES.Terminal1">_faab7959-f9bf-421b-bc3f-d364e0c1388b</iidm:alias>
@@ -70,6 +72,7 @@
                 <iidm:property name="CGMES.GeneratingUnit" value="_049438a6-780a-44fe-a788-ebe385d98e25"/>
                 <iidm:property name="CGMES.RegulatingControl" value="_04f338d3-3c0d-433f-a77b-e36dd256f0f0"/>
                 <iidm:minMaxReactiveLimits minQ="0.0" maxQ="600.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
         </iidm:voltageLevel>
         <iidm:voltageLevel id="_b7998ae6-0cc6-4dfe-8fec-0b549b07b6c3" name="400.0" nominalV="400.0" lowVoltageLimit="360.0" highVoltageLimit="440.0" topologyKind="NODE_BREAKER">
@@ -557,6 +560,7 @@
                 <iidm:property name="CGMES.GeneratingUnit" value="_5b7a4d43-09ec-4033-882d-64a76d557631"/>
                 <iidm:property name="CGMES.RegulatingControl" value="_84bf5be8-eb59-4555-b131-fce4d2d7775d"/>
                 <iidm:minMaxReactiveLimits minQ="-200.0" maxQ="200.0"/>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
         </iidm:voltageLevel>
         <iidm:voltageLevel id="_b10b171b-3bc5-4849-bb1f-61ed9ea1ec7c" name="225.0" nominalV="225.0" lowVoltageLimit="202.5" highVoltageLimit="247.5" topologyKind="NODE_BREAKER">
@@ -623,6 +627,7 @@
                     <iidm:point p="0.0" minQ="-300.0" maxQ="300.0"/>
                     <iidm:point p="200.0" minQ="-200.0" maxQ="200.0"/>
                 </iidm:reactiveCapabilityCurve>
+                <iidm:voltageRegulation mode="VOLTAGE" regulating="true"/>
             </iidm:generator>
         </iidm:voltageLevel>
         <iidm:twoWindingsTransformer id="_a708c3bc-465d-4fe7-b6ef-6fa6408a62b0" name="BE-TR2_1" r="0.20476920750000005" x="1.0979918125" g="0.0" b="0.0" ratedU1="400.0" ratedU2="110.0" ratedS="650.0" node1="16" voltageLevelId1="_469df5f7-058f-4451-a998-57a48e8a56fe" node2="13" voltageLevelId2="_8bbd7e74-ae20-4dce-8780-c20f8e18c2e0" p1="142.0258" q1="-209.8164" p2="-141.009" q2="215.3255">

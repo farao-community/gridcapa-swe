@@ -38,6 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Thomas Bouquet {@literal <thomas.bouquet at rte-france.com>}
  */
 class PstRegulationTest {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(RaoBusinessLogs.class);
+
     @Test
     void testPstRegulationWithSeveralContingencyScenarios() throws IOException {
         Network network = Network.read("4NodesSeries.uct", getClass().getResourceAsStream("/network/4NodesSeries.uct"));
@@ -54,17 +57,18 @@ class PstRegulationTest {
         ListAppender<ILoggingEvent> listAppender = getBusinessLogs();
         List<ILoggingEvent> logsList = listAppender.list;
 
-        RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of(
-                "FFR1AA1  FFR2AA1  2", "FFR1AA1  FFR2AA1  2",
-                "FFR2AA1  FFR3AA1  2", "FFR2AA1  FFR3AA1  2",
-                "FFR3AA1  FFR4AA1  2", "FFR3AA1  FFR4AA1  2"));
+        RaoResult raoResultWithPstRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, Map.of(
+                                                                                  "FFR1AA1  FFR2AA1  2", "FFR1AA1  FFR2AA1  2",
+                                                                                  "FFR2AA1  FFR3AA1  2", "FFR2AA1  FFR3AA1  2",
+                                                                                  "FFR3AA1  FFR4AA1  2", "FFR3AA1  FFR4AA1  2"),
+                                                                          LOGGER);
         List<String> logMessages = logsList.stream().map(ILoggingEvent::getFormattedMessage).sorted().toList();
 
         assertEquals("2 PST(s) to regulate: pstFr12, pstFr34", logMessages.get(0));
         assertEquals("3 contingency scenario(s) to regulate: Contingency FR 12, Contingency FR 23, Contingency FR 34", logMessages.get(1));
 
         // PST FR2-FR3 is only preventive so it cannot be regulated
-        assertEquals("PST FFR1AA1  FFR2AA1  2 cannot be regulated as no PST range action was defined for it on instant preventive.", logMessages.get(5));
+        assertEquals("PST FFR1AA1  FFR2AA1  2 cannot be regulated as no PST range action was defined for it on instant preventive.", logMessages.get(17));
 
         // Contingency FR1-FR2
         assertEquals(-15, raoResultWithPstRegulation.getOptimizedTapOnState(crac.getState("Contingency FR 12", crac.getLastInstant()), pst12));
@@ -125,7 +129,7 @@ class PstRegulationTest {
         assertEquals(-690.23, raoResult.getMargin(curativeInstant, curativeCnecOnPst, Unit.AMPERE), 1e-2);
 
         // second run with regulation: regulation shifts PST's tap to position 7 to remove the overload but worsens min margin
-        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of("BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2"));
+        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, Map.of("BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2"), LOGGER);
         assertEquals(1382.77, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
         assertEquals(7, raoResultWithRegulation.getOptimizedTapOnState(curativeState, pstRangeAction));
         assertEquals(-1382.77, raoResultWithRegulation.getMargin(curativeInstant, curativeCnecOnLine, Unit.AMPERE), 1e-2);
@@ -163,7 +167,7 @@ class PstRegulationTest {
         assertEquals(823.54, raoResult.getMargin(curativeInstant, curativeCnecOnPst, Unit.AMPERE), 1e-2);
 
         // run PST regulation -> PST will be pushed up to tap position 2
-        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of("BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2"));
+        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, Map.of("BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2"), LOGGER);
 
         assertEquals(79.38, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
 
@@ -212,9 +216,10 @@ class PstRegulationTest {
         assertEquals(16.51, raoResult.getMargin(curativeInstant, curativeCnecOnPst4, Unit.AMPERE), 1e-2);
 
         // run PST regulation -> PST will be pushed up to tap position 2 making second PST overloaded in curative
-        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, ReportNode.NO_OP, Map.of(
-                "BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2",
-                "BBE1AA1  FFR1AA1  4", "BBE1AA1  FFR1AA1  4"));
+        final RaoResult raoResultWithRegulation = PstRegulation.regulatePsts(network, crac, raoResult, raoParameters, Map.of(
+                                                                                     "BBE1AA1  FFR1AA1  2", "BBE1AA1  FFR1AA1  2",
+                                                                                     "BBE1AA1  FFR1AA1  4", "BBE1AA1  FFR1AA1  4"),
+                                                                             LOGGER);
 
         assertEquals(79.38, raoResultWithRegulation.getCost(crac.getLastInstant()), 1e-2);
 
