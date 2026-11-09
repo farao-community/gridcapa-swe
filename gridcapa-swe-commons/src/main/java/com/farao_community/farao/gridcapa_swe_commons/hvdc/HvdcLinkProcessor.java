@@ -115,7 +115,7 @@ public final class HvdcLinkProcessor {
                     Terminal terminal = gen.getTerminal();
                     // WARNING : in CVG, this is done for the equivalent generator of HVDC line 1 for both HVDC lines. Here it is more generic => check if OK
                     VscStationCreationParameters vscStationCreationParameters = creationParameters.getVscCreationParameters(side);
-                    double voltageSetpoint = terminal.isConnected() ? gen.getLocalTargetV() : vscStationCreationParameters.getDefaultVoltageSetpoint();
+                    double voltageSetpoint = terminal.isConnected() ? gen.getRegulatingTargetV() : vscStationCreationParameters.getDefaultVoltageSetpoint();
                     VoltageLevel voltageLevel = terminal.getVoltageLevel();
                     VscConverterStationAdder adder = voltageLevel.newVscConverterStation()
                             .setId(vscStationCreationParameters.getId())
