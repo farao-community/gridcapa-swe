@@ -12,6 +12,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
 import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
@@ -83,6 +84,7 @@ import static org.mockito.Mockito.when;
 class CgmesExportServiceTest {
 
     private static Path temporaryBoundariesPath;
+    private final CgmesSubset stateVariable = CgmesSubset.STATE_VARIABLES;
 
     @Autowired
     private CgmesExportService cgmesExportService;
@@ -91,30 +93,30 @@ class CgmesExportServiceTest {
     private UrlValidationService urlValidationService;
 
     @Mock
-    SweData sweData;
+    SweData mockedSweData;
 
     @Mock
-    Path temporaryBoundariesDirectory;
+    Path mockedTemporaryBoundariesPath;
 
     @Mock
-    List<SweFileResource> boundariesFiles;
+    List<SweFileResource> mockedBoundariesFiles;
 
     @BeforeEach
     void setUp() {
-        temporaryBoundariesPath = FilesService.createTemporaryBoundariesDirectory(sweData.getBoundariesFiles());
+        temporaryBoundariesPath = FilesService.createTemporaryBoundariesDirectory(mockedSweData.getBoundariesFiles());
     }
 
     @Test
     void buildCgmesFilenameTest() {
         SoftAssertions assertions = new SoftAssertions();
-        when(sweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.of("UTC")));
+        when(mockedSweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.of("UTC")));
 
-        when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        final String d2ccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "001");
+        when(mockedSweData.getProcessType()).thenReturn(ProcessType.D2CC);
+        final String d2ccResult = cgmesExportService.buildCgmesFilename(mockedSweData, "FR", "ESFR", "001");
         assertions.assertThat(d2ccResult).isEqualTo("20221130T0000Z_2D_FR_ESFR_001");
 
-        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC);
-        final String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
+        when(mockedSweData.getProcessType()).thenReturn(ProcessType.IDCC);
+        final String idccResult = cgmesExportService.buildCgmesFilename(mockedSweData, "FR", "ESFR", "002");
         assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_1D_FR_ESFR_002");
 
         assertions.assertAll();
@@ -123,8 +125,8 @@ class CgmesExportServiceTest {
     @Test
     void buildCgmesFilenameTestIDCF() {
         OffsetDateTime mockTimestamp = OffsetDateTime.now().plusHours(5).plusSeconds(1);
-        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
-        when(sweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
+        when(mockedSweData.getTimestamp()).thenReturn(mockTimestamp);
+        when(mockedSweData.getProcessType()).thenReturn(ProcessType.IDCC_IDCF);
         final String tso = "fakeTso";
         final String type = "fakeType";
         final String version = "fakeExample";
@@ -132,23 +134,23 @@ class CgmesExportServiceTest {
         // Expected time when difference is between 0 and 23 : +5 hours
         String expectedTime = "_05_";
         String expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
-        String actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        String actualFilename = cgmesExportService.buildCgmesFilename(mockedSweData, tso, type, version);
         assertEquals(expectedFilename, actualFilename);
 
         // Test that the min value is 0 when value is <0
         mockTimestamp = OffsetDateTime.now().minusHours(30);
-        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        when(mockedSweData.getTimestamp()).thenReturn(mockTimestamp);
         expectedTime = "_00_";
         expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
-        actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        actualFilename = cgmesExportService.buildCgmesFilename(mockedSweData, tso, type, version);
         assertEquals(expectedFilename, actualFilename);
 
         // Test that the max value is 23 when value is >23
         mockTimestamp = OffsetDateTime.now().plusHours(30);
-        when(sweData.getTimestamp()).thenReturn(mockTimestamp);
+        when(mockedSweData.getTimestamp()).thenReturn(mockTimestamp);
         expectedTime = "_23_";
         expectedFilename = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm'Z'").format(mockTimestamp) + expectedTime + "fakeTso_fakeType_fakeExample";
-        actualFilename = cgmesExportService.buildCgmesFilename(sweData, tso, type, version);
+        actualFilename = cgmesExportService.buildCgmesFilename(mockedSweData, tso, type, version);
         assertEquals(expectedFilename, actualFilename);
     }
 
@@ -168,8 +170,8 @@ class CgmesExportServiceTest {
     void buildLastSecureCgmesNoValidStep() {
         final DichotomyResult<SweDichotomyValidationData> dichotomyResult = DichotomyResult.buildFromRaoFailure("test");
         final String result = cgmesExportService.buildAndExportLastSecureCgmesFiles(DichotomyDirection.ES_FR,
-                                                                                    sweData,
-                                                                                    temporaryBoundariesDirectory,
+                                                                                    mockedSweData,
+                                                                                    mockedTemporaryBoundariesPath,
                                                                                     dichotomyResult,
                                                                                     mock(SweTaskParameters.class));
         assertNull(result);
@@ -179,11 +181,12 @@ class CgmesExportServiceTest {
     void buildLastSecureCgmesValidStep() {
         final CgmesExportService spyCgmesExportService = spy(cgmesExportService);
         doReturn("Test").when(spyCgmesExportService).buildAndExportCgmesFiles(any(), any(), any(), any(), any(), eq(true));
+        @SuppressWarnings("unchecked")
         final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
         when(dichotomyResult.hasValidStep()).thenReturn(true);
         final String result = spyCgmesExportService.buildAndExportLastSecureCgmesFiles(DichotomyDirection.ES_FR,
-                                                                                       sweData,
-                                                                                       temporaryBoundariesDirectory,
+                                                                                       mockedSweData,
+                                                                                       mockedTemporaryBoundariesPath,
                                                                                        dichotomyResult,
                                                                                        mock(SweTaskParameters.class));
         assertEquals("Test", result);
@@ -197,15 +200,18 @@ class CgmesExportServiceTest {
         appender.start();
         logger.addAppender(appender);
 
+        @SuppressWarnings("unchecked")
         final DichotomyStepResult<SweDichotomyValidationData> mockStepResult = mock(DichotomyStepResult.class);
-        when(mockStepResult.getValidationData()).thenReturn(mock(SweDichotomyValidationData.class));
-        when(mockStepResult.getValidationData().getRaoResponse()).thenReturn(mock(RaoSuccessResponse.class));
+        final SweDichotomyValidationData mockSweValidationData = mock(SweDichotomyValidationData.class);
+        when(mockStepResult.getValidationData()).thenReturn(mockSweValidationData);
+        final RaoSuccessResponse mockRaoSuccessResponse = mock(RaoSuccessResponse.class);
+        when(mockStepResult.getValidationData().getRaoResponse()).thenReturn(mockRaoSuccessResponse);
 
         when(urlValidationService.openUrlStream(anyString()))
                 .thenThrow(new RuntimeException("stop here"));
         assertThrows(RuntimeException.class,
                      () -> cgmesExportService.buildAndExportCgmesFiles(DichotomyDirection.ES_FR,
-                                                                       sweData,
+                                                                       mockedSweData,
                                                                        temporaryBoundariesPath,
                                                                        mock(SweTaskParameters.class),
                                                                        mockStepResult,
@@ -218,11 +224,12 @@ class CgmesExportServiceTest {
 
     @Test
     void buildFirstUnsecureCgmesNoInvalidStep() {
+        @SuppressWarnings("unchecked")
         final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
         when(dichotomyResult.getLowestInvalidStep()).thenReturn(null);
         final String result = cgmesExportService.buildAndExportFirstUnsecureCgmesFiles(DichotomyDirection.ES_FR,
-                                                                                       sweData,
-                                                                                       temporaryBoundariesDirectory,
+                                                                                       mockedSweData,
+                                                                                       mockedTemporaryBoundariesPath,
                                                                                        dichotomyResult,
                                                                                        mock(SweTaskParameters.class));
         assertNull(result);
@@ -232,13 +239,16 @@ class CgmesExportServiceTest {
     void buildFirstUnsecureCgmesInvalidStep() {
         final CgmesExportService spyCgmesExportService = spy(cgmesExportService);
         doReturn("Test").when(spyCgmesExportService).buildAndExportCgmesFiles(any(), any(), any(), any(), any(), eq(false));
+        @SuppressWarnings("unchecked")
         final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
+        @SuppressWarnings("unchecked")
         final DichotomyStepResult<SweDichotomyValidationData> mockStepResult = mock(DichotomyStepResult.class);
         when(dichotomyResult.getLowestInvalidStep()).thenReturn(mockStepResult);
-        when(mockStepResult.getValidationData()).thenReturn(mock(SweDichotomyValidationData.class));
+        final SweDichotomyValidationData mockSweValidationData = mock(SweDichotomyValidationData.class);
+        when(mockStepResult.getValidationData()).thenReturn(mockSweValidationData);
         final String result = spyCgmesExportService.buildAndExportFirstUnsecureCgmesFiles(DichotomyDirection.ES_FR,
-                                                                                          sweData,
-                                                                                          temporaryBoundariesDirectory,
+                                                                                          mockedSweData,
+                                                                                          mockedTemporaryBoundariesPath,
                                                                                           dichotomyResult,
                                                                                           mock(SweTaskParameters.class));
         assertEquals("Test", result);
@@ -247,10 +257,9 @@ class CgmesExportServiceTest {
     @Test
     void exportCgmesFilesTest() throws IOException {
         final String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
-        final String subNetwork = "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"; //subnetwork of REE
-        Network network = setTestNetwork(networkFileName, subNetwork);
+        Network network = setTestNetwork(networkFileName);
         Map<CgmesFileType, SweFileResource> cgmesInputFiles = getCgmesInputFiles();
-        final SweData sweData = createSweData(cgmesInputFiles, boundariesFiles);
+        final SweData sweData = createSweData(cgmesInputFiles, mockedBoundariesFiles);
 
         final Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFiles(network, sweData, temporaryBoundariesPath);
 
@@ -273,7 +282,8 @@ class CgmesExportServiceTest {
         // Checking that extension was added to network
         final CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
         assertNotNull(modelsExtension);
-        final CgmesMetadataModel svModel = modelsExtension.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
+        final CgmesMetadataModel svModel = modelsExtension.getModelForSubset(stateVariable).orElseThrow(() -> new IllegalStateException(
+                "No model found for subset " + stateVariable));
         assertEquals("sv-id-test1", svModel.getSupersedes().toArray()[0]);
         assertFalse(svModel.getDependentOn().contains("ssh-id-test1")); //initial ssh id removed from sv dependencies
         assertTrue(svModel.getDependentOn().contains("tp-id-test1")); // Initial tp id is kept
@@ -287,7 +297,8 @@ class CgmesExportServiceTest {
         final Network subnetwork = (Network) outputNetwork.getSubnetworks().toArray()[0];
         final CgmesMetadataModels modelsExtensionOutput = subnetwork.getExtension(CgmesMetadataModels.class);
         assertNotNull(modelsExtensionOutput);
-        final CgmesMetadataModel svModelOutput = modelsExtensionOutput.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
+        final CgmesMetadataModel svModelOutput = modelsExtensionOutput.getModelForSubset(stateVariable).orElseThrow(() -> new IllegalStateException(
+                "No model found for subset " + stateVariable));
         assertEquals("http://entsoe.eu/CIM/StateVariables/4/1", svModelOutput.getProfiles().stream().findFirst().get());
         assertEquals(1, svModelOutput.getVersion());
         assertEquals("http://www.coreso.eu/OperationalPlanning", svModelOutput.getModelingAuthoritySet());
@@ -305,10 +316,9 @@ class CgmesExportServiceTest {
 
         // Test Node Breaker Topology for REN only - TP files are retrieved for only RTE and REE
         String networkFileName = "/export_cgmes/TestCase_with_swe_countries_node_breaker_PT.xiidm";
-        final String subNetwork = "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"; //subnetwork of REE
-        Network network = setTestNetwork(networkFileName, subNetwork);
+        Network network = setTestNetwork(networkFileName);
         Map<CgmesFileType, SweFileResource> cgmesInputFiles = getCgmesInputFiles();
-        final SweData sweData = createSweData(cgmesInputFiles, boundariesFiles);
+        final SweData sweData = createSweData(cgmesInputFiles, mockedBoundariesFiles);
         cgmesExportService.generateCgmesFiles(network, sweData, temporaryBoundariesPath);
 
         List<String> matchingLogsNodeBreaker = appender.list.stream()
@@ -321,7 +331,7 @@ class CgmesExportServiceTest {
 
         // Test Bus Breaker Topology for all TSO - TP files are retrieved for the 3 TSO
         networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
-        network = setTestNetwork(networkFileName, subNetwork);
+        network = setTestNetwork(networkFileName);
         cgmesExportService.generateCgmesFiles(network, sweData, temporaryBoundariesPath);
 
         List<String> matchingLogsBusBreaker = appender.list.stream()
@@ -334,9 +344,8 @@ class CgmesExportServiceTest {
     @Test
     void exportCgmesSshTest() throws IOException {
         final String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
-        final String subNetwork = "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"; //subnetwork of REE
-        Network network = setTestNetwork(networkFileName, subNetwork);
-        final SweData sweData = createSweData(new EnumMap<>(CgmesFileType.class), boundariesFiles);
+        Network network = setTestNetwork(networkFileName);
+        final SweData sweData = createSweData(new EnumMap<>(CgmesFileType.class), mockedBoundariesFiles);
 
         final Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshTpFilesForAllTso(network,
                                                                                                          sweData,
@@ -353,7 +362,7 @@ class CgmesExportServiceTest {
     void exportCgmesSshTpNodeBreakerTest() throws IOException {
         final String networkFileName = "/export_cgmes/TestCase_with_swe_countries_node_breaker_PT.xiidm";
         final Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        final SweData sweData = createSweData(new EnumMap<>(CgmesFileType.class), boundariesFiles);
+        final SweData sweData = createSweData(new EnumMap<>(CgmesFileType.class), mockedBoundariesFiles);
 
         final Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshTpFilesForAllTso(network,
                                                                                                          sweData,
@@ -391,12 +400,14 @@ class CgmesExportServiceTest {
 
     private static @NonNull SweData createSweData(Map<CgmesFileType, SweFileResource> cgmesInputFiles,
                                                   List<SweFileResource> boundariesFiles) {
+        @SuppressWarnings("unchecked")
+        List<HvdcInformation> hvdcInformationList = Collections.EMPTY_LIST;
         return new SweData("id", "runId", OffsetDateTime.parse("2023-07-31T00:30:00Z"),
                            ProcessType.D2CC, null, null, null,
                            null, null, null, "glskUrl",
                            "CracEsPt", "CracFrEs",
                            "raoParametersEsFrUrl", "raoParametersEsPtUrl",
-                           Collections.EMPTY_LIST, cgmesInputFiles, boundariesFiles);
+                           hvdcInformationList, cgmesInputFiles, boundariesFiles);
     }
 
     private static @NonNull SweRequest createSweRequest(final SweFileResource sweFileResource) {
@@ -431,9 +442,9 @@ class CgmesExportServiceTest {
         }
     }
 
-    private Network setTestNetwork(String networkFileName,
-                                   String subNetwork) {
-        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+    private Network setTestNetwork(String networkFileName) {
+        final Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        final String subNetwork = "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"; //subnetwork of REE
         network.getSubnetwork(subNetwork)
                 .newExtension(CgmesMetadataModelsAdder.class)
                 .newModel()
@@ -444,7 +455,7 @@ class CgmesExportServiceTest {
                 .setModelingAuthoritySet("fakeAuthority")
                 .add()
                 .newModel()
-                .setSubset(CgmesSubset.STATE_VARIABLES)
+                .setSubset(stateVariable)
                 .setId("sv-id-test1")
                 .setVersion(5)
                 .addDependentOn("tp-id-test1")
