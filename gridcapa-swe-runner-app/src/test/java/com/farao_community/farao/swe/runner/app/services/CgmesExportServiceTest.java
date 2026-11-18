@@ -6,16 +6,21 @@
  */
 package com.farao_community.farao.swe.runner.app.services;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.dichotomy.api.results.DichotomyStepResult;
 import com.farao_community.farao.gridcapa_swe_commons.dichotomy.DichotomyDirection;
 import com.farao_community.farao.gridcapa_swe_commons.resource.ProcessType;
+import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.farao.swe.runner.api.resource.SweFileResource;
 import com.farao_community.farao.swe.runner.api.resource.SweRequest;
 import com.farao_community.farao.swe.runner.app.domain.CgmesFileType;
 import com.farao_community.farao.swe.runner.app.domain.SweData;
 import com.farao_community.farao.swe.runner.app.domain.SweDichotomyValidationData;
 import com.farao_community.farao.swe.runner.app.domain.SweTaskParameters;
+import com.farao_community.farao.swe.runner.app.utils.UrlValidationService;
 import com.google.common.base.Suppliers;
 import com.powsybl.cgmes.conversion.CgmesImport;
 import com.powsybl.cgmes.extensions.CgmesMetadataModels;
@@ -30,6 +35,7 @@ import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -54,12 +60,15 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -77,6 +86,9 @@ class CgmesExportServiceTest {
 
     @Autowired
     private CgmesExportService cgmesExportService;
+
+    @Mock
+    private UrlValidationService urlValidationService;
 
     @Mock
     SweData sweData;
@@ -98,11 +110,11 @@ class CgmesExportServiceTest {
         when(sweData.getTimestamp()).thenReturn(OffsetDateTime.ofInstant(Instant.parse("2022-11-30T00:00:00Z"), ZoneId.of("UTC")));
 
         when(sweData.getProcessType()).thenReturn(ProcessType.D2CC);
-        String d2ccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "001");
+        final String d2ccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "001");
         assertions.assertThat(d2ccResult).isEqualTo("20221130T0000Z_2D_FR_ESFR_001");
 
         when(sweData.getProcessType()).thenReturn(ProcessType.IDCC);
-        String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
+        final String idccResult = cgmesExportService.buildCgmesFilename(sweData, "FR", "ESFR", "002");
         assertions.assertThat(idccResult).isEqualTo("20221130T0000Z_1D_FR_ESFR_002");
 
         assertions.assertAll();
@@ -178,6 +190,33 @@ class CgmesExportServiceTest {
     }
 
     @Test
+    void buildCgmesFilesTempBoundaryFileTest() {
+
+        final Logger logger = (Logger) LoggerFactory.getLogger(CgmesExportService.class);
+        final ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+
+        final DichotomyStepResult<SweDichotomyValidationData> mockStepResult = mock(DichotomyStepResult.class);
+        when(mockStepResult.getValidationData()).thenReturn(mock(SweDichotomyValidationData.class));
+        when(mockStepResult.getValidationData().getRaoResponse()).thenReturn(mock(RaoSuccessResponse.class));
+
+        when(urlValidationService.openUrlStream(anyString()))
+                .thenThrow(new RuntimeException("stop here"));
+        assertThrows(RuntimeException.class,
+                     () -> cgmesExportService.buildAndExportCgmesFiles(DichotomyDirection.ES_FR,
+                                                                       sweData,
+                                                                       temporaryBoundariesPath,
+                                                                       mock(SweTaskParameters.class),
+                                                                       mockStepResult,
+                                                                       true));
+        assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .contains("BOUNDARY_LOCATION: " + temporaryBoundariesPath);
+
+    }
+
+    @Test
     void buildFirstUnsecureCgmesNoInvalidStep() {
         final DichotomyResult<SweDichotomyValidationData> dichotomyResult = mock(DichotomyResult.class);
         when(dichotomyResult.getLowestInvalidStep()).thenReturn(null);
@@ -207,38 +246,13 @@ class CgmesExportServiceTest {
 
     @Test
     void exportCgmesFilesTest() throws IOException {
-        String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
-        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        network.getSubnetwork("urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103") //subnetwork of REE
-                .newExtension(CgmesMetadataModelsAdder.class)
-                .newModel()
-                .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
-                .setId("ssh-id-test1")
-                .setVersion(5)
-                .addProfile("fakeProfile")
-                .setModelingAuthoritySet("fakeAuthority")
-                .add()
-                .newModel()
-                .setSubset(CgmesSubset.STATE_VARIABLES)
-                .setId("sv-id-test1")
-                .setVersion(5)
-                .addDependentOn("tp-id-test1")
-                .addDependentOn("ssh-id-test1")
-                .addProfile("fakeProfile")
-                .setModelingAuthoritySet("fakeAuthority")
-                .add()
-                .add();
-        Map<CgmesFileType, SweFileResource> cgmesInputFiles = new EnumMap<>(CgmesFileType.class);
-
-        cgmesInputFiles.put(CgmesFileType.REE_EQ, new SweFileResource("REE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_EQ.xml")).toExternalForm()));
-        cgmesInputFiles.put(CgmesFileType.REE_TP, new SweFileResource("REE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_TP.xml")).toExternalForm()));
-        cgmesInputFiles.put(CgmesFileType.REN_EQ, new SweFileResource("REN_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_EQ.xml")).toExternalForm()));
-        cgmesInputFiles.put(CgmesFileType.REN_TP, new SweFileResource("REN_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_TP.xml")).toExternalForm()));
-        cgmesInputFiles.put(CgmesFileType.RTE_EQ, new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
-        cgmesInputFiles.put(CgmesFileType.RTE_TP, new SweFileResource("RTE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_TP.xml")).toExternalForm()));
+        final String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
+        final String subNetwork = "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"; //subnetwork of REE
+        Network network = setTestNetwork(networkFileName, subNetwork);
+        Map<CgmesFileType, SweFileResource> cgmesInputFiles = getCgmesInputFiles();
         final SweData sweData = createSweData(cgmesInputFiles, boundariesFiles);
 
-        Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFile(network, sweData, temporaryBoundariesPath);
+        final Map<String, ByteArrayOutputStream> cgmesFiles = cgmesExportService.generateCgmesFiles(network, sweData, temporaryBoundariesPath);
 
         assertEquals(10, cgmesFiles.size());
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
@@ -252,13 +266,14 @@ class CgmesExportServiceTest {
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_TP_001"));
         assertTrue(cgmesFiles.containsKey("20230731T0030Z_2D_CGMSWE_SV_001"));
 
-        String tmp = Files.createTempDirectory("pref_").toAbsolutePath() + "/network_output.zip";
+        final String tmp = Files.createTempDirectory("pref_").toAbsolutePath() + "/network_output.zip";
+        final Path filePath = Paths.get(tmp);
         exportCgmesZipFile(cgmesFiles, tmp);
 
         // Checking that extension was added to network
-        CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
+        final CgmesMetadataModels modelsExtension = network.getExtension(CgmesMetadataModels.class);
         assertNotNull(modelsExtension);
-        CgmesMetadataModel svModel = modelsExtension.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
+        final CgmesMetadataModel svModel = modelsExtension.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
         assertEquals("sv-id-test1", svModel.getSupersedes().toArray()[0]);
         assertFalse(svModel.getDependentOn().contains("ssh-id-test1")); //initial ssh id removed from sv dependencies
         assertTrue(svModel.getDependentOn().contains("tp-id-test1")); // Initial tp id is kept
@@ -267,41 +282,67 @@ class CgmesExportServiceTest {
         // Checking that the extension was correctly exported in the SV
         Properties importParams = new Properties();
         importParams.put(CgmesImport.SOURCE_FOR_IIDM_ID, CgmesImport.SOURCE_FOR_IIDM_ID_RDFID);
-        Network outputNetwork = Network.read(Paths.get(tmp), LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
+        final Network outputNetwork = Network.read(filePath, LocalComputationManager.getDefault(), Suppliers.memoize(ImportConfig::load).get(), importParams);
         assertNotNull(outputNetwork);
-        Network subnetwork = (Network) outputNetwork.getSubnetworks().toArray()[0];
-        CgmesMetadataModels modelsExtensionOutput = subnetwork.getExtension(CgmesMetadataModels.class);
+        final Network subnetwork = (Network) outputNetwork.getSubnetworks().toArray()[0];
+        final CgmesMetadataModels modelsExtensionOutput = subnetwork.getExtension(CgmesMetadataModels.class);
         assertNotNull(modelsExtensionOutput);
-        CgmesMetadataModel svModelOutput = modelsExtensionOutput.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
+        final CgmesMetadataModel svModelOutput = modelsExtensionOutput.getModelForSubset(CgmesSubset.STATE_VARIABLES).get();
         assertEquals("http://entsoe.eu/CIM/StateVariables/4/1", svModelOutput.getProfiles().stream().findFirst().get());
         assertEquals(1, svModelOutput.getVersion());
         assertEquals("http://www.coreso.eu/OperationalPlanning", svModelOutput.getModelingAuthoritySet());
         assertEquals(4, svModelOutput.getDependentOn().size()); // Initial tp id + 3 new ssh ids generated during export
 
-        Files.deleteIfExists(Paths.get(tmp));
+        Files.deleteIfExists(filePath);
+    }
+
+    @Test
+    void retrievingTpFilesTest() throws IOException {
+        final Logger logger = (Logger) LoggerFactory.getLogger(CgmesExportService.class);
+        final ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+
+        // Test Node Breaker Topology for REN only - TP files are retrieved for only RTE and REE
+        String networkFileName = "/export_cgmes/TestCase_with_swe_countries_node_breaker_PT.xiidm";
+        final String subNetwork = "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"; //subnetwork of REE
+        Network network = setTestNetwork(networkFileName, subNetwork);
+        Map<CgmesFileType, SweFileResource> cgmesInputFiles = getCgmesInputFiles();
+        final SweData sweData = createSweData(cgmesInputFiles, boundariesFiles);
+        cgmesExportService.generateCgmesFiles(network, sweData, temporaryBoundariesPath);
+
+        List<String> matchingLogsNodeBreaker = appender.list.stream()
+                .map(ILoggingEvent::getFormattedMessage)
+                .filter(msg -> msg.contains("Retrieving TP file"))
+                .toList();
+        assertThat(matchingLogsNodeBreaker).hasSize(2);
+
+        appender.list.clear();
+
+        // Test Bus Breaker Topology for all TSO - TP files are retrieved for the 3 TSO
+        networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
+        network = setTestNetwork(networkFileName, subNetwork);
+        cgmesExportService.generateCgmesFiles(network, sweData, temporaryBoundariesPath);
+
+        List<String> matchingLogsBusBreaker = appender.list.stream()
+                .map(ILoggingEvent::getFormattedMessage)
+                .filter(msg -> msg.contains("Retrieving TP file"))
+                .toList();
+        assertThat(matchingLogsBusBreaker).hasSize(3);
     }
 
     @Test
     void exportCgmesSshTest() throws IOException {
-        String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
-        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
-        network.getSubnetwork("urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103") //subnetwork of REE
-                .newExtension(CgmesMetadataModelsAdder.class)
-                .newModel()
-                .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
-                .setId("sshId")
-                .setVersion(5)
-                .addProfile("fakeProfile")
-                .setModelingAuthoritySet("fakeAuthority")
-                .add()
-                .add();
+        final String networkFileName = "/export_cgmes/TestCase_with_swe_countries.xiidm";
+        final String subNetwork = "urn:uuid:563eadb1-4dfa-9784-a7ad-c8eddaaf3103"; //subnetwork of REE
+        Network network = setTestNetwork(networkFileName, subNetwork);
         final SweData sweData = createSweData(new EnumMap<>(CgmesFileType.class), boundariesFiles);
 
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllTsoFiles(network,
-                                                                                           sweData,
-                                                                                           new ArrayList<>(),
-                                                                                           new ArrayList<>(),
-                                                                                           temporaryBoundariesPath);
+        final Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshTpFilesForAllTso(network,
+                                                                                                         sweData,
+                                                                                                         new ArrayList<>(),
+                                                                                                         new ArrayList<>(),
+                                                                                                         temporaryBoundariesPath);
         assertEquals(3, sshFiles.size());
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_006"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001"));
@@ -309,21 +350,40 @@ class CgmesExportServiceTest {
     }
 
     @Test
+    void exportCgmesSshTpNodeBreakerTest() throws IOException {
+        final String networkFileName = "/export_cgmes/TestCase_with_swe_countries_node_breaker_PT.xiidm";
+        final Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        final SweData sweData = createSweData(new EnumMap<>(CgmesFileType.class), boundariesFiles);
+
+        final Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshTpFilesForAllTso(network,
+                                                                                                         sweData,
+                                                                                                         new ArrayList<>(),
+                                                                                                         new ArrayList<>(),
+                                                                                                         temporaryBoundariesPath);
+        // As PT (REN) has a Node Beraker Typoology, T file is created for the REN TSO
+        assertEquals(4, sshFiles.size());
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_SSH_001"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_REN_TP_001"));
+        assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
+    }
+
+    @Test
     void exportCgmesFilesWithMissingCountryTest() throws IOException {
         //In cas of subnetwork contains many countries it will not be exported
-        String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
-        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        final String networkFileName = "/export_cgmes/TestCase_with_swe_countries_error.xiidm";
+        final Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
 
-        SweFileResource sweFileResource = new SweFileResource("name", "url");
+        final SweFileResource sweFileResource = new SweFileResource("name", "url");
         final SweRequest sweRequest = createSweRequest(sweFileResource);
         List<SweFileResource> boundariesFiles = List.of(sweRequest.getBoundaryEq(), sweRequest.getBoundaryTp());
         final SweData sweData = createSweData(new EnumMap<>(CgmesFileType.class), boundariesFiles);
 
-        Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createAllTsoFiles(network,
-                                                                                           sweData,
-                                                                                           new ArrayList<>(),
-                                                                                           new ArrayList<>(),
-                                                                                           temporaryBoundariesPath);
+        final Map<String, ByteArrayOutputStream> sshFiles = cgmesExportService.createSshTpFilesForAllTso(network,
+                                                                                                         sweData,
+                                                                                                         new ArrayList<>(),
+                                                                                                         new ArrayList<>(),
+                                                                                                         temporaryBoundariesPath);
         assertEquals(2, sshFiles.size());
         assertFalse(sshFiles.containsKey("20230731T0030Z_2D_REE_SSH_001"));
         assertTrue(sshFiles.containsKey("20230731T0030Z_2D_RTEFRANCE_SSH_001"));
@@ -369,5 +429,42 @@ class CgmesExportServiceTest {
 
             Files.write(Path.of(path), baos.toByteArray());
         }
+    }
+
+    private Network setTestNetwork(String networkFileName,
+                                   String subNetwork) {
+        Network network = Network.read(networkFileName, getClass().getResourceAsStream(networkFileName));
+        network.getSubnetwork(subNetwork)
+                .newExtension(CgmesMetadataModelsAdder.class)
+                .newModel()
+                .setSubset(CgmesSubset.STEADY_STATE_HYPOTHESIS)
+                .setId("ssh-id-test1")
+                .setVersion(5)
+                .addProfile("fakeProfile")
+                .setModelingAuthoritySet("fakeAuthority")
+                .add()
+                .newModel()
+                .setSubset(CgmesSubset.STATE_VARIABLES)
+                .setId("sv-id-test1")
+                .setVersion(5)
+                .addDependentOn("tp-id-test1")
+                .addDependentOn("ssh-id-test1")
+                .addProfile("fakeProfile")
+                .setModelingAuthoritySet("fakeAuthority")
+                .add()
+                .add();
+        return network;
+    }
+
+    private Map<CgmesFileType, SweFileResource> getCgmesInputFiles() {
+        Map<CgmesFileType, SweFileResource> cgmesInputFiles = new EnumMap<>(CgmesFileType.class);
+
+        cgmesInputFiles.put(CgmesFileType.REE_EQ, new SweFileResource("REE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_EQ.xml")).toExternalForm()));
+        cgmesInputFiles.put(CgmesFileType.REE_TP, new SweFileResource("REE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_ES_TP.xml")).toExternalForm()));
+        cgmesInputFiles.put(CgmesFileType.REN_EQ, new SweFileResource("REN_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_EQ.xml")).toExternalForm()));
+        cgmesInputFiles.put(CgmesFileType.REN_TP, new SweFileResource("REN_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_PT_TP.xml")).toExternalForm()));
+        cgmesInputFiles.put(CgmesFileType.RTE_EQ, new SweFileResource("RTE_EQ.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_EQ.xml")).toExternalForm()));
+        cgmesInputFiles.put(CgmesFileType.RTE_TP, new SweFileResource("RTE_TP.xml", Objects.requireNonNull(getClass().getResource("/network/MicroGrid_SWE/network_FR_TP.xml")).toExternalForm()));
+        return cgmesInputFiles;
     }
 }
