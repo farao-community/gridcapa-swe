@@ -177,7 +177,7 @@ public class CgmesExportService {
         // As topology may differ for each TSO, TP files will be created only if the TSO has a Node Breaker topology
         Map<String, ByteArrayOutputStream> mapCgmesFiles = new HashMap<>(createSshTpFilesForAllTso(mergedNetwork, sweData, inputSshIds, outputSshIds, temporaryBoundariesDirectory));
         // Creation of the common SV file
-        mapCgmesFiles.putAll(createCommonFile(mergedNetwork, sweData, inputSshIds, outputSshIds));
+        mapCgmesFiles.putAll(createCommonFile(mergedNetwork, sweData, inputSshIds, outputSshIds, temporaryBoundariesDirectory));
         // Retrieving EQ files for each TSO
         retrieveEqFiles(sweData, mapCgmesFiles);
         // Retrieving TP files if not created
@@ -393,11 +393,13 @@ public class CgmesExportService {
     private Map<String, ByteArrayOutputStream> createCommonFile(Network network,
                                                                 SweData sweData,
                                                                 List<String> inputSshIds,
-                                                                List<String> outputSshIds) throws IOException {
+                                                                List<String> outputSshIds,
+                                                                Path temporaryBoundariesDirectory) throws IOException {
         LOGGER.info("Building SV file");
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             MemDataSource memDataSource = new MemDataSource();
             addSvMetadataExtension(network, inputSshIds, outputSshIds);
+            SV_FILE_EXPORT_PARAMS.put(CgmesImport.BOUNDARY_LOCATION, temporaryBoundariesDirectory.toString());
             network.write("CGMES", SV_FILE_EXPORT_PARAMS, memDataSource);
             final String filenameFromCgmesExport = network.getNameOrId() + "_SV.xml";
             os.write(memDataSource.getData(filenameFromCgmesExport));
